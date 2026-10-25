@@ -1,0 +1,869 @@
+<title>Dev Notes Vault</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: three-pane notebook — section tree | note | backlinks + local graph; graph view replaces the note pane */
+:root{
+  --bg:#f7f8fa; --panel:#ffffff; --fg:#1b2130; --muted:#6b7385; --line:#e3e6ec; --soft:#eef1f6;
+  --accent:#3b5bdb; --accent-soft:#e8edfb;
+  --c-java:#c77c1a; --c-spring:#2f9e5b; --c-db:#2b7fb8; --c-arch:#8a5cd6; --c-5:#c2466b; --c-6:#1f9a9a; --c-7:#7a7f2a; --c-tag:#9aa3b5;
+  --k0:#e8590c; --k1:#1c7ed6; --k2:#2b8a3e; --k3:#ae3ec9; --k4:#c2255c; --on-k:#ffffff; --warn:#c92a2a; --ok:#2f9e44; --unc:#e67700;
+  --code-bg:#f2f4f8; --kw:#8a3fb3; --str:#1f7a4d; --num:#b35c00; --cmt:#8b93a5; --ty:#2b6cb0;
+  --f-display:"Newsreader",Georgia,serif; --f-body:"IBM Plex Sans",system-ui,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141720; --panel:#1b1f2a; --fg:#e4e7ee; --muted:#8e97ab; --line:#2a2f3c; --soft:#222736;
+  --accent:#8aa4ff; --accent-soft:#273055;
+  --c-java:#e3a040; --c-spring:#5cc98a; --c-db:#5ea8e0; --c-arch:#b08cf0; --c-5:#f07aa0; --c-6:#4fc9c9; --c-7:#c3c870; --c-tag:#6d7689;
+  --k0:#ff922b; --k1:#4dabf7; --k2:#51cf66; --k3:#da77f2; --k4:#f06595; --on-k:#15181f; --warn:#ff6b6b; --ok:#69db7c; --unc:#ffa94d;
+  --code-bg:#11141b; --kw:#c792ea; --str:#8fd6a9; --num:#f0a860; --cmt:#6a7387; --ty:#82b1ff; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#141720; --panel:#1b1f2a; --fg:#e4e7ee; --muted:#8e97ab; --line:#2a2f3c; --soft:#222736;
+  --accent:#8aa4ff; --accent-soft:#273055;
+  --c-java:#e3a040; --c-spring:#5cc98a; --c-db:#5ea8e0; --c-arch:#b08cf0; --c-5:#f07aa0; --c-6:#4fc9c9; --c-7:#c3c870; --c-tag:#6d7689;
+  --k0:#ff922b; --k1:#4dabf7; --k2:#51cf66; --k3:#da77f2; --k4:#f06595; --on-k:#15181f; --warn:#ff6b6b; --ok:#69db7c; --unc:#ffa94d;
+  --code-bg:#11141b; --kw:#c792ea; --str:#8fd6a9; --num:#f0a860; --cmt:#6a7387; --ty:#82b1ff; color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--f-body);display:flex;flex-direction:column}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+a{color:var(--accent)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:12px;height:52px;background:var(--panel);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{font-family:var(--f-display);font-size:20px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.brand small{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:8px;font-weight:400}
+.search{flex:1;max-width:460px;position:relative}
+.search input{width:100%;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);padding:0 12px 0 34px;font:inherit;font-size:14px}
+.search svg{position:absolute;left:11px;top:9px;width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2}
+.results{position:absolute;top:38px;left:0;right:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.12);overflow:hidden;z-index:20}
+.results button{display:block;width:100%;text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
+.results button:last-child{border-bottom:0}
+.results button:hover{background:var(--soft)}
+.results .sec{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.tabs{display:flex;gap:4px;margin-left:auto}
+.tabs button{padding:6px 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted)}
+.tabs button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.menu{display:none;width:34px;height:34px;border-radius:7px}
+.menu:hover{background:var(--soft)}
+
+/* panes */
+.app{flex:1;display:grid;grid-template-columns:250px minmax(0,1fr) 300px;min-height:0}
+.side{border-right:1px solid var(--line);background:var(--panel);overflow:auto;padding:14px 10px 24px;padding-left:max(10px,env(safe-area-inset-left,0px))}
+.tree-tools{display:flex;gap:6px;margin:0 6px 8px}
+.tree-tools button{flex:1;padding:5px 8px;border:1px solid var(--line);border-radius:7px;font-size:12px;color:var(--muted);background:var(--bg)}
+.tree-tools button:hover{color:var(--accent);border-color:var(--accent)}
+.side .hd{display:flex;align-items:center;gap:7px;width:100%;text-align:left;border-radius:6px}
+.side .hd:hover{background:var(--soft)}
+.side .hd b{margin-left:auto;font-weight:400;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.side .hd i{border-radius:50%;background:var(--c);flex:none}
+.side .hd.sec{margin-top:6px;padding:7px 10px 7px 4px;font:500 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.side .hd.sec i{width:9px;height:9px}
+.side .hd.sub{padding:5px 10px 5px 18px;font:500 12.5px/1.2 var(--f-body);color:var(--fg)}
+.side .hd.sub i{width:7px;height:7px}
+.side .chev{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.side .hd[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.side button.n{display:block;width:100%;text-align:left;padding:5px 10px 5px 46px;border-radius:6px;font-size:13.5px;color:var(--fg)}
+.side button.n:hover{background:var(--soft)}
+.side button.n[aria-current="true"]{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.side .recent button.n{padding-left:25px}
+.side .recent .d{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:6px}
+
+.main{overflow:auto;min-width:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 60px}
+.note{max-width:68ch;margin:0 auto}
+.crumb{font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.crumb i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.note h1{font-family:var(--f-display);font-size:34px;line-height:1.15;font-weight:600;margin:8px 0 10px;text-wrap:balance;letter-spacing:-.015em}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:24px;font-size:12.5px;color:var(--muted)}
+.tag{font-family:var(--f-mono);font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--fg)}
+.tag:hover{background:var(--accent-soft);color:var(--accent)}
+.meta .learned{font-family:var(--f-mono);margin-left:auto}
+.body h2{font-family:var(--f-display);font-size:22px;font-weight:600;margin:30px 0 8px;letter-spacing:-.01em}
+.body h3{font-size:16px;margin:22px 0 6px}
+.body p,.body li{line-height:1.65}
+.body ul{padding-left:22px}
+.body li{margin:3px 0}
+.body code{font-family:var(--f-mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.body pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5;margin:12px 0}
+.body pre code{background:none;padding:0;font-size:inherit}
+.body blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--accent);background:var(--soft);border-radius:0 8px 8px 0;color:var(--fg)}
+.body table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto}
+.body th,.body td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+.body th{background:var(--soft);font-weight:500}
+a.wl{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft);cursor:pointer}
+a.wl:hover{border-bottom-color:var(--accent)}
+a.wl.missing{color:var(--muted);border-bottom:1px dashed var(--muted)}
+a.wl.missing::after{content:" †";font-size:.8em}
+.hljs-keyword,.hljs-meta{color:var(--kw)} .hljs-string{color:var(--str)} .hljs-number,.hljs-literal{color:var(--num)} .hljs-comment{color:var(--cmt);font-style:italic} .hljs-type,.hljs-title,.hljs-built_in{color:var(--ty)} .hljs-attr{color:var(--ty)}
+
+.right{border-left:1px solid var(--line);background:var(--panel);overflow:auto;padding:18px 16px;padding-right:max(16px,env(safe-area-inset-right,0px))}
+.right h4{margin:0 0 8px;font:500 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.right .block{margin-bottom:26px}
+.right ul{list-style:none;margin:0;padding:0}
+.right li button{display:block;width:100%;text-align:left;padding:5px 8px;border-radius:6px;font-size:13px}
+.right li button:hover{background:var(--soft)}
+.right li .sec{font-family:var(--f-mono);font-size:11px;color:var(--muted);display:block}
+.right .empty{font-size:13px;color:var(--muted)}
+.right svg{width:100%;height:200px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+
+/* graph view */
+.graph{display:none;flex-direction:column;min-width:0}
+.graph.on{display:flex}
+.gbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);font-size:13px;background:var(--panel);padding-left:max(16px,env(safe-area-inset-left,0px))}
+.gbar label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.gbar .lg{display:flex;gap:12px;margin-left:auto;color:var(--muted);font-family:var(--f-mono);font-size:11.5px}
+.gbar .shapes{margin-left:0}
+.gbar .shapes span::before{--c:var(--muted)}
+.gbar .shapes .sq::before{border-radius:1px}
+.gbar .shapes .dm::before{border-radius:1px;transform:rotate(45deg) scale(.85)}
+.gbar .shapes .tr::before{background:none;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid var(--muted);width:0;height:0;border-radius:0}
+.gbar .lg span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:-1px}
+.gbar .hint{width:100%;color:var(--muted);font-size:12px}
+.seg{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--bg)}
+.seg span{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 8px 0 6px}
+.seg button{padding:4px 10px;border-radius:6px;font-size:12.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:500}
+path.hull{pointer-events:none;stroke-width:1.2}
+path.hull.sec{fill-opacity:.07;stroke-opacity:.35}
+path.hull.sub{fill-opacity:.07;stroke-opacity:.45;stroke-dasharray:4 4}
+text.hlbl{font:600 11px var(--f-mono);letter-spacing:.12em;text-anchor:middle;opacity:.8;pointer-events:none}
+line.e.st{stroke-width:1;stroke-opacity:.35}
+line.e.spoke{stroke-opacity:.2;stroke-width:1}
+.nofolders line.e.st{display:none}
+line.e.agg{stroke-width:var(--w,2);stroke-opacity:.45}
+.nd.hub{stroke-width:2.5}
+text.lbl.hub{font-weight:600;font-size:12.5px}
+.gwrap{flex:1;position:relative;min-height:420px}
+.gwrap svg{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
+.gwrap svg:active{cursor:grabbing}
+.gwrap .tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:4px 9px;font-size:12.5px;box-shadow:0 4px 14px rgba(0,0,0,.12);display:none}
+text.lbl{font:11px var(--f-body);fill:var(--fg);pointer-events:none;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
+text.lbl.tg{font-family:var(--f-mono);font-size:10px;fill:var(--muted)}
+line.e{stroke:var(--muted);stroke-width:1;stroke-opacity:.16;transition:stroke-opacity .12s}
+#gsvg.focus line.e{stroke-opacity:.03}
+#gsvg.focus line.e.hi{stroke-opacity:1}
+#gsvg.edges-hover line.e{stroke-opacity:0}
+#gsvg.edges-hover.focus line.e.hi{stroke-opacity:1}
+line.e.tg{stroke-dasharray:3 3}
+line.e.hi{stroke:var(--accent);stroke-width:1.8}
+.nd{stroke:var(--panel);stroke-width:1.5;cursor:pointer}
+.nd.dim{opacity:.25}
+
+@media (max-width:1100px){ .app{grid-template-columns:230px minmax(0,1fr)} .right{display:none} .note .mob-right{display:block} }
+@media (max-width:760px){
+  .menu{display:block}
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{display:none;position:fixed;top:calc(52px + env(safe-area-inset-top,0px));bottom:0;left:0;width:min(84vw,300px);z-index:6;box-shadow:12px 0 30px rgba(0,0,0,.18)}
+  .side.open{display:block}
+  .brand small{display:none}
+  .note h1{font-size:28px}
+}
+.right .toc li button,.toc-inline .toc li button{padding:4px 10px;border-radius:0;border-left:2px solid var(--line);color:var(--muted);font-size:13px;line-height:1.35}
+.right .toc li.l3 button,.toc-inline .toc li.l3 button{padding-left:22px;font-size:12.5px}
+.right .toc li button:hover,.toc-inline .toc li button:hover{background:none;color:var(--fg)}
+.toc li button.on{color:var(--accent);border-left-color:var(--accent);font-weight:500}
+.toc{list-style:none;margin:0;padding:0}
+.toc li button{display:block;width:100%;text-align:left}
+.toc-inline{display:none;margin:0 0 22px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.toc-inline summary{cursor:pointer;font:500 11px/1.6 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc-inline[open] summary{margin-bottom:6px}
+@media (max-width:1100px){ .toc-inline{display:block} .toc-inline[hidden]{display:none} }
+/* animations */
+.anim{margin:18px 0 22px;border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+.anim-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;border-bottom:1px solid var(--line)}
+.anim-title{font:500 11px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:auto}
+.anim-ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.anim-ctl button{padding:4px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;background:var(--bg);color:var(--fg)}
+.anim-ctl button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.anim-ctl button:disabled{opacity:.45;cursor:default}
+.anim-ctl .anim-play{background:var(--accent-soft);color:var(--accent);border-color:transparent;font-weight:500;min-width:62px}
+.anim-sep{width:1px;height:18px;background:var(--line);margin:0 2px}
+.anim-stage{overflow-x:auto;background:var(--bg)}
+.anim-svg{display:block;width:100%;min-width:600px;height:auto}
+.anim-say{padding:9px 14px;font:12.5px/1.5 var(--f-mono);color:var(--fg);border-top:1px solid var(--line);min-height:2.6em}
+.an-box{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+.an-frame{fill:var(--soft);stroke:var(--line)}
+.an-frame.reb{stroke:var(--unc);stroke-dasharray:5 4}
+.an-frame.lead{stroke:var(--accent);stroke-width:1.6}
+.an-down{opacity:.4}
+.an-t{font:13px var(--f-body);fill:var(--fg)}
+.an-b{font-weight:600}
+.an-m{font:10.5px var(--f-mono);fill:var(--muted)}
+.an-on{fill:var(--on-k)}
+.an-warn{fill:var(--warn)}
+.an-lane{stroke:var(--line);stroke-dasharray:2 4}
+.an-cell-t,.an-dot-t{font:600 12px var(--f-mono);fill:var(--on-k);pointer-events:none}
+.an-cell,.an-dot{stroke:var(--panel);stroke-width:1}
+.k0{fill:var(--k0)} .k1{fill:var(--k1)} .k2{fill:var(--k2)} .k3{fill:var(--k3)} .k4{fill:var(--k4)} .knone{fill:var(--muted)}
+.an-dot.an-flow{fill:var(--accent)} .an-dot.an-ack{fill:var(--ok)}
+.an-log.done{fill:var(--muted);opacity:.35} .an-log.todo{fill:var(--k1)}
+.an-mark{fill:var(--fg)}
+.an-link{fill:none;stroke:var(--accent);stroke-opacity:.45;stroke-width:1.3} .an-link.dead{stroke:var(--warn);stroke-dasharray:3 3}
+.an-rcell.ok{fill:var(--ok)} .an-rcell.unc{fill:var(--unc)} .an-rcell.gone{opacity:.5}
+.an-hw{stroke:var(--fg);stroke-width:1.2;stroke-dasharray:6 4}
+.an-hwt{fill:var(--fg)}
+.mob-right{display:none;margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
+.mob-right h4{font:500 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.mob-right ul{list-style:none;margin:0 0 18px;padding:0}
+.mob-right li button{padding:4px 0;font-size:13.5px;color:var(--accent)}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+
+<header class="top">
+  <button class="menu" id="menu" aria-label="Toggle sections">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <div class="brand">Dev Notes <small>sarinzhan / dev-notes · 10 notes</small></div>
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" placeholder="Search notes, tags…" autocomplete="off" aria-label="Search notes">
+    <div class="results" id="results" hidden></div>
+  </div>
+  <nav class="tabs">
+    <button id="t-notes" aria-pressed="true">Notes</button>
+    <button id="t-graph" aria-pressed="false">Graph</button>
+  </nav>
+</header>
+
+<div class="app">
+  <aside class="side" id="side"></aside>
+  <main class="main" id="main"><article class="note" id="note"></article></main>
+  <section class="graph" id="graph">
+    <div class="gbar">
+      <div class="seg" role="group" aria-label="Depth"><span>Depth</span>
+        <button data-depth="1">1 · sections</button><button data-depth="2">2 · + subsections</button><button data-depth="3" aria-pressed="true">3 · + notes</button></div>
+      <label><input type="checkbox" id="g-folders"> Folder edges</label>
+      <label><input type="checkbox" id="g-hoveronly"> Links only on hover</label>
+      <label><input type="checkbox" id="g-tags"> Tags as nodes</label>
+      <label><input type="checkbox" id="g-labels" checked> Labels</label>
+      <div class="lg shapes"><span class="sq">section</span><span class="dm">subsection</span><span class="ci">note</span><span class="tr">tag</span></div>
+      <div class="lg" id="glegend"></div>
+      <div class="hint" id="ghint"></div>
+    </div>
+    <div class="gwrap"><svg id="gsvg" class="nofolders"></svg><div class="tip" id="gtip"></div></div>
+  </section>
+  <aside class="right" id="right"></aside>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+// ---- Data comes from notes.json + notes/**/*.md, generated by build.py
+const PALETTE=["var(--c-java)","var(--c-spring)","var(--c-db)","var(--c-arch)","var(--c-5)","var(--c-6)","var(--c-7)"];
+let SECTIONS={}, NOTES=[], byId={};
+const SHADES=["0%","white 32%","black 22%","white 55%"];
+function subColor(sec,sub){ const i=Object.keys(SECTIONS[sec].subs).indexOf(sub); const m=SHADES[i%SHADES.length]; return m==="0%"?SECTIONS[sec].c:`color-mix(in oklab, ${SECTIONS[sec].c}, ${m})`; }
+const FM=/^---\s*\n[\s\S]*?\n---\s*\n/;
+async function load(){
+  const data=await (await fetch("notes.json")).json();
+  SECTIONS=data.sections; Object.keys(SECTIONS).forEach((k,i)=>SECTIONS[k].c=PALETTE[i%PALETTE.length]);
+  NOTES=data.notes; byId=Object.fromEntries(NOTES.map(n=>[n.id,n]));
+  await Promise.all(NOTES.map(async n=>{ n.md=(await (await fetch(n.path)).text()).replace(FM,""); n.text=(n.title+" "+n.tags.join(" ")+" "+n.md).toLowerCase(); }));
+  document.getElementById("glegend").innerHTML=Object.entries(SECTIONS).map(([k,v])=>`<span style="--c:${v.c}">${v.name.toLowerCase()}</span>`).join("")+`<span style="--c:var(--c-tag)">tag</span>`;
+  document.querySelector(".brand small").textContent=`sarinzhan / dev-notes · ${NOTES.length} notes`;
+  boot();
+}
+// ---- derived data: index, links, backlinks, graph
+const WL = /\[\[([a-z0-9][a-z0-9-]*)(?:\|([^\]]+))?\]\]/g;
+const backlinks = id => NOTES.filter(n=>n.links.includes(id));
+
+// ---- markdown rendering with wikilinks
+marked.setOptions({ highlight:(code,lang)=> lang && hljs.getLanguage(lang) ? hljs.highlight(code,{language:lang}).value : hljs.highlightAuto(code).value });
+const renderer = { code(code,lang){ if(lang==="anim"){ const name=code.trim().replace(/[^a-z0-9-]/g,""); return `<div class="anim" data-anim="${name}"></div>`; } const l=lang&&hljs.getLanguage(lang)?lang:null; const h=l?hljs.highlight(code,{language:l}).value:hljs.highlightAuto(code).value; return `<pre><code class="hljs">${h}</code></pre>`; } };
+marked.use({renderer});
+function md(src){
+  // replace wikilinks only outside code (fenced blocks and inline spans)
+  const pre = src.split(/(```[\s\S]*?```|`[^`\n]*`)/g).map((part,i)=> i%2 ? part : part.replace(WL,(m,id,label)=>{ const ok=!!byId[id]; const text=label?label.trim():(ok?byId[id].title:id);
+    return `<a class="wl${ok?"":" missing"}" data-id="${id}" title="${ok?"Open note":"Note not written yet"}">${text}</a>`; })).join("");
+  return marked.parse(pre).replace(/src="assets\//g,'src="notes/assets/');
+}
+
+// ---- state + routing
+let current = null;
+const $ = s=>document.querySelector(s);
+function go(id){ if(!byId[id]) return; current=id; revealCurrent(); try{ history.replaceState(null,"",`#${id}`);}catch(e){} showNotes(); renderNote(); renderSide(); renderRight(); $("#main").scrollTop=0; }
+function openTag(tag){ $("#q").value="#"+tag; search(); $("#q").focus(); }
+
+// ---- sidebar tree: collapsible sections and subsections
+// open = set of "sec:<k>" / "sub:<k>/<sk>" keys; remembered per browser, current note's branch is always opened
+let openKeys=new Set();
+try{ const saved=JSON.parse(localStorage.getItem("dn-open")||"null"); if(Array.isArray(saved)) openKeys=new Set(saved); }catch(e){}
+function saveOpen(){ try{ localStorage.setItem("dn-open",JSON.stringify([...openKeys])); }catch(e){} }
+function revealCurrent(){ const n=byId[current]; if(!n) return; openKeys.add("sec:"+n.sec); openKeys.add("sub:"+n.sec+"/"+n.sub); }
+function allKeys(){ const keys=[]; for(const [k,s] of Object.entries(SECTIONS)){ keys.push("sec:"+k); for(const sk of Object.keys(s.subs)) keys.push("sub:"+k+"/"+sk); } return keys; }
+function setAll(expand){ openKeys=expand?new Set(allKeys()):new Set(); saveOpen(); renderSide(); }
+function toggleKey(key){ openKeys.has(key)?openKeys.delete(key):openKeys.add(key); saveOpen(); renderSide(); }
+const CHEV='<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg>';
+
+function renderSide(){
+  const side=$("#side"), top=side.scrollTop; let h="";
+  h+=`<div class="tree-tools"><button data-all="expand">Expand all</button><button data-all="collapse">Collapse all</button></div>`;
+  const recent=[...NOTES].sort((a,b)=>b.learned.localeCompare(a.learned)).slice(0,4);
+  const rOpen=!openKeys.has("recent-closed");
+  h+=`<div class="recent"><button class="hd sec" data-toggle="recent-closed" aria-expanded="${rOpen}">${CHEV}Recently learned</button>`+
+     (rOpen?recent.map(n=>`<button class="n" data-go="${n.id}">${n.title}<span class="d">${n.learned.slice(5)}</span></button>`).join(""):"")+`</div>`;
+  for(const [k,s] of Object.entries(SECTIONS)){
+    const all=NOTES.filter(n=>n.sec===k); if(!all.length) continue;
+    const sOpen=openKeys.has("sec:"+k);
+    h+=`<button class="hd sec" style="--c:${s.c}" data-toggle="sec:${k}" aria-expanded="${sOpen}">${CHEV}<i></i>${s.name}<b>${all.length}</b></button>`;
+    if(!sOpen) continue;
+    for(const [sk,sn] of Object.entries(s.subs)){
+      const list=all.filter(n=>n.sub===sk).sort((a,b)=>a.title.localeCompare(b.title)); if(!list.length) continue;
+      const key="sub:"+k+"/"+sk, subOpen=openKeys.has(key);
+      h+=`<button class="hd sub" style="--c:${subColor(k,sk)}" data-toggle="${key}" aria-expanded="${subOpen}">${CHEV}<i></i>${sn}<b>${list.length}</b></button>`;
+      if(subOpen) h+=list.map(n=>`<button class="n" data-go="${n.id}" aria-current="${n.id===current}">${n.title}</button>`).join("");
+    }
+  }
+  side.innerHTML=h; side.scrollTop=top;
+}
+function renderNote(){
+  stopAnims();
+  const n=byId[current]; const s=SECTIONS[n.sec];
+  const bl=backlinks(current);
+  $("#note").innerHTML=`
+    <div class="crumb"><i style="--c:${s.c}"></i>${s.name} <span>/</span> <i style="--c:${subColor(n.sec,n.sub)}"></i>${s.subs[n.sub]} <span>/</span> <span>${n.id}.md</span></div>
+    <h1>${n.title}</h1>
+    <div class="meta">${n.tags.map(t=>`<button class="tag" data-tag="${t}">#${t}</button>`).join("")}<span class="learned">learned ${n.learned}</span></div>
+    <details class="toc-inline" id="toc-inline"><summary>Contents</summary><ul class="toc"></ul></details>
+    <div class="body">${md(n.md)}</div>
+    <div class="mob-right">
+      <h4>Linked from</h4><ul>${bl.length?bl.map(b=>`<li><button data-go="${b.id}">${b.title}</button></li>`).join(""):'<li class="empty">No backlinks yet</li>'}</ul>
+    </div>`;
+  buildToc();
+  mountAnims($("#note"));
+}
+
+// ---- table of contents (H2 + H3 of the current note)
+let TOC=[];
+function slug(t){ return t.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"s"; }
+function buildToc(){
+  const seen={}; TOC=[];
+  $("#note .body").querySelectorAll("h2, h3").forEach(h=>{
+    let id="h-"+slug(h.textContent); if(seen[id]) id+="-"+(++seen[id]); else seen[id]=1;
+    h.id=id; TOC.push({id,text:h.textContent,level:h.tagName==="H3"?3:2});
+  });
+  const inline=$("#toc-inline");
+  if(TOC.length<2){ inline.hidden=true; return; }
+  inline.querySelector("ul").innerHTML=tocItems();
+}
+function tocItems(){ return TOC.map(t=>`<li class="l${t.level}"><button data-toc="${t.id}">${t.text}</button></li>`).join(""); }
+function scrollToHeading(id){
+  const main=$("#main"), el=document.getElementById(id); if(!el) return;
+  const top=main.scrollTop+el.getBoundingClientRect().top-main.getBoundingClientRect().top-12;
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  main.scrollTo({top,behavior:reduce?"auto":"smooth"});
+}
+function spyToc(){
+  if(!TOC.length) return;
+  const main=$("#main"), base=main.getBoundingClientRect().top+60; let active=TOC[0].id;
+  for(const t of TOC){ const el=document.getElementById(t.id); if(el && el.getBoundingClientRect().top<=base) active=t.id; else break; }
+  if(main.scrollTop+main.clientHeight>=main.scrollHeight-4) active=TOC[TOC.length-1].id;
+  document.querySelectorAll("[data-toc]").forEach(b=>b.classList.toggle("on",b.dataset.toc===active));
+}
+function renderRight(){
+  const n=byId[current]; const bl=backlinks(current); const out=n.links.map(id=>byId[id]).filter(Boolean);
+  $("#right").innerHTML=`
+    ${TOC.length>1?`<div class="block"><h4>Contents</h4><ul class="toc">${tocItems()}</ul></div>`:""}
+    <div class="block"><h4>Local graph</h4><svg id="lsvg"></svg></div>
+    <div class="block"><h4>Linked from · ${bl.length}</h4><ul>${bl.length?bl.map(b=>`<li><button data-go="${b.id}"><span class="sec">${b.sec}</span>${b.title}</button></li>`).join(""):'<li class="empty">Nothing links here yet.</li>'}</ul></div>
+    <div class="block"><h4>Links to · ${out.length}</h4><ul>${out.length?out.map(b=>`<li><button data-go="${b.id}"><span class="sec">${b.sec}</span>${b.title}</button></li>`).join(""):'<li class="empty">No outgoing links.</li>'}</ul></div>`;
+  drawLocal(); spyToc();
+}
+
+// ---- search
+function search(){
+  const q=$("#q").value.trim().toLowerCase(); const box=$("#results");
+  if(!q){ box.hidden=true; return; }
+  let hits;
+  if(q.startsWith("#")) hits=NOTES.filter(n=>n.tags.some(t=>t.includes(q.slice(1))));
+  else hits=NOTES.filter(n=>n.text.includes(q)).sort((a,b)=>(b.title.toLowerCase().includes(q))-(a.title.toLowerCase().includes(q)));
+  box.innerHTML=hits.length?hits.slice(0,8).map(n=>`<button data-go="${n.id}"><span class="sec">${SECTIONS[n.sec].name} · #${n.tags.join(" #")}</span><br>${n.title}</button>`).join(""):`<button disabled>No notes match "${q}"</button>`;
+  box.hidden=false;
+}
+$("#q").addEventListener("input",search);
+$("#q").addEventListener("keydown",e=>{ if(e.key==="Escape"){ $("#q").value=""; search(); } if(e.key==="Enter"){ const b=$("#results button[data-go]"); if(b) b.click(); } });
+document.addEventListener("click",e=>{ if(!e.target.closest(".search")) $("#results").hidden=true; });
+
+// ---- global click delegation
+document.addEventListener("click",e=>{
+  const tc=e.target.closest("[data-toc]"); if(tc){ scrollToHeading(tc.dataset.toc); return; }
+  const tg=e.target.closest("[data-toggle]"); if(tg){ toggleKey(tg.dataset.toggle); return; }
+  const al=e.target.closest("[data-all]"); if(al){ setAll(al.dataset.all==="expand"); return; }
+  const g=e.target.closest("[data-go]"); if(g){ go(g.dataset.go); $("#q").value=""; $("#side").classList.remove("open"); return; }
+  const w=e.target.closest("a.wl"); if(w){ e.preventDefault(); if(byId[w.dataset.id]) go(w.dataset.id); return; }
+  const t=e.target.closest("[data-tag]"); if(t){ openTag(t.dataset.tag); return; }
+});
+$("#main").addEventListener("scroll",()=>requestAnimationFrame(spyToc),{passive:true});
+$("#menu").addEventListener("click",()=>$("#side").classList.toggle("open"));
+
+// ---- views
+function showNotes(){ $("#graph").classList.remove("on"); $("#main").style.display=""; $("#t-notes").setAttribute("aria-pressed","true"); $("#t-graph").setAttribute("aria-pressed","false"); }
+function showGraph(){ $("#graph").classList.add("on"); $("#main").style.display="none"; $("#t-notes").setAttribute("aria-pressed","false"); $("#t-graph").setAttribute("aria-pressed","true"); drawGraph(); }
+$("#t-notes").onclick=showNotes; $("#t-graph").onclick=showGraph;
+$("#g-tags").onchange=drawGraph; $("#g-labels").onchange=drawGraph; $("#g-folders").onchange=()=>$("#gsvg").classList.toggle("nofolders",!$("#g-folders").checked); $("#g-hoveronly").onchange=()=>$("#gsvg").classList.toggle("edges-hover",$("#g-hoveronly").checked);
+
+// ---- graph data
+let depth=3;
+function colorOf(n){ if(n.kind==="tag") return "var(--c-tag)"; if(n.kind==="sec") return SECTIONS[n.sec].c; return subColor(n.sec,n.sub); }
+// Aggregate note→note wikilinks up to the chosen depth; structural edges connect section → subsection → note.
+function graphData(depth,withTags){
+  const nodes=[],edges=[],idx=new Map(); const add=n=>{ n.deg=0; nodes.push(n); idx.set(n.id,n); };
+  for(const [k,s] of Object.entries(SECTIONS)){
+    add({id:"sec:"+k,label:s.name,sec:k,kind:"sec",size:NOTES.filter(n=>n.sec===k).length});
+    if(depth>=2) for(const [sk,sn] of Object.entries(s.subs)){ add({id:"sub:"+k+"/"+sk,label:sn,sec:k,sub:sk,kind:"sub",size:NOTES.filter(n=>n.sec===k&&n.sub===sk).length}); edges.push({source:"sec:"+k,target:"sub:"+k+"/"+sk,kind:"st"}); }
+  }
+  if(depth>=3) NOTES.forEach(n=>{ add({id:n.id,label:n.title,sec:n.sec,sub:n.sub,kind:"note",size:1}); edges.push({source:"sub:"+n.sec+"/"+n.sub,target:n.id,kind:"st"}); edges.push({source:"sec:"+n.sec,target:n.id,kind:"st spoke"}); });
+  const bucket=n=>depth===3?n.id:depth===2?"sub:"+n.sec+"/"+n.sub:"sec:"+n.sec;
+  const agg=new Map();
+  NOTES.forEach(n=>n.links.forEach(l=>{ const t=byId[l]; if(!t) return; const a=bucket(n),b=bucket(t); if(a===b) return; const k=[a,b].sort().join("|"); agg.set(k,(agg.get(k)||0)+1); }));
+  agg.forEach((w,k)=>{ const [a,b]=k.split("|"); edges.push({source:a,target:b,kind:depth===3?"link":"agg",w}); });
+  if(withTags&&depth===3){ const tags=new Set(NOTES.flatMap(n=>n.tags)); tags.forEach(t=>add({id:"tag:"+t,label:"#"+t,kind:"tag",size:1}));
+    NOTES.forEach(n=>n.tags.forEach(t=>edges.push({source:n.id,target:"tag:"+t,kind:"tag"}))); }
+  edges.forEach(e=>{ idx.get(e.source).deg++; idx.get(e.target).deg++; });
+  return {nodes,edges};
+}
+let sim=null;
+function drawGraph(){
+  const svg=d3.select("#gsvg"); svg.selectAll("*").remove();
+  const W=svg.node().clientWidth||800,H=svg.node().clientHeight||500;
+  const {nodes,edges}=graphData(depth,$("#g-tags").checked); const labels=$("#g-labels").checked;
+  $("#g-tags").disabled=depth<3;
+  $("#ghint").textContent=depth===3?"Drag nodes, scroll to zoom, click a note to open it. Notes are grouped by section (solid outline), then by subsection (dashed). Faint lines are [[wikilinks]] between notes; hover a node to highlight its links. Tick Folder edges to also draw section → note lines.":
+    `Links between notes are rolled up to the ${depth===2?"subsection":"section"} level; thicker edge = more cross-links. Click a node to open its first note.`;
+  const g=svg.append("g");
+  svg.call(d3.zoom().scaleExtent([.4,3]).on("zoom",e=>g.attr("transform",e.transform)));
+  // Cluster anchors: sections on a ring around the centre, subsections on a smaller ring around their section.
+  const secKeys=Object.keys(SECTIONS), R=Math.min(W,H)*(depth===1?.22:.34), anchor={};
+  secKeys.forEach((k,i)=>{ const a=-Math.PI/2+i*2*Math.PI/secKeys.length; anchor["sec:"+k]={x:W/2+R*Math.cos(a),y:H/2+R*Math.sin(a),a};
+    const subs=Object.keys(SECTIONS[k].subs); subs.forEach((sk,j)=>{ const b=a+(j-(subs.length-1)/2)*0.9; const rr=depth===3?120:70; anchor["sub:"+k+"/"+sk]={x:anchor["sec:"+k].x+rr*Math.cos(b),y:anchor["sec:"+k].y+rr*Math.sin(b)}; }); });
+  const home=d=>d.kind==="sec"?anchor[d.id]:d.kind==="sub"?anchor[d.id]:d.kind==="note"?(anchor["sub:"+d.sec+"/"+d.sub]||anchor["sec:"+d.sec]):{x:W/2,y:H/2};
+  const hulls=g.append("g");
+  const hullGroups=[...secKeys.map(k=>({key:k,kind:"sec",c:SECTIONS[k].c,test:n=>n.sec===k&&n.kind!=="tag"})),
+    ...(depth===3?secKeys.flatMap(k=>Object.keys(SECTIONS[k].subs).map(sk=>({key:k+"/"+sk,kind:"sub",c:subColor(k,sk),test:n=>n.sec===k&&n.sub===sk&&n.kind!=="sec"}))):[])];
+  const hullPath=hulls.selectAll("path").data(hullGroups).join("path").attr("class",d=>"hull "+d.kind).attr("fill",d=>d.c).attr("stroke",d=>d.c);
+  const hullLabel=hulls.selectAll("text").data(hullGroups.filter(h=>h.kind==="sec")).join("text").attr("class","hlbl").attr("fill",d=>d.c).text(d=>SECTIONS[d.key].name.toUpperCase());
+  const pad=d=>d.kind==="sec"?34:22, curve=d3.line().curve(d3.curveCatmullRomClosed.alpha(.6));
+  function drawHulls(){
+    hullPath.attr("d",h=>{ const pts=nodes.filter(h.test); if(!pts.length) return null; const p=pad(h), raw=pts.flatMap(n=>[[n.x-p,n.y-p],[n.x+p,n.y-p],[n.x-p,n.y+p],[n.x+p,n.y+p]]); const hull=d3.polygonHull(raw); return hull?curve(hull):null; });
+    hullLabel.attr("x",h=>d3.mean(nodes.filter(h.test),n=>n.x)).attr("y",h=>d3.min(nodes.filter(h.test),n=>n.y)-pad(h)-8);
+  }
+  const wMax=d3.max(edges,e=>e.w||0)||1; // thickness 1–5px, square-root scaled to the busiest edge
+  const link=g.append("g").selectAll("line").data(edges).join("line").attr("class",d=>"e "+d.kind).style("--w",d=>d.w?(1+4*Math.sqrt(d.w/wMax)).toFixed(2)+"px":null);
+  // Strict size tiers by depth: section > subsection > note > tag (degree only nudges within a tier).
+  const r=d=>d.kind==="sec"?24:d.kind==="sub"?14:d.kind==="note"?6+Math.min(3,d.deg*.4):4;
+  const short=s=>s.length>26?s.slice(0,24)+"…":s;
+  const labelW=d=>short(d.label).length*(d.kind==="tag"?6:6.6)/2+6;
+  // Shape per depth: section = square, subsection = diamond, note = circle, tag = triangle
+  const SYM={sec:d3.symbolSquare,sub:d3.symbolDiamond,note:d3.symbolCircle,tag:d3.symbolTriangle};
+  const sym=d=>d3.symbol().type(SYM[d.kind]).size(Math.PI*r(d)*r(d)*(d.kind==="sub"?1.15:1))();
+  const node=g.append("g").selectAll("path").data(nodes).join("path").attr("class",d=>"nd"+(d.kind==="sec"||d.kind==="sub"?" hub":"")).attr("d",sym).attr("fill",colorOf)
+    .call(d3.drag().on("start",(e,d)=>{ if(!e.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; }).on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; }).on("end",(e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+  const lbl=labels?g.append("g").selectAll("text").data(nodes).join("text").attr("class",d=>"lbl"+(d.kind==="tag"?" tg":"")+(d.kind==="sec"||d.kind==="sub"?" hub":"")).text(d=>short(d.label)).attr("dy",d=>r(d)+13).attr("text-anchor","middle"):null;
+  const tip=$("#gtip"), neigh=new Map(); edges.forEach(e=>{ (neigh.get(e.source)||neigh.set(e.source,new Set()).get(e.source)).add(e.target); (neigh.get(e.target)||neigh.set(e.target,new Set()).get(e.target)).add(e.source); });
+  node.on("mouseenter",(ev,d)=>{ const ns=neigh.get(d.id)||new Set(); svg.classed("focus",true); node.classed("dim",o=>o!==d&&!ns.has(o.id)); link.classed("hi",l=>l.source.id===d.id||l.target.id===d.id); tip.textContent=d.label+(d.kind==="sec"||d.kind==="sub"?` · ${d.size} notes`:""); tip.style.display="block"; })
+      .on("mousemove",ev=>{ const b=svg.node().getBoundingClientRect(); tip.style.left=(ev.clientX-b.left+14)+"px"; tip.style.top=(ev.clientY-b.top+10)+"px"; })
+      .on("mouseleave",()=>{ svg.classed("focus",false); node.classed("dim",false); link.classed("hi",false); tip.style.display="none"; })
+      .on("click",(ev,d)=>{ if(d.kind==="note") go(d.id); else if(d.kind==="tag") openTag(d.id.slice(4)); else { const f=NOTES.find(n=>n.sec===d.sec&&(!d.sub||n.sub===d.sub)); if(f) go(f.id); } });
+  nodes.forEach(d=>{ const h=home(d); d.x=h.x+(Math.random()-.5)*60; d.y=h.y+(Math.random()-.5)*60; });
+  if(sim) sim.stop();
+  const dist=d=>d.kind==="tag"?110:d.kind==="st spoke"?200:d.kind==="st"?(depth===3?120:150):d.kind==="agg"?240:170;
+  sim=d3.forceSimulation(nodes)
+    .force("link",d3.forceLink(edges).id(d=>d.id).distance(dist).strength(d=>d.kind==="tag"?.15:d.kind==="st spoke"?.15:d.kind==="st"?.6:d.kind==="agg"?.1:.08))
+    .force("charge",d3.forceManyBody().strength(d=>d.kind==="tag"?-150:d.kind==="note"?-380:-600).distanceMax(320))
+    .force("x",d3.forceX(d=>home(d).x).strength(d=>d.kind==="sec"?.6:d.kind==="sub"?.45:d.kind==="note"?.28:.05))
+    .force("y",d3.forceY(d=>home(d).y).strength(d=>d.kind==="sec"?.6:d.kind==="sub"?.45:d.kind==="note"?.28:.05))
+    .force("collide",d3.forceCollide(d=>Math.max(r(d)+16,labels?labelW(d):0)).strength(.9).iterations(3))
+    .on("tick",()=>{ link.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y); node.attr("transform",d=>`translate(${d.x},${d.y})`); if(lbl) lbl.attr("x",d=>d.x).attr("y",d=>d.y); drawHulls(); });
+}
+document.querySelectorAll("[data-depth]").forEach(b=>b.onclick=()=>{ depth=+b.dataset.depth; document.querySelectorAll("[data-depth]").forEach(x=>x.setAttribute("aria-pressed",x===b)); drawGraph(); });
+function drawLocal(){
+  const svg=d3.select("#lsvg"); if(svg.empty()) return; svg.selectAll("*").remove();
+  const W=svg.node().clientWidth||260,H=200;
+  const n=byId[current]; const ids=new Set([current,...n.links.filter(l=>byId[l]),...backlinks(current).map(b=>b.id)]);
+  const nodes=[...ids].map(id=>({id,label:byId[id].title,sec:byId[id].sec,kind:"note",me:id===current}));
+  const edges=[]; NOTES.filter(x=>ids.has(x.id)).forEach(x=>x.links.forEach(l=>{ if(ids.has(l)&&(x.id===current||l===current)) edges.push({source:x.id,target:l}); }));
+  const link=svg.append("g").selectAll("line").data(edges).join("line").attr("class","e");
+  const node=svg.append("g").selectAll("circle").data(nodes).join("circle").attr("class","nd").attr("r",d=>d.me?9:6).attr("fill",colorOf)
+    .on("click",(e,d)=>{ if(!d.me) go(d.id); }).append("title").text(d=>d.label);
+  const circ=svg.selectAll("circle");
+  const lbl=svg.append("g").selectAll("text").data(nodes).join("text").attr("class","lbl").attr("text-anchor","middle").attr("dy",d=>(d.me?9:6)+11).text(d=>d.label.length>18?d.label.slice(0,16)+"…":d.label);
+  d3.forceSimulation(nodes).force("link",d3.forceLink(edges).id(d=>d.id).distance(85)).force("charge",d3.forceManyBody().strength(-320)).force("center",d3.forceCenter(W/2,H/2-8)).force("collide",d3.forceCollide(d=>Math.min(62,d.label.length*3.2+14)).iterations(3))
+    .on("tick",()=>{ const cx=x=>Math.max(14,Math.min(W-14,x)), cy=y=>Math.max(14,Math.min(H-22,y)); nodes.forEach(d=>{d.x=cx(d.x);d.y=cy(d.y);}); link.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y); circ.attr("cx",d=>d.x).attr("cy",d=>d.y); lbl.attr("x",d=>d.x).attr("y",d=>d.y); });
+}
+
+// ---- animations: ```anim <name>``` blocks in notes become live diagrams
+// Each entry in ANIMS mounts into a .anim element and returns { stop() }.
+const ANIMS = {};
+let liveAnims = [];
+function stopAnims(){ liveAnims.forEach(a=>{ try{ a.stop(); }catch(e){} }); liveAnims = []; }
+function mountAnims(root){
+  root.querySelectorAll(".anim[data-anim]").forEach(el=>{
+    const make = ANIMS[el.dataset.anim];
+    if(!make){ el.innerHTML = `<div class="anim-say">No animation named "${el.dataset.anim}".</div>`; return; }
+    liveAnims.push(make(el));
+  });
+}
+const SVGNS = "http://www.w3.org/2000/svg";
+function E(p, tag, attrs, text){
+  const e = document.createElementNS(SVGNS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(text != null) e.textContent = text;
+  p.appendChild(e); return e;
+}
+const easeIO = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+
+// Shell: title, Play/Pause, speed, custom buttons, an SVG stage and a narration line.
+function animShell(el, { title, vb, buttons = [] }){
+  el.innerHTML = `<div class="anim-head"><span class="anim-title">${title}</span><div class="anim-ctl"></div></div>
+    <div class="anim-stage"><svg class="anim-svg" viewBox="0 0 ${vb[0]} ${vb[1]}" role="img" aria-label="${title}"></svg></div>
+    <div class="anim-say" aria-live="polite"></div>`;
+  const ctl = el.querySelector(".anim-ctl"), svg = el.querySelector("svg"), sayEl = el.querySelector(".anim-say");
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const st = { playing: !reduce, speed: 1, visible: true };
+  const btns = {};
+  for(const b of buttons){
+    const x = document.createElement("button"); x.type = "button"; x.textContent = b.label;
+    x.addEventListener("click", ()=>{ b.on(); api.kick(); });
+    ctl.appendChild(x); btns[b.id] = x;
+  }
+  const sep = document.createElement("span"); sep.className = "anim-sep"; ctl.appendChild(sep);
+  const play = document.createElement("button"); play.type = "button"; play.className = "anim-play";
+  const speed = document.createElement("button"); speed.type = "button"; speed.textContent = "1×"; speed.title = "Speed";
+  ctl.append(play, speed);
+  const syncPlay = ()=>{ play.textContent = st.playing ? "Pause" : "Play"; play.setAttribute("aria-pressed", st.playing); };
+  play.addEventListener("click", ()=>{ st.playing = !st.playing; syncPlay(); });
+  speed.addEventListener("click", ()=>{ st.speed = st.speed === 1 ? 2 : st.speed === 2 ? .5 : 1; speed.textContent = st.speed + "×"; });
+  syncPlay();
+  let frame = null, raf = 0, last = 0, holdUntil = 0;
+  const io = "IntersectionObserver" in window ? new IntersectionObserver(es=>{ st.visible = es[0].isIntersecting; }) : null;
+  if(io) io.observe(el);
+  function loop(ts){
+    raf = requestAnimationFrame(loop);
+    const dt = Math.min(50, ts - (last || ts)); last = ts;
+    if(st.playing && st.visible && frame) frame(dt * st.speed);
+  }
+  raf = requestAnimationFrame(loop);
+  const api = {
+    svg, btns, st,
+    say(t, hold = 0){                                  // hold: ms during which routine messages may not replace this one
+      const now = performance.now();
+      if(!hold && now < holdUntil) return;
+      sayEl.textContent = t; holdUntil = hold ? now + hold / Math.max(1, st.speed) : 0;
+    },
+    onFrame(f){ frame = f; },
+    kick(){ if(frame) frame(0); },
+    stop(){ cancelAnimationFrame(raf); if(io) io.disconnect(); }
+  };
+  return api;
+}
+
+// Dots that travel from A to B and run a callback on arrival.
+function movers(){
+  const list = [];
+  return {
+    list,
+    add(m){ m.t = 0; list.push(m); },
+    update(dt){ for(let i = list.length - 1; i >= 0; i--){ const m = list[i]; m.t += dt; if(m.t >= m.dur){ list.splice(i, 1); if(m.done) m.done(); } } },
+    draw(g){
+      for(const m of list){
+        const k = easeIO(Math.min(1, m.t / m.dur)), x = m.x0 + (m.x1 - m.x0) * k, y = m.y0 + (m.y1 - m.y0) * k;
+        E(g, "circle", { cx: x, cy: y, r: m.r || 6, class: "an-dot " + (m.cls || "") });
+        if(m.label) E(g, "text", { x, y: y + 3.5, class: "an-dot-t", "text-anchor": "middle" }, m.label);
+      }
+    }
+  };
+}
+
+// ============ 1. Producer → partitions (keys, hashing, offsets, sticky partitioner)
+ANIMS["kafka-partitioning"] = el=>{
+  const KEYS = ["A", "B", "C", "D", "E"], P = 3, MAXC = 9;
+  const hash = k=>{ let x = 0; for(const c of k) x = (x * 31 + c.charCodeAt(0)) >>> 0; return x % P; };
+  const laneY = i => 64 + i * 84, cellX = j => 318 + j * 40;
+  const S = { useKeys: true, lanes: [[], [], []], next: [0, 0, 0], acc: 600, sticky: 0, left: 4 };
+  for(let i = 0; i < 11; i++){                         // prefill so the first frame already shows a log
+    const k = KEYS[i % KEYS.length === 0 ? 0 : (i * 7) % 5], p = hash(k), lane = S.lanes[p];
+    lane.push({ key: k, off: S.next[p]++, x: cellX(lane.length) });
+  }
+  const sh = animShell(el, { title: "Producer → partitions", vb: [720, 290], buttons: [
+    { id: "keys", label: "Keys: on", on(){
+      S.useKeys = !S.useKeys; sh.btns.keys.textContent = "Keys: " + (S.useKeys ? "on" : "off");
+      sh.say(S.useKeys ? "Keyed records: partition = hash(key) % 3. One key always lands on the same partition, so its records stay in order."
+                       : "No key: the sticky partitioner fills one batch on a partition, then switches to another. Even spread, no per-key order.", 3500);
+    }}
+  ]});
+  const mv = movers();
+  function emit(){
+    let key = null, p;
+    if(S.useKeys){ key = KEYS[Math.floor(Math.random() * KEYS.length)]; p = hash(key);
+      sh.say(`send(key="${key}")  →  hash("${key}") % 3 = ${p}  →  partition ${p}, offset ${S.next[p]}`); }
+    else { p = S.sticky; if(--S.left <= 0){ S.sticky = (S.sticky + 1) % P; S.left = 3 + Math.floor(Math.random() * 3); }
+      sh.say(`send(no key)  →  sticky partitioner adds it to the open batch for partition ${p}`); }
+    const lane = S.lanes[p], slot = Math.min(lane.length, MAXC);
+    mv.add({ x0: 150, y0: 148, x1: cellX(slot) + 17, y1: laneY(p), dur: 750, r: 11,
+      cls: key ? "k" + KEYS.indexOf(key) : "knone", label: key || "·",
+      done(){ lane.push({ key, off: S.next[p]++, x: cellX(lane.length) }); if(lane.length > MAXC) lane.shift(); } });
+  }
+  function render(){
+    const g = sh.svg; g.textContent = "";
+    E(g, "rect", { x: 14, y: 116, width: 136, height: 64, rx: 9, class: "an-box" });
+    E(g, "text", { x: 82, y: 144, class: "an-t", "text-anchor": "middle" }, "Producer");
+    E(g, "text", { x: 82, y: 163, class: "an-m", "text-anchor": "middle" }, S.useKeys ? "hash(key) % 3" : "sticky partitioner");
+    E(g, "rect", { x: 250, y: 16, width: 458, height: 262, rx: 10, class: "an-frame" });
+    E(g, "text", { x: 264, y: 34, class: "an-m" }, "topic \"orders\" · 3 partitions · offsets grow per partition");
+    for(let i = 0; i < P; i++){
+      const y = laneY(i);
+      E(g, "text", { x: 266, y: y + 4, class: "an-t an-b" }, "P" + i);
+      E(g, "line", { x1: 308, y1: y, x2: 700, y2: y, class: "an-lane" });
+      for(const c of S.lanes[i]){
+        E(g, "rect", { x: c.x, y: y - 15, width: 34, height: 30, rx: 5, class: "an-cell " + (c.key ? "k" + KEYS.indexOf(c.key) : "knone") });
+        E(g, "text", { x: c.x + 17, y: y + 4.5, class: "an-cell-t", "text-anchor": "middle" }, c.key || "·");
+        E(g, "text", { x: c.x + 17, y: y + 29, class: "an-m", "text-anchor": "middle" }, String(c.off));
+      }
+    }
+    mv.draw(g);
+  }
+  sh.onFrame(dt=>{
+    S.acc += dt; if(S.acc >= 1000){ S.acc -= 1000; emit(); }
+    mv.update(dt);
+    for(const lane of S.lanes) lane.forEach((c, j)=>{ c.x += (cellX(j) - c.x) * Math.min(1, dt / 140); });
+    render();
+  });
+  sh.say("Each record is routed to one partition and appended at that partition's next offset. Same key → same partition.");
+  sh.kick();
+  return sh;
+};
+
+// ============ 2. Consumer group: assignment, lag, rebalancing, crashes
+ANIMS["kafka-consumer-group"] = el=>{
+  const P = 6, WIN = 12, CAP = 2.6, MAXC = 7, PROD = 1;   // CAP = records/s one consumer can process, PROD = records/s per partition
+  const rowY = i => 50 + i * 44, consY = j => 46 + j * 38;
+  const S = { le: [], co: [], tmr: [], cons: [], nextId: 1, assign: new Map(), reb: 0, rebWhy: "", crash: null };
+  for(let i = 0; i < P; i++){ S.le[i] = 9 + i % 3; S.co[i] = S.le[i] - (i % 2) - 1; S.tmr[i] = 300 + i * 170; }
+  const addConsumer = ()=>{ const c = { id: S.nextId++, alive: true, carry: 0, rr: 0 }; S.cons.push(c); return c; };
+  addConsumer(); addConsumer();
+  function computeAssign(){                               // range assignor over consumers sorted by id
+    const alive = S.cons.filter(c=>c.alive).sort((a, b)=>a.id - b.id), n = alive.length, m = new Map();
+    let p = 0;
+    alive.forEach((c, j)=>{ const cnt = n ? Math.floor(P / n) + (j < P % n ? 1 : 0) : 0; m.set(c.id, Array.from({ length: cnt }, ()=>p++)); });
+    return m;
+  }
+  S.assign = computeAssign();
+  const sh = animShell(el, { title: "Consumer group: assignment, lag and rebalancing", vb: [720, 340], buttons: [
+    { id: "add", label: "+ Consumer", on(){ if(S.cons.length >= MAXC || S.reb > 0) return; const c = addConsumer(); rebalance(`C${c.id} joined the group`); } },
+    { id: "rem", label: "− Consumer", on(){
+      const alive = S.cons.filter(c=>c.alive); if(alive.length <= 1 || S.reb > 0) return;
+      const c = alive[alive.length - 1]; S.cons.splice(S.cons.indexOf(c), 1); rebalance(`C${c.id} left the group cleanly (LeaveGroup)`); } },
+    { id: "crash", label: "Crash one", on(){
+      const alive = S.cons.filter(c=>c.alive); if(alive.length <= 1 || S.reb > 0 || S.crash) return;
+      const c = alive[0]; c.alive = false; c.crashed = true; S.crash = { c, t: 2600 };
+      sh.say(`C${c.id} crashed. It stops polling and heartbeating, but the coordinator only notices after session.timeout.ms (45 s by default, shortened here). Its partitions are stuck meanwhile.`, 3500); } }
+  ]});
+  const mv = movers();
+  function rebalance(why){
+    S.reb = 1500; S.rebWhy = why;
+    sh.say(`${why} → rebalance. The coordinator revokes partitions and the group pauses consumption (eager protocol) until the new assignment is sent.`, 3000);
+  }
+  function finishRebalance(){
+    S.assign = computeAssign();
+    const parts = [...S.assign].map(([id, ps])=> `C${id}→${ps.length ? ps.map(p=>"P" + p).join(",") : "idle"}`).join("  ");
+    const n = S.cons.filter(c=>c.alive).length;
+    const note = n > P ? " More consumers than partitions: the extra one sits idle." :
+                 n * CAP < P * PROD ? " Throughput is lower than the produce rate, so lag keeps growing." : " The group can now keep up, so lag drains.";
+    sh.say(`Assignment (range): ${parts}.${note}`, 4500);
+  }
+  function owner(p){ for(const [id, ps] of S.assign) if(ps.includes(p)) return S.cons.find(c=>c.id === id); return null; }
+  function update(dt){
+    for(let i = 0; i < P; i++){ S.tmr[i] -= dt; if(S.tmr[i] <= 0){ S.le[i]++; S.tmr[i] += (600 + Math.random() * 800) / PROD; } }
+    if(S.crash){ S.crash.t -= dt; if(S.crash.t <= 0){ const c = S.crash.c; S.cons.splice(S.cons.indexOf(c), 1); S.crash = null; rebalance(`Session for C${c.id} timed out`); } }
+    if(S.reb > 0){ S.reb -= dt; if(S.reb <= 0){ S.reb = 0; finishRebalance(); } }
+    else for(const c of S.cons){
+      if(!c.alive) continue;
+      const ps = S.assign.get(c.id) || []; if(!ps.length) continue;
+      c.carry = Math.min(c.carry + CAP * dt / 1000, 3);
+      let guard = ps.length;
+      while(c.carry >= 1 && guard-- > 0){
+        const p = ps[c.rr++ % ps.length];
+        if(S.co[p] < S.le[p]){
+          S.co[p]++; c.carry -= 1; guard = ps.length;
+          const j = S.cons.indexOf(c);
+          mv.add({ x0: 330, y0: rowY(p), x1: 446, y1: consY(j) + 14, dur: 420, r: 4, cls: "an-flow" });
+        }
+      }
+    }
+    mv.update(dt);
+  }
+  function render(){
+    const g = sh.svg; g.textContent = "";
+    E(g, "text", { x: 16, y: 22, class: "an-m" }, "topic \"payments\" · 6 partitions · ~1 record/s each");
+    let total = 0;
+    for(let p = 0; p < P; p++){
+      const y = rowY(p), lag = S.le[p] - S.co[p]; total += lag;
+      E(g, "text", { x: 16, y: y + 4, class: "an-t an-b" }, "P" + p);
+      const base = S.le[p] - WIN;
+      for(let j = 0; j < WIN; j++){
+        const off = base + j; if(off < 0) continue;
+        E(g, "rect", { x: 46 + j * 19, y: y - 11, width: 17, height: 22, rx: 3, class: "an-log " + (off < S.co[p] ? "done" : "todo") });
+      }
+      const mx = 46 + Math.max(0, Math.min(WIN, S.co[p] - base)) * 19 - 1;
+      E(g, "path", { d: `M${mx - 5},${y + 17} L${mx + 5},${y + 17} L${mx},${y + 11} Z`, class: "an-mark" });
+      E(g, "text", { x: 282, y: y + 4, class: "an-m" + (lag > 8 ? " an-warn" : "") }, "lag " + lag);
+    }
+    E(g, "text", { x: 46, y: 318, class: "an-m" }, "▲ committed offset · grey: read · blue: waiting");
+    E(g, "rect", { x: 426, y: 16, width: 284, height: 300, rx: 10, class: "an-frame" + (S.reb > 0 ? " reb" : "") });
+    E(g, "text", { x: 440, y: 34, class: "an-m" }, S.reb > 0 ? "consumer group \"billing\" · REBALANCING…" : "consumer group \"billing\"");
+    S.cons.forEach((c, j)=>{
+      const cy = consY(j), ps = S.assign.get(c.id) || [];
+      if(S.reb === 0 || !c.alive) for(const p of ps) E(g, "path", {
+        d: `M330,${rowY(p)} C388,${rowY(p)} 388,${cy + 14} 446,${cy + 14}`, class: "an-link" + (c.alive ? "" : " dead") });
+      E(g, "rect", { x: 446, y: cy, width: 250, height: 28, rx: 6, class: "an-box" + (c.alive ? "" : " an-down") });
+      E(g, "text", { x: 458, y: cy + 18, class: "an-t an-b" }, "C" + c.id);
+      const label = !c.alive ? "no heartbeat…" : S.reb > 0 ? "waiting for assignment" : ps.length ? ps.map(p=>"P" + p).join("  ") : "idle (no partition)";
+      E(g, "text", { x: 490, y: cy + 18, class: "an-m" }, label);
+    });
+    E(g, "text", { x: 440, y: 332, class: "an-m" + (total > 30 ? " an-warn" : "") },
+      `lag ${total} · reads ${(S.cons.filter(c=>c.alive).length * CAP).toFixed(1)}/s · incoming ${P * PROD}/s`);
+    mv.draw(g);
+    const alive = S.cons.filter(c=>c.alive).length;
+    sh.btns.add.disabled = S.cons.length >= MAXC || S.reb > 0;
+    sh.btns.rem.disabled = alive <= 1 || S.reb > 0;
+    sh.btns.crash.disabled = alive <= 1 || S.reb > 0 || !!S.crash;
+  }
+  sh.onFrame(dt=>{ update(dt); render(); });
+  sh.say("Two consumers share six partitions. Each partition is read by exactly one consumer in the group. Try adding a consumer, removing one, or crashing one.");
+  sh.kick();
+  return sh;
+};
+
+// ============ 3. Replication: leader, followers, ISR, high watermark, acks, failover
+ANIMS["kafka-replication"] = el=>{
+  const ROWS = 10, bx = i => 168 + i * 182, cellY = (off, base) => 76 + (off - base) * 21;
+  const S = { b: [0, 1, 2].map(i=>({ id: i + 1, alive: true, inIsr: true, log: [], fetching: false })),
+              leader: 0, hw: 0, acks: "all", seq: 1, acc: 900, pending: [], acked: new Set(), queue: [], elect: 0 };
+  for(let i = 0; i < 5; i++){ const e = { off: i, id: S.seq++ }; S.b.forEach(b=>b.log.push({ ...e })); S.acked.add(e.id); }
+  S.hw = 5;
+  const sh = animShell(el, { title: "Replication: leader, ISR, high watermark", vb: [720, 340], buttons: [
+    { id: "acks", label: "acks=all", on(){
+      S.acks = S.acks === "all" ? "1" : "all"; sh.btns.acks.textContent = "acks=" + S.acks;
+      sh.say(S.acks === "1" ? "acks=1: the leader confirms as soon as it has written the record. Faster, but a record can be acked before any follower has it (followers fetch every ~2 s here). Kill the leader now."
+                            : "acks=all: the leader confirms only after every in-sync replica has the record (the high watermark has passed it).", 3500); } },
+    { id: "kill", label: "Kill leader", on(){ killLeader(); } },
+    { id: "restart", label: "Restart broker", on(){ restart(); } }
+  ]});
+  const mv = movers();
+  const L = ()=> S.leader == null ? null : S.b[S.leader];
+  function send(id){
+    const l = L(); if(!l){ S.queue.push(id); return; }
+    const target = S.leader;
+    mv.add({ x0: 132, y0: 166, x1: bx(target) + 24, y1: 60, dur: 480, r: 7, cls: "an-flow", done(){
+      const b = S.b[target];
+      if(!b.alive || S.leader !== target){ sh.say(`send of m${id} to Broker ${b.id} failed → producer refreshes metadata and retries`); S.queue.push(id); return; }
+      const off = b.log.length; b.log.push({ off, id });
+      if(S.acks === "1") ack(off, id); else S.pending.push({ off, id });
+    }});
+  }
+  function ack(off, id){
+    const l = L(); if(!l) return;
+    mv.add({ x0: bx(S.leader) + 24, y0: 52, x1: 132, y1: 150, dur: 420, r: 5, cls: "an-ack", done(){
+      S.acked.add(id);
+      sh.say(S.acks === "1" ? `ack m${id} at offset ${off}: written on the leader only` : `ack m${id} at offset ${off}: on every in-sync replica, so it is committed`);
+    }});
+  }
+  function killLeader(){
+    const l = L(); if(!l || S.b.filter(b=>b.alive).length <= 1) return;
+    l.alive = false; l.inIsr = false; l.fetching = false; S.leader = null; S.elect = 1000;
+    sh.say(`Broker ${l.id} (the leader) crashed. Writes stop until the controller elects a new leader from the ISR.`, 3000);
+  }
+  function elect(){
+    const cands = S.b.filter(b=>b.alive && b.inIsr).sort((a, b)=>b.log.length - a.log.length);
+    const nl = cands[0] || S.b.find(b=>b.alive); if(!nl) return;
+    S.leader = S.b.indexOf(nl);
+    const old = S.b.find(b=>!b.alive && b.log.length > nl.log.length);
+    const lost = old ? old.log.slice(nl.log.length).filter(e=>S.acked.has(e.id)) : [];
+    for(const b of S.b) if(b.alive && b !== nl && b.log.length > nl.log.length) b.log.length = nl.log.length;
+    S.pending = S.pending.filter(p=>{ if(p.off < nl.log.length) return true; S.queue.push(p.id); return false; });
+    sh.say(lost.length
+      ? `⚠ Broker ${nl.id} is the new leader, but ${lost.map(e=>"m" + e.id).join(", ")} were acked with acks=1 and never reached it. Those records are lost.`
+      : `Controller elected Broker ${nl.id} from the ISR. Every acked record is on it, so nothing committed is lost. Unacked sends are retried.`, 6000);
+    const q = S.queue.splice(0); q.forEach(send);
+  }
+  function restart(){
+    const d = S.b.find(b=>!b.alive); if(!d) return;
+    d.alive = true; d.inIsr = false; d.fetching = false;
+    const cut = d.log.length - S.hw; if(cut > 0) d.log.length = S.hw;
+    sh.say(`Broker ${d.id} restarts as a follower, truncates its log to the high watermark (offset ${S.hw})${cut > 0 ? `, dropping ${cut} uncommitted record${cut > 1 ? "s" : ""}` : ""}, then catches up from the leader.`, 4500);
+  }
+  function update(dt){
+    S.acc += dt; if(S.acc >= 1700){ S.acc -= 1700; send(S.seq++); }
+    if(S.elect > 0){ S.elect -= dt; if(S.elect <= 0){ S.elect = 0; elect(); } }
+    const l = L();
+    if(l) for(const f of S.b){
+      if(f === l || !f.alive || f.fetching) continue;
+      f.wait = (f.wait || 0) - dt;
+      if(f.log.length >= l.log.length || f.wait > 0) continue;
+      // a fetch copies every record the follower is missing; with acks=1 followers fetch every ~2 s here
+      f.fetching = true;
+      const from = S.leader, batch = l.log.slice(f.log.length), base = viewBase(), first = batch[0];
+      mv.add({ x0: bx(from) + 132, y0: cellY(first.off, base) + 9, x1: bx(S.b.indexOf(f)) + 20, y1: cellY(first.off, base) + 9,
+        dur: f.inIsr ? 480 : 260, r: batch.length > 1 ? 9 : 5, cls: "an-flow", label: batch.length > 1 ? String(batch.length) : null, done(){
+          f.fetching = false; f.wait = S.acks === "1" && f.inIsr ? 2000 : 0;
+          if(!(f.alive && S.leader === from && S.b[from].alive)) return;
+          for(const e of batch) if(f.log.length === e.off) f.log.push({ ...e });
+          if(!f.inIsr && f.log.length === S.b[from].log.length){ f.inIsr = true; sh.say(`Broker ${f.id} caught up with the leader and is back in the ISR.`, 3000); }
+        }});
+    }
+    if(l){
+      const isr = S.b.filter(b=>b.alive && (b.inIsr || b === l));
+      S.hw = Math.max(S.hw, Math.min(...isr.map(b=>b.log.length)));
+      S.pending = S.pending.filter(p=>{ if(p.off < S.hw){ ack(p.off, p.id); return false; } return true; });
+    }
+    mv.update(dt);
+  }
+  function viewBase(){ return Math.max(0, Math.max(...S.b.map(b=>b.log.length)) - ROWS); }
+  function render(){
+    const g = sh.svg; g.textContent = ""; const base = viewBase();
+    E(g, "rect", { x: 12, y: 132, width: 120, height: 66, rx: 9, class: "an-box" });
+    E(g, "text", { x: 72, y: 160, class: "an-t", "text-anchor": "middle" }, "Producer");
+    E(g, "text", { x: 72, y: 179, class: "an-m", "text-anchor": "middle" }, "acks=" + S.acks);
+    S.b.forEach((b, i)=>{
+      const x = bx(i), isL = S.leader === i;
+      E(g, "rect", { x, y: 16, width: 168, height: 290, rx: 10, class: "an-frame" + (b.alive ? "" : " an-down") + (isL ? " lead" : "") });
+      E(g, "text", { x: x + 14, y: 36, class: "an-t an-b" }, "Broker " + b.id);
+      E(g, "text", { x: x + 14, y: 54, class: "an-m" + (b.alive ? "" : " an-warn") },
+        !b.alive ? "down" : isL ? "leader of P0" : b.inIsr ? "follower · in ISR" : "follower · catching up");
+      for(const e of b.log){
+        if(e.off < base) continue;
+        const y = cellY(e.off, base), committed = e.off < S.hw;
+        E(g, "rect", { x: x + 20, y, width: 112, height: 17, rx: 3, class: "an-rcell" + (committed ? " ok" : " unc") + (b.alive ? "" : " gone") });
+        E(g, "text", { x: x + 28, y: y + 12.5, class: "an-m an-on" }, `${e.off}`);
+        E(g, "text", { x: x + 126, y: y + 12.5, class: "an-m an-on", "text-anchor": "end" }, "m" + e.id + (S.acked.has(e.id) ? " ✓" : ""));
+      }
+    });
+    if(S.hw > base){
+      const y = cellY(S.hw, base) - 2;
+      E(g, "line", { x1: 160, y1: y, x2: 684, y2: y, class: "an-hw" });
+      E(g, "text", { x: 706, y: y + 4, class: "an-m an-hwt", "text-anchor": "end" }, "HW");
+    }
+    const isr = S.b.filter(b=>b.alive && (b.inIsr || S.leader === S.b.indexOf(b))).map(b=>b.id);
+    E(g, "text", { x: 168, y: 328, class: "an-m" },
+      `ISR = {${isr.join(", ")}} · leader = ${S.leader == null ? "electing…" : "Broker " + L().id} · HW (high watermark) = ${S.hw}: consumers read below it`);
+    mv.draw(g);
+    sh.btns.kill.disabled = S.leader == null || S.b.filter(b=>b.alive).length <= 1;
+    sh.btns.restart.disabled = !S.b.some(b=>!b.alive);
+  }
+  sh.onFrame(dt=>{ update(dt); render(); });
+  sh.say("The producer writes to the leader; followers fetch from it. A record is committed once every in-sync replica has it. Try acks=1, then kill the leader.");
+  sh.kick();
+  return sh;
+};
+
+// ---- boot
+function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
+  window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
+load();
+window.addEventListener("resize",()=>{ if($("#graph").classList.contains("on")) drawGraph(); });
+</script>

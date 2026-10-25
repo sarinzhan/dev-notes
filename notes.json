@@ -1,0 +1,2608 @@
+{
+ "sections": {
+  "java": {
+   "name": "Java",
+   "subs": {
+    "core": "Core language",
+    "collections": "Collections",
+    "streams": "Streams & functional",
+    "io": "IO & NIO",
+    "concurrency": "Concurrency",
+    "jvm": "JVM & GC",
+    "jdbc": "JDBC & pools"
+   }
+  },
+  "spring": {
+   "name": "Spring",
+   "subs": {
+    "core": "Core & AOP",
+    "boot": "Boot",
+    "web": "Web & REST",
+    "data": "Data & transactions",
+    "security": "Security",
+    "kafka": "Kafka",
+    "testing": "Testing",
+    "resources": "Resources"
+   }
+  },
+  "databases": {
+   "name": "Databases",
+   "subs": {
+    "relational": "Relational",
+    "nosql": "NoSQL"
+   }
+  },
+  "messaging": {
+   "name": "Messaging",
+   "subs": {
+    "kafka": "Kafka",
+    "rabbitmq": "RabbitMQ & ActiveMQ"
+   }
+  },
+  "architecture": {
+   "name": "Architecture",
+   "subs": {
+    "principles": "Principles & DDD",
+    "patterns": "Design patterns",
+    "messaging": "Messaging & reliability",
+    "resources": "Resources"
+   }
+  },
+  "devops": {
+   "name": "DevOps",
+   "subs": {
+    "linux": "Linux",
+    "docker": "Docker",
+    "git": "Git",
+    "build": "Build tools",
+    "observability": "Observability",
+    "resources": "Resources"
+   }
+  }
+ },
+ "notes": [
+  {
+   "id": "idempotency",
+   "sec": "architecture",
+   "sub": "messaging",
+   "title": "Idempotent consumers and APIs",
+   "tags": [
+    "reliability",
+    "kafka",
+    "api-design",
+    "redis"
+   ],
+   "learned": "2026-09-05",
+   "path": "notes/architecture/messaging/idempotency.md",
+   "links": [
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "redis-data-structures",
+    "spring-kafka-consumer"
+   ],
+   "words": 171
+  },
+  {
+   "id": "outbox-pattern",
+   "sec": "architecture",
+   "sub": "messaging",
+   "title": "Transactional outbox pattern",
+   "tags": [
+    "messaging",
+    "kafka",
+    "reliability",
+    "postgres"
+   ],
+   "learned": "2026-08-20",
+   "path": "notes/architecture/messaging/outbox-pattern.md",
+   "links": [
+    "idempotency",
+    "postgres-indexes",
+    "spring-transactional"
+   ],
+   "words": 172
+  },
+  {
+   "id": "behavioral-patterns",
+   "sec": "architecture",
+   "sub": "patterns",
+   "title": "Behavioral design patterns",
+   "tags": [
+    "design-patterns",
+    "behavioral",
+    "strategy",
+    "observer",
+    "state"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/architecture/patterns/behavioral-patterns.md",
+   "links": [
+    "creational-patterns",
+    "ddd-basics",
+    "executors-and-thread-pools",
+    "functional-interfaces",
+    "iterators-and-fail-fast",
+    "java-nio",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "rabbitmq-basics",
+    "solid",
+    "spring-bean-lifecycle",
+    "spring-kafka-consumer",
+    "spring-mvc-request-lifecycle",
+    "spring-security-basics",
+    "stream-api",
+    "structural-patterns",
+    "threads-basics"
+   ],
+   "words": 758
+  },
+  {
+   "id": "creational-patterns",
+   "sec": "architecture",
+   "sub": "patterns",
+   "title": "Creational design patterns",
+   "tags": [
+    "design-patterns",
+    "creational",
+    "singleton",
+    "builder",
+    "factory"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/architecture/patterns/creational-patterns.md",
+   "links": [
+    "behavioral-patterns",
+    "executors-and-thread-pools",
+    "hikaricp-pool-sizing",
+    "immutable-objects",
+    "iterators-and-fail-fast",
+    "java-memory-model",
+    "solid",
+    "spring-bean-lifecycle",
+    "spring-bean-scopes-and-configuration",
+    "spring-ioc-and-di",
+    "structural-patterns"
+   ],
+   "words": 680
+  },
+  {
+   "id": "structural-patterns",
+   "sec": "architecture",
+   "sub": "patterns",
+   "title": "Structural design patterns",
+   "tags": [
+    "design-patterns",
+    "structural",
+    "adapter",
+    "decorator",
+    "proxy"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/architecture/patterns/structural-patterns.md",
+   "links": [
+    "behavioral-patterns",
+    "creational-patterns",
+    "equals-and-hashcode",
+    "idempotency",
+    "java-io-streams",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "kafka-producer",
+    "primitives-and-wrappers",
+    "solid",
+    "spring-aop",
+    "spring-mvc-request-lifecycle",
+    "spring-transactional",
+    "strings-and-string-pool"
+   ],
+   "words": 692
+  },
+  {
+   "id": "ddd-basics",
+   "sec": "architecture",
+   "sub": "principles",
+   "title": "DDD basics and the architecture vocabulary",
+   "tags": [
+    "ddd",
+    "architecture",
+    "aggregates",
+    "design-principles"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/architecture/principles/ddd-basics.md",
+   "links": [
+    "architecture-resources",
+    "behavioral-patterns",
+    "creational-patterns",
+    "docker-swarm",
+    "idempotency",
+    "immutable-objects",
+    "jpa-entities-and-relationships",
+    "jpa-n-plus-one",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "kafka-architecture",
+    "outbox-pattern",
+    "rabbitmq-basics",
+    "solid",
+    "spring-data-repositories",
+    "structural-patterns"
+   ],
+   "words": 845
+  },
+  {
+   "id": "solid",
+   "sec": "architecture",
+   "sub": "principles",
+   "title": "SOLID principles",
+   "tags": [
+    "solid",
+    "design-principles",
+    "oop",
+    "architecture"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/architecture/principles/solid.md",
+   "links": [
+    "behavioral-patterns",
+    "class-relationships",
+    "collections-framework",
+    "creational-patterns",
+    "ddd-basics",
+    "oop-principles",
+    "spring-bean-lifecycle",
+    "spring-data-repositories",
+    "spring-ioc-and-di",
+    "structural-patterns",
+    "testing-types-and-dev-cycles"
+   ],
+   "words": 659
+  },
+  {
+   "id": "architecture-resources",
+   "sec": "architecture",
+   "sub": "resources",
+   "title": "Architecture and system design resources",
+   "tags": [
+    "resources",
+    "system-design",
+    "software-design",
+    "architecture"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/architecture/resources/architecture-resources.md",
+   "links": [
+    "database-indexes",
+    "ddd-basics",
+    "devops-resources",
+    "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "outbox-pattern",
+    "postgres-indexes",
+    "rabbitmq-basics",
+    "redis-data-structures",
+    "solid",
+    "spring-cache-abstraction",
+    "spring-resources",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 495
+  },
+  {
+   "id": "redis-data-structures",
+   "sec": "databases",
+   "sub": "nosql",
+   "title": "Redis data structures cheat sheet",
+   "tags": [
+    "redis",
+    "cache",
+    "nosql"
+   ],
+   "learned": "2026-10-19",
+   "path": "notes/databases/nosql/redis-data-structures.md",
+   "links": [
+    "idempotency",
+    "kafka-architecture",
+    "spring-cache-abstraction"
+   ],
+   "words": 304
+  },
+  {
+   "id": "constraints-and-relationships",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Constraints and table relationships",
+   "tags": [
+    "sql",
+    "constraints",
+    "foreign-keys",
+    "schema-design"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/relational/constraints-and-relationships.md",
+   "links": [
+    "database-indexes",
+    "idempotency",
+    "jpa-entities-and-relationships",
+    "normalization-and-denormalization"
+   ],
+   "words": 1047
+  },
+  {
+   "id": "database-fundamentals",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Databases, DBMS, relational vs NoSQL, and views",
+   "tags": [
+    "databases",
+    "sql",
+    "fundamentals",
+    "views"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/relational/database-fundamentals.md",
+   "links": [
+    "constraints-and-relationships",
+    "database-indexes",
+    "hikaricp-pool-sizing",
+    "jpa-entities-and-relationships",
+    "normalization-and-denormalization",
+    "postgres-indexes",
+    "postgres-isolation-levels",
+    "redis-data-structures",
+    "sql-joins-and-commands",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 999
+  },
+  {
+   "id": "database-indexes",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Database indexes: how they work and when they hurt",
+   "tags": [
+    "databases",
+    "indexes",
+    "performance",
+    "b-tree"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/relational/database-indexes.md",
+   "links": [
+    "constraints-and-relationships",
+    "jpa-n-plus-one",
+    "postgres-indexes",
+    "sql-joins-and-commands"
+   ],
+   "words": 1004
+  },
+  {
+   "id": "normalization-and-denormalization",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Normal forms and denormalization",
+   "tags": [
+    "databases",
+    "schema-design",
+    "normalization",
+    "sql"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/relational/normalization-and-denormalization.md",
+   "links": [
+    "constraints-and-relationships",
+    "database-fundamentals",
+    "database-indexes",
+    "outbox-pattern",
+    "spring-data-repositories",
+    "spring-transactional"
+   ],
+   "words": 765
+  },
+  {
+   "id": "postgres-indexes",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Postgres index types and when to use them",
+   "tags": [
+    "postgres",
+    "performance",
+    "indexes"
+   ],
+   "learned": "2026-08-29",
+   "path": "notes/databases/relational/postgres-indexes.md",
+   "links": [
+    "outbox-pattern",
+    "postgres-isolation-levels"
+   ],
+   "words": 167
+  },
+  {
+   "id": "postgres-isolation-levels",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Transaction isolation levels in Postgres",
+   "tags": [
+    "postgres",
+    "transactions",
+    "concurrency",
+    "mvcc"
+   ],
+   "learned": "2026-09-12",
+   "path": "notes/databases/relational/postgres-isolation-levels.md",
+   "links": [
+    "idempotency",
+    "postgres-indexes",
+    "spring-transactional"
+   ],
+   "words": 218
+  },
+  {
+   "id": "sql-joins-and-commands",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "SQL command categories and join types",
+   "tags": [
+    "sql",
+    "joins",
+    "ddl",
+    "dml"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/relational/sql-joins-and-commands.md",
+   "links": [
+    "constraints-and-relationships",
+    "database-indexes",
+    "jpa-n-plus-one",
+    "normalization-and-denormalization",
+    "postgres-indexes",
+    "spring-transactional",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 854
+  },
+  {
+   "id": "transactions-acid-and-isolation",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Transactions, ACID and isolation anomalies",
+   "tags": [
+    "transactions",
+    "acid",
+    "isolation",
+    "concurrency"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/relational/transactions-acid-and-isolation.md",
+   "links": [
+    "concurrency-hazards",
+    "constraints-and-relationships",
+    "idempotency",
+    "jpa-locking",
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "spring-transactional",
+    "sql-joins-and-commands"
+   ],
+   "words": 985
+  },
+  {
+   "id": "maven",
+   "sec": "devops",
+   "sub": "build",
+   "title": "Maven build lifecycle and dependency management",
+   "tags": [
+    "maven",
+    "build",
+    "dependencies",
+    "java"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/build/maven.md",
+   "links": [
+    "docker-socket-dind-dood",
+    "dockerfile-and-images",
+    "git-commands",
+    "spring-boot-starters-and-autoconfiguration",
+    "testing-types-and-dev-cycles"
+   ],
+   "words": 962
+  },
+  {
+   "id": "docker-containers-and-resources",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker containers, resources, restart policies and logs",
+   "tags": [
+    "docker",
+    "cgroups",
+    "healthcheck",
+    "restart-policy",
+    "logging"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/docker/docker-containers-and-resources.md",
+   "links": [
+    "docker-fundamentals",
+    "docker-swarm",
+    "dockerfile-and-images",
+    "executors-and-thread-pools",
+    "fork-join-framework",
+    "garbage-collection",
+    "hikaricp-pool-sizing",
+    "jvm-memory-areas",
+    "linux-architecture-and-kernel",
+    "linux-memory-filesystems-io",
+    "linux-processes",
+    "logging-stacks"
+   ],
+   "words": 1058
+  },
+  {
+   "id": "docker-fundamentals",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker fundamentals, containers vs VMs",
+   "tags": [
+    "docker",
+    "containers",
+    "virtualization",
+    "images"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/docker/docker-fundamentals.md",
+   "links": [
+    "docker-containers-and-resources",
+    "docker-socket-dind-dood",
+    "docker-swarm",
+    "docker-volumes-and-registry",
+    "dockerfile-and-images",
+    "linux-architecture-and-kernel"
+   ],
+   "words": 978
+  },
+  {
+   "id": "docker-socket-dind-dood",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "docker.sock, Docker-in-Docker and Docker-out-of-Docker",
+   "tags": [
+    "docker",
+    "docker-sock",
+    "dind",
+    "dood",
+    "gitlab-ci"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/docker/docker-socket-dind-dood.md",
+   "links": [
+    "docker-containers-and-resources",
+    "docker-fundamentals",
+    "docker-swarm",
+    "docker-volumes-and-registry",
+    "linux-basics",
+    "linux-memory-filesystems-io",
+    "linux-networking"
+   ],
+   "words": 978
+  },
+  {
+   "id": "docker-swarm-stack-deploy",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Swarm stack file: deploy and healthcheck reference",
+   "tags": [
+    "docker",
+    "swarm",
+    "stack-file",
+    "rolling-update",
+    "healthcheck"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/docker/docker-swarm-stack-deploy.md",
+   "links": [
+    "docker-containers-and-resources",
+    "docker-swarm",
+    "docker-volumes-and-registry",
+    "dockerfile-and-images",
+    "logging-stacks"
+   ],
+   "words": 826
+  },
+  {
+   "id": "docker-swarm",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker Swarm",
+   "tags": [
+    "docker",
+    "swarm",
+    "orchestration",
+    "deploy",
+    "overlay-network"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/docker/docker-swarm.md",
+   "links": [
+    "docker-containers-and-resources",
+    "docker-socket-dind-dood",
+    "docker-swarm-stack-deploy",
+    "docker-volumes-and-registry",
+    "dockerfile-and-images",
+    "linux-networking",
+    "logging-stacks",
+    "spring-boot-properties-and-profiles"
+   ],
+   "words": 1181
+  },
+  {
+   "id": "docker-volumes-and-registry",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker volumes, bind mounts and registries",
+   "tags": [
+    "docker",
+    "volumes",
+    "storage",
+    "registry",
+    "docker-hub"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/docker/docker-volumes-and-registry.md",
+   "links": [
+    "docker-fundamentals",
+    "docker-socket-dind-dood",
+    "docker-swarm",
+    "dockerfile-and-images",
+    "linux-basics",
+    "linux-memory-filesystems-io"
+   ],
+   "words": 963
+  },
+  {
+   "id": "dockerfile-and-images",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Dockerfile, multi-stage builds, layers and cache",
+   "tags": [
+    "docker",
+    "dockerfile",
+    "build-cache",
+    "multi-stage"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/docker/dockerfile-and-images.md",
+   "links": [
+    "docker-containers-and-resources",
+    "docker-fundamentals",
+    "docker-swarm",
+    "docker-volumes-and-registry",
+    "linux-processes",
+    "logging-stacks",
+    "maven",
+    "spring-boot-starters-and-autoconfiguration"
+   ],
+   "words": 1012
+  },
+  {
+   "id": "git-commands",
+   "sec": "devops",
+   "sub": "git",
+   "title": "Git commands and workflows",
+   "tags": [
+    "git",
+    "version-control",
+    "rebase",
+    "merge",
+    "conflicts"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/git/git-commands.md",
+   "links": [
+    "docker-socket-dind-dood",
+    "linux-commands",
+    "maven"
+   ],
+   "words": 1147
+  },
+  {
+   "id": "linux-architecture-and-kernel",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux architecture, kernel space and user space",
+   "tags": [
+    "linux",
+    "kernel",
+    "syscalls",
+    "namespaces",
+    "cgroups"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/linux/linux-architecture-and-kernel.md",
+   "links": [
+    "docker-containers-and-resources",
+    "docker-fundamentals",
+    "garbage-collection",
+    "java-nio",
+    "jvm-memory-areas",
+    "linux-basics",
+    "linux-commands",
+    "linux-memory-filesystems-io",
+    "linux-processes"
+   ],
+   "words": 891
+  },
+  {
+   "id": "linux-basics",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux basics for a backend developer",
+   "tags": [
+    "linux",
+    "filesystem",
+    "permissions",
+    "shell"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/linux/linux-basics.md",
+   "links": [
+    "docker-socket-dind-dood",
+    "dockerfile-and-images",
+    "linux-architecture-and-kernel",
+    "linux-commands",
+    "linux-memory-filesystems-io",
+    "linux-processes"
+   ],
+   "words": 626
+  },
+  {
+   "id": "linux-commands",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux commands and shell scripting",
+   "tags": [
+    "linux",
+    "shell",
+    "bash",
+    "cli",
+    "scripting"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/linux/linux-commands.md",
+   "links": [
+    "docker-containers-and-resources",
+    "git-commands",
+    "linux-basics",
+    "linux-memory-filesystems-io",
+    "linux-networking",
+    "linux-processes"
+   ],
+   "words": 944
+  },
+  {
+   "id": "linux-memory-filesystems-io",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux memory, filesystems and IO",
+   "tags": [
+    "linux",
+    "virtual-memory",
+    "filesystems",
+    "page-cache",
+    "disk"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/linux/linux-memory-filesystems-io.md",
+   "links": [
+    "docker-containers-and-resources",
+    "docker-fundamentals",
+    "docker-volumes-and-registry",
+    "garbage-collection",
+    "java-nio",
+    "jvm-memory-areas",
+    "kafka-architecture",
+    "linux-architecture-and-kernel",
+    "linux-commands",
+    "linux-processes"
+   ],
+   "words": 1007
+  },
+  {
+   "id": "linux-networking",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux networking stack",
+   "tags": [
+    "linux",
+    "networking",
+    "tcp",
+    "iproute2",
+    "dns"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/linux/linux-networking.md",
+   "links": [
+    "docker-fundamentals",
+    "docker-swarm",
+    "hikaricp-pool-sizing",
+    "java-io-streams",
+    "java-nio",
+    "linux-architecture-and-kernel",
+    "linux-commands",
+    "rest-and-http",
+    "rest-clients"
+   ],
+   "words": 911
+  },
+  {
+   "id": "linux-processes",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux processes, signals and systemd",
+   "tags": [
+    "linux",
+    "processes",
+    "signals",
+    "systemd",
+    "scheduling"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/linux/linux-processes.md",
+   "links": [
+    "docker-containers-and-resources",
+    "kafka-consumer",
+    "linux-architecture-and-kernel",
+    "linux-commands",
+    "spring-boot-properties-and-profiles",
+    "threads-basics",
+    "virtual-threads"
+   ],
+   "words": 872
+  },
+  {
+   "id": "logging-stacks",
+   "sec": "devops",
+   "sub": "observability",
+   "title": "Logging stacks: Loki, ELK and EFK",
+   "tags": [
+    "observability",
+    "logging",
+    "loki",
+    "elasticsearch",
+    "grafana"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/observability/logging-stacks.md",
+   "links": [
+    "devops-resources",
+    "docker-containers-and-resources",
+    "docker-swarm",
+    "kafka-architecture",
+    "spring-boot-properties-and-profiles"
+   ],
+   "words": 1171
+  },
+  {
+   "id": "otel-metric-types",
+   "sec": "devops",
+   "sub": "observability",
+   "title": "OpenTelemetry metric types and naming",
+   "tags": [
+    "observability",
+    "metrics",
+    "opentelemetry",
+    "prometheus"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/observability/otel-metric-types.md",
+   "links": [
+    "executors-and-thread-pools",
+    "hikaricp-pool-sizing",
+    "kafka-consumer",
+    "logging-stacks",
+    "spring-boot-starters-and-autoconfiguration"
+   ],
+   "words": 712
+  },
+  {
+   "id": "devops-resources",
+   "sec": "devops",
+   "sub": "resources",
+   "title": "DevOps, OS and general learning resources",
+   "tags": [
+    "resources",
+    "linux",
+    "docker",
+    "roadmap"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/devops/resources/devops-resources.md",
+   "links": [
+    "architecture-resources",
+    "database-fundamentals",
+    "docker-containers-and-resources",
+    "docker-fundamentals",
+    "docker-socket-dind-dood",
+    "docker-swarm",
+    "docker-volumes-and-registry",
+    "dockerfile-and-images",
+    "git-commands",
+    "linux-architecture-and-kernel",
+    "linux-basics",
+    "linux-commands",
+    "linux-memory-filesystems-io",
+    "linux-networking",
+    "linux-processes",
+    "logging-stacks",
+    "maven",
+    "otel-metric-types",
+    "spring-resources"
+   ],
+   "words": 443
+  },
+  {
+   "id": "collections-framework",
+   "sec": "java",
+   "sub": "collections",
+   "title": "Java Collections Framework map",
+   "tags": [
+    "collections",
+    "list",
+    "set",
+    "map",
+    "queue",
+    "big-o"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/collections/collections-framework.md",
+   "links": [
+    "concurrent-collections",
+    "generics",
+    "hashmap-internals",
+    "iterators-and-fail-fast"
+   ],
+   "words": 683
+  },
+  {
+   "id": "data-structures",
+   "sec": "java",
+   "sub": "collections",
+   "title": "Core data structures and algorithms",
+   "tags": [
+    "data-structures",
+    "algorithms",
+    "big-o",
+    "trees",
+    "complexity"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/collections/data-structures.md",
+   "links": [
+    "collections-framework",
+    "database-indexes",
+    "equals-and-hashcode",
+    "executors-and-thread-pools",
+    "hashmap-internals",
+    "iterators-and-fail-fast",
+    "postgres-indexes"
+   ],
+   "words": 967
+  },
+  {
+   "id": "hashmap-internals",
+   "sec": "java",
+   "sub": "collections",
+   "title": "How HashMap works inside",
+   "tags": [
+    "hashmap",
+    "hashing",
+    "equals-hashcode",
+    "red-black-tree",
+    "weakhashmap"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/collections/hashmap-internals.md",
+   "links": [
+    "collections-framework",
+    "concurrent-collections",
+    "reference-types"
+   ],
+   "words": 530
+  },
+  {
+   "id": "iterators-and-fail-fast",
+   "sec": "java",
+   "sub": "collections",
+   "title": "Iterator, Iterable and fail-fast vs fail-safe",
+   "tags": [
+    "iterator",
+    "iterable",
+    "fail-fast",
+    "concurrentmodificationexception"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/collections/iterators-and-fail-fast.md",
+   "links": [
+    "collections-framework",
+    "concurrent-collections"
+   ],
+   "words": 359
+  },
+  {
+   "id": "completable-future",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "CompletableFuture essentials",
+   "tags": [
+    "concurrency",
+    "async"
+   ],
+   "learned": "2026-09-30",
+   "path": "notes/java/concurrency/completable-future.md",
+   "links": [
+    "virtual-threads"
+   ],
+   "words": 137
+  },
+  {
+   "id": "concurrency-hazards",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Race conditions, deadlock, livelock and starvation",
+   "tags": [
+    "race-condition",
+    "deadlock",
+    "livelock",
+    "starvation"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/concurrency-hazards.md",
+   "links": [
+    "java-memory-model",
+    "locks-and-lock-free",
+    "postgres-isolation-levels",
+    "synchronization-and-monitors"
+   ],
+   "words": 394
+  },
+  {
+   "id": "concurrent-collections",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Thread-safe collections",
+   "tags": [
+    "collections",
+    "concurrenthashmap",
+    "copyonwrite",
+    "blockingqueue"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/concurrent-collections.md",
+   "links": [
+    "executors-and-thread-pools",
+    "locks-and-lock-free"
+   ],
+   "words": 379
+  },
+  {
+   "id": "executors-and-thread-pools",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Thread pools, ExecutorService and Future",
+   "tags": [
+    "executor",
+    "thread-pool",
+    "future",
+    "async",
+    "spring-boot"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/executors-and-thread-pools.md",
+   "links": [
+    "completable-future",
+    "hikaricp-pool-sizing",
+    "threads-basics",
+    "virtual-threads"
+   ],
+   "words": 447
+  },
+  {
+   "id": "fork-join-framework",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Fork/Join framework",
+   "tags": [
+    "fork-join",
+    "parallelism",
+    "work-stealing",
+    "parallel-streams"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/fork-join-framework.md",
+   "links": [
+    "completable-future",
+    "executors-and-thread-pools",
+    "virtual-threads"
+   ],
+   "words": 364
+  },
+  {
+   "id": "java-memory-model",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Java Memory Model and happens-before",
+   "tags": [
+    "jmm",
+    "happens-before",
+    "volatile",
+    "visibility"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/java-memory-model.md",
+   "links": [
+    "concurrency-hazards",
+    "synchronization-and-monitors"
+   ],
+   "words": 560
+  },
+  {
+   "id": "locks-and-lock-free",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "ReentrantLock, ReadWriteLock, spin locks and lock-free structures",
+   "tags": [
+    "locks",
+    "reentrantlock",
+    "readwritelock",
+    "cas",
+    "lock-free"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/locks-and-lock-free.md",
+   "links": [
+    "concurrency-hazards",
+    "concurrent-collections",
+    "synchronization-and-monitors"
+   ],
+   "words": 429
+  },
+  {
+   "id": "synchronization-and-monitors",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Synchronization, monitors and wait/notify",
+   "tags": [
+    "synchronized",
+    "monitor",
+    "mutex",
+    "wait-notify",
+    "thread-safety",
+    "cas"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/synchronization-and-monitors.md",
+   "links": [
+    "java-memory-model",
+    "locks-and-lock-free",
+    "virtual-threads"
+   ],
+   "words": 520
+  },
+  {
+   "id": "synchronizers",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "CountDownLatch, CyclicBarrier and Semaphore",
+   "tags": [
+    "countdownlatch",
+    "cyclicbarrier",
+    "semaphore",
+    "coordination"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/synchronizers.md",
+   "links": [
+    "executors-and-thread-pools"
+   ],
+   "words": 337
+  },
+  {
+   "id": "threads-basics",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Threads, processes and the Thread API",
+   "tags": [
+    "threads",
+    "runnable",
+    "callable",
+    "interrupt",
+    "threadlocal"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/concurrency/threads-basics.md",
+   "links": [
+    "executors-and-thread-pools",
+    "virtual-threads"
+   ],
+   "words": 516
+  },
+  {
+   "id": "virtual-threads",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Virtual threads (Project Loom)",
+   "tags": [
+    "concurrency",
+    "jvm",
+    "java21"
+   ],
+   "learned": "2026-10-14",
+   "path": "notes/java/concurrency/virtual-threads.md",
+   "links": [
+    "completable-future",
+    "hikaricp-pool-sizing",
+    "spring-kafka-consumer"
+   ],
+   "words": 288
+  },
+  {
+   "id": "abstract-classes-and-interfaces",
+   "sec": "java",
+   "sub": "core",
+   "title": "Abstract classes and interfaces",
+   "tags": [
+    "abstract-class",
+    "interface",
+    "default-methods",
+    "sealed",
+    "functional-interface"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/abstract-classes-and-interfaces.md",
+   "links": [
+    "enums",
+    "functional-interfaces",
+    "methods-overloading-overriding",
+    "oop-principles"
+   ],
+   "words": 776
+  },
+  {
+   "id": "annotations",
+   "sec": "java",
+   "sub": "core",
+   "title": "Annotations",
+   "tags": [
+    "annotations",
+    "metadata",
+    "retention",
+    "reflection",
+    "annotation-processing"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/annotations.md",
+   "links": [
+    "functional-interfaces",
+    "java-ee-and-jakarta",
+    "jpa-entities-and-relationships",
+    "object-class-and-reflection",
+    "spring-aop",
+    "spring-bean-scopes-and-configuration",
+    "spring-ioc-and-di",
+    "spring-transactional"
+   ],
+   "words": 623
+  },
+  {
+   "id": "casting-and-autoboxing",
+   "sec": "java",
+   "sub": "core",
+   "title": "Type casting, instanceof and autoboxing",
+   "tags": [
+    "casting",
+    "autoboxing",
+    "instanceof",
+    "pattern-matching",
+    "type-conversion"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/casting-and-autoboxing.md",
+   "links": [
+    "abstract-classes-and-interfaces",
+    "generics",
+    "methods-overloading-overriding",
+    "oop-principles",
+    "primitives-and-wrappers"
+   ],
+   "words": 768
+  },
+  {
+   "id": "class-initialization-order",
+   "sec": "java",
+   "sub": "core",
+   "title": "Class loading and initialization order",
+   "tags": [
+    "class-loading",
+    "static-init",
+    "initialization-order",
+    "classloader"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/class-initialization-order.md",
+   "links": [
+    "constructors-and-initialization",
+    "creational-patterns",
+    "jvm-jre-jdk",
+    "jvm-memory-areas",
+    "modifiers-final-static-access"
+   ],
+   "words": 670
+  },
+  {
+   "id": "class-relationships",
+   "sec": "java",
+   "sub": "core",
+   "title": "Relationships between classes",
+   "tags": [
+    "oop",
+    "uml",
+    "composition",
+    "aggregation",
+    "association"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/class-relationships.md",
+   "links": [
+    "immutable-objects",
+    "jpa-entities-and-relationships",
+    "oop-principles",
+    "solid",
+    "spring-ioc-and-di",
+    "structural-patterns"
+   ],
+   "words": 597
+  },
+  {
+   "id": "constructors-and-initialization",
+   "sec": "java",
+   "sub": "core",
+   "title": "Constructors and object initialization",
+   "tags": [
+    "constructors",
+    "initialization",
+    "builder",
+    "records",
+    "object-creation"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/constructors-and-initialization.md",
+   "links": [
+    "class-initialization-order",
+    "creational-patterns",
+    "immutable-objects",
+    "java-memory-model",
+    "jvm-memory-areas",
+    "modifiers-final-static-access",
+    "object-class-and-reflection",
+    "spring-ioc-and-di"
+   ],
+   "words": 680
+  },
+  {
+   "id": "enums",
+   "sec": "java",
+   "sub": "core",
+   "title": "Enums",
+   "tags": [
+    "enum",
+    "constants",
+    "singleton",
+    "enummap",
+    "switch"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/enums.md",
+   "links": [
+    "abstract-classes-and-interfaces",
+    "class-initialization-order",
+    "collections-framework",
+    "creational-patterns",
+    "immutable-objects",
+    "jpa-entities-and-relationships"
+   ],
+   "words": 681
+  },
+  {
+   "id": "equals-and-hashcode",
+   "sec": "java",
+   "sub": "core",
+   "title": "equals and hashCode contracts",
+   "tags": [
+    "equals",
+    "hashcode",
+    "object-identity",
+    "contracts",
+    "records"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/equals-and-hashcode.md",
+   "links": [
+    "garbage-collection",
+    "hashmap-internals",
+    "immutable-objects",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "methods-overloading-overriding",
+    "object-class-and-reflection",
+    "strings-and-string-pool"
+   ],
+   "words": 728
+  },
+  {
+   "id": "exceptions",
+   "sec": "java",
+   "sub": "core",
+   "title": "Exceptions",
+   "tags": [
+    "exceptions",
+    "checked",
+    "unchecked",
+    "try-with-resources",
+    "error-handling"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/exceptions.md",
+   "links": [
+    "java-io-streams",
+    "object-class-and-reflection",
+    "rest-and-http",
+    "spring-kafka-consumer",
+    "spring-mvc-request-lifecycle",
+    "spring-transactional",
+    "threads-basics"
+   ],
+   "words": 859
+  },
+  {
+   "id": "generics",
+   "sec": "java",
+   "sub": "core",
+   "title": "Generics, wildcards and type erasure",
+   "tags": [
+    "generics",
+    "wildcards",
+    "pecs",
+    "type-erasure"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/generics.md",
+   "links": [
+    "collections-framework"
+   ],
+   "words": 489
+  },
+  {
+   "id": "immutable-objects",
+   "sec": "java",
+   "sub": "core",
+   "title": "Immutable objects",
+   "tags": [
+    "immutability",
+    "final",
+    "defensive-copy",
+    "records",
+    "thread-safety"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/immutable-objects.md",
+   "links": [
+    "concurrency-hazards",
+    "constructors-and-initialization",
+    "equals-and-hashcode",
+    "garbage-collection",
+    "java-memory-model",
+    "jpa-entities-and-relationships",
+    "primitives-and-wrappers",
+    "strings-and-string-pool"
+   ],
+   "words": 750
+  },
+  {
+   "id": "java-ee-and-jakarta",
+   "sec": "java",
+   "sub": "core",
+   "title": "Java EE, Jakarta EE and how Spring uses the specifications",
+   "tags": [
+    "jakarta-ee",
+    "java-ee",
+    "servlet",
+    "jpa",
+    "specifications"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/java-ee-and-jakarta.md",
+   "links": [
+    "activemq-basics",
+    "hikaricp-pool-sizing",
+    "jpa-entities-and-relationships",
+    "spring-bean-lifecycle",
+    "spring-boot-starters-and-autoconfiguration",
+    "spring-data-repositories",
+    "spring-ioc-and-di",
+    "spring-mvc-request-lifecycle",
+    "spring-mvc-validation-and-uploads",
+    "spring-transactional"
+   ],
+   "words": 762
+  },
+  {
+   "id": "jvm-jre-jdk",
+   "sec": "java",
+   "sub": "core",
+   "title": "JVM, JRE and JDK",
+   "tags": [
+    "jvm",
+    "jdk",
+    "jre",
+    "bytecode",
+    "jit"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/jvm-jre-jdk.md",
+   "links": [
+    "class-initialization-order",
+    "docker-containers-and-resources",
+    "garbage-collection",
+    "jvm-memory-areas",
+    "maven",
+    "reference-types"
+   ],
+   "words": 570
+  },
+  {
+   "id": "methods-overloading-overriding",
+   "sec": "java",
+   "sub": "core",
+   "title": "Methods, signatures, overloading and overriding",
+   "tags": [
+    "methods",
+    "overloading",
+    "overriding",
+    "signature",
+    "loops"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/methods-overloading-overriding.md",
+   "links": [
+    "abstract-classes-and-interfaces",
+    "casting-and-autoboxing",
+    "constructors-and-initialization",
+    "equals-and-hashcode",
+    "exceptions",
+    "generics",
+    "iterators-and-fail-fast",
+    "modifiers-final-static-access",
+    "oop-principles",
+    "stream-api"
+   ],
+   "words": 802
+  },
+  {
+   "id": "modifiers-final-static-access",
+   "sec": "java",
+   "sub": "core",
+   "title": "Access modifiers, final, static, this and super",
+   "tags": [
+    "modifiers",
+    "final",
+    "static",
+    "access-control",
+    "effectively-final"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/modifiers-final-static-access.md",
+   "links": [
+    "abstract-classes-and-interfaces",
+    "class-initialization-order",
+    "constructors-and-initialization",
+    "garbage-collection",
+    "immutable-objects",
+    "java-memory-model",
+    "methods-overloading-overriding",
+    "nested-and-anonymous-classes",
+    "oop-principles"
+   ],
+   "words": 814
+  },
+  {
+   "id": "nested-and-anonymous-classes",
+   "sec": "java",
+   "sub": "core",
+   "title": "Nested, inner, local, anonymous classes and lambdas",
+   "tags": [
+    "nested-classes",
+    "inner-classes",
+    "anonymous-classes",
+    "lambdas",
+    "closures"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/nested-and-anonymous-classes.md",
+   "links": [
+    "functional-interfaces",
+    "garbage-collection",
+    "modifiers-final-static-access",
+    "structural-patterns"
+   ],
+   "words": 872
+  },
+  {
+   "id": "object-class-and-reflection",
+   "sec": "java",
+   "sub": "core",
+   "title": "The Object class, clone and reflection",
+   "tags": [
+    "object",
+    "clone",
+    "reflection",
+    "finalize",
+    "cleaner"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/object-class-and-reflection.md",
+   "links": [
+    "annotations",
+    "class-initialization-order",
+    "equals-and-hashcode",
+    "exceptions",
+    "immutable-objects",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "reference-types",
+    "spring-aop",
+    "spring-ioc-and-di",
+    "synchronization-and-monitors"
+   ],
+   "words": 769
+  },
+  {
+   "id": "oop-principles",
+   "sec": "java",
+   "sub": "core",
+   "title": "OOP principles and the kinds of polymorphism",
+   "tags": [
+    "oop",
+    "polymorphism",
+    "encapsulation",
+    "inheritance",
+    "abstraction"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/oop-principles.md",
+   "links": [
+    "abstract-classes-and-interfaces",
+    "casting-and-autoboxing",
+    "class-relationships",
+    "constructors-and-initialization",
+    "generics",
+    "immutable-objects",
+    "jvm-memory-areas",
+    "methods-overloading-overriding",
+    "modifiers-final-static-access",
+    "solid"
+   ],
+   "words": 795
+  },
+  {
+   "id": "primitives-and-wrappers",
+   "sec": "java",
+   "sub": "core",
+   "title": "Primitive types and wrapper classes",
+   "tags": [
+    "primitives",
+    "wrappers",
+    "integer-cache",
+    "immutability"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/primitives-and-wrappers.md",
+   "links": [
+    "casting-and-autoboxing",
+    "generics",
+    "immutable-objects",
+    "stream-api",
+    "strings-and-string-pool"
+   ],
+   "words": 670
+  },
+  {
+   "id": "strings-and-string-pool",
+   "sec": "java",
+   "sub": "core",
+   "title": "Strings, the string pool, StringBuilder and StringBuffer",
+   "tags": [
+    "string",
+    "string-pool",
+    "interning",
+    "stringbuilder",
+    "immutability"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/core/strings-and-string-pool.md",
+   "links": [
+    "equals-and-hashcode",
+    "garbage-collection",
+    "hashmap-internals",
+    "immutable-objects",
+    "jvm-memory-areas",
+    "primitives-and-wrappers",
+    "structural-patterns"
+   ],
+   "words": 803
+  },
+  {
+   "id": "java-io-streams",
+   "sec": "java",
+   "sub": "io",
+   "title": "Java IO streams",
+   "tags": [
+    "java-io",
+    "streams",
+    "reader-writer",
+    "buffering",
+    "serialization"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/io/java-io-streams.md",
+   "links": [
+    "exceptions",
+    "java-nio",
+    "strings-and-string-pool",
+    "structural-patterns",
+    "virtual-threads"
+   ],
+   "words": 663
+  },
+  {
+   "id": "java-nio",
+   "sec": "java",
+   "sub": "io",
+   "title": "Java NIO: channels, buffers, selectors and NIO.2",
+   "tags": [
+    "java-nio",
+    "channels",
+    "buffers",
+    "selector",
+    "non-blocking-io"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/io/java-nio.md",
+   "links": [
+    "executors-and-thread-pools",
+    "java-io-streams",
+    "jvm-memory-areas",
+    "reference-types",
+    "spring-reactive-webclient-sse",
+    "virtual-threads"
+   ],
+   "words": 757
+  },
+  {
+   "id": "hikaricp-pool-sizing",
+   "sec": "java",
+   "sub": "jdbc",
+   "title": "HikariCP pool sizing",
+   "tags": [
+    "jdbc",
+    "performance",
+    "postgres"
+   ],
+   "learned": "2026-10-02",
+   "path": "notes/java/jdbc/hikaricp-pool-sizing.md",
+   "links": [
+    "spring-transactional",
+    "virtual-threads"
+   ],
+   "words": 146
+  },
+  {
+   "id": "garbage-collection",
+   "sec": "java",
+   "sub": "jvm",
+   "title": "Garbage collection in HotSpot",
+   "tags": [
+    "gc",
+    "g1",
+    "zgc",
+    "generational",
+    "stop-the-world"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/jvm/garbage-collection.md",
+   "links": [
+    "docker-containers-and-resources",
+    "java-memory-model",
+    "jvm-memory-areas",
+    "nested-and-anonymous-classes",
+    "object-class-and-reflection",
+    "reference-types"
+   ],
+   "words": 1238
+  },
+  {
+   "id": "jvm-memory-areas",
+   "sec": "java",
+   "sub": "jvm",
+   "title": "JVM memory areas",
+   "tags": [
+    "jvm",
+    "heap",
+    "stack",
+    "metaspace",
+    "memory-layout"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/jvm/jvm-memory-areas.md",
+   "links": [
+    "class-initialization-order",
+    "data-structures",
+    "docker-containers-and-resources",
+    "executors-and-thread-pools",
+    "garbage-collection",
+    "java-memory-model",
+    "java-nio",
+    "jvm-jre-jdk",
+    "reference-types",
+    "strings-and-string-pool",
+    "virtual-threads"
+   ],
+   "words": 1039
+  },
+  {
+   "id": "reference-types",
+   "sec": "java",
+   "sub": "jvm",
+   "title": "Strong, soft, weak and phantom references",
+   "tags": [
+    "gc",
+    "references",
+    "memory",
+    "cache"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/jvm/reference-types.md",
+   "links": [],
+   "words": 292
+  },
+  {
+   "id": "functional-interfaces",
+   "sec": "java",
+   "sub": "streams",
+   "title": "Functional interfaces and lambdas",
+   "tags": [
+    "functional",
+    "lambda",
+    "method-reference",
+    "java.util.function"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/streams/functional-interfaces.md",
+   "links": [
+    "completable-future",
+    "stream-api",
+    "threads-basics"
+   ],
+   "words": 382
+  },
+  {
+   "id": "stream-api",
+   "sec": "java",
+   "sub": "streams",
+   "title": "Stream API, parallel streams and gatherers",
+   "tags": [
+    "streams",
+    "functional",
+    "parallel-streams",
+    "gatherers",
+    "java24"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/java/streams/stream-api.md",
+   "links": [
+    "fork-join-framework",
+    "functional-interfaces"
+   ],
+   "words": 442
+  },
+  {
+   "id": "kafka-architecture",
+   "sec": "messaging",
+   "sub": "kafka",
+   "title": "Kafka architecture — brokers, topics, partitions, segments",
+   "tags": [
+    "kafka",
+    "messaging",
+    "distributed-systems",
+    "architecture"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/messaging/kafka/kafka-architecture.md",
+   "links": [
+    "activemq-basics",
+    "kafka-consumer",
+    "kafka-producer",
+    "outbox-pattern",
+    "rabbitmq-basics",
+    "spring-kafka-consumer"
+   ],
+   "words": 1362
+  },
+  {
+   "id": "kafka-consumer",
+   "sec": "messaging",
+   "sub": "kafka",
+   "title": "Kafka consumer — groups, rebalancing, offsets, lag",
+   "tags": [
+    "kafka",
+    "messaging",
+    "consumer-groups",
+    "delivery-semantics"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/messaging/kafka/kafka-consumer.md",
+   "links": [
+    "idempotency",
+    "kafka-architecture",
+    "kafka-producer",
+    "outbox-pattern",
+    "rabbitmq-basics",
+    "spring-kafka-consumer"
+   ],
+   "words": 1271
+  },
+  {
+   "id": "kafka-producer",
+   "sec": "messaging",
+   "sub": "kafka",
+   "title": "Kafka producer — partitioning, acks, idempotence, transactions",
+   "tags": [
+    "kafka",
+    "messaging",
+    "reliability",
+    "delivery-semantics"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/messaging/kafka/kafka-producer.md",
+   "links": [
+    "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "outbox-pattern",
+    "spring-kafka-consumer"
+   ],
+   "words": 1211
+  },
+  {
+   "id": "activemq-basics",
+   "sec": "messaging",
+   "sub": "rabbitmq",
+   "title": "ActiveMQ basics — JMS model, Classic vs Artemis",
+   "tags": [
+    "activemq",
+    "jms",
+    "messaging",
+    "message-broker"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/messaging/rabbitmq/activemq-basics.md",
+   "links": [
+    "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "outbox-pattern",
+    "rabbitmq-basics",
+    "spring-kafka-consumer"
+   ],
+   "words": 1121
+  },
+  {
+   "id": "rabbitmq-basics",
+   "sec": "messaging",
+   "sub": "rabbitmq",
+   "title": "RabbitMQ basics — AMQP model, exchanges, queues, acks",
+   "tags": [
+    "rabbitmq",
+    "amqp",
+    "messaging",
+    "message-broker"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/messaging/rabbitmq/rabbitmq-basics.md",
+   "links": [
+    "activemq-basics",
+    "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "outbox-pattern"
+   ],
+   "words": 1554
+  },
+  {
+   "id": "spring-boot-properties-and-profiles",
+   "sec": "spring",
+   "sub": "boot",
+   "title": "Properties, profiles and tuning the embedded server",
+   "tags": [
+    "spring-boot",
+    "properties",
+    "profiles",
+    "configuration",
+    "performance"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/boot/spring-boot-properties-and-profiles.md",
+   "links": [
+    "docker-fundamentals",
+    "hikaricp-pool-sizing",
+    "logging-stacks",
+    "rest-clients",
+    "spring-boot-starters-and-autoconfiguration",
+    "spring-ioc-and-di",
+    "virtual-threads"
+   ],
+   "words": 667
+  },
+  {
+   "id": "spring-boot-starters-and-autoconfiguration",
+   "sec": "spring",
+   "sub": "boot",
+   "title": "Spring Boot: starters, autoconfiguration and @SpringBootApplication",
+   "tags": [
+    "spring-boot",
+    "autoconfiguration",
+    "starters",
+    "conditional"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/boot/spring-boot-starters-and-autoconfiguration.md",
+   "links": [
+    "java-ee-and-jakarta",
+    "maven",
+    "spring-bean-lifecycle",
+    "spring-bean-scopes-and-configuration",
+    "spring-boot-properties-and-profiles",
+    "spring-ioc-and-di"
+   ],
+   "words": 695
+  },
+  {
+   "id": "spring-aop",
+   "sec": "spring",
+   "sub": "core",
+   "title": "Spring AOP: aspects, proxies and their limits",
+   "tags": [
+    "spring-core",
+    "aop",
+    "proxies",
+    "cglib"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/core/spring-aop.md",
+   "links": [
+    "object-class-and-reflection",
+    "spring-bean-lifecycle",
+    "spring-transactional",
+    "structural-patterns"
+   ],
+   "words": 603
+  },
+  {
+   "id": "spring-bean-lifecycle",
+   "sec": "spring",
+   "sub": "core",
+   "title": "Bean lifecycle and how the context starts",
+   "tags": [
+    "spring-core",
+    "beans",
+    "lifecycle",
+    "bean-post-processor"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/core/spring-bean-lifecycle.md",
+   "links": [
+    "class-initialization-order",
+    "spring-aop",
+    "spring-bean-scopes-and-configuration",
+    "spring-boot-starters-and-autoconfiguration",
+    "spring-ioc-and-di"
+   ],
+   "words": 600
+  },
+  {
+   "id": "spring-bean-scopes-and-configuration",
+   "sec": "spring",
+   "sub": "core",
+   "title": "Bean scopes and ways to configure beans",
+   "tags": [
+    "spring-core",
+    "beans",
+    "scopes",
+    "configuration"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/core/spring-bean-scopes-and-configuration.md",
+   "links": [
+    "concurrency-hazards",
+    "spring-bean-lifecycle",
+    "spring-boot-properties-and-profiles",
+    "spring-boot-starters-and-autoconfiguration",
+    "spring-ioc-and-di",
+    "spring-mvc-request-lifecycle"
+   ],
+   "words": 651
+  },
+  {
+   "id": "spring-ioc-and-di",
+   "sec": "spring",
+   "sub": "core",
+   "title": "IoC container and dependency injection in Spring",
+   "tags": [
+    "spring-core",
+    "ioc",
+    "dependency-injection",
+    "beans"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/core/spring-ioc-and-di.md",
+   "links": [
+    "solid",
+    "spring-aop",
+    "spring-bean-lifecycle",
+    "spring-bean-scopes-and-configuration",
+    "spring-boot-properties-and-profiles",
+    "spring-boot-starters-and-autoconfiguration",
+    "spring-transactional"
+   ],
+   "words": 663
+  },
+  {
+   "id": "hibernate-caching",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Hibernate first-level, second-level and query cache",
+   "tags": [
+    "hibernate",
+    "jpa",
+    "caching",
+    "performance"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/data/hibernate-caching.md",
+   "links": [
+    "idempotency",
+    "jpa-n-plus-one",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "redis-data-structures",
+    "spring-cache-abstraction"
+   ],
+   "words": 784
+  },
+  {
+   "id": "jpa-entities-and-relationships",
+   "sec": "spring",
+   "sub": "data",
+   "title": "JPA entities and relationship mappings",
+   "tags": [
+    "jpa",
+    "hibernate",
+    "orm",
+    "spring-data"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/data/jpa-entities-and-relationships.md",
+   "links": [
+    "constraints-and-relationships",
+    "hikaricp-pool-sizing",
+    "jpa-locking",
+    "jpa-n-plus-one",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "spring-data-repositories",
+    "spring-ioc-and-di",
+    "spring-transactional"
+   ],
+   "words": 846
+  },
+  {
+   "id": "jpa-locking",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Optimistic and pessimistic locking in JPA",
+   "tags": [
+    "jpa",
+    "hibernate",
+    "locking",
+    "concurrency"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/data/jpa-locking.md",
+   "links": [
+    "concurrency-hazards",
+    "idempotency",
+    "locks-and-lock-free",
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "spring-transactional",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 862
+  },
+  {
+   "id": "jpa-n-plus-one",
+   "sec": "spring",
+   "sub": "data",
+   "title": "The N+1 select problem and how to fix it",
+   "tags": [
+    "jpa",
+    "hibernate",
+    "performance",
+    "n-plus-one"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/data/jpa-n-plus-one.md",
+   "links": [
+    "hibernate-caching",
+    "jpa-entities-and-relationships",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "logging-stacks",
+    "sql-joins-and-commands"
+   ],
+   "words": 827
+  },
+  {
+   "id": "jpa-persistence-context-and-entity-lifecycle",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Persistence context, entity lifecycle and flushing",
+   "tags": [
+    "jpa",
+    "hibernate",
+    "persistence-context",
+    "transactions"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/data/jpa-persistence-context-and-entity-lifecycle.md",
+   "links": [
+    "hibernate-caching",
+    "hikaricp-pool-sizing",
+    "jpa-locking",
+    "jpa-n-plus-one",
+    "spring-cache-abstraction",
+    "spring-data-repositories",
+    "spring-transactional",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 913
+  },
+  {
+   "id": "spring-cache-abstraction",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Spring Cache abstraction",
+   "tags": [
+    "spring",
+    "caching",
+    "redis",
+    "caffeine",
+    "aop"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/data/spring-cache-abstraction.md",
+   "links": [
+    "database-indexes",
+    "hibernate-caching",
+    "idempotency",
+    "redis-data-structures",
+    "spring-transactional"
+   ],
+   "words": 845
+  },
+  {
+   "id": "spring-data-repositories",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Spring Data repositories and ways to write queries",
+   "tags": [
+    "spring-data",
+    "jpa",
+    "repositories",
+    "querydsl"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/data/spring-data-repositories.md",
+   "links": [
+    "jpa-locking",
+    "jpa-n-plus-one",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "spring-transactional"
+   ],
+   "words": 840
+  },
+  {
+   "id": "spring-transactional",
+   "sec": "spring",
+   "sub": "data",
+   "title": "@Transactional: how it really works",
+   "tags": [
+    "transactions",
+    "jpa",
+    "aop"
+   ],
+   "learned": "2026-09-18",
+   "path": "notes/spring/data/spring-transactional.md",
+   "links": [
+    "hikaricp-pool-sizing",
+    "outbox-pattern",
+    "postgres-isolation-levels"
+   ],
+   "words": 202
+  },
+  {
+   "id": "spring-kafka-consumer",
+   "sec": "spring",
+   "sub": "kafka",
+   "title": "Spring Kafka consumer basics",
+   "tags": [
+    "kafka",
+    "messaging",
+    "spring-boot"
+   ],
+   "learned": "2026-10-08",
+   "path": "notes/spring/kafka/spring-kafka-consumer.md",
+   "links": [
+    "idempotency",
+    "outbox-pattern",
+    "spring-transactional"
+   ],
+   "words": 190
+  },
+  {
+   "id": "spring-resources",
+   "sec": "spring",
+   "sub": "resources",
+   "title": "Spring resources: links, tools and templates",
+   "tags": [
+    "spring",
+    "resources",
+    "links",
+    "tools"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/resources/spring-resources.md",
+   "links": [
+    "architecture-resources",
+    "devops-resources",
+    "openapi-swagger",
+    "rest-clients",
+    "spring-aop",
+    "spring-bean-lifecycle",
+    "spring-boot-properties-and-profiles",
+    "spring-boot-starters-and-autoconfiguration",
+    "spring-ioc-and-di",
+    "spring-security-basics",
+    "spring-transactional",
+    "testing-types-and-dev-cycles"
+   ],
+   "words": 522
+  },
+  {
+   "id": "jwt-authentication",
+   "sec": "spring",
+   "sub": "security",
+   "title": "JWT authentication in a Spring Boot API",
+   "tags": [
+    "jwt",
+    "spring-security",
+    "authentication",
+    "tokens"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/security/jwt-authentication.md",
+   "links": [
+    "idempotency",
+    "redis-data-structures",
+    "rest-and-http",
+    "spring-boot-properties-and-profiles",
+    "spring-security-basics"
+   ],
+   "words": 767
+  },
+  {
+   "id": "spring-security-basics",
+   "sec": "spring",
+   "sub": "security",
+   "title": "Spring Security 6: filter chain, authentication and authorization",
+   "tags": [
+    "spring-security",
+    "authentication",
+    "authorization",
+    "filters"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/security/spring-security-basics.md",
+   "links": [
+    "jwt-authentication",
+    "openapi-swagger",
+    "rest-and-http",
+    "spring-aop",
+    "spring-kafka-consumer",
+    "spring-mvc-request-lifecycle"
+   ],
+   "words": 663
+  },
+  {
+   "id": "testing-types-and-dev-cycles",
+   "sec": "spring",
+   "sub": "testing",
+   "title": "Test types, test doubles and development cycles",
+   "tags": [
+    "testing",
+    "junit",
+    "mockito",
+    "spring-boot-test",
+    "tdd"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/testing/testing-types-and-dev-cycles.md",
+   "links": [
+    "docker-fundamentals",
+    "docker-socket-dind-dood",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "rest-clients",
+    "spring-kafka-consumer",
+    "spring-transactional"
+   ],
+   "words": 891
+  },
+  {
+   "id": "openapi-swagger",
+   "sec": "spring",
+   "sub": "web",
+   "title": "API documentation with OpenAPI and Swagger",
+   "tags": [
+    "openapi",
+    "swagger",
+    "springdoc",
+    "api-design"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/web/openapi-swagger.md",
+   "links": [
+    "rest-and-http",
+    "rest-clients",
+    "spring-mvc-request-lifecycle",
+    "spring-mvc-validation-and-uploads",
+    "spring-security-basics"
+   ],
+   "words": 516
+  },
+  {
+   "id": "rest-and-http",
+   "sec": "spring",
+   "sub": "web",
+   "title": "REST principles and HTTP essentials",
+   "tags": [
+    "rest",
+    "http",
+    "api-design",
+    "cors"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/web/rest-and-http.md",
+   "links": [
+    "idempotency",
+    "jwt-authentication",
+    "openapi-swagger",
+    "rest-clients",
+    "spring-boot-properties-and-profiles",
+    "spring-mvc-request-lifecycle",
+    "spring-security-basics"
+   ],
+   "words": 971
+  },
+  {
+   "id": "rest-clients",
+   "sec": "spring",
+   "sub": "web",
+   "title": "Calling external APIs: RestTemplate, RestClient, WebClient, Feign and how to test them",
+   "tags": [
+    "rest-client",
+    "http",
+    "resttemplate",
+    "webclient",
+    "wiremock",
+    "testing"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/web/rest-clients.md",
+   "links": [
+    "completable-future",
+    "idempotency",
+    "rest-and-http",
+    "spring-boot-properties-and-profiles",
+    "spring-reactive-webclient-sse",
+    "spring-transactional",
+    "testing-types-and-dev-cycles",
+    "virtual-threads"
+   ],
+   "words": 793
+  },
+  {
+   "id": "spring-mvc-request-lifecycle",
+   "sec": "spring",
+   "sub": "web",
+   "title": "Spring MVC: DispatcherServlet and the request lifecycle",
+   "tags": [
+    "spring-mvc",
+    "web",
+    "dispatcher-servlet",
+    "controllers"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/web/spring-mvc-request-lifecycle.md",
+   "links": [
+    "executors-and-thread-pools",
+    "jpa-n-plus-one",
+    "jwt-authentication",
+    "openapi-swagger",
+    "rest-and-http",
+    "spring-mvc-validation-and-uploads",
+    "spring-reactive-webclient-sse",
+    "spring-security-basics",
+    "virtual-threads"
+   ],
+   "words": 760
+  },
+  {
+   "id": "spring-mvc-validation-and-uploads",
+   "sec": "spring",
+   "sub": "web",
+   "title": "Request validation and file uploads in Spring MVC",
+   "tags": [
+    "spring-mvc",
+    "validation",
+    "bean-validation",
+    "multipart"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/web/spring-mvc-validation-and-uploads.md",
+   "links": [
+    "annotations",
+    "rest-and-http",
+    "spring-aop",
+    "spring-mvc-request-lifecycle",
+    "spring-transactional"
+   ],
+   "words": 619
+  },
+  {
+   "id": "spring-reactive-webclient-sse",
+   "sec": "spring",
+   "sub": "web",
+   "title": "Reactive Spring: WebFlux, WebClient and Server-Sent Events",
+   "tags": [
+    "reactive",
+    "webflux",
+    "webclient",
+    "sse",
+    "reactor"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/spring/web/spring-reactive-webclient-sse.md",
+   "links": [
+    "completable-future",
+    "rest-clients",
+    "spring-kafka-consumer",
+    "spring-mvc-request-lifecycle",
+    "virtual-threads"
+   ],
+   "words": 727
+  }
+ ]
+}

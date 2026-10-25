@@ -1,0 +1,61 @@
+{
+ "java": {
+  "name": "Java",
+  "subs": {
+   "core": "Core language",
+   "collections": "Collections",
+   "streams": "Streams & functional",
+   "io": "IO & NIO",
+   "concurrency": "Concurrency",
+   "jvm": "JVM & GC",
+   "jdbc": "JDBC & pools"
+  }
+ },
+ "spring": {
+  "name": "Spring",
+  "subs": {
+   "core": "Core & AOP",
+   "boot": "Boot",
+   "web": "Web & REST",
+   "data": "Data & transactions",
+   "security": "Security",
+   "kafka": "Kafka",
+   "testing": "Testing",
+   "resources": "Resources"
+  }
+ },
+ "databases": {
+  "name": "Databases",
+  "subs": {
+   "relational": "Relational",
+   "nosql": "NoSQL"
+  }
+ },
+ "messaging": {
+  "name": "Messaging",
+  "subs": {
+   "kafka": "Kafka",
+   "rabbitmq": "RabbitMQ & ActiveMQ"
+  }
+ },
+ "architecture": {
+  "name": "Architecture",
+  "subs": {
+   "principles": "Principles & DDD",
+   "patterns": "Design patterns",
+   "messaging": "Messaging & reliability",
+   "resources": "Resources"
+  }
+ },
+ "devops": {
+  "name": "DevOps",
+  "subs": {
+   "linux": "Linux",
+   "docker": "Docker",
+   "git": "Git",
+   "build": "Build tools",
+   "observability": "Observability",
+   "resources": "Resources"
+  }
+ }
+}

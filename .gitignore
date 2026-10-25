@@ -1,0 +1,4 @@
+_src/
+__pycache__/
+assets.json
+.DS_Store

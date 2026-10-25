@@ -1,0 +1,3382 @@
+{
+ "nodes": [
+  {
+   "id": "idempotency",
+   "sec": "architecture",
+   "sub": "messaging",
+   "title": "Idempotent consumers and APIs",
+   "tags": [
+    "reliability",
+    "kafka",
+    "api-design",
+    "redis"
+   ]
+  },
+  {
+   "id": "outbox-pattern",
+   "sec": "architecture",
+   "sub": "messaging",
+   "title": "Transactional outbox pattern",
+   "tags": [
+    "messaging",
+    "kafka",
+    "reliability",
+    "postgres"
+   ]
+  },
+  {
+   "id": "behavioral-patterns",
+   "sec": "architecture",
+   "sub": "patterns",
+   "title": "Behavioral design patterns",
+   "tags": [
+    "design-patterns",
+    "behavioral",
+    "strategy",
+    "observer",
+    "state"
+   ]
+  },
+  {
+   "id": "creational-patterns",
+   "sec": "architecture",
+   "sub": "patterns",
+   "title": "Creational design patterns",
+   "tags": [
+    "design-patterns",
+    "creational",
+    "singleton",
+    "builder",
+    "factory"
+   ]
+  },
+  {
+   "id": "structural-patterns",
+   "sec": "architecture",
+   "sub": "patterns",
+   "title": "Structural design patterns",
+   "tags": [
+    "design-patterns",
+    "structural",
+    "adapter",
+    "decorator",
+    "proxy"
+   ]
+  },
+  {
+   "id": "ddd-basics",
+   "sec": "architecture",
+   "sub": "principles",
+   "title": "DDD basics and the architecture vocabulary",
+   "tags": [
+    "ddd",
+    "architecture",
+    "aggregates",
+    "design-principles"
+   ]
+  },
+  {
+   "id": "solid",
+   "sec": "architecture",
+   "sub": "principles",
+   "title": "SOLID principles",
+   "tags": [
+    "solid",
+    "design-principles",
+    "oop",
+    "architecture"
+   ]
+  },
+  {
+   "id": "architecture-resources",
+   "sec": "architecture",
+   "sub": "resources",
+   "title": "Architecture and system design resources",
+   "tags": [
+    "resources",
+    "system-design",
+    "software-design",
+    "architecture"
+   ]
+  },
+  {
+   "id": "redis-data-structures",
+   "sec": "databases",
+   "sub": "nosql",
+   "title": "Redis data structures cheat sheet",
+   "tags": [
+    "redis",
+    "cache",
+    "nosql"
+   ]
+  },
+  {
+   "id": "constraints-and-relationships",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Constraints and table relationships",
+   "tags": [
+    "sql",
+    "constraints",
+    "foreign-keys",
+    "schema-design"
+   ]
+  },
+  {
+   "id": "database-fundamentals",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Databases, DBMS, relational vs NoSQL, and views",
+   "tags": [
+    "databases",
+    "sql",
+    "fundamentals",
+    "views"
+   ]
+  },
+  {
+   "id": "database-indexes",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Database indexes: how they work and when they hurt",
+   "tags": [
+    "databases",
+    "indexes",
+    "performance",
+    "b-tree"
+   ]
+  },
+  {
+   "id": "normalization-and-denormalization",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Normal forms and denormalization",
+   "tags": [
+    "databases",
+    "schema-design",
+    "normalization",
+    "sql"
+   ]
+  },
+  {
+   "id": "postgres-indexes",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Postgres index types and when to use them",
+   "tags": [
+    "postgres",
+    "performance",
+    "indexes"
+   ]
+  },
+  {
+   "id": "postgres-isolation-levels",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Transaction isolation levels in Postgres",
+   "tags": [
+    "postgres",
+    "transactions",
+    "concurrency",
+    "mvcc"
+   ]
+  },
+  {
+   "id": "sql-joins-and-commands",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "SQL command categories and join types",
+   "tags": [
+    "sql",
+    "joins",
+    "ddl",
+    "dml"
+   ]
+  },
+  {
+   "id": "transactions-acid-and-isolation",
+   "sec": "databases",
+   "sub": "relational",
+   "title": "Transactions, ACID and isolation anomalies",
+   "tags": [
+    "transactions",
+    "acid",
+    "isolation",
+    "concurrency"
+   ]
+  },
+  {
+   "id": "maven",
+   "sec": "devops",
+   "sub": "build",
+   "title": "Maven build lifecycle and dependency management",
+   "tags": [
+    "maven",
+    "build",
+    "dependencies",
+    "java"
+   ]
+  },
+  {
+   "id": "docker-containers-and-resources",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker containers, resources, restart policies and logs",
+   "tags": [
+    "docker",
+    "cgroups",
+    "healthcheck",
+    "restart-policy",
+    "logging"
+   ]
+  },
+  {
+   "id": "docker-fundamentals",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker fundamentals, containers vs VMs",
+   "tags": [
+    "docker",
+    "containers",
+    "virtualization",
+    "images"
+   ]
+  },
+  {
+   "id": "docker-socket-dind-dood",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "docker.sock, Docker-in-Docker and Docker-out-of-Docker",
+   "tags": [
+    "docker",
+    "docker-sock",
+    "dind",
+    "dood",
+    "gitlab-ci"
+   ]
+  },
+  {
+   "id": "docker-swarm-stack-deploy",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Swarm stack file: deploy and healthcheck reference",
+   "tags": [
+    "docker",
+    "swarm",
+    "stack-file",
+    "rolling-update",
+    "healthcheck"
+   ]
+  },
+  {
+   "id": "docker-swarm",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker Swarm",
+   "tags": [
+    "docker",
+    "swarm",
+    "orchestration",
+    "deploy",
+    "overlay-network"
+   ]
+  },
+  {
+   "id": "docker-volumes-and-registry",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker volumes, bind mounts and registries",
+   "tags": [
+    "docker",
+    "volumes",
+    "storage",
+    "registry",
+    "docker-hub"
+   ]
+  },
+  {
+   "id": "dockerfile-and-images",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Dockerfile, multi-stage builds, layers and cache",
+   "tags": [
+    "docker",
+    "dockerfile",
+    "build-cache",
+    "multi-stage"
+   ]
+  },
+  {
+   "id": "git-commands",
+   "sec": "devops",
+   "sub": "git",
+   "title": "Git commands and workflows",
+   "tags": [
+    "git",
+    "version-control",
+    "rebase",
+    "merge",
+    "conflicts"
+   ]
+  },
+  {
+   "id": "linux-architecture-and-kernel",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux architecture, kernel space and user space",
+   "tags": [
+    "linux",
+    "kernel",
+    "syscalls",
+    "namespaces",
+    "cgroups"
+   ]
+  },
+  {
+   "id": "linux-basics",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux basics for a backend developer",
+   "tags": [
+    "linux",
+    "filesystem",
+    "permissions",
+    "shell"
+   ]
+  },
+  {
+   "id": "linux-commands",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux commands and shell scripting",
+   "tags": [
+    "linux",
+    "shell",
+    "bash",
+    "cli",
+    "scripting"
+   ]
+  },
+  {
+   "id": "linux-memory-filesystems-io",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux memory, filesystems and IO",
+   "tags": [
+    "linux",
+    "virtual-memory",
+    "filesystems",
+    "page-cache",
+    "disk"
+   ]
+  },
+  {
+   "id": "linux-networking",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux networking stack",
+   "tags": [
+    "linux",
+    "networking",
+    "tcp",
+    "iproute2",
+    "dns"
+   ]
+  },
+  {
+   "id": "linux-processes",
+   "sec": "devops",
+   "sub": "linux",
+   "title": "Linux processes, signals and systemd",
+   "tags": [
+    "linux",
+    "processes",
+    "signals",
+    "systemd",
+    "scheduling"
+   ]
+  },
+  {
+   "id": "logging-stacks",
+   "sec": "devops",
+   "sub": "observability",
+   "title": "Logging stacks: Loki, ELK and EFK",
+   "tags": [
+    "observability",
+    "logging",
+    "loki",
+    "elasticsearch",
+    "grafana"
+   ]
+  },
+  {
+   "id": "otel-metric-types",
+   "sec": "devops",
+   "sub": "observability",
+   "title": "OpenTelemetry metric types and naming",
+   "tags": [
+    "observability",
+    "metrics",
+    "opentelemetry",
+    "prometheus"
+   ]
+  },
+  {
+   "id": "devops-resources",
+   "sec": "devops",
+   "sub": "resources",
+   "title": "DevOps, OS and general learning resources",
+   "tags": [
+    "resources",
+    "linux",
+    "docker",
+    "roadmap"
+   ]
+  },
+  {
+   "id": "collections-framework",
+   "sec": "java",
+   "sub": "collections",
+   "title": "Java Collections Framework map",
+   "tags": [
+    "collections",
+    "list",
+    "set",
+    "map",
+    "queue",
+    "big-o"
+   ]
+  },
+  {
+   "id": "data-structures",
+   "sec": "java",
+   "sub": "collections",
+   "title": "Core data structures and algorithms",
+   "tags": [
+    "data-structures",
+    "algorithms",
+    "big-o",
+    "trees",
+    "complexity"
+   ]
+  },
+  {
+   "id": "hashmap-internals",
+   "sec": "java",
+   "sub": "collections",
+   "title": "How HashMap works inside",
+   "tags": [
+    "hashmap",
+    "hashing",
+    "equals-hashcode",
+    "red-black-tree",
+    "weakhashmap"
+   ]
+  },
+  {
+   "id": "iterators-and-fail-fast",
+   "sec": "java",
+   "sub": "collections",
+   "title": "Iterator, Iterable and fail-fast vs fail-safe",
+   "tags": [
+    "iterator",
+    "iterable",
+    "fail-fast",
+    "concurrentmodificationexception"
+   ]
+  },
+  {
+   "id": "completable-future",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "CompletableFuture essentials",
+   "tags": [
+    "concurrency",
+    "async"
+   ]
+  },
+  {
+   "id": "concurrency-hazards",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Race conditions, deadlock, livelock and starvation",
+   "tags": [
+    "race-condition",
+    "deadlock",
+    "livelock",
+    "starvation"
+   ]
+  },
+  {
+   "id": "concurrent-collections",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Thread-safe collections",
+   "tags": [
+    "collections",
+    "concurrenthashmap",
+    "copyonwrite",
+    "blockingqueue"
+   ]
+  },
+  {
+   "id": "executors-and-thread-pools",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Thread pools, ExecutorService and Future",
+   "tags": [
+    "executor",
+    "thread-pool",
+    "future",
+    "async",
+    "spring-boot"
+   ]
+  },
+  {
+   "id": "fork-join-framework",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Fork/Join framework",
+   "tags": [
+    "fork-join",
+    "parallelism",
+    "work-stealing",
+    "parallel-streams"
+   ]
+  },
+  {
+   "id": "java-memory-model",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Java Memory Model and happens-before",
+   "tags": [
+    "jmm",
+    "happens-before",
+    "volatile",
+    "visibility"
+   ]
+  },
+  {
+   "id": "locks-and-lock-free",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "ReentrantLock, ReadWriteLock, spin locks and lock-free structures",
+   "tags": [
+    "locks",
+    "reentrantlock",
+    "readwritelock",
+    "cas",
+    "lock-free"
+   ]
+  },
+  {
+   "id": "synchronization-and-monitors",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Synchronization, monitors and wait/notify",
+   "tags": [
+    "synchronized",
+    "monitor",
+    "mutex",
+    "wait-notify",
+    "thread-safety",
+    "cas"
+   ]
+  },
+  {
+   "id": "synchronizers",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "CountDownLatch, CyclicBarrier and Semaphore",
+   "tags": [
+    "countdownlatch",
+    "cyclicbarrier",
+    "semaphore",
+    "coordination"
+   ]
+  },
+  {
+   "id": "threads-basics",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Threads, processes and the Thread API",
+   "tags": [
+    "threads",
+    "runnable",
+    "callable",
+    "interrupt",
+    "threadlocal"
+   ]
+  },
+  {
+   "id": "virtual-threads",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Virtual threads (Project Loom)",
+   "tags": [
+    "concurrency",
+    "jvm",
+    "java21"
+   ]
+  },
+  {
+   "id": "abstract-classes-and-interfaces",
+   "sec": "java",
+   "sub": "core",
+   "title": "Abstract classes and interfaces",
+   "tags": [
+    "abstract-class",
+    "interface",
+    "default-methods",
+    "sealed",
+    "functional-interface"
+   ]
+  },
+  {
+   "id": "annotations",
+   "sec": "java",
+   "sub": "core",
+   "title": "Annotations",
+   "tags": [
+    "annotations",
+    "metadata",
+    "retention",
+    "reflection",
+    "annotation-processing"
+   ]
+  },
+  {
+   "id": "casting-and-autoboxing",
+   "sec": "java",
+   "sub": "core",
+   "title": "Type casting, instanceof and autoboxing",
+   "tags": [
+    "casting",
+    "autoboxing",
+    "instanceof",
+    "pattern-matching",
+    "type-conversion"
+   ]
+  },
+  {
+   "id": "class-initialization-order",
+   "sec": "java",
+   "sub": "core",
+   "title": "Class loading and initialization order",
+   "tags": [
+    "class-loading",
+    "static-init",
+    "initialization-order",
+    "classloader"
+   ]
+  },
+  {
+   "id": "class-relationships",
+   "sec": "java",
+   "sub": "core",
+   "title": "Relationships between classes",
+   "tags": [
+    "oop",
+    "uml",
+    "composition",
+    "aggregation",
+    "association"
+   ]
+  },
+  {
+   "id": "constructors-and-initialization",
+   "sec": "java",
+   "sub": "core",
+   "title": "Constructors and object initialization",
+   "tags": [
+    "constructors",
+    "initialization",
+    "builder",
+    "records",
+    "object-creation"
+   ]
+  },
+  {
+   "id": "enums",
+   "sec": "java",
+   "sub": "core",
+   "title": "Enums",
+   "tags": [
+    "enum",
+    "constants",
+    "singleton",
+    "enummap",
+    "switch"
+   ]
+  },
+  {
+   "id": "equals-and-hashcode",
+   "sec": "java",
+   "sub": "core",
+   "title": "equals and hashCode contracts",
+   "tags": [
+    "equals",
+    "hashcode",
+    "object-identity",
+    "contracts",
+    "records"
+   ]
+  },
+  {
+   "id": "exceptions",
+   "sec": "java",
+   "sub": "core",
+   "title": "Exceptions",
+   "tags": [
+    "exceptions",
+    "checked",
+    "unchecked",
+    "try-with-resources",
+    "error-handling"
+   ]
+  },
+  {
+   "id": "generics",
+   "sec": "java",
+   "sub": "core",
+   "title": "Generics, wildcards and type erasure",
+   "tags": [
+    "generics",
+    "wildcards",
+    "pecs",
+    "type-erasure"
+   ]
+  },
+  {
+   "id": "immutable-objects",
+   "sec": "java",
+   "sub": "core",
+   "title": "Immutable objects",
+   "tags": [
+    "immutability",
+    "final",
+    "defensive-copy",
+    "records",
+    "thread-safety"
+   ]
+  },
+  {
+   "id": "java-ee-and-jakarta",
+   "sec": "java",
+   "sub": "core",
+   "title": "Java EE, Jakarta EE and how Spring uses the specifications",
+   "tags": [
+    "jakarta-ee",
+    "java-ee",
+    "servlet",
+    "jpa",
+    "specifications"
+   ]
+  },
+  {
+   "id": "jvm-jre-jdk",
+   "sec": "java",
+   "sub": "core",
+   "title": "JVM, JRE and JDK",
+   "tags": [
+    "jvm",
+    "jdk",
+    "jre",
+    "bytecode",
+    "jit"
+   ]
+  },
+  {
+   "id": "methods-overloading-overriding",
+   "sec": "java",
+   "sub": "core",
+   "title": "Methods, signatures, overloading and overriding",
+   "tags": [
+    "methods",
+    "overloading",
+    "overriding",
+    "signature",
+    "loops"
+   ]
+  },
+  {
+   "id": "modifiers-final-static-access",
+   "sec": "java",
+   "sub": "core",
+   "title": "Access modifiers, final, static, this and super",
+   "tags": [
+    "modifiers",
+    "final",
+    "static",
+    "access-control",
+    "effectively-final"
+   ]
+  },
+  {
+   "id": "nested-and-anonymous-classes",
+   "sec": "java",
+   "sub": "core",
+   "title": "Nested, inner, local, anonymous classes and lambdas",
+   "tags": [
+    "nested-classes",
+    "inner-classes",
+    "anonymous-classes",
+    "lambdas",
+    "closures"
+   ]
+  },
+  {
+   "id": "object-class-and-reflection",
+   "sec": "java",
+   "sub": "core",
+   "title": "The Object class, clone and reflection",
+   "tags": [
+    "object",
+    "clone",
+    "reflection",
+    "finalize",
+    "cleaner"
+   ]
+  },
+  {
+   "id": "oop-principles",
+   "sec": "java",
+   "sub": "core",
+   "title": "OOP principles and the kinds of polymorphism",
+   "tags": [
+    "oop",
+    "polymorphism",
+    "encapsulation",
+    "inheritance",
+    "abstraction"
+   ]
+  },
+  {
+   "id": "primitives-and-wrappers",
+   "sec": "java",
+   "sub": "core",
+   "title": "Primitive types and wrapper classes",
+   "tags": [
+    "primitives",
+    "wrappers",
+    "integer-cache",
+    "immutability"
+   ]
+  },
+  {
+   "id": "strings-and-string-pool",
+   "sec": "java",
+   "sub": "core",
+   "title": "Strings, the string pool, StringBuilder and StringBuffer",
+   "tags": [
+    "string",
+    "string-pool",
+    "interning",
+    "stringbuilder",
+    "immutability"
+   ]
+  },
+  {
+   "id": "java-io-streams",
+   "sec": "java",
+   "sub": "io",
+   "title": "Java IO streams",
+   "tags": [
+    "java-io",
+    "streams",
+    "reader-writer",
+    "buffering",
+    "serialization"
+   ]
+  },
+  {
+   "id": "java-nio",
+   "sec": "java",
+   "sub": "io",
+   "title": "Java NIO: channels, buffers, selectors and NIO.2",
+   "tags": [
+    "java-nio",
+    "channels",
+    "buffers",
+    "selector",
+    "non-blocking-io"
+   ]
+  },
+  {
+   "id": "hikaricp-pool-sizing",
+   "sec": "java",
+   "sub": "jdbc",
+   "title": "HikariCP pool sizing",
+   "tags": [
+    "jdbc",
+    "performance",
+    "postgres"
+   ]
+  },
+  {
+   "id": "garbage-collection",
+   "sec": "java",
+   "sub": "jvm",
+   "title": "Garbage collection in HotSpot",
+   "tags": [
+    "gc",
+    "g1",
+    "zgc",
+    "generational",
+    "stop-the-world"
+   ]
+  },
+  {
+   "id": "jvm-memory-areas",
+   "sec": "java",
+   "sub": "jvm",
+   "title": "JVM memory areas",
+   "tags": [
+    "jvm",
+    "heap",
+    "stack",
+    "metaspace",
+    "memory-layout"
+   ]
+  },
+  {
+   "id": "reference-types",
+   "sec": "java",
+   "sub": "jvm",
+   "title": "Strong, soft, weak and phantom references",
+   "tags": [
+    "gc",
+    "references",
+    "memory",
+    "cache"
+   ]
+  },
+  {
+   "id": "functional-interfaces",
+   "sec": "java",
+   "sub": "streams",
+   "title": "Functional interfaces and lambdas",
+   "tags": [
+    "functional",
+    "lambda",
+    "method-reference",
+    "java.util.function"
+   ]
+  },
+  {
+   "id": "stream-api",
+   "sec": "java",
+   "sub": "streams",
+   "title": "Stream API, parallel streams and gatherers",
+   "tags": [
+    "streams",
+    "functional",
+    "parallel-streams",
+    "gatherers",
+    "java24"
+   ]
+  },
+  {
+   "id": "kafka-architecture",
+   "sec": "messaging",
+   "sub": "kafka",
+   "title": "Kafka architecture — brokers, topics, partitions, segments",
+   "tags": [
+    "kafka",
+    "messaging",
+    "distributed-systems",
+    "architecture"
+   ]
+  },
+  {
+   "id": "kafka-consumer",
+   "sec": "messaging",
+   "sub": "kafka",
+   "title": "Kafka consumer — groups, rebalancing, offsets, lag",
+   "tags": [
+    "kafka",
+    "messaging",
+    "consumer-groups",
+    "delivery-semantics"
+   ]
+  },
+  {
+   "id": "kafka-producer",
+   "sec": "messaging",
+   "sub": "kafka",
+   "title": "Kafka producer — partitioning, acks, idempotence, transactions",
+   "tags": [
+    "kafka",
+    "messaging",
+    "reliability",
+    "delivery-semantics"
+   ]
+  },
+  {
+   "id": "activemq-basics",
+   "sec": "messaging",
+   "sub": "rabbitmq",
+   "title": "ActiveMQ basics — JMS model, Classic vs Artemis",
+   "tags": [
+    "activemq",
+    "jms",
+    "messaging",
+    "message-broker"
+   ]
+  },
+  {
+   "id": "rabbitmq-basics",
+   "sec": "messaging",
+   "sub": "rabbitmq",
+   "title": "RabbitMQ basics — AMQP model, exchanges, queues, acks",
+   "tags": [
+    "rabbitmq",
+    "amqp",
+    "messaging",
+    "message-broker"
+   ]
+  },
+  {
+   "id": "spring-boot-properties-and-profiles",
+   "sec": "spring",
+   "sub": "boot",
+   "title": "Properties, profiles and tuning the embedded server",
+   "tags": [
+    "spring-boot",
+    "properties",
+    "profiles",
+    "configuration",
+    "performance"
+   ]
+  },
+  {
+   "id": "spring-boot-starters-and-autoconfiguration",
+   "sec": "spring",
+   "sub": "boot",
+   "title": "Spring Boot: starters, autoconfiguration and @SpringBootApplication",
+   "tags": [
+    "spring-boot",
+    "autoconfiguration",
+    "starters",
+    "conditional"
+   ]
+  },
+  {
+   "id": "spring-aop",
+   "sec": "spring",
+   "sub": "core",
+   "title": "Spring AOP: aspects, proxies and their limits",
+   "tags": [
+    "spring-core",
+    "aop",
+    "proxies",
+    "cglib"
+   ]
+  },
+  {
+   "id": "spring-bean-lifecycle",
+   "sec": "spring",
+   "sub": "core",
+   "title": "Bean lifecycle and how the context starts",
+   "tags": [
+    "spring-core",
+    "beans",
+    "lifecycle",
+    "bean-post-processor"
+   ]
+  },
+  {
+   "id": "spring-bean-scopes-and-configuration",
+   "sec": "spring",
+   "sub": "core",
+   "title": "Bean scopes and ways to configure beans",
+   "tags": [
+    "spring-core",
+    "beans",
+    "scopes",
+    "configuration"
+   ]
+  },
+  {
+   "id": "spring-ioc-and-di",
+   "sec": "spring",
+   "sub": "core",
+   "title": "IoC container and dependency injection in Spring",
+   "tags": [
+    "spring-core",
+    "ioc",
+    "dependency-injection",
+    "beans"
+   ]
+  },
+  {
+   "id": "hibernate-caching",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Hibernate first-level, second-level and query cache",
+   "tags": [
+    "hibernate",
+    "jpa",
+    "caching",
+    "performance"
+   ]
+  },
+  {
+   "id": "jpa-entities-and-relationships",
+   "sec": "spring",
+   "sub": "data",
+   "title": "JPA entities and relationship mappings",
+   "tags": [
+    "jpa",
+    "hibernate",
+    "orm",
+    "spring-data"
+   ]
+  },
+  {
+   "id": "jpa-locking",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Optimistic and pessimistic locking in JPA",
+   "tags": [
+    "jpa",
+    "hibernate",
+    "locking",
+    "concurrency"
+   ]
+  },
+  {
+   "id": "jpa-n-plus-one",
+   "sec": "spring",
+   "sub": "data",
+   "title": "The N+1 select problem and how to fix it",
+   "tags": [
+    "jpa",
+    "hibernate",
+    "performance",
+    "n-plus-one"
+   ]
+  },
+  {
+   "id": "jpa-persistence-context-and-entity-lifecycle",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Persistence context, entity lifecycle and flushing",
+   "tags": [
+    "jpa",
+    "hibernate",
+    "persistence-context",
+    "transactions"
+   ]
+  },
+  {
+   "id": "spring-cache-abstraction",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Spring Cache abstraction",
+   "tags": [
+    "spring",
+    "caching",
+    "redis",
+    "caffeine",
+    "aop"
+   ]
+  },
+  {
+   "id": "spring-data-repositories",
+   "sec": "spring",
+   "sub": "data",
+   "title": "Spring Data repositories and ways to write queries",
+   "tags": [
+    "spring-data",
+    "jpa",
+    "repositories",
+    "querydsl"
+   ]
+  },
+  {
+   "id": "spring-transactional",
+   "sec": "spring",
+   "sub": "data",
+   "title": "@Transactional: how it really works",
+   "tags": [
+    "transactions",
+    "jpa",
+    "aop"
+   ]
+  },
+  {
+   "id": "spring-kafka-consumer",
+   "sec": "spring",
+   "sub": "kafka",
+   "title": "Spring Kafka consumer basics",
+   "tags": [
+    "kafka",
+    "messaging",
+    "spring-boot"
+   ]
+  },
+  {
+   "id": "spring-resources",
+   "sec": "spring",
+   "sub": "resources",
+   "title": "Spring resources: links, tools and templates",
+   "tags": [
+    "spring",
+    "resources",
+    "links",
+    "tools"
+   ]
+  },
+  {
+   "id": "jwt-authentication",
+   "sec": "spring",
+   "sub": "security",
+   "title": "JWT authentication in a Spring Boot API",
+   "tags": [
+    "jwt",
+    "spring-security",
+    "authentication",
+    "tokens"
+   ]
+  },
+  {
+   "id": "spring-security-basics",
+   "sec": "spring",
+   "sub": "security",
+   "title": "Spring Security 6: filter chain, authentication and authorization",
+   "tags": [
+    "spring-security",
+    "authentication",
+    "authorization",
+    "filters"
+   ]
+  },
+  {
+   "id": "testing-types-and-dev-cycles",
+   "sec": "spring",
+   "sub": "testing",
+   "title": "Test types, test doubles and development cycles",
+   "tags": [
+    "testing",
+    "junit",
+    "mockito",
+    "spring-boot-test",
+    "tdd"
+   ]
+  },
+  {
+   "id": "openapi-swagger",
+   "sec": "spring",
+   "sub": "web",
+   "title": "API documentation with OpenAPI and Swagger",
+   "tags": [
+    "openapi",
+    "swagger",
+    "springdoc",
+    "api-design"
+   ]
+  },
+  {
+   "id": "rest-and-http",
+   "sec": "spring",
+   "sub": "web",
+   "title": "REST principles and HTTP essentials",
+   "tags": [
+    "rest",
+    "http",
+    "api-design",
+    "cors"
+   ]
+  },
+  {
+   "id": "rest-clients",
+   "sec": "spring",
+   "sub": "web",
+   "title": "Calling external APIs: RestTemplate, RestClient, WebClient, Feign and how to test them",
+   "tags": [
+    "rest-client",
+    "http",
+    "resttemplate",
+    "webclient",
+    "wiremock",
+    "testing"
+   ]
+  },
+  {
+   "id": "spring-mvc-request-lifecycle",
+   "sec": "spring",
+   "sub": "web",
+   "title": "Spring MVC: DispatcherServlet and the request lifecycle",
+   "tags": [
+    "spring-mvc",
+    "web",
+    "dispatcher-servlet",
+    "controllers"
+   ]
+  },
+  {
+   "id": "spring-mvc-validation-and-uploads",
+   "sec": "spring",
+   "sub": "web",
+   "title": "Request validation and file uploads in Spring MVC",
+   "tags": [
+    "spring-mvc",
+    "validation",
+    "bean-validation",
+    "multipart"
+   ]
+  },
+  {
+   "id": "spring-reactive-webclient-sse",
+   "sec": "spring",
+   "sub": "web",
+   "title": "Reactive Spring: WebFlux, WebClient and Server-Sent Events",
+   "tags": [
+    "reactive",
+    "webflux",
+    "webclient",
+    "sse",
+    "reactor"
+   ]
+  }
+ ],
+ "edges": [
+  {
+   "source": "abstract-classes-and-interfaces",
+   "target": "casting-and-autoboxing"
+  },
+  {
+   "source": "abstract-classes-and-interfaces",
+   "target": "enums"
+  },
+  {
+   "source": "abstract-classes-and-interfaces",
+   "target": "functional-interfaces"
+  },
+  {
+   "source": "abstract-classes-and-interfaces",
+   "target": "methods-overloading-overriding"
+  },
+  {
+   "source": "abstract-classes-and-interfaces",
+   "target": "modifiers-final-static-access"
+  },
+  {
+   "source": "abstract-classes-and-interfaces",
+   "target": "oop-principles"
+  },
+  {
+   "source": "activemq-basics",
+   "target": "idempotency"
+  },
+  {
+   "source": "activemq-basics",
+   "target": "java-ee-and-jakarta"
+  },
+  {
+   "source": "activemq-basics",
+   "target": "kafka-architecture"
+  },
+  {
+   "source": "activemq-basics",
+   "target": "kafka-consumer"
+  },
+  {
+   "source": "activemq-basics",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "activemq-basics",
+   "target": "rabbitmq-basics"
+  },
+  {
+   "source": "activemq-basics",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "annotations",
+   "target": "functional-interfaces"
+  },
+  {
+   "source": "annotations",
+   "target": "java-ee-and-jakarta"
+  },
+  {
+   "source": "annotations",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "annotations",
+   "target": "object-class-and-reflection"
+  },
+  {
+   "source": "annotations",
+   "target": "spring-aop"
+  },
+  {
+   "source": "annotations",
+   "target": "spring-bean-scopes-and-configuration"
+  },
+  {
+   "source": "annotations",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "annotations",
+   "target": "spring-mvc-validation-and-uploads"
+  },
+  {
+   "source": "annotations",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "database-indexes"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "ddd-basics"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "devops-resources"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "idempotency"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "kafka-architecture"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "kafka-consumer"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "postgres-indexes"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "rabbitmq-basics"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "redis-data-structures"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "solid"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "spring-cache-abstraction"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "spring-resources"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "creational-patterns"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "ddd-basics"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "functional-interfaces"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "iterators-and-fail-fast"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "java-nio"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "jpa-persistence-context-and-entity-lifecycle"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "rabbitmq-basics"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "solid"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "spring-bean-lifecycle"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "stream-api"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "behavioral-patterns",
+   "target": "threads-basics"
+  },
+  {
+   "source": "casting-and-autoboxing",
+   "target": "generics"
+  },
+  {
+   "source": "casting-and-autoboxing",
+   "target": "methods-overloading-overriding"
+  },
+  {
+   "source": "casting-and-autoboxing",
+   "target": "oop-principles"
+  },
+  {
+   "source": "casting-and-autoboxing",
+   "target": "primitives-and-wrappers"
+  },
+  {
+   "source": "class-initialization-order",
+   "target": "constructors-and-initialization"
+  },
+  {
+   "source": "class-initialization-order",
+   "target": "creational-patterns"
+  },
+  {
+   "source": "class-initialization-order",
+   "target": "enums"
+  },
+  {
+   "source": "class-initialization-order",
+   "target": "jvm-jre-jdk"
+  },
+  {
+   "source": "class-initialization-order",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "class-initialization-order",
+   "target": "modifiers-final-static-access"
+  },
+  {
+   "source": "class-initialization-order",
+   "target": "object-class-and-reflection"
+  },
+  {
+   "source": "class-initialization-order",
+   "target": "spring-bean-lifecycle"
+  },
+  {
+   "source": "class-relationships",
+   "target": "immutable-objects"
+  },
+  {
+   "source": "class-relationships",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "class-relationships",
+   "target": "oop-principles"
+  },
+  {
+   "source": "class-relationships",
+   "target": "solid"
+  },
+  {
+   "source": "class-relationships",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "class-relationships",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "collections-framework",
+   "target": "concurrent-collections"
+  },
+  {
+   "source": "collections-framework",
+   "target": "data-structures"
+  },
+  {
+   "source": "collections-framework",
+   "target": "enums"
+  },
+  {
+   "source": "collections-framework",
+   "target": "generics"
+  },
+  {
+   "source": "collections-framework",
+   "target": "hashmap-internals"
+  },
+  {
+   "source": "collections-framework",
+   "target": "iterators-and-fail-fast"
+  },
+  {
+   "source": "collections-framework",
+   "target": "solid"
+  },
+  {
+   "source": "completable-future",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "completable-future",
+   "target": "fork-join-framework"
+  },
+  {
+   "source": "completable-future",
+   "target": "functional-interfaces"
+  },
+  {
+   "source": "completable-future",
+   "target": "rest-clients"
+  },
+  {
+   "source": "completable-future",
+   "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "completable-future",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "concurrency-hazards",
+   "target": "immutable-objects"
+  },
+  {
+   "source": "concurrency-hazards",
+   "target": "java-memory-model"
+  },
+  {
+   "source": "concurrency-hazards",
+   "target": "jpa-locking"
+  },
+  {
+   "source": "concurrency-hazards",
+   "target": "locks-and-lock-free"
+  },
+  {
+   "source": "concurrency-hazards",
+   "target": "postgres-isolation-levels"
+  },
+  {
+   "source": "concurrency-hazards",
+   "target": "spring-bean-scopes-and-configuration"
+  },
+  {
+   "source": "concurrency-hazards",
+   "target": "synchronization-and-monitors"
+  },
+  {
+   "source": "concurrency-hazards",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "concurrent-collections",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "concurrent-collections",
+   "target": "hashmap-internals"
+  },
+  {
+   "source": "concurrent-collections",
+   "target": "iterators-and-fail-fast"
+  },
+  {
+   "source": "concurrent-collections",
+   "target": "locks-and-lock-free"
+  },
+  {
+   "source": "constraints-and-relationships",
+   "target": "database-fundamentals"
+  },
+  {
+   "source": "constraints-and-relationships",
+   "target": "database-indexes"
+  },
+  {
+   "source": "constraints-and-relationships",
+   "target": "idempotency"
+  },
+  {
+   "source": "constraints-and-relationships",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "constraints-and-relationships",
+   "target": "normalization-and-denormalization"
+  },
+  {
+   "source": "constraints-and-relationships",
+   "target": "sql-joins-and-commands"
+  },
+  {
+   "source": "constraints-and-relationships",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "creational-patterns"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "immutable-objects"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "java-memory-model"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "methods-overloading-overriding"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "modifiers-final-static-access"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "object-class-and-reflection"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "oop-principles"
+  },
+  {
+   "source": "constructors-and-initialization",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "ddd-basics"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "enums"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "immutable-objects"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "iterators-and-fail-fast"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "java-memory-model"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "solid"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "spring-bean-lifecycle"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "spring-bean-scopes-and-configuration"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "creational-patterns",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "data-structures",
+   "target": "database-indexes"
+  },
+  {
+   "source": "data-structures",
+   "target": "equals-and-hashcode"
+  },
+  {
+   "source": "data-structures",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "data-structures",
+   "target": "hashmap-internals"
+  },
+  {
+   "source": "data-structures",
+   "target": "iterators-and-fail-fast"
+  },
+  {
+   "source": "data-structures",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "data-structures",
+   "target": "postgres-indexes"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "database-indexes"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "devops-resources"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "normalization-and-denormalization"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "postgres-indexes"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "postgres-isolation-levels"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "redis-data-structures"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "sql-joins-and-commands"
+  },
+  {
+   "source": "database-fundamentals",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "database-indexes",
+   "target": "jpa-n-plus-one"
+  },
+  {
+   "source": "database-indexes",
+   "target": "normalization-and-denormalization"
+  },
+  {
+   "source": "database-indexes",
+   "target": "postgres-indexes"
+  },
+  {
+   "source": "database-indexes",
+   "target": "spring-cache-abstraction"
+  },
+  {
+   "source": "database-indexes",
+   "target": "sql-joins-and-commands"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "docker-swarm"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "idempotency"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "immutable-objects"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "jpa-n-plus-one"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "jpa-persistence-context-and-entity-lifecycle"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "kafka-architecture"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "rabbitmq-basics"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "solid"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "spring-data-repositories"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "devops-resources",
+   "target": "docker-containers-and-resources"
+  },
+  {
+   "source": "devops-resources",
+   "target": "docker-fundamentals"
+  },
+  {
+   "source": "devops-resources",
+   "target": "docker-socket-dind-dood"
+  },
+  {
+   "source": "devops-resources",
+   "target": "docker-swarm"
+  },
+  {
+   "source": "devops-resources",
+   "target": "docker-volumes-and-registry"
+  },
+  {
+   "source": "devops-resources",
+   "target": "dockerfile-and-images"
+  },
+  {
+   "source": "devops-resources",
+   "target": "git-commands"
+  },
+  {
+   "source": "devops-resources",
+   "target": "linux-architecture-and-kernel"
+  },
+  {
+   "source": "devops-resources",
+   "target": "linux-basics"
+  },
+  {
+   "source": "devops-resources",
+   "target": "linux-commands"
+  },
+  {
+   "source": "devops-resources",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "devops-resources",
+   "target": "linux-networking"
+  },
+  {
+   "source": "devops-resources",
+   "target": "linux-processes"
+  },
+  {
+   "source": "devops-resources",
+   "target": "logging-stacks"
+  },
+  {
+   "source": "devops-resources",
+   "target": "maven"
+  },
+  {
+   "source": "devops-resources",
+   "target": "otel-metric-types"
+  },
+  {
+   "source": "devops-resources",
+   "target": "spring-resources"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "docker-fundamentals"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "docker-socket-dind-dood"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "docker-swarm"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "docker-swarm-stack-deploy"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "dockerfile-and-images"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "fork-join-framework"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "garbage-collection"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "jvm-jre-jdk"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "linux-architecture-and-kernel"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "linux-commands"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "linux-processes"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "logging-stacks"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "docker-socket-dind-dood"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "docker-swarm"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "docker-volumes-and-registry"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "dockerfile-and-images"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "linux-architecture-and-kernel"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "linux-networking"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "docker-socket-dind-dood",
+   "target": "docker-swarm"
+  },
+  {
+   "source": "docker-socket-dind-dood",
+   "target": "docker-volumes-and-registry"
+  },
+  {
+   "source": "docker-socket-dind-dood",
+   "target": "git-commands"
+  },
+  {
+   "source": "docker-socket-dind-dood",
+   "target": "linux-basics"
+  },
+  {
+   "source": "docker-socket-dind-dood",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "docker-socket-dind-dood",
+   "target": "linux-networking"
+  },
+  {
+   "source": "docker-socket-dind-dood",
+   "target": "maven"
+  },
+  {
+   "source": "docker-socket-dind-dood",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "docker-swarm",
+   "target": "docker-swarm-stack-deploy"
+  },
+  {
+   "source": "docker-swarm",
+   "target": "docker-volumes-and-registry"
+  },
+  {
+   "source": "docker-swarm",
+   "target": "dockerfile-and-images"
+  },
+  {
+   "source": "docker-swarm",
+   "target": "linux-networking"
+  },
+  {
+   "source": "docker-swarm",
+   "target": "logging-stacks"
+  },
+  {
+   "source": "docker-swarm",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "docker-swarm-stack-deploy",
+   "target": "docker-volumes-and-registry"
+  },
+  {
+   "source": "docker-swarm-stack-deploy",
+   "target": "dockerfile-and-images"
+  },
+  {
+   "source": "docker-swarm-stack-deploy",
+   "target": "logging-stacks"
+  },
+  {
+   "source": "docker-volumes-and-registry",
+   "target": "dockerfile-and-images"
+  },
+  {
+   "source": "docker-volumes-and-registry",
+   "target": "linux-basics"
+  },
+  {
+   "source": "docker-volumes-and-registry",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "dockerfile-and-images",
+   "target": "linux-basics"
+  },
+  {
+   "source": "dockerfile-and-images",
+   "target": "linux-processes"
+  },
+  {
+   "source": "dockerfile-and-images",
+   "target": "logging-stacks"
+  },
+  {
+   "source": "dockerfile-and-images",
+   "target": "maven"
+  },
+  {
+   "source": "dockerfile-and-images",
+   "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "enums",
+   "target": "immutable-objects"
+  },
+  {
+   "source": "enums",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "equals-and-hashcode",
+   "target": "garbage-collection"
+  },
+  {
+   "source": "equals-and-hashcode",
+   "target": "hashmap-internals"
+  },
+  {
+   "source": "equals-and-hashcode",
+   "target": "immutable-objects"
+  },
+  {
+   "source": "equals-and-hashcode",
+   "target": "jpa-persistence-context-and-entity-lifecycle"
+  },
+  {
+   "source": "equals-and-hashcode",
+   "target": "methods-overloading-overriding"
+  },
+  {
+   "source": "equals-and-hashcode",
+   "target": "object-class-and-reflection"
+  },
+  {
+   "source": "equals-and-hashcode",
+   "target": "strings-and-string-pool"
+  },
+  {
+   "source": "equals-and-hashcode",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "exceptions",
+   "target": "java-io-streams"
+  },
+  {
+   "source": "exceptions",
+   "target": "methods-overloading-overriding"
+  },
+  {
+   "source": "exceptions",
+   "target": "object-class-and-reflection"
+  },
+  {
+   "source": "exceptions",
+   "target": "rest-and-http"
+  },
+  {
+   "source": "exceptions",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "exceptions",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "exceptions",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "exceptions",
+   "target": "threads-basics"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "fork-join-framework"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "java-nio"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "otel-metric-types"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "synchronizers"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "threads-basics"
+  },
+  {
+   "source": "executors-and-thread-pools",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "fork-join-framework",
+   "target": "stream-api"
+  },
+  {
+   "source": "fork-join-framework",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "functional-interfaces",
+   "target": "nested-and-anonymous-classes"
+  },
+  {
+   "source": "functional-interfaces",
+   "target": "stream-api"
+  },
+  {
+   "source": "functional-interfaces",
+   "target": "threads-basics"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "immutable-objects"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "java-memory-model"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "jvm-jre-jdk"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "linux-architecture-and-kernel"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "modifiers-final-static-access"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "nested-and-anonymous-classes"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "object-class-and-reflection"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "reference-types"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "strings-and-string-pool"
+  },
+  {
+   "source": "generics",
+   "target": "methods-overloading-overriding"
+  },
+  {
+   "source": "generics",
+   "target": "oop-principles"
+  },
+  {
+   "source": "generics",
+   "target": "primitives-and-wrappers"
+  },
+  {
+   "source": "git-commands",
+   "target": "linux-commands"
+  },
+  {
+   "source": "git-commands",
+   "target": "maven"
+  },
+  {
+   "source": "hashmap-internals",
+   "target": "reference-types"
+  },
+  {
+   "source": "hashmap-internals",
+   "target": "strings-and-string-pool"
+  },
+  {
+   "source": "hibernate-caching",
+   "target": "idempotency"
+  },
+  {
+   "source": "hibernate-caching",
+   "target": "jpa-n-plus-one"
+  },
+  {
+   "source": "hibernate-caching",
+   "target": "jpa-persistence-context-and-entity-lifecycle"
+  },
+  {
+   "source": "hibernate-caching",
+   "target": "redis-data-structures"
+  },
+  {
+   "source": "hibernate-caching",
+   "target": "spring-cache-abstraction"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "java-ee-and-jakarta"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "jpa-persistence-context-and-entity-lifecycle"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "linux-networking"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "otel-metric-types"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "idempotency",
+   "target": "jpa-locking"
+  },
+  {
+   "source": "idempotency",
+   "target": "jwt-authentication"
+  },
+  {
+   "source": "idempotency",
+   "target": "kafka-consumer"
+  },
+  {
+   "source": "idempotency",
+   "target": "kafka-producer"
+  },
+  {
+   "source": "idempotency",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "idempotency",
+   "target": "postgres-isolation-levels"
+  },
+  {
+   "source": "idempotency",
+   "target": "rabbitmq-basics"
+  },
+  {
+   "source": "idempotency",
+   "target": "redis-data-structures"
+  },
+  {
+   "source": "idempotency",
+   "target": "rest-and-http"
+  },
+  {
+   "source": "idempotency",
+   "target": "rest-clients"
+  },
+  {
+   "source": "idempotency",
+   "target": "spring-cache-abstraction"
+  },
+  {
+   "source": "idempotency",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "idempotency",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "idempotency",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "immutable-objects",
+   "target": "java-memory-model"
+  },
+  {
+   "source": "immutable-objects",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "immutable-objects",
+   "target": "modifiers-final-static-access"
+  },
+  {
+   "source": "immutable-objects",
+   "target": "object-class-and-reflection"
+  },
+  {
+   "source": "immutable-objects",
+   "target": "oop-principles"
+  },
+  {
+   "source": "immutable-objects",
+   "target": "primitives-and-wrappers"
+  },
+  {
+   "source": "immutable-objects",
+   "target": "strings-and-string-pool"
+  },
+  {
+   "source": "iterators-and-fail-fast",
+   "target": "methods-overloading-overriding"
+  },
+  {
+   "source": "java-ee-and-jakarta",
+   "target": "jpa-entities-and-relationships"
+  },
+  {
+   "source": "java-ee-and-jakarta",
+   "target": "spring-bean-lifecycle"
+  },
+  {
+   "source": "java-ee-and-jakarta",
+   "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "java-ee-and-jakarta",
+   "target": "spring-data-repositories"
+  },
+  {
+   "source": "java-ee-and-jakarta",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "java-ee-and-jakarta",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "java-ee-and-jakarta",
+   "target": "spring-mvc-validation-and-uploads"
+  },
+  {
+   "source": "java-ee-and-jakarta",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "java-io-streams",
+   "target": "java-nio"
+  },
+  {
+   "source": "java-io-streams",
+   "target": "linux-networking"
+  },
+  {
+   "source": "java-io-streams",
+   "target": "strings-and-string-pool"
+  },
+  {
+   "source": "java-io-streams",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "java-io-streams",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "java-memory-model",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "java-memory-model",
+   "target": "modifiers-final-static-access"
+  },
+  {
+   "source": "java-memory-model",
+   "target": "synchronization-and-monitors"
+  },
+  {
+   "source": "java-nio",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "java-nio",
+   "target": "linux-architecture-and-kernel"
+  },
+  {
+   "source": "java-nio",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "java-nio",
+   "target": "linux-networking"
+  },
+  {
+   "source": "java-nio",
+   "target": "reference-types"
+  },
+  {
+   "source": "java-nio",
+   "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "java-nio",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "jpa-entities-and-relationships",
+   "target": "jpa-locking"
+  },
+  {
+   "source": "jpa-entities-and-relationships",
+   "target": "jpa-n-plus-one"
+  },
+  {
+   "source": "jpa-entities-and-relationships",
+   "target": "jpa-persistence-context-and-entity-lifecycle"
+  },
+  {
+   "source": "jpa-entities-and-relationships",
+   "target": "spring-data-repositories"
+  },
+  {
+   "source": "jpa-entities-and-relationships",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "jpa-entities-and-relationships",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "jpa-locking",
+   "target": "jpa-persistence-context-and-entity-lifecycle"
+  },
+  {
+   "source": "jpa-locking",
+   "target": "locks-and-lock-free"
+  },
+  {
+   "source": "jpa-locking",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "jpa-locking",
+   "target": "postgres-isolation-levels"
+  },
+  {
+   "source": "jpa-locking",
+   "target": "spring-data-repositories"
+  },
+  {
+   "source": "jpa-locking",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "jpa-locking",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "jpa-n-plus-one",
+   "target": "jpa-persistence-context-and-entity-lifecycle"
+  },
+  {
+   "source": "jpa-n-plus-one",
+   "target": "logging-stacks"
+  },
+  {
+   "source": "jpa-n-plus-one",
+   "target": "spring-data-repositories"
+  },
+  {
+   "source": "jpa-n-plus-one",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "jpa-n-plus-one",
+   "target": "sql-joins-and-commands"
+  },
+  {
+   "source": "jpa-persistence-context-and-entity-lifecycle",
+   "target": "object-class-and-reflection"
+  },
+  {
+   "source": "jpa-persistence-context-and-entity-lifecycle",
+   "target": "spring-cache-abstraction"
+  },
+  {
+   "source": "jpa-persistence-context-and-entity-lifecycle",
+   "target": "spring-data-repositories"
+  },
+  {
+   "source": "jpa-persistence-context-and-entity-lifecycle",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "jpa-persistence-context-and-entity-lifecycle",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "jpa-persistence-context-and-entity-lifecycle",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "jpa-persistence-context-and-entity-lifecycle",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "jvm-jre-jdk",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "jvm-jre-jdk",
+   "target": "maven"
+  },
+  {
+   "source": "jvm-jre-jdk",
+   "target": "reference-types"
+  },
+  {
+   "source": "jvm-memory-areas",
+   "target": "linux-architecture-and-kernel"
+  },
+  {
+   "source": "jvm-memory-areas",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "jvm-memory-areas",
+   "target": "oop-principles"
+  },
+  {
+   "source": "jvm-memory-areas",
+   "target": "reference-types"
+  },
+  {
+   "source": "jvm-memory-areas",
+   "target": "strings-and-string-pool"
+  },
+  {
+   "source": "jvm-memory-areas",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "jwt-authentication",
+   "target": "redis-data-structures"
+  },
+  {
+   "source": "jwt-authentication",
+   "target": "rest-and-http"
+  },
+  {
+   "source": "jwt-authentication",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "jwt-authentication",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "jwt-authentication",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "kafka-architecture",
+   "target": "kafka-consumer"
+  },
+  {
+   "source": "kafka-architecture",
+   "target": "kafka-producer"
+  },
+  {
+   "source": "kafka-architecture",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "kafka-architecture",
+   "target": "logging-stacks"
+  },
+  {
+   "source": "kafka-architecture",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "kafka-architecture",
+   "target": "rabbitmq-basics"
+  },
+  {
+   "source": "kafka-architecture",
+   "target": "redis-data-structures"
+  },
+  {
+   "source": "kafka-architecture",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "kafka-consumer",
+   "target": "kafka-producer"
+  },
+  {
+   "source": "kafka-consumer",
+   "target": "linux-processes"
+  },
+  {
+   "source": "kafka-consumer",
+   "target": "otel-metric-types"
+  },
+  {
+   "source": "kafka-consumer",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "kafka-consumer",
+   "target": "rabbitmq-basics"
+  },
+  {
+   "source": "kafka-consumer",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "kafka-producer",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "kafka-producer",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "kafka-producer",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "linux-architecture-and-kernel",
+   "target": "linux-basics"
+  },
+  {
+   "source": "linux-architecture-and-kernel",
+   "target": "linux-commands"
+  },
+  {
+   "source": "linux-architecture-and-kernel",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "linux-architecture-and-kernel",
+   "target": "linux-networking"
+  },
+  {
+   "source": "linux-architecture-and-kernel",
+   "target": "linux-processes"
+  },
+  {
+   "source": "linux-basics",
+   "target": "linux-commands"
+  },
+  {
+   "source": "linux-basics",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "linux-basics",
+   "target": "linux-processes"
+  },
+  {
+   "source": "linux-commands",
+   "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "linux-commands",
+   "target": "linux-networking"
+  },
+  {
+   "source": "linux-commands",
+   "target": "linux-processes"
+  },
+  {
+   "source": "linux-memory-filesystems-io",
+   "target": "linux-processes"
+  },
+  {
+   "source": "linux-networking",
+   "target": "rest-and-http"
+  },
+  {
+   "source": "linux-networking",
+   "target": "rest-clients"
+  },
+  {
+   "source": "linux-processes",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "linux-processes",
+   "target": "threads-basics"
+  },
+  {
+   "source": "linux-processes",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "locks-and-lock-free",
+   "target": "synchronization-and-monitors"
+  },
+  {
+   "source": "logging-stacks",
+   "target": "otel-metric-types"
+  },
+  {
+   "source": "logging-stacks",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "maven",
+   "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "maven",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "methods-overloading-overriding",
+   "target": "modifiers-final-static-access"
+  },
+  {
+   "source": "methods-overloading-overriding",
+   "target": "oop-principles"
+  },
+  {
+   "source": "methods-overloading-overriding",
+   "target": "stream-api"
+  },
+  {
+   "source": "modifiers-final-static-access",
+   "target": "nested-and-anonymous-classes"
+  },
+  {
+   "source": "modifiers-final-static-access",
+   "target": "oop-principles"
+  },
+  {
+   "source": "nested-and-anonymous-classes",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "normalization-and-denormalization",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "normalization-and-denormalization",
+   "target": "spring-data-repositories"
+  },
+  {
+   "source": "normalization-and-denormalization",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "normalization-and-denormalization",
+   "target": "sql-joins-and-commands"
+  },
+  {
+   "source": "object-class-and-reflection",
+   "target": "reference-types"
+  },
+  {
+   "source": "object-class-and-reflection",
+   "target": "spring-aop"
+  },
+  {
+   "source": "object-class-and-reflection",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "object-class-and-reflection",
+   "target": "synchronization-and-monitors"
+  },
+  {
+   "source": "oop-principles",
+   "target": "solid"
+  },
+  {
+   "source": "openapi-swagger",
+   "target": "rest-and-http"
+  },
+  {
+   "source": "openapi-swagger",
+   "target": "rest-clients"
+  },
+  {
+   "source": "openapi-swagger",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "openapi-swagger",
+   "target": "spring-mvc-validation-and-uploads"
+  },
+  {
+   "source": "openapi-swagger",
+   "target": "spring-resources"
+  },
+  {
+   "source": "openapi-swagger",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "otel-metric-types",
+   "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "outbox-pattern",
+   "target": "postgres-indexes"
+  },
+  {
+   "source": "outbox-pattern",
+   "target": "rabbitmq-basics"
+  },
+  {
+   "source": "outbox-pattern",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "outbox-pattern",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "outbox-pattern",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "postgres-indexes",
+   "target": "postgres-isolation-levels"
+  },
+  {
+   "source": "postgres-indexes",
+   "target": "sql-joins-and-commands"
+  },
+  {
+   "source": "postgres-isolation-levels",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "postgres-isolation-levels",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "primitives-and-wrappers",
+   "target": "stream-api"
+  },
+  {
+   "source": "primitives-and-wrappers",
+   "target": "strings-and-string-pool"
+  },
+  {
+   "source": "primitives-and-wrappers",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "redis-data-structures",
+   "target": "spring-cache-abstraction"
+  },
+  {
+   "source": "rest-and-http",
+   "target": "rest-clients"
+  },
+  {
+   "source": "rest-and-http",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "rest-and-http",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "rest-and-http",
+   "target": "spring-mvc-validation-and-uploads"
+  },
+  {
+   "source": "rest-and-http",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "rest-clients",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "rest-clients",
+   "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "rest-clients",
+   "target": "spring-resources"
+  },
+  {
+   "source": "rest-clients",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "rest-clients",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "rest-clients",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "solid",
+   "target": "spring-bean-lifecycle"
+  },
+  {
+   "source": "solid",
+   "target": "spring-data-repositories"
+  },
+  {
+   "source": "solid",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "solid",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "solid",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "spring-aop",
+   "target": "spring-bean-lifecycle"
+  },
+  {
+   "source": "spring-aop",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "spring-aop",
+   "target": "spring-mvc-validation-and-uploads"
+  },
+  {
+   "source": "spring-aop",
+   "target": "spring-resources"
+  },
+  {
+   "source": "spring-aop",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "spring-aop",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "spring-aop",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "spring-bean-lifecycle",
+   "target": "spring-bean-scopes-and-configuration"
+  },
+  {
+   "source": "spring-bean-lifecycle",
+   "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "spring-bean-lifecycle",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "spring-bean-lifecycle",
+   "target": "spring-resources"
+  },
+  {
+   "source": "spring-bean-scopes-and-configuration",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "spring-bean-scopes-and-configuration",
+   "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "spring-bean-scopes-and-configuration",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "spring-bean-scopes-and-configuration",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "spring-boot-properties-and-profiles",
+   "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "spring-boot-properties-and-profiles",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "spring-boot-properties-and-profiles",
+   "target": "spring-resources"
+  },
+  {
+   "source": "spring-boot-properties-and-profiles",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "spring-boot-starters-and-autoconfiguration",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "spring-boot-starters-and-autoconfiguration",
+   "target": "spring-resources"
+  },
+  {
+   "source": "spring-cache-abstraction",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "spring-data-repositories",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "spring-ioc-and-di",
+   "target": "spring-resources"
+  },
+  {
+   "source": "spring-ioc-and-di",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "spring-kafka-consumer",
+   "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "spring-kafka-consumer",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "spring-kafka-consumer",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "spring-kafka-consumer",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "spring-kafka-consumer",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "spring-mvc-request-lifecycle",
+   "target": "spring-mvc-validation-and-uploads"
+  },
+  {
+   "source": "spring-mvc-request-lifecycle",
+   "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "spring-mvc-request-lifecycle",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "spring-mvc-request-lifecycle",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "spring-mvc-request-lifecycle",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "spring-mvc-validation-and-uploads",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "spring-reactive-webclient-sse",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "spring-resources",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "spring-resources",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "spring-resources",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "spring-transactional",
+   "target": "sql-joins-and-commands"
+  },
+  {
+   "source": "spring-transactional",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "spring-transactional",
+   "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "spring-transactional",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "sql-joins-and-commands",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "strings-and-string-pool",
+   "target": "structural-patterns"
+  },
+  {
+   "source": "synchronization-and-monitors",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "threads-basics",
+   "target": "virtual-threads"
+  }
+ ]
+}
