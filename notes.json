@@ -1,5 +1,17 @@
 {
  "sections": {
+  "computer-science": {
+   "name": "Computer science",
+   "subs": {
+    "algorithms": "Algorithms",
+    "data-structures": "Data structures",
+    "operating-systems": "Operating systems",
+    "concurrency-theory": "Concurrency theory",
+    "computation": "Computation & hardware",
+    "programming": "Programming concepts",
+    "security-basics": "Security basics"
+   }
+  },
   "java": {
    "name": "Java",
    "subs": {
@@ -28,8 +40,10 @@
   "databases": {
    "name": "Databases",
    "subs": {
-    "relational": "Relational",
-    "nosql": "NoSQL"
+    "fundamentals": "Fundamentals",
+    "postgres": "PostgreSQL",
+    "nosql": "NoSQL",
+    "design": "Data modeling & migrations"
    }
   },
   "messaging": {
@@ -39,16 +53,46 @@
     "rabbitmq": "RabbitMQ & ActiveMQ"
    }
   },
+  "networking": {
+   "name": "Networking",
+   "subs": {
+    "fundamentals": "Fundamentals",
+    "http": "HTTP",
+    "security": "TLS & auth",
+    "dns-and-routing": "DNS, proxies & load balancing",
+    "tools": "Tools"
+   }
+  },
+  "distributed-systems": {
+   "name": "Distributed systems",
+   "subs": {
+    "fundamentals": "Fundamentals",
+    "consensus": "Consensus & coordination",
+    "replication": "Replication",
+    "partitioning": "Partitioning",
+    "patterns": "Patterns"
+   }
+  },
+  "system-design": {
+   "name": "System design",
+   "subs": {
+    "method": "Method & estimates",
+    "building-blocks": "Building blocks",
+    "scaling": "Scaling",
+    "case-studies": "Case studies"
+   }
+  },
   "architecture": {
    "name": "Architecture",
    "subs": {
-    "principles": "Principles & DDD",
+    "principles": "Principles",
+    "styles": "Architecture styles",
+    "ddd": "Domain-driven design",
     "patterns": "Design patterns",
-    "messaging": "Messaging & reliability",
-    "resources": "Resources",
     "microservices": "Microservices & resilience",
-    "system-design": "System design",
-    "workflows": "Workflow orchestration"
+    "messaging": "Messaging & reliability",
+    "workflows": "Workflow orchestration",
+    "resources": "Resources"
    }
   },
   "devops": {
@@ -56,11 +100,11 @@
    "subs": {
     "linux": "Linux",
     "docker": "Docker",
+    "kubernetes": "Kubernetes",
     "git": "Git",
     "build": "Build tools",
     "observability": "Observability",
-    "resources": "Resources",
-    "kubernetes": "Kubernetes"
+    "resources": "Resources"
    }
   },
   "projects": {
@@ -71,6 +115,38 @@
   }
  },
  "notes": [
+  {
+   "id": "ddd-basics",
+   "sec": "architecture",
+   "sub": "ddd",
+   "title": "DDD basics and the architecture vocabulary",
+   "tags": [
+    "ddd",
+    "architecture",
+    "aggregates",
+    "design-principles"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/architecture/ddd/ddd-basics.md",
+   "links": [
+    "architecture-resources",
+    "behavioral-patterns",
+    "creational-patterns",
+    "docker-swarm",
+    "idempotency",
+    "immutable-objects",
+    "jpa-entities-and-relationships",
+    "jpa-n-plus-one",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "kafka-architecture",
+    "outbox-pattern",
+    "rabbitmq-basics",
+    "solid",
+    "spring-data-repositories",
+    "structural-patterns"
+   ],
+   "words": 845
+  },
   {
    "id": "idempotency",
    "sec": "architecture",
@@ -327,38 +403,6 @@
    "words": 692
   },
   {
-   "id": "ddd-basics",
-   "sec": "architecture",
-   "sub": "principles",
-   "title": "DDD basics and the architecture vocabulary",
-   "tags": [
-    "ddd",
-    "architecture",
-    "aggregates",
-    "design-principles"
-   ],
-   "learned": "2026-10-22",
-   "path": "notes/architecture/principles/ddd-basics.md",
-   "links": [
-    "architecture-resources",
-    "behavioral-patterns",
-    "creational-patterns",
-    "docker-swarm",
-    "idempotency",
-    "immutable-objects",
-    "jpa-entities-and-relationships",
-    "jpa-n-plus-one",
-    "jpa-persistence-context-and-entity-lifecycle",
-    "kafka-architecture",
-    "outbox-pattern",
-    "rabbitmq-basics",
-    "solid",
-    "spring-data-repositories",
-    "structural-patterns"
-   ],
-   "words": 845
-  },
-  {
    "id": "solid",
    "sec": "architecture",
    "sub": "principles",
@@ -418,48 +462,6 @@
    "words": 495
   },
   {
-   "id": "system-design-basics",
-   "sec": "architecture",
-   "sub": "system-design",
-   "title": "System design basics — framework, building blocks, numbers",
-   "tags": [
-    "system-design",
-    "architecture",
-    "distributed-systems",
-    "interview"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/architecture/system-design/system-design-basics.md",
-   "links": [
-    "api-gateway-and-service-discovery",
-    "architecture-resources",
-    "circuit-breaker",
-    "database-fundamentals",
-    "distributed-tracing",
-    "hibernate-caching",
-    "idempotency",
-    "jwt-authentication",
-    "kafka-architecture",
-    "kafka-consumer",
-    "kafka-producer",
-    "kubernetes-basics",
-    "logging-stacks",
-    "normalization-and-denormalization",
-    "openapi-swagger",
-    "outbox-pattern",
-    "postgres-indexes",
-    "postgres-isolation-levels",
-    "rabbitmq-basics",
-    "redis-data-structures",
-    "rest-and-http",
-    "saga",
-    "spring-cache-abstraction",
-    "temporal-concepts",
-    "transactions-acid-and-isolation"
-   ],
-   "words": 1055
-  },
-  {
    "id": "temporal-concepts",
    "sec": "architecture",
    "sub": "workflows",
@@ -484,6 +486,172 @@
    "words": 1101
   },
   {
+   "id": "data-structures",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Core data structures and algorithms",
+   "tags": [
+    "data-structures",
+    "algorithms",
+    "big-o",
+    "trees",
+    "complexity"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/computer-science/data-structures/data-structures.md",
+   "links": [
+    "collections-framework",
+    "database-indexes",
+    "equals-and-hashcode",
+    "executors-and-thread-pools",
+    "hashmap-internals",
+    "iterators-and-fail-fast",
+    "postgres-indexes"
+   ],
+   "words": 967
+  },
+  {
+   "id": "constraints-and-relationships",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Constraints and table relationships",
+   "tags": [
+    "sql",
+    "constraints",
+    "foreign-keys",
+    "schema-design"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/fundamentals/constraints-and-relationships.md",
+   "links": [
+    "database-indexes",
+    "idempotency",
+    "jpa-entities-and-relationships",
+    "normalization-and-denormalization"
+   ],
+   "words": 1047
+  },
+  {
+   "id": "database-fundamentals",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Databases, DBMS, relational vs NoSQL, and views",
+   "tags": [
+    "databases",
+    "sql",
+    "fundamentals",
+    "views"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/fundamentals/database-fundamentals.md",
+   "links": [
+    "constraints-and-relationships",
+    "database-indexes",
+    "hikaricp-pool-sizing",
+    "jpa-entities-and-relationships",
+    "normalization-and-denormalization",
+    "postgres-indexes",
+    "postgres-isolation-levels",
+    "redis-data-structures",
+    "sql-joins-and-commands",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 999
+  },
+  {
+   "id": "database-indexes",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Database indexes: how they work and when they hurt",
+   "tags": [
+    "databases",
+    "indexes",
+    "performance",
+    "b-tree"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/fundamentals/database-indexes.md",
+   "links": [
+    "constraints-and-relationships",
+    "jpa-n-plus-one",
+    "postgres-indexes",
+    "sql-joins-and-commands"
+   ],
+   "words": 1004
+  },
+  {
+   "id": "normalization-and-denormalization",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Normal forms and denormalization",
+   "tags": [
+    "databases",
+    "schema-design",
+    "normalization",
+    "sql"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/fundamentals/normalization-and-denormalization.md",
+   "links": [
+    "constraints-and-relationships",
+    "database-fundamentals",
+    "database-indexes",
+    "outbox-pattern",
+    "spring-data-repositories",
+    "spring-transactional"
+   ],
+   "words": 765
+  },
+  {
+   "id": "sql-joins-and-commands",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "SQL command categories and join types",
+   "tags": [
+    "sql",
+    "joins",
+    "ddl",
+    "dml"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/fundamentals/sql-joins-and-commands.md",
+   "links": [
+    "constraints-and-relationships",
+    "database-indexes",
+    "jpa-n-plus-one",
+    "normalization-and-denormalization",
+    "postgres-indexes",
+    "spring-transactional",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 854
+  },
+  {
+   "id": "transactions-acid-and-isolation",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Transactions, ACID and isolation anomalies",
+   "tags": [
+    "transactions",
+    "acid",
+    "isolation",
+    "concurrency"
+   ],
+   "learned": "2026-10-22",
+   "path": "notes/databases/fundamentals/transactions-acid-and-isolation.md",
+   "links": [
+    "concurrency-hazards",
+    "constraints-and-relationships",
+    "idempotency",
+    "jpa-locking",
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "spring-transactional",
+    "sql-joins-and-commands"
+   ],
+   "words": 985
+  },
+  {
    "id": "redis-data-structures",
    "sec": "databases",
    "sub": "nosql",
@@ -503,101 +671,9 @@
    "words": 304
   },
   {
-   "id": "constraints-and-relationships",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Constraints and table relationships",
-   "tags": [
-    "sql",
-    "constraints",
-    "foreign-keys",
-    "schema-design"
-   ],
-   "learned": "2026-10-22",
-   "path": "notes/databases/relational/constraints-and-relationships.md",
-   "links": [
-    "database-indexes",
-    "idempotency",
-    "jpa-entities-and-relationships",
-    "normalization-and-denormalization"
-   ],
-   "words": 1047
-  },
-  {
-   "id": "database-fundamentals",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Databases, DBMS, relational vs NoSQL, and views",
-   "tags": [
-    "databases",
-    "sql",
-    "fundamentals",
-    "views"
-   ],
-   "learned": "2026-10-22",
-   "path": "notes/databases/relational/database-fundamentals.md",
-   "links": [
-    "constraints-and-relationships",
-    "database-indexes",
-    "hikaricp-pool-sizing",
-    "jpa-entities-and-relationships",
-    "normalization-and-denormalization",
-    "postgres-indexes",
-    "postgres-isolation-levels",
-    "redis-data-structures",
-    "sql-joins-and-commands",
-    "transactions-acid-and-isolation"
-   ],
-   "words": 999
-  },
-  {
-   "id": "database-indexes",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Database indexes: how they work and when they hurt",
-   "tags": [
-    "databases",
-    "indexes",
-    "performance",
-    "b-tree"
-   ],
-   "learned": "2026-10-22",
-   "path": "notes/databases/relational/database-indexes.md",
-   "links": [
-    "constraints-and-relationships",
-    "jpa-n-plus-one",
-    "postgres-indexes",
-    "sql-joins-and-commands"
-   ],
-   "words": 1004
-  },
-  {
-   "id": "normalization-and-denormalization",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Normal forms and denormalization",
-   "tags": [
-    "databases",
-    "schema-design",
-    "normalization",
-    "sql"
-   ],
-   "learned": "2026-10-22",
-   "path": "notes/databases/relational/normalization-and-denormalization.md",
-   "links": [
-    "constraints-and-relationships",
-    "database-fundamentals",
-    "database-indexes",
-    "outbox-pattern",
-    "spring-data-repositories",
-    "spring-transactional"
-   ],
-   "words": 765
-  },
-  {
    "id": "postgres-indexes",
    "sec": "databases",
-   "sub": "relational",
+   "sub": "postgres",
    "title": "Postgres index types and when to use them",
    "tags": [
     "postgres",
@@ -605,7 +681,7 @@
     "indexes"
    ],
    "learned": "2026-08-29",
-   "path": "notes/databases/relational/postgres-indexes.md",
+   "path": "notes/databases/postgres/postgres-indexes.md",
    "links": [
     "database-indexes",
     "jpa-n-plus-one",
@@ -617,7 +693,7 @@
   {
    "id": "postgres-isolation-levels",
    "sec": "databases",
-   "sub": "relational",
+   "sub": "postgres",
    "title": "Transaction isolation levels in Postgres",
    "tags": [
     "postgres",
@@ -626,62 +702,13 @@
     "mvcc"
    ],
    "learned": "2026-09-12",
-   "path": "notes/databases/relational/postgres-isolation-levels.md",
+   "path": "notes/databases/postgres/postgres-isolation-levels.md",
    "links": [
     "idempotency",
     "postgres-indexes",
     "spring-transactional"
    ],
    "words": 218
-  },
-  {
-   "id": "sql-joins-and-commands",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "SQL command categories and join types",
-   "tags": [
-    "sql",
-    "joins",
-    "ddl",
-    "dml"
-   ],
-   "learned": "2026-10-22",
-   "path": "notes/databases/relational/sql-joins-and-commands.md",
-   "links": [
-    "constraints-and-relationships",
-    "database-indexes",
-    "jpa-n-plus-one",
-    "normalization-and-denormalization",
-    "postgres-indexes",
-    "spring-transactional",
-    "transactions-acid-and-isolation"
-   ],
-   "words": 854
-  },
-  {
-   "id": "transactions-acid-and-isolation",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Transactions, ACID and isolation anomalies",
-   "tags": [
-    "transactions",
-    "acid",
-    "isolation",
-    "concurrency"
-   ],
-   "learned": "2026-10-22",
-   "path": "notes/databases/relational/transactions-acid-and-isolation.md",
-   "links": [
-    "concurrency-hazards",
-    "constraints-and-relationships",
-    "idempotency",
-    "jpa-locking",
-    "outbox-pattern",
-    "postgres-isolation-levels",
-    "spring-transactional",
-    "sql-joins-and-commands"
-   ],
-   "words": 985
   },
   {
    "id": "maven",
@@ -1188,31 +1215,6 @@
     "iterators-and-fail-fast"
    ],
    "words": 683
-  },
-  {
-   "id": "data-structures",
-   "sec": "java",
-   "sub": "collections",
-   "title": "Core data structures and algorithms",
-   "tags": [
-    "data-structures",
-    "algorithms",
-    "big-o",
-    "trees",
-    "complexity"
-   ],
-   "learned": "2026-10-22",
-   "path": "notes/java/collections/data-structures.md",
-   "links": [
-    "collections-framework",
-    "database-indexes",
-    "equals-and-hashcode",
-    "executors-and-thread-pools",
-    "hashmap-internals",
-    "iterators-and-fail-fast",
-    "postgres-indexes"
-   ],
-   "words": 967
   },
   {
    "id": "hashmap-internals",
@@ -2995,6 +2997,48 @@
     "virtual-threads"
    ],
    "words": 727
+  },
+  {
+   "id": "system-design-basics",
+   "sec": "system-design",
+   "sub": "method",
+   "title": "System design basics — framework, building blocks, numbers",
+   "tags": [
+    "system-design",
+    "architecture",
+    "distributed-systems",
+    "interview"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/method/system-design-basics.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "architecture-resources",
+    "circuit-breaker",
+    "database-fundamentals",
+    "distributed-tracing",
+    "hibernate-caching",
+    "idempotency",
+    "jwt-authentication",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kafka-producer",
+    "kubernetes-basics",
+    "logging-stacks",
+    "normalization-and-denormalization",
+    "openapi-swagger",
+    "outbox-pattern",
+    "postgres-indexes",
+    "postgres-isolation-levels",
+    "rabbitmq-basics",
+    "redis-data-structures",
+    "rest-and-http",
+    "saga",
+    "spring-cache-abstraction",
+    "temporal-concepts",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 1055
   }
  ]
 }
