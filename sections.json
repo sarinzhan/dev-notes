@@ -9,6 +9,16 @@
    "computation": "Computation & hardware",
    "programming": "Programming concepts",
    "security-basics": "Security basics"
+  },
+  "name_ru": "Информатика",
+  "subs_ru": {
+   "algorithms": "Алгоритмы",
+   "data-structures": "Структуры данных",
+   "operating-systems": "Операционные системы",
+   "concurrency-theory": "Теория конкурентности",
+   "computation": "Вычисления и железо",
+   "programming": "Концепции программирования",
+   "security-basics": "Основы безопасности"
   }
  },
  "java": {
@@ -21,6 +31,16 @@
    "concurrency": "Concurrency",
    "jvm": "JVM & GC",
    "jdbc": "JDBC & pools"
+  },
+  "name_ru": "Java",
+  "subs_ru": {
+   "core": "Основы языка",
+   "collections": "Коллекции",
+   "streams": "Стримы и функциональщина",
+   "io": "IO и NIO",
+   "concurrency": "Многопоточность",
+   "jvm": "JVM и GC",
+   "jdbc": "JDBC и пулы"
   }
  },
  "spring": {
@@ -34,6 +54,17 @@
    "kafka": "Kafka",
    "testing": "Testing",
    "resources": "Resources"
+  },
+  "name_ru": "Spring",
+  "subs_ru": {
+   "core": "Ядро и AOP",
+   "boot": "Boot",
+   "web": "Web и REST",
+   "data": "Данные и транзакции",
+   "security": "Безопасность",
+   "kafka": "Kafka",
+   "testing": "Тестирование",
+   "resources": "Ресурсы"
   }
  },
  "databases": {
@@ -43,6 +74,13 @@
    "postgres": "PostgreSQL",
    "nosql": "NoSQL",
    "design": "Data modeling & migrations"
+  },
+  "name_ru": "Базы данных",
+  "subs_ru": {
+   "fundamentals": "Основы",
+   "postgres": "PostgreSQL",
+   "nosql": "NoSQL",
+   "design": "Моделирование и миграции"
   }
  },
  "messaging": {
@@ -50,6 +88,11 @@
   "subs": {
    "kafka": "Kafka",
    "rabbitmq": "RabbitMQ & ActiveMQ"
+  },
+  "name_ru": "Очереди сообщений",
+  "subs_ru": {
+   "kafka": "Kafka",
+   "rabbitmq": "RabbitMQ и ActiveMQ"
   }
  },
  "networking": {
@@ -60,6 +103,14 @@
    "security": "TLS & auth",
    "dns-and-routing": "DNS, proxies & load balancing",
    "tools": "Tools"
+  },
+  "name_ru": "Сети",
+  "subs_ru": {
+   "fundamentals": "Основы",
+   "http": "HTTP",
+   "security": "TLS и аутентификация",
+   "dns-and-routing": "DNS, прокси и балансировка",
+   "tools": "Инструменты"
   }
  },
  "distributed-systems": {
@@ -70,6 +121,14 @@
    "replication": "Replication",
    "partitioning": "Partitioning",
    "patterns": "Patterns"
+  },
+  "name_ru": "Распределённые системы",
+  "subs_ru": {
+   "fundamentals": "Основы",
+   "consensus": "Консенсус и координация",
+   "replication": "Репликация",
+   "partitioning": "Партиционирование",
+   "patterns": "Паттерны"
   }
  },
  "system-design": {
@@ -79,6 +138,13 @@
    "building-blocks": "Building blocks",
    "scaling": "Scaling",
    "case-studies": "Case studies"
+  },
+  "name_ru": "Системный дизайн",
+  "subs_ru": {
+   "method": "Метод и оценки",
+   "building-blocks": "Строительные блоки",
+   "scaling": "Масштабирование",
+   "case-studies": "Разборы задач"
   }
  },
  "architecture": {
@@ -92,6 +158,17 @@
    "messaging": "Messaging & reliability",
    "workflows": "Workflow orchestration",
    "resources": "Resources"
+  },
+  "name_ru": "Архитектура",
+  "subs_ru": {
+   "principles": "Принципы",
+   "styles": "Архитектурные стили",
+   "ddd": "Domain-driven design",
+   "patterns": "Паттерны проектирования",
+   "microservices": "Микросервисы и устойчивость",
+   "messaging": "Сообщения и надёжность",
+   "workflows": "Оркестрация процессов",
+   "resources": "Ресурсы"
   }
  },
  "devops": {
@@ -104,12 +181,26 @@
    "build": "Build tools",
    "observability": "Observability",
    "resources": "Resources"
+  },
+  "name_ru": "DevOps",
+  "subs_ru": {
+   "linux": "Linux",
+   "docker": "Docker",
+   "kubernetes": "Kubernetes",
+   "git": "Git",
+   "build": "Сборка",
+   "observability": "Наблюдаемость",
+   "resources": "Ресурсы"
   }
  },
  "projects": {
   "name": "Projects",
   "subs": {
    "stories": "Project stories"
+  },
+  "name_ru": "Проекты",
+  "subs_ru": {
+   "stories": "Истории проектов"
   }
  }
 }

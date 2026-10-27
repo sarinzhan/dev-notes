@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dev Notes Vault</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -48,6 +50,9 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .tabs{display:flex;gap:4px;margin-left:auto}
 .tabs button{padding:6px 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted)}
 .tabs button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.tabs.lang{margin-left:0;gap:2px;border:1px solid var(--line);border-radius:8px;padding:2px}
+.tabs.lang button{padding:4px 8px;font:500 12px var(--f-mono);letter-spacing:.04em}
+.trnote{margin:0 0 18px;padding:8px 12px;border:1px solid var(--line);border-left:3px solid var(--unc);border-radius:8px;background:var(--panel);color:var(--muted);font-size:13.5px}
 .menu{display:none;width:34px;height:34px;border-radius:7px}
 .menu:hover{background:var(--soft)}
 
@@ -160,6 +165,12 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
   .side{display:none;position:fixed;top:calc(52px + env(safe-area-inset-top,0px));bottom:0;left:0;width:min(84vw,300px);z-index:6;box-shadow:12px 0 30px rgba(0,0,0,.18)}
   .side.open{display:block}
   .brand small{display:none}
+  .top{gap:8px}
+  .brand{display:none}
+  .search{min-width:0}
+  .search input{box-sizing:border-box}
+  .tabs button{padding:6px 8px}
+  .tabs.lang button{padding:4px 6px}
   .note h1{font-size:28px}
 }
 .right .toc li button,.toc-inline .toc li button{padding:4px 10px;border-radius:0;border-left:2px solid var(--line);color:var(--muted);font-size:13px;line-height:1.35}
@@ -227,6 +238,10 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
     <button id="t-notes" aria-pressed="true">Notes</button>
     <button id="t-graph" aria-pressed="false">Graph</button>
   </nav>
+  <nav class="tabs lang" aria-label="Language">
+    <button data-lang="en" aria-pressed="true">EN</button>
+    <button data-lang="ru" aria-pressed="false">RU</button>
+  </nav>
 </header>
 
 <div class="app">
@@ -234,13 +249,13 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
   <main class="main" id="main"><article class="note" id="note"></article></main>
   <section class="graph" id="graph">
     <div class="gbar">
-      <div class="seg" role="group" aria-label="Depth"><span>Depth</span>
-        <button data-depth="1">1 · sections</button><button data-depth="2">2 · + subsections</button><button data-depth="3" aria-pressed="true">3 · + notes</button></div>
-      <label><input type="checkbox" id="g-folders"> Folder edges</label>
-      <label><input type="checkbox" id="g-hoveronly"> Links only on hover</label>
-      <label><input type="checkbox" id="g-tags"> Tags as nodes</label>
-      <label><input type="checkbox" id="g-labels" checked> Labels</label>
-      <div class="lg shapes"><span class="sq">section</span><span class="dm">subsection</span><span class="ci">note</span><span class="tr">tag</span></div>
+      <div class="seg" role="group" aria-label="Depth"><span data-i18n="depth">Depth</span>
+        <button data-depth="1" data-i18n="d1">1 · sections</button><button data-depth="2" data-i18n="d2">2 · + subsections</button><button data-depth="3" aria-pressed="true" data-i18n="d3">3 · + notes</button></div>
+      <label><input type="checkbox" id="g-folders"> <span data-i18n="gFolders">Folder edges</span></label>
+      <label><input type="checkbox" id="g-hoveronly"> <span data-i18n="gHover">Links only on hover</span></label>
+      <label><input type="checkbox" id="g-tags"> <span data-i18n="gTags">Tags as nodes</span></label>
+      <label><input type="checkbox" id="g-labels" checked> <span data-i18n="gLabels">Labels</span></label>
+      <div class="lg shapes"><span class="sq" data-i18n="kSec">section</span><span class="dm" data-i18n="kSub">subsection</span><span class="ci" data-i18n="kNote">note</span><span class="tr" data-i18n="kTag">tag</span></div>
       <div class="lg" id="glegend"></div>
       <div class="hint" id="ghint"></div>
     </div>
@@ -259,13 +274,66 @@ let SECTIONS={}, NOTES=[], byId={};
 const SHADES=["0%","white 32%","black 22%","white 55%"];
 function subColor(sec,sub){ const i=Object.keys(SECTIONS[sec].subs).indexOf(sub); const m=SHADES[i%SHADES.length]; return m==="0%"?SECTIONS[sec].c:`color-mix(in oklab, ${SECTIONS[sec].c}, ${m})`; }
 const FM=/^---\s*\n[\s\S]*?\n---\s*\n/;
+
+// ---- language: one note per topic; the EN/RU switch picks which text is shown.
+// Russian files live in notes-ru/ under the same path and id; a note without one falls back to English.
+const UI={
+  en:{search:"Search notes, tags…",notes:"Notes",graph:"Graph",notesWord:"notes",expandAll:"Expand all",collapseAll:"Collapse all",recent:"Recently learned",learned:"learned",contents:"Contents",localGraph:"Local graph",linkedFrom:"Linked from",linksTo:"Links to",noBacklinks:"No backlinks yet",nothingLinks:"Nothing links here yet.",noOutgoing:"No outgoing links.",noMatch:"No notes match",openNote:"Open note",notWritten:"Note not written yet",notTranslated:"",
+      depth:"Depth",d1:"1 · sections",d2:"2 · + subsections",d3:"3 · + notes",gFolders:"Folder edges",gHover:"Links only on hover",gTags:"Tags as nodes",gLabels:"Labels",kSec:"section",kSub:"subsection",kNote:"note",kTag:"tag",
+      hint3:"Drag nodes, scroll to zoom, click a note to open it. Notes are grouped by section (solid outline), then by subsection (dashed). Faint lines are [[wikilinks]] between notes; hover a node to highlight its links. Tick Folder edges to also draw section → note lines.",
+      hintUp:lvl=>`Links between notes are rolled up to the ${lvl===2?"subsection":"section"} level; thicker edge = more cross-links. Click a node to open its first note.`},
+  ru:{search:"Поиск по заметкам и тегам…",notes:"Заметки",graph:"Граф",notesWord:"заметок",expandAll:"Развернуть всё",collapseAll:"Свернуть всё",recent:"Недавно изученное",learned:"изучено",contents:"Содержание",localGraph:"Локальный граф",linkedFrom:"Ссылаются сюда",linksTo:"Ссылки отсюда",noBacklinks:"Пока никто не ссылается",nothingLinks:"Пока никто не ссылается.",noOutgoing:"Нет исходящих ссылок.",noMatch:"Ничего не найдено по запросу",openNote:"Открыть заметку",notWritten:"Заметка ещё не написана",notTranslated:"Перевода этой заметки пока нет — показан английский оригинал.",
+      depth:"Глубина",d1:"1 · разделы",d2:"2 · + подразделы",d3:"3 · + заметки",gFolders:"Связи папок",gHover:"Связи только при наведении",gTags:"Теги как узлы",gLabels:"Подписи",kSec:"раздел",kSub:"подраздел",kNote:"заметка",kTag:"тег",
+      hint3:"Перетаскивайте узлы, колесом меняйте масштаб, кликните по заметке, чтобы открыть её. Заметки сгруппированы по разделам (сплошной контур) и подразделам (пунктир). Тонкие линии — [[wikilinks]] между заметками; наведите на узел, чтобы подсветить его связи. Включите «Связи папок», чтобы нарисовать ещё и линии раздел → заметка.",
+      hintUp:lvl=>`Связи между заметками собраны до уровня ${lvl===2?"подразделов":"разделов"}; чем толще линия, тем больше перекрёстных ссылок. Кликните по узлу, чтобы открыть его первую заметку.`}
+};
+let LANG="en";
+try{ if(localStorage.getItem("dn-lang")==="ru") LANG="ru"; }catch(e){}
+const t=k=>(UI[LANG][k]!==undefined&&UI[LANG][k]!=="")?UI[LANG][k]:UI.en[k];
+let ruLoaded=false;
+async function loadRu(){
+  if(ruLoaded) return;
+  await Promise.all(NOTES.filter(n=>n.ru).map(async n=>{ try{ const r=await fetch(n.ru); if(r.ok) n.md_ru=(await r.text()).replace(FM,""); }catch(e){} }));
+  ruLoaded=true;
+}
+function applyLang(){
+  const ru=LANG==="ru";
+  for(const s of Object.values(SECTIONS)){
+    s.name=ru&&s.name_ru?s.name_ru:s.name_en;
+    for(const k of Object.keys(s.subs)) s.subs[k]=ru&&s.subs_ru&&s.subs_ru[k]?s.subs_ru[k]:s.subs_en[k];
+  }
+  for(const n of NOTES){
+    const tr=ru&&n.md_ru!=null;
+    n.translated=tr; n.title=tr?(n.title_ru||n.title_en):n.title_en; n.md=tr?n.md_ru:n.md_en;
+    n.text=(n.title+" "+n.title_en+" "+n.tags.join(" ")+" "+n.md).toLowerCase();
+  }
+  document.documentElement.lang=LANG;
+  document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===LANG)));
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.getElementById("q").placeholder=t("search");
+  document.getElementById("t-notes").textContent=t("notes");
+  document.getElementById("t-graph").textContent=t("graph");
+  document.getElementById("glegend").innerHTML=Object.entries(SECTIONS).map(([k,v])=>`<span style="--c:${v.c}">${v.name.toLowerCase()}</span>`).join("")+`<span style="--c:var(--c-tag)">${t("kTag")}</span>`;
+  const nRu=NOTES.filter(n=>n.ru).length;
+  document.querySelector(".brand small").textContent=`sarinzhan / dev-notes · ${NOTES.length} ${t("notesWord")}`+(ru?` · RU ${nRu}/${NOTES.length}`:"");
+}
+async function setLang(l){
+  if(l===LANG||!UI[l]) return;
+  LANG=l; try{ localStorage.setItem("dn-lang",l); }catch(e){}
+  if(l==="ru") await loadRu();
+  applyLang(); renderSide();
+  if(current){ renderNote(); renderRight(); }
+  if(document.getElementById("graph").classList.contains("on")) drawGraph();
+  search();
+}
 async function load(){
   const data=await (await fetch("notes.json")).json();
-  SECTIONS=data.sections; Object.keys(SECTIONS).forEach((k,i)=>SECTIONS[k].c=PALETTE[i%PALETTE.length]);
+  SECTIONS=data.sections; Object.keys(SECTIONS).forEach((k,i)=>{ const s=SECTIONS[k]; s.c=PALETTE[i%PALETTE.length]; s.name_en=s.name; s.subs_en={...s.subs}; });
   NOTES=data.notes; byId=Object.fromEntries(NOTES.map(n=>[n.id,n]));
-  await Promise.all(NOTES.map(async n=>{ n.md=(await (await fetch(n.path)).text()).replace(FM,""); n.text=(n.title+" "+n.tags.join(" ")+" "+n.md).toLowerCase(); }));
-  document.getElementById("glegend").innerHTML=Object.entries(SECTIONS).map(([k,v])=>`<span style="--c:${v.c}">${v.name.toLowerCase()}</span>`).join("")+`<span style="--c:var(--c-tag)">tag</span>`;
-  document.querySelector(".brand small").textContent=`sarinzhan / dev-notes · ${NOTES.length} notes`;
+  NOTES.forEach(n=>n.title_en=n.title);
+  await Promise.all(NOTES.map(async n=>{ n.md_en=(await (await fetch(n.path)).text()).replace(FM,""); }));
+  if(LANG==="ru") await loadRu();
+  applyLang();
   boot();
 }
 // ---- derived data: index, links, backlinks, graph
@@ -279,7 +347,7 @@ marked.use({renderer});
 function md(src){
   // replace wikilinks only outside code (fenced blocks and inline spans)
   const pre = src.split(/(```[\s\S]*?```|`[^`\n]*`)/g).map((part,i)=> i%2 ? part : part.replace(WL,(m,id,label)=>{ const ok=!!byId[id]; const text=label?label.trim():(ok?byId[id].title:id);
-    return `<a class="wl${ok?"":" missing"}" data-id="${id}" title="${ok?"Open note":"Note not written yet"}">${text}</a>`; })).join("");
+    return `<a class="wl${ok?"":" missing"}" data-id="${id}" title="${ok?t("openNote"):t("notWritten")}">${text}</a>`; })).join("");
   return marked.parse(pre).replace(/src="assets\//g,'src="notes/assets/');
 }
 
@@ -302,10 +370,10 @@ const CHEV='<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6
 
 function renderSide(){
   const side=$("#side"), top=side.scrollTop; let h="";
-  h+=`<div class="tree-tools"><button data-all="expand">Expand all</button><button data-all="collapse">Collapse all</button></div>`;
+  h+=`<div class="tree-tools"><button data-all="expand">${t("expandAll")}</button><button data-all="collapse">${t("collapseAll")}</button></div>`;
   const recent=[...NOTES].sort((a,b)=>b.learned.localeCompare(a.learned)).slice(0,4);
   const rOpen=!openKeys.has("recent-closed");
-  h+=`<div class="recent"><button class="hd sec" data-toggle="recent-closed" aria-expanded="${rOpen}">${CHEV}Recently learned</button>`+
+  h+=`<div class="recent"><button class="hd sec" data-toggle="recent-closed" aria-expanded="${rOpen}">${CHEV}${t("recent")}</button>`+
      (rOpen?recent.map(n=>`<button class="n" data-go="${n.id}">${n.title}<span class="d">${n.learned.slice(5)}</span></button>`).join(""):"")+`</div>`;
   for(const [k,s] of Object.entries(SECTIONS)){
     const all=NOTES.filter(n=>n.sec===k); if(!all.length) continue;
@@ -313,7 +381,7 @@ function renderSide(){
     h+=`<button class="hd sec" style="--c:${s.c}" data-toggle="sec:${k}" aria-expanded="${sOpen}">${CHEV}<i></i>${s.name}<b>${all.length}</b></button>`;
     if(!sOpen) continue;
     for(const [sk,sn] of Object.entries(s.subs)){
-      const list=all.filter(n=>n.sub===sk).sort((a,b)=>a.title.localeCompare(b.title)); if(!list.length) continue;
+      const list=all.filter(n=>n.sub===sk).sort((a,b)=>a.title.localeCompare(b.title,LANG)); if(!list.length) continue;
       const key="sub:"+k+"/"+sk, subOpen=openKeys.has(key);
       h+=`<button class="hd sub" style="--c:${subColor(k,sk)}" data-toggle="${key}" aria-expanded="${subOpen}">${CHEV}<i></i>${sn}<b>${list.length}</b></button>`;
       if(subOpen) h+=list.map(n=>`<button class="n" data-go="${n.id}" aria-current="${n.id===current}">${n.title}</button>`).join("");
@@ -328,11 +396,12 @@ function renderNote(){
   $("#note").innerHTML=`
     <div class="crumb"><i style="--c:${s.c}"></i>${s.name} <span>/</span> <i style="--c:${subColor(n.sec,n.sub)}"></i>${s.subs[n.sub]} <span>/</span> <span>${n.id}.md</span></div>
     <h1>${n.title}</h1>
-    <div class="meta">${n.tags.map(t=>`<button class="tag" data-tag="${t}">#${t}</button>`).join("")}<span class="learned">learned ${n.learned}</span></div>
-    <details class="toc-inline" id="toc-inline"><summary>Contents</summary><ul class="toc"></ul></details>
+    <div class="meta">${n.tags.map(t=>`<button class="tag" data-tag="${t}">#${t}</button>`).join("")}<span class="learned">${t("learned")} ${n.learned}</span></div>
+    ${LANG==="ru"&&!n.translated?`<div class="trnote">${t("notTranslated")}</div>`:""}
+    <details class="toc-inline" id="toc-inline"><summary>${t("contents")}</summary><ul class="toc"></ul></details>
     <div class="body">${md(n.md)}</div>
     <div class="mob-right">
-      <h4>Linked from</h4><ul>${bl.length?bl.map(b=>`<li><button data-go="${b.id}">${b.title}</button></li>`).join(""):'<li class="empty">No backlinks yet</li>'}</ul>
+      <h4>${t("linkedFrom")}</h4><ul>${bl.length?bl.map(b=>`<li><button data-go="${b.id}">${b.title}</button></li>`).join(""):`<li class="empty">${t("noBacklinks")}</li>`}</ul>
     </div>`;
   buildToc();
   mountAnims($("#note"));
@@ -340,7 +409,7 @@ function renderNote(){
 
 // ---- table of contents (H2 + H3 of the current note)
 let TOC=[];
-function slug(t){ return t.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"s"; }
+function slug(s){ return s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu,"-").replace(/^-|-$/g,"")||"s"; }
 function buildToc(){
   const seen={}; TOC=[];
   $("#note .body").querySelectorAll("h2, h3").forEach(h=>{
@@ -368,10 +437,10 @@ function spyToc(){
 function renderRight(){
   const n=byId[current]; const bl=backlinks(current); const out=n.links.map(id=>byId[id]).filter(Boolean);
   $("#right").innerHTML=`
-    ${TOC.length>1?`<div class="block"><h4>Contents</h4><ul class="toc">${tocItems()}</ul></div>`:""}
-    <div class="block"><h4>Local graph</h4><svg id="lsvg"></svg></div>
-    <div class="block"><h4>Linked from · ${bl.length}</h4><ul>${bl.length?bl.map(b=>`<li><button data-go="${b.id}"><span class="sec">${b.sec}</span>${b.title}</button></li>`).join(""):'<li class="empty">Nothing links here yet.</li>'}</ul></div>
-    <div class="block"><h4>Links to · ${out.length}</h4><ul>${out.length?out.map(b=>`<li><button data-go="${b.id}"><span class="sec">${b.sec}</span>${b.title}</button></li>`).join(""):'<li class="empty">No outgoing links.</li>'}</ul></div>`;
+    ${TOC.length>1?`<div class="block"><h4>${t("contents")}</h4><ul class="toc">${tocItems()}</ul></div>`:""}
+    <div class="block"><h4>${t("localGraph")}</h4><svg id="lsvg"></svg></div>
+    <div class="block"><h4>${t("linkedFrom")} · ${bl.length}</h4><ul>${bl.length?bl.map(b=>`<li><button data-go="${b.id}"><span class="sec">${b.sec}</span>${b.title}</button></li>`).join(""):`<li class="empty">${t("nothingLinks")}</li>`}</ul></div>
+    <div class="block"><h4>${t("linksTo")} · ${out.length}</h4><ul>${out.length?out.map(b=>`<li><button data-go="${b.id}"><span class="sec">${b.sec}</span>${b.title}</button></li>`).join(""):`<li class="empty">${t("noOutgoing")}</li>`}</ul></div>`;
   drawLocal(); spyToc();
 }
 
@@ -382,7 +451,7 @@ function search(){
   let hits;
   if(q.startsWith("#")) hits=NOTES.filter(n=>n.tags.some(t=>t.includes(q.slice(1))));
   else hits=NOTES.filter(n=>n.text.includes(q)).sort((a,b)=>(b.title.toLowerCase().includes(q))-(a.title.toLowerCase().includes(q)));
-  box.innerHTML=hits.length?hits.slice(0,8).map(n=>`<button data-go="${n.id}"><span class="sec">${SECTIONS[n.sec].name} · #${n.tags.join(" #")}</span><br>${n.title}</button>`).join(""):`<button disabled>No notes match "${q}"</button>`;
+  box.innerHTML=hits.length?hits.slice(0,8).map(n=>`<button data-go="${n.id}"><span class="sec">${SECTIONS[n.sec].name} · #${n.tags.join(" #")}</span><br>${n.title}</button>`).join(""):`<button disabled>${t("noMatch")} "${q}"</button>`;
   box.hidden=false;
 }
 $("#q").addEventListener("input",search);
@@ -391,6 +460,7 @@ document.addEventListener("click",e=>{ if(!e.target.closest(".search")) $("#resu
 
 // ---- global click delegation
 document.addEventListener("click",e=>{
+  const lg=e.target.closest("[data-lang]"); if(lg){ setLang(lg.dataset.lang); return; }
   const tc=e.target.closest("[data-toc]"); if(tc){ scrollToHeading(tc.dataset.toc); return; }
   const tg=e.target.closest("[data-toggle]"); if(tg){ toggleKey(tg.dataset.toggle); return; }
   const al=e.target.closest("[data-all]"); if(al){ setAll(al.dataset.all==="expand"); return; }
@@ -433,8 +503,7 @@ function drawGraph(){
   const W=svg.node().clientWidth||800,H=svg.node().clientHeight||500;
   const {nodes,edges}=graphData(depth,$("#g-tags").checked); const labels=$("#g-labels").checked;
   $("#g-tags").disabled=depth<3;
-  $("#ghint").textContent=depth===3?"Drag nodes, scroll to zoom, click a note to open it. Notes are grouped by section (solid outline), then by subsection (dashed). Faint lines are [[wikilinks]] between notes; hover a node to highlight its links. Tick Folder edges to also draw section → note lines.":
-    `Links between notes are rolled up to the ${depth===2?"subsection":"section"} level; thicker edge = more cross-links. Click a node to open its first note.`;
+  $("#ghint").textContent=depth===3?t("hint3"):UI[LANG].hintUp(depth);
   const g=svg.append("g");
   svg.call(d3.zoom().scaleExtent([.4,3]).on("zoom",e=>g.attr("transform",e.transform)));
   // Cluster anchors: sections on a ring around the centre, subsections on a smaller ring around their section.
@@ -465,7 +534,7 @@ function drawGraph(){
     .call(d3.drag().on("start",(e,d)=>{ if(!e.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; }).on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; }).on("end",(e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }));
   const lbl=labels?g.append("g").selectAll("text").data(nodes).join("text").attr("class",d=>"lbl"+(d.kind==="tag"?" tg":"")+(d.kind==="sec"||d.kind==="sub"?" hub":"")).text(d=>short(d.label)).attr("dy",d=>r(d)+13).attr("text-anchor","middle"):null;
   const tip=$("#gtip"), neigh=new Map(); edges.forEach(e=>{ (neigh.get(e.source)||neigh.set(e.source,new Set()).get(e.source)).add(e.target); (neigh.get(e.target)||neigh.set(e.target,new Set()).get(e.target)).add(e.source); });
-  node.on("mouseenter",(ev,d)=>{ const ns=neigh.get(d.id)||new Set(); svg.classed("focus",true); node.classed("dim",o=>o!==d&&!ns.has(o.id)); link.classed("hi",l=>l.source.id===d.id||l.target.id===d.id); tip.textContent=d.label+(d.kind==="sec"||d.kind==="sub"?` · ${d.size} notes`:""); tip.style.display="block"; })
+  node.on("mouseenter",(ev,d)=>{ const ns=neigh.get(d.id)||new Set(); svg.classed("focus",true); node.classed("dim",o=>o!==d&&!ns.has(o.id)); link.classed("hi",l=>l.source.id===d.id||l.target.id===d.id); tip.textContent=d.label+(d.kind==="sec"||d.kind==="sub"?` · ${d.size} ${t("notesWord")}`:""); tip.style.display="block"; })
       .on("mousemove",ev=>{ const b=svg.node().getBoundingClientRect(); tip.style.left=(ev.clientX-b.left+14)+"px"; tip.style.top=(ev.clientY-b.top+10)+"px"; })
       .on("mouseleave",()=>{ svg.classed("focus",false); node.classed("dim",false); link.classed("hi",false); tip.style.display="none"; })
       .on("click",(ev,d)=>{ if(d.kind==="note") go(d.id); else if(d.kind==="tag") openTag(d.id.slice(4)); else { const f=NOTES.find(n=>n.sec===d.sec&&(!d.sub||n.sub===d.sub)); if(f) go(f.id); } });

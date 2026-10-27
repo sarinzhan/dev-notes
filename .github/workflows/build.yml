@@ -2,7 +2,7 @@ name: Build notes index
 on:
   push:
     branches: [main]
-    paths: ["notes/**", "sections.json", "build.py"]
+    paths: ["notes/**", "notes-ru/**", "sections.json", "build.py"]
   workflow_dispatch:
 permissions:
   contents: write

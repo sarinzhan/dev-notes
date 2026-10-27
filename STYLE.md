@@ -53,5 +53,16 @@ Source images live in the chapter folder under `media/`. Skip screenshots of tex
 ## Do not
 - Do not write "Section", "Chapter", or question numbers in headings.
 - Do not keep Russian text, except a proper noun in parentheses if it helps.
-- Exception: a Russian translation of an existing note lives next to it as `<id>-ru.md`, starts with a line linking the English original, and may use Russian headings. The English note stays the main version.
 - Do not add links to external courses/articles inside knowledge notes; those belong in the section's `resources` note.
+
+## Russian translations
+The site has an EN/RU switch. Each topic exists once; the Russian text is an alternative body for the same note, never a separate note.
+- Path: `notes-ru/<section>/<subsection>/<id>.md`, exactly mirroring the English file. `build.py` refuses a translation whose English note does not exist. A note without a translation falls back to English in the RU view.
+- Front matter: translate `title`; copy `tags` and `learned` unchanged from the English note.
+- Headings: `## Кратко`, `## Основное`, `## Пример`, `## Подводные камни`, in the same order as the English. Translate `###` sub-headings. Notes with their own layout (project stories, case studies) keep that layout with translated headings.
+- Content stays 1:1 with the English: same bullets, tables, numbers and facts, nothing added or dropped. If the English is wrong, fix the English note first.
+- Wikilinks: keep the same ids. `[[id]]` renders the target's title in the reader's language; in `[[id|label]]` translate the label.
+- Code: never change code, identifiers, annotations, config keys, CLI commands or output. Translate only comments. `anim` blocks and image paths are copied unchanged.
+- Terms: use the established Russian term and add the English one in parentheses on first use when developers commonly say it in English (`пул потоков (thread pool)`). Product names and words Russian-speaking developers use as-is (Kafka, consumer group, offset, rebalance, commit, deploy, pod) stay in Latin script.
+- Tone: neutral, impersonal sentences. Where the English addresses the reader directly, use «ты».
+

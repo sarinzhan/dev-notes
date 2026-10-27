@@ -8,6 +8,8 @@ Front matter per note:
     learned: YYYY-MM-DD
     ---
 Wikilinks: [[note-id]] or [[note-id|label]], where note-id is the file name without .md.
+Russian translations live in notes-ru/<section>/<subsection>/<id>.md (same path and id as the
+English note). They are optional; a note without one falls back to English in the UI.
 Run: python3 build.py   (no dependencies)
 """
 import json, re, sys
@@ -15,6 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 NOTES = ROOT / "notes"
+NOTES_RU = ROOT / "notes-ru"
 SECTIONS = json.loads((ROOT / "sections.json").read_text(encoding="utf-8"))
 
 FM = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
@@ -58,6 +61,16 @@ def main():
             "links": sorted({m.group(1) for m in WL.finditer(CODE.sub("", body))}),
             "words": len(body.split()),
         })
+        ru = NOTES_RU / sec / sub / path.name
+        if ru.exists():
+            ru_meta, _ = parse_front_matter(ru.read_text(encoding="utf-8"))
+            notes[-1]["ru"] = str(ru.relative_to(ROOT)).replace("\\", "/")
+            notes[-1]["title_ru"] = ru_meta.get("title", notes[-1]["title"])
+
+    orphans = sorted(str(p.relative_to(ROOT)) for p in NOTES_RU.glob("*/*/*.md")
+                     if not (NOTES / p.relative_to(NOTES_RU)).exists()) if NOTES_RU.exists() else []
+    if orphans:
+        sys.exit("translations without an English note: " + ", ".join(orphans))
 
     missing = sorted({l for n in notes for l in n["links"] if l not in ids})
     (ROOT / "notes.json").write_text(json.dumps({"sections": SECTIONS, "notes": notes}, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -69,7 +82,8 @@ def main():
 
     assets = sorted(str(a.relative_to(ROOT)).replace("\\", "/") for a in (NOTES / "assets").glob("*") if a.is_file())
     (ROOT / "assets.json").write_text(json.dumps(assets), encoding="utf-8")
-    print(f"{len(notes)} notes, {len(edges)} links, {len(assets)} assets")
+    ru_count = sum(1 for n in notes if "ru" in n)
+    print(f"{len(notes)} notes ({ru_count} with Russian), {len(edges)} links, {len(assets)} assets")
     if missing:
         print("links to notes that do not exist yet:", ", ".join(missing))
 

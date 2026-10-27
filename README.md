@@ -8,6 +8,7 @@ My personal engineering notebook: Java, Spring, databases, messaging, architectu
 index.html              the one-page app (marked.js + highlight.js + d3, no build step for the page itself)
 sections.json           section -> subsection names; every note folder must be declared here
 PLAN.md                 full list of note ids per folder: existing, moved, and still to write
+notes-ru/               optional Russian translations, same paths and ids as notes/; the site has an EN/RU switch
 notes/<section>/<subsection>/<id>.md   one note per topic, front matter + markdown
 notes/assets/           images referenced from notes as assets/<name>.png
 build.py                scans notes/ and writes notes.json + graph.json (run before commit, or let the Action do it)
