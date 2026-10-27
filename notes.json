@@ -116,6 +116,74 @@
  },
  "notes": [
   {
+   "id": "aggregates-and-invariants",
+   "sec": "architecture",
+   "sub": "ddd",
+   "title": "Aggregates, invariants and the transactional boundary",
+   "tags": [
+    "ddd",
+    "aggregates",
+    "consistency",
+    "jpa"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/ddd/aggregates-and-invariants.md",
+   "links": [
+    "constraints-and-relationships",
+    "creational-patterns",
+    "ddd-basics",
+    "domain-events-and-integration-events",
+    "event-sourcing",
+    "idempotency",
+    "jpa-entities-and-relationships",
+    "jpa-locking",
+    "jpa-n-plus-one",
+    "kafka-producer",
+    "outbox-pattern",
+    "postgres-locks",
+    "race-conditions-and-critical-sections",
+    "saga",
+    "sharding-strategies",
+    "spring-transactional",
+    "temporal-concepts",
+    "use-cases-and-application-layer",
+    "value-objects-and-entities"
+   ],
+   "words": 830
+  },
+  {
+   "id": "bounded-contexts-and-context-mapping",
+   "sec": "architecture",
+   "sub": "ddd",
+   "title": "Bounded contexts and context mapping",
+   "tags": [
+    "ddd",
+    "architecture",
+    "microservices",
+    "integration"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/ddd/bounded-contexts-and-context-mapping.md",
+   "links": [
+    "aggregates-and-invariants",
+    "contract-testing-and-wiremock",
+    "coupling-cohesion-and-general-principles",
+    "data-modeling-for-services",
+    "ddd-basics",
+    "domain-events-and-integration-events",
+    "esim-provisioning-platform",
+    "event-driven-architecture",
+    "hexagonal-architecture",
+    "message-schema-evolution",
+    "modular-monolith",
+    "monolith-vs-microservices",
+    "outbox-pattern",
+    "service-communication-sync-vs-async",
+    "strangler-fig-migration"
+   ],
+   "words": 818
+  },
+  {
    "id": "ddd-basics",
    "sec": "architecture",
    "sub": "ddd",
@@ -148,6 +216,125 @@
    "words": 845
   },
   {
+   "id": "domain-events-and-integration-events",
+   "sec": "architecture",
+   "sub": "ddd",
+   "title": "Domain events vs integration events",
+   "tags": [
+    "ddd",
+    "events",
+    "spring",
+    "kafka",
+    "outbox"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/ddd/domain-events-and-integration-events.md",
+   "links": [
+    "aggregates-and-invariants",
+    "bounded-contexts-and-context-mapping",
+    "cqrs",
+    "distributed-tracing",
+    "event-driven-architecture",
+    "event-sourcing",
+    "idempotency",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "message-schema-evolution",
+    "outbox-pattern",
+    "spring-data-repositories",
+    "spring-kafka-consumer",
+    "spring-transactional"
+   ],
+   "words": 831
+  },
+  {
+   "id": "use-cases-and-application-layer",
+   "sec": "architecture",
+   "sub": "ddd",
+   "title": "Use cases and the application layer",
+   "tags": [
+    "ddd",
+    "architecture",
+    "spring",
+    "cqrs"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/ddd/use-cases-and-application-layer.md",
+   "links": [
+    "aggregates-and-invariants",
+    "bff-and-api-composition",
+    "clean-architecture",
+    "cqrs",
+    "ddd-basics",
+    "distributed-tracing",
+    "hexagonal-architecture",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "layered-architecture",
+    "saga",
+    "solid",
+    "spring-aop",
+    "spring-mvc-validation-and-uploads",
+    "spring-transactional",
+    "temporal-concepts",
+    "testing-types-and-dev-cycles"
+   ],
+   "words": 829
+  },
+  {
+   "id": "value-objects-and-entities",
+   "sec": "architecture",
+   "sub": "ddd",
+   "title": "Value objects and entities",
+   "tags": [
+    "ddd",
+    "java",
+    "immutability",
+    "jpa"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/ddd/value-objects-and-entities.md",
+   "links": [
+    "aggregates-and-invariants",
+    "bounded-contexts-and-context-mapping",
+    "ddd-basics",
+    "equals-and-hashcode",
+    "immutability-and-side-effects",
+    "immutable-objects",
+    "jpa-entities-and-relationships",
+    "numbers-bits-and-floating-point",
+    "spring-mvc-validation-and-uploads",
+    "time-money-and-ids"
+   ],
+   "words": 879
+  },
+  {
+   "id": "dead-letter-queues-and-retries",
+   "sec": "architecture",
+   "sub": "messaging",
+   "title": "Dead letter queues, retry topics and poison messages",
+   "tags": [
+    "messaging",
+    "kafka",
+    "spring-kafka",
+    "reliability"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/messaging/dead-letter-queues-and-retries.md",
+   "links": [
+    "activemq-basics",
+    "circuit-breaker",
+    "event-driven-architecture",
+    "grafana-dashboards-and-red-use",
+    "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "outbox-pattern",
+    "rabbitmq-basics",
+    "slo-sli-and-alerting",
+    "spring-kafka-consumer"
+   ],
+   "words": 956
+  },
+  {
    "id": "idempotency",
    "sec": "architecture",
    "sub": "messaging",
@@ -173,6 +360,32 @@
     "spring-transactional"
    ],
    "words": 805
+  },
+  {
+   "id": "message-schema-evolution",
+   "sec": "architecture",
+   "sub": "messaging",
+   "title": "Message schema evolution — JSON, Avro, Protobuf and the schema registry",
+   "tags": [
+    "messaging",
+    "kafka",
+    "schema",
+    "api-design"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/messaging/message-schema-evolution.md",
+   "links": [
+    "api-design-for-system-design",
+    "contract-testing-and-wiremock",
+    "coupling-cohesion-and-general-principles",
+    "domain-events-and-integration-events",
+    "event-driven-architecture",
+    "event-sourcing",
+    "grpc-and-protobuf",
+    "kafka-producer",
+    "outbox-pattern"
+   ],
+   "words": 957
   },
   {
    "id": "outbox-pattern",
@@ -233,6 +446,37 @@
    "words": 833
   },
   {
+   "id": "bff-and-api-composition",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Backend for frontend and API composition",
+   "tags": [
+    "microservices",
+    "api-design",
+    "gateway",
+    "bff"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/bff-and-api-composition.md",
+   "links": [
+    "api-design-for-system-design",
+    "api-gateway-and-service-discovery",
+    "authentication-vs-authorization",
+    "caching",
+    "circuit-breaker",
+    "completable-future",
+    "cqrs",
+    "design-news-feed",
+    "jpa-n-plus-one",
+    "mtls-and-service-to-service-auth",
+    "saga",
+    "service-communication-sync-vs-async",
+    "spring-reactive-webclient-sse",
+    "virtual-threads"
+   ],
+   "words": 933
+  },
+  {
    "id": "circuit-breaker",
    "sec": "architecture",
    "sub": "microservices",
@@ -260,6 +504,38 @@
    "words": 827
   },
   {
+   "id": "cqrs",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "CQRS — separate read and write models",
+   "tags": [
+    "cqrs",
+    "architecture",
+    "microservices",
+    "postgres"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/cqrs.md",
+   "links": [
+    "aggregates-and-invariants",
+    "column-and-wide-column-stores",
+    "consistency-models",
+    "database-scaling-path",
+    "design-news-feed",
+    "domain-events-and-integration-events",
+    "event-driven-architecture",
+    "event-sourcing",
+    "idempotency",
+    "jpa-n-plus-one",
+    "outbox-pattern",
+    "read-write-splitting-and-cqrs-lite",
+    "search-and-indexing-services",
+    "spring-transactional",
+    "use-cases-and-application-layer"
+   ],
+   "words": 928
+  },
+  {
    "id": "distributed-tracing",
    "sec": "architecture",
    "sub": "microservices",
@@ -282,6 +558,71 @@
     "system-design-basics"
    ],
    "words": 957
+  },
+  {
+   "id": "event-driven-architecture",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Event-driven architecture",
+   "tags": [
+    "microservices",
+    "events",
+    "kafka",
+    "architecture"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/event-driven-architecture.md",
+   "links": [
+    "aggregates-and-invariants",
+    "async-processing-and-event-driven-scaling",
+    "backpressure-and-flow-control",
+    "coupling-cohesion-and-general-principles",
+    "cqrs",
+    "dead-letter-queues-and-retries",
+    "design-notification-service",
+    "distributed-tracing",
+    "domain-events-and-integration-events",
+    "event-sourcing",
+    "exactly-once-myth",
+    "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kafka-producer",
+    "message-queues-and-streams",
+    "message-schema-evolution",
+    "outbox-pattern",
+    "saga",
+    "service-communication-sync-vs-async",
+    "temporal-concepts"
+   ],
+   "words": 910
+  },
+  {
+   "id": "event-sourcing",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Event sourcing",
+   "tags": [
+    "event-sourcing",
+    "architecture",
+    "ddd",
+    "postgres"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/event-sourcing.md",
+   "links": [
+    "aggregates-and-invariants",
+    "cqrs",
+    "design-payment-processing",
+    "domain-events-and-integration-events",
+    "emv-card-processing",
+    "event-driven-architecture",
+    "junit-and-mockito",
+    "message-schema-evolution",
+    "outbox-pattern",
+    "time-money-and-ids"
+   ],
+   "words": 1041
   },
   {
    "id": "saga",
@@ -307,6 +648,69 @@
     "temporal-concepts"
    ],
    "words": 798
+  },
+  {
+   "id": "service-communication-sync-vs-async",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Service communication — synchronous vs asynchronous",
+   "tags": [
+    "microservices",
+    "rest",
+    "grpc",
+    "kafka",
+    "resilience"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/service-communication-sync-vs-async.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "distributed-tracing",
+    "event-driven-architecture",
+    "failure-modes-and-timeouts",
+    "grpc-and-protobuf",
+    "http-1-1-vs-2-vs-3",
+    "http-caching",
+    "idempotency",
+    "openapi-swagger",
+    "outbox-pattern",
+    "postgres-performance-checklist",
+    "rest-and-http",
+    "rest-clients",
+    "saga",
+    "temporal-concepts"
+   ],
+   "words": 885
+  },
+  {
+   "id": "strangler-fig-migration",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Strangler fig migration — decomposing a monolith incrementally",
+   "tags": [
+    "microservices",
+    "migration",
+    "monolith",
+    "architecture"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/strangler-fig-migration.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "bounded-contexts-and-context-mapping",
+    "coupling-cohesion-and-general-principles",
+    "event-driven-architecture",
+    "grafana-dashboards-and-red-use",
+    "modular-monolith",
+    "monolith-vs-microservices",
+    "outbox-pattern",
+    "reverse-proxy-nginx-basics",
+    "schema-migrations-flyway-liquibase",
+    "slo-sli-and-alerting"
+   ],
+   "words": 906
   },
   {
    "id": "behavioral-patterns",
@@ -403,6 +807,38 @@
    "words": 692
   },
   {
+   "id": "coupling-cohesion-and-general-principles",
+   "sec": "architecture",
+   "sub": "principles",
+   "title": "Coupling, cohesion and the general design principles",
+   "tags": [
+    "design-principles",
+    "architecture",
+    "coupling",
+    "cohesion"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/principles/coupling-cohesion-and-general-principles.md",
+   "links": [
+    "bounded-contexts-and-context-mapping",
+    "class-relationships",
+    "clean-architecture",
+    "constructors-and-initialization",
+    "ddd-basics",
+    "hexagonal-architecture",
+    "idempotency",
+    "layered-architecture",
+    "message-schema-evolution",
+    "modular-monolith",
+    "monolith-vs-microservices",
+    "oop-principles",
+    "solid",
+    "spring-aop",
+    "structural-patterns"
+   ],
+   "words": 932
+  },
+  {
    "id": "solid",
    "sec": "architecture",
    "sub": "principles",
@@ -462,6 +898,162 @@
    "words": 495
   },
   {
+   "id": "clean-architecture",
+   "sec": "architecture",
+   "sub": "styles",
+   "title": "Clean architecture — rings, the dependency rule, use cases",
+   "tags": [
+    "architecture",
+    "clean-architecture",
+    "design-principles",
+    "java"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/styles/clean-architecture.md",
+   "links": [
+    "ddd-basics",
+    "hexagonal-architecture",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "junit-and-mockito",
+    "layered-architecture",
+    "modular-monolith",
+    "solid",
+    "spring-boot-starters-and-autoconfiguration",
+    "spring-transactional"
+   ],
+   "words": 929
+  },
+  {
+   "id": "hexagonal-architecture",
+   "sec": "architecture",
+   "sub": "styles",
+   "title": "Hexagonal architecture — ports and adapters",
+   "tags": [
+    "architecture",
+    "hexagonal",
+    "ddd",
+    "spring",
+    "testing"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/styles/hexagonal-architecture.md",
+   "links": [
+    "clean-architecture",
+    "ddd-basics",
+    "esim-provisioning-platform",
+    "jpa-entities-and-relationships",
+    "junit-and-mockito",
+    "kafka-producer",
+    "layered-architecture",
+    "maven",
+    "modular-monolith",
+    "outbox-pattern",
+    "rest-clients",
+    "solid",
+    "spring-bean-scopes-and-configuration",
+    "spring-data-repositories",
+    "spring-ioc-and-di",
+    "spring-kafka-consumer",
+    "spring-transactional",
+    "temporal-concepts",
+    "testcontainers",
+    "testing-types-and-dev-cycles"
+   ],
+   "words": 924
+  },
+  {
+   "id": "layered-architecture",
+   "sec": "architecture",
+   "sub": "styles",
+   "title": "Layered architecture — controller, service, repository",
+   "tags": [
+    "architecture",
+    "layered",
+    "spring",
+    "design-principles"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/styles/layered-architecture.md",
+   "links": [
+    "clean-architecture",
+    "ddd-basics",
+    "hexagonal-architecture",
+    "hikaricp-pool-sizing",
+    "jpa-n-plus-one",
+    "junit-and-mockito",
+    "modular-monolith",
+    "outbox-pattern",
+    "solid",
+    "spring-aop",
+    "spring-data-repositories",
+    "spring-mvc-request-lifecycle",
+    "spring-transactional"
+   ],
+   "words": 810
+  },
+  {
+   "id": "modular-monolith",
+   "sec": "architecture",
+   "sub": "styles",
+   "title": "Modular monolith — enforced boundaries, Spring Modulith, ArchUnit",
+   "tags": [
+    "architecture",
+    "modular-monolith",
+    "spring-modulith",
+    "archunit",
+    "postgres"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/styles/modular-monolith.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "clean-architecture",
+    "ddd-basics",
+    "hexagonal-architecture",
+    "hikaricp-pool-sizing",
+    "kafka-producer",
+    "layered-architecture",
+    "monolith-vs-microservices",
+    "outbox-pattern",
+    "saga",
+    "testcontainers"
+   ],
+   "words": 910
+  },
+  {
+   "id": "monolith-vs-microservices",
+   "sec": "architecture",
+   "sub": "styles",
+   "title": "Monolith vs microservices — trade-offs, when to split, strangler fig",
+   "tags": [
+    "architecture",
+    "microservices",
+    "monolith",
+    "distributed-systems",
+    "migration"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/styles/monolith-vs-microservices.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "circuit-breaker",
+    "ddd-basics",
+    "distributed-tracing",
+    "hikaricp-pool-sizing",
+    "idempotency",
+    "kubernetes-basics",
+    "logging-stacks",
+    "modular-monolith",
+    "openapi-swagger",
+    "outbox-pattern",
+    "saga",
+    "system-design-basics",
+    "testcontainers",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 930
+  },
+  {
    "id": "temporal-concepts",
    "sec": "architecture",
    "sub": "workflows",
@@ -484,6 +1076,851 @@
     "system-design-basics"
    ],
    "words": 1101
+  },
+  {
+   "id": "workflow-engines-vs-sagas",
+   "sec": "architecture",
+   "sub": "workflows",
+   "title": "Workflow engines vs hand-rolled sagas — Temporal, Camunda, state machines",
+   "tags": [
+    "workflows",
+    "temporal",
+    "camunda",
+    "saga",
+    "architecture"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/workflows/workflow-engines-vs-sagas.md",
+   "links": [
+    "background-jobs-and-schedulers",
+    "design-esim-provisioning",
+    "esim-provisioning-platform",
+    "event-driven-architecture",
+    "idempotency",
+    "logging-stacks",
+    "outbox-pattern",
+    "saga",
+    "temporal-concepts",
+    "use-cases-and-application-layer"
+   ],
+   "words": 1267
+  },
+  {
+   "id": "big-o-and-complexity",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Big-O and complexity analysis",
+   "tags": [
+    "algorithms",
+    "complexity",
+    "big-o",
+    "performance"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/big-o-and-complexity.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "binary-search-and-variants",
+    "bit-manipulation",
+    "cpu-caches-and-cache-lines",
+    "data-structures",
+    "database-indexes",
+    "equals-and-hashcode",
+    "hash-tables",
+    "interview-problem-patterns",
+    "recursion-and-backtracking",
+    "sorting-algorithms",
+    "stack-vs-heap-memory",
+    "stream-api",
+    "strings-and-string-pool",
+    "topological-sort-and-union-find",
+    "trees-and-bst"
+   ],
+   "words": 948
+  },
+  {
+   "id": "binary-search-and-variants",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Binary search and its variants",
+   "tags": [
+    "algorithms",
+    "binary-search",
+    "complexity"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/binary-search-and-variants.md",
+   "links": [
+    "database-indexes",
+    "interview-problem-patterns",
+    "kafka-architecture",
+    "sorting-algorithms",
+    "trees-and-bst",
+    "two-pointers-and-sliding-window"
+   ],
+   "words": 889
+  },
+  {
+   "id": "bit-manipulation",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Bit manipulation",
+   "tags": [
+    "algorithms",
+    "bits",
+    "bitmask",
+    "xor"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/bit-manipulation.md",
+   "links": [
+    "binary-search-and-variants",
+    "bloom-filters-and-probabilistic",
+    "data-modeling-for-services",
+    "dynamic-programming",
+    "emv-card-processing",
+    "enums",
+    "hash-tables",
+    "hashmap-internals",
+    "interview-problem-patterns",
+    "ip-addressing-ports-nat",
+    "numbers-bits-and-floating-point"
+   ],
+   "words": 1001
+  },
+  {
+   "id": "dynamic-programming",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Dynamic programming",
+   "tags": [
+    "algorithms",
+    "dynamic-programming",
+    "memoization",
+    "recursion"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/dynamic-programming.md",
+   "links": [
+    "big-o-and-complexity",
+    "binary-search-and-variants",
+    "bit-manipulation",
+    "elasticsearch-basics",
+    "greedy-algorithms",
+    "interview-problem-patterns",
+    "query-planning-and-execution",
+    "recursion-and-backtracking",
+    "stack-vs-heap-memory"
+   ],
+   "words": 964
+  },
+  {
+   "id": "graph-traversal-bfs-dfs",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Graph traversal with BFS and DFS",
+   "tags": [
+    "algorithms",
+    "graphs",
+    "bfs",
+    "dfs"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/graph-traversal-bfs-dfs.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "background-jobs-and-schedulers",
+    "design-news-feed",
+    "garbage-collection",
+    "graphs-representation",
+    "interview-problem-patterns",
+    "iterators-and-fail-fast",
+    "jvm-memory-areas",
+    "maven",
+    "recursion-and-backtracking",
+    "shortest-paths-dijkstra",
+    "temporal-concepts",
+    "topological-sort-and-union-find",
+    "trees-and-bst"
+   ],
+   "words": 882
+  },
+  {
+   "id": "greedy-algorithms",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Greedy algorithms",
+   "tags": [
+    "algorithms",
+    "greedy",
+    "intervals",
+    "optimization"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/greedy-algorithms.md",
+   "links": [
+    "cpu-scheduling",
+    "dynamic-programming",
+    "heaps-and-priority-queues",
+    "http-fundamentals",
+    "interview-problem-patterns",
+    "kafka-consumer",
+    "kubernetes-basics",
+    "prefix-sums-and-intervals",
+    "rate-limiting",
+    "shortest-paths-dijkstra",
+    "sorting-algorithms",
+    "stack-and-monotonic-stack",
+    "topological-sort-and-union-find",
+    "two-pointers-and-sliding-window"
+   ],
+   "words": 891
+  },
+  {
+   "id": "interview-problem-patterns",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Interview problem patterns cheat sheet",
+   "tags": [
+    "algorithms",
+    "interview",
+    "patterns",
+    "cheat-sheet"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/interview-problem-patterns.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "big-o-and-complexity",
+    "binary-search-and-variants",
+    "bit-manipulation",
+    "bloom-filters-and-probabilistic",
+    "collections-framework",
+    "data-structures",
+    "dynamic-programming",
+    "graph-traversal-bfs-dfs",
+    "greedy-algorithms",
+    "hash-tables",
+    "hashmap-internals",
+    "heaps-and-priority-queues",
+    "linked-lists",
+    "lru-cache-design",
+    "prefix-sums-and-intervals",
+    "recursion-and-backtracking",
+    "shortest-paths-dijkstra",
+    "sorting-algorithms",
+    "stack-and-monotonic-stack",
+    "stacks-and-queues",
+    "string-algorithms",
+    "system-design-basics",
+    "topological-sort-and-union-find",
+    "trees-and-bst",
+    "tries",
+    "two-pointers-and-sliding-window"
+   ],
+   "words": 1281
+  },
+  {
+   "id": "prefix-sums-and-intervals",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Prefix sums, difference arrays and interval problems",
+   "tags": [
+    "algorithms",
+    "prefix-sum",
+    "intervals",
+    "sweep-line"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/prefix-sums-and-intervals.md",
+   "links": [
+    "greedy-algorithms",
+    "interview-problem-patterns",
+    "otel-metric-types",
+    "postgres-indexes",
+    "slo-sli-and-alerting",
+    "two-pointers-and-sliding-window"
+   ],
+   "words": 867
+  },
+  {
+   "id": "recursion-and-backtracking",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Recursion and backtracking",
+   "tags": [
+    "algorithms",
+    "recursion",
+    "backtracking",
+    "call-stack"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/recursion-and-backtracking.md",
+   "links": [
+    "big-o-and-complexity",
+    "binary-search-and-variants",
+    "dynamic-programming",
+    "exceptions",
+    "graph-traversal-bfs-dfs",
+    "interview-problem-patterns",
+    "jvm-memory-areas",
+    "linked-lists",
+    "maven",
+    "sorting-algorithms",
+    "stack-vs-heap-memory",
+    "stacks-and-queues",
+    "temporal-concepts",
+    "trees-and-bst"
+   ],
+   "words": 827
+  },
+  {
+   "id": "shortest-paths-dijkstra",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Shortest paths with Dijkstra and friends",
+   "tags": [
+    "algorithms",
+    "graphs",
+    "dijkstra",
+    "shortest-path"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/shortest-paths-dijkstra.md",
+   "links": [
+    "graph-traversal-bfs-dfs",
+    "graphs-representation",
+    "greedy-algorithms",
+    "heaps-and-priority-queues",
+    "interview-problem-patterns",
+    "load-balancing",
+    "multi-region-basics",
+    "osi-and-tcp-ip-models",
+    "topological-sort-and-union-find"
+   ],
+   "words": 786
+  },
+  {
+   "id": "sorting-algorithms",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Sorting algorithms and what Java actually uses",
+   "tags": [
+    "algorithms",
+    "sorting",
+    "complexity",
+    "java"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/sorting-algorithms.md",
+   "links": [
+    "big-o-and-complexity",
+    "data-structures",
+    "equals-and-hashcode",
+    "explain-analyze",
+    "fork-join-framework",
+    "greedy-algorithms",
+    "heaps-and-priority-queues",
+    "interview-problem-patterns",
+    "postgres-indexes",
+    "time-money-and-ids",
+    "trees-and-bst"
+   ],
+   "words": 922
+  },
+  {
+   "id": "stack-and-monotonic-stack",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Stack problems and the monotonic stack",
+   "tags": [
+    "algorithms",
+    "stack",
+    "monotonic-stack",
+    "arrays"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/stack-and-monotonic-stack.md",
+   "links": [
+    "big-o-and-complexity",
+    "casting-and-autoboxing",
+    "collections-framework",
+    "interview-problem-patterns",
+    "recursion-and-backtracking",
+    "stack-vs-heap-memory",
+    "stacks-and-queues",
+    "two-pointers-and-sliding-window"
+   ],
+   "words": 975
+  },
+  {
+   "id": "string-algorithms",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "String algorithms for interviews and backends",
+   "tags": [
+    "algorithms",
+    "strings",
+    "hashing",
+    "kmp"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/string-algorithms.md",
+   "links": [
+    "binary-search-and-variants",
+    "bloom-filters-and-probabilistic",
+    "dynamic-programming",
+    "elasticsearch-basics",
+    "hash-tables",
+    "hashmap-internals",
+    "interview-problem-patterns",
+    "owasp-top-10-for-backend",
+    "postgres-indexes",
+    "postgres-jsonb-and-full-text",
+    "stack-and-monotonic-stack",
+    "strings-and-string-pool",
+    "text-encodings-and-unicode",
+    "tries",
+    "two-pointers-and-sliding-window"
+   ],
+   "words": 924
+  },
+  {
+   "id": "topological-sort-and-union-find",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Topological sort and union-find",
+   "tags": [
+    "algorithms",
+    "graphs",
+    "topological-sort",
+    "union-find"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/topological-sort-and-union-find.md",
+   "links": [
+    "big-o-and-complexity",
+    "dynamic-programming",
+    "graph-traversal-bfs-dfs",
+    "graphs-representation",
+    "greedy-algorithms",
+    "heaps-and-priority-queues",
+    "interview-problem-patterns",
+    "schema-migrations-flyway-liquibase",
+    "spring-ioc-and-di",
+    "temporal-concepts"
+   ],
+   "words": 928
+  },
+  {
+   "id": "two-pointers-and-sliding-window",
+   "sec": "computer-science",
+   "sub": "algorithms",
+   "title": "Two pointers and sliding window",
+   "tags": [
+    "algorithms",
+    "two-pointers",
+    "sliding-window",
+    "arrays"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/algorithms/two-pointers-and-sliding-window.md",
+   "links": [
+    "big-o-and-complexity",
+    "casting-and-autoboxing",
+    "greedy-algorithms",
+    "hash-tables",
+    "interview-problem-patterns",
+    "linked-lists",
+    "otel-metric-types",
+    "prefix-sums-and-intervals",
+    "rate-limiting",
+    "sorting-algorithms",
+    "stack-and-monotonic-stack",
+    "string-algorithms"
+   ],
+   "words": 833
+  },
+  {
+   "id": "compilation-interpretation-jit",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "Compilation, interpretation and JIT",
+   "tags": [
+    "compilers",
+    "jit",
+    "jvm",
+    "performance",
+    "fundamentals"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/computation/compilation-interpretation-jit.md",
+   "links": [
+    "garbage-collection",
+    "how-cpu-executes-code",
+    "immutable-objects",
+    "jvm-jre-jdk",
+    "jvm-memory-areas",
+    "type-systems"
+   ],
+   "words": 1110
+  },
+  {
+   "id": "cpu-caches-and-cache-lines",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "CPU caches, cache lines and false sharing",
+   "tags": [
+    "cpu",
+    "cache",
+    "performance",
+    "concurrency",
+    "memory"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/computation/cpu-caches-and-cache-lines.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "caching",
+    "column-and-wide-column-stores",
+    "hash-tables",
+    "hashmap-internals",
+    "how-cpu-executes-code",
+    "java-memory-model",
+    "latency-numbers",
+    "linked-lists",
+    "lock-free-and-cas",
+    "lru-cache-design",
+    "memory-models-and-visibility",
+    "virtual-memory-and-paging"
+   ],
+   "words": 1032
+  },
+  {
+   "id": "how-cpu-executes-code",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "How a CPU executes code",
+   "tags": [
+    "cpu",
+    "computer-architecture",
+    "performance",
+    "fundamentals"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/computation/how-cpu-executes-code.md",
+   "links": [
+    "amdahls-law-and-parallel-speedup",
+    "big-o-and-complexity",
+    "bit-manipulation",
+    "compilation-interpretation-jit",
+    "cpu-caches-and-cache-lines",
+    "io-models-blocking-nonblocking-epoll",
+    "java-memory-model",
+    "jvm-memory-areas",
+    "latency-numbers",
+    "lock-free-and-cas",
+    "memory-models-and-visibility",
+    "processes-and-threads",
+    "race-conditions-and-critical-sections",
+    "stack-vs-heap-memory",
+    "virtual-threads"
+   ],
+   "words": 977
+  },
+  {
+   "id": "numbers-bits-and-floating-point",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "Numbers, bits and floating point",
+   "tags": [
+    "numbers",
+    "floating-point",
+    "ieee-754",
+    "bigdecimal",
+    "fundamentals"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/computation/numbers-bits-and-floating-point.md",
+   "links": [
+    "binary-search-and-variants",
+    "bit-manipulation",
+    "hash-tables",
+    "java-nio",
+    "primitives-and-wrappers",
+    "text-encodings-and-unicode",
+    "time-money-and-ids"
+   ],
+   "words": 950
+  },
+  {
+   "id": "text-encodings-and-unicode",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "Text encodings and Unicode",
+   "tags": [
+    "unicode",
+    "utf-8",
+    "encoding",
+    "strings",
+    "fundamentals"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/computation/text-encodings-and-unicode.md",
+   "links": [
+    "numbers-bits-and-floating-point",
+    "postgres-indexes",
+    "strings-and-string-pool"
+   ],
+   "words": 1018
+  },
+  {
+   "id": "actor-and-message-passing-models",
+   "sec": "computer-science",
+   "sub": "concurrency-theory",
+   "title": "Actor and message-passing concurrency models",
+   "tags": [
+    "concurrency",
+    "actors",
+    "message-passing",
+    "csp",
+    "architecture"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/concurrency-theory/actor-and-message-passing-models.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "deadlocks-and-synchronization-primitives",
+    "delivery-guarantees",
+    "distributed-locks-and-fencing",
+    "event-driven-architecture",
+    "event-sourcing",
+    "executors-and-thread-pools",
+    "immutability-and-side-effects",
+    "kafka-consumer",
+    "message-queues-and-streams",
+    "mutex-semaphore-monitor",
+    "race-conditions-and-critical-sections",
+    "saga",
+    "service-communication-sync-vs-async",
+    "spring-reactive-webclient-sse",
+    "temporal-concepts",
+    "virtual-threads",
+    "workflow-engines-vs-sagas"
+   ],
+   "words": 1130
+  },
+  {
+   "id": "amdahls-law-and-parallel-speedup",
+   "sec": "computer-science",
+   "sub": "concurrency-theory",
+   "title": "Amdahl's law, parallel speedup and Little's law",
+   "tags": [
+    "concurrency",
+    "performance",
+    "amdahl",
+    "littles-law",
+    "capacity"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/concurrency-theory/amdahls-law-and-parallel-speedup.md",
+   "links": [
+    "actor-and-message-passing-models",
+    "back-of-envelope-estimation",
+    "backpressure-and-flow-control",
+    "completable-future",
+    "cpu-caches-and-cache-lines",
+    "cpu-scheduling",
+    "fork-join-framework",
+    "hikaricp-pool-sizing",
+    "horizontal-vs-vertical-scaling",
+    "kafka-consumer",
+    "latency-numbers",
+    "load-balancing",
+    "lock-free-and-cas",
+    "rate-limiting",
+    "slo-sli-and-alerting",
+    "syscalls-and-file-descriptors",
+    "virtual-threads"
+   ],
+   "words": 1087
+  },
+  {
+   "id": "lock-free-and-cas",
+   "sec": "computer-science",
+   "sub": "concurrency-theory",
+   "title": "Lock-free programming and compare-and-swap",
+   "tags": [
+    "concurrency",
+    "lock-free",
+    "cas",
+    "atomics",
+    "aba"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/concurrency-theory/lock-free-and-cas.md",
+   "links": [
+    "cpu-caches-and-cache-lines",
+    "cpu-scheduling",
+    "deadlocks-and-synchronization-primitives",
+    "distributed-locks-and-fencing",
+    "http-caching",
+    "idempotency",
+    "immutability-and-side-effects",
+    "jpa-locking",
+    "locks-and-lock-free",
+    "memory-models-and-visibility",
+    "mutex-semaphore-monitor",
+    "race-conditions-and-critical-sections",
+    "rate-limiting"
+   ],
+   "words": 1112
+  },
+  {
+   "id": "memory-models-and-visibility",
+   "sec": "computer-science",
+   "sub": "concurrency-theory",
+   "title": "Memory models, reordering and visibility",
+   "tags": [
+    "concurrency",
+    "memory-model",
+    "visibility",
+    "happens-before",
+    "reordering"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/concurrency-theory/memory-models-and-visibility.md",
+   "links": [
+    "consistency-models",
+    "cpu-caches-and-cache-lines",
+    "immutability-and-side-effects",
+    "java-memory-model",
+    "lock-free-and-cas",
+    "postgres-isolation-levels",
+    "race-conditions-and-critical-sections",
+    "time-and-clocks"
+   ],
+   "words": 1117
+  },
+  {
+   "id": "mutex-semaphore-monitor",
+   "sec": "computer-science",
+   "sub": "concurrency-theory",
+   "title": "Mutex, semaphore and monitor",
+   "tags": [
+    "concurrency",
+    "mutex",
+    "semaphore",
+    "monitor",
+    "synchronization"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/concurrency-theory/mutex-semaphore-monitor.md",
+   "links": [
+    "circuit-breaker",
+    "completable-future",
+    "deadlocks-and-synchronization-primitives",
+    "lock-free-and-cas",
+    "locks-and-lock-free",
+    "race-conditions-and-critical-sections",
+    "synchronization-and-monitors",
+    "synchronizers"
+   ],
+   "words": 1108
+  },
+  {
+   "id": "race-conditions-and-critical-sections",
+   "sec": "computer-science",
+   "sub": "concurrency-theory",
+   "title": "Race conditions, data races and critical sections",
+   "tags": [
+    "concurrency",
+    "race-condition",
+    "atomicity",
+    "critical-section"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/concurrency-theory/race-conditions-and-critical-sections.md",
+   "links": [
+    "concurrency-hazards",
+    "concurrent-collections",
+    "constraints-and-relationships",
+    "deadlocks-and-synchronization-primitives",
+    "distributed-locks-and-fencing",
+    "idempotency",
+    "immutability-and-side-effects",
+    "jpa-locking",
+    "lock-free-and-cas",
+    "locks-and-lock-free",
+    "memory-models-and-visibility",
+    "mutex-semaphore-monitor",
+    "postgres-isolation-levels",
+    "synchronization-and-monitors",
+    "synchronizers",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 1065
+  },
+  {
+   "id": "arrays-and-dynamic-arrays",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Arrays and dynamic arrays",
+   "tags": [
+    "data-structures",
+    "arrays",
+    "memory",
+    "amortized",
+    "complexity"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/arrays-and-dynamic-arrays.md",
+   "links": [
+    "big-o-and-complexity",
+    "binary-search-and-variants",
+    "collections-framework",
+    "concurrent-collections",
+    "cpu-caches-and-cache-lines",
+    "data-structures",
+    "garbage-collection",
+    "heaps-and-priority-queues",
+    "iterators-and-fail-fast",
+    "linked-lists",
+    "prefix-sums-and-intervals",
+    "primitives-and-wrappers",
+    "stack-vs-heap-memory",
+    "stacks-and-queues",
+    "two-pointers-and-sliding-window"
+   ],
+   "words": 820
+  },
+  {
+   "id": "bloom-filters-and-probabilistic",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Bloom filters and probabilistic data structures",
+   "tags": [
+    "data-structures",
+    "bloom-filter",
+    "hyperloglog",
+    "count-min-sketch",
+    "probabilistic"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/bloom-filters-and-probabilistic.md",
+   "links": [
+    "caching",
+    "cdn",
+    "column-and-wide-column-stores",
+    "design-notification-service",
+    "hash-tables",
+    "idempotency",
+    "otel-metric-types",
+    "postgres-indexes",
+    "rate-limiting",
+    "redis-data-structures"
+   ],
+   "words": 1138
   },
   {
    "id": "data-structures",
@@ -509,6 +1946,857 @@
     "postgres-indexes"
    ],
    "words": 967
+  },
+  {
+   "id": "graphs-representation",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Graph representations",
+   "tags": [
+    "data-structures",
+    "graphs",
+    "adjacency-list",
+    "adjacency-matrix"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/graphs-representation.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "cpu-caches-and-cache-lines",
+    "data-structures",
+    "distributed-tracing",
+    "graph-traversal-bfs-dfs",
+    "hash-tables",
+    "query-planning-and-execution",
+    "shortest-paths-dijkstra",
+    "spring-bean-lifecycle",
+    "sql-vs-nosql-choosing",
+    "temporal-concepts",
+    "topological-sort-and-union-find",
+    "trees-and-bst"
+   ],
+   "words": 935
+  },
+  {
+   "id": "hash-tables",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Hash tables",
+   "tags": [
+    "data-structures",
+    "hashing",
+    "hash-table",
+    "collisions",
+    "complexity"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/hash-tables.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "bloom-filters-and-probabilistic",
+    "concurrent-collections",
+    "consistent-hashing",
+    "data-structures",
+    "equals-and-hashcode",
+    "hashmap-internals",
+    "immutable-objects",
+    "linked-lists",
+    "lru-cache-design",
+    "numbers-bits-and-floating-point",
+    "owasp-top-10-for-backend",
+    "sharding-strategies",
+    "trees-and-bst"
+   ],
+   "words": 1091
+  },
+  {
+   "id": "heaps-and-priority-queues",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Heaps and priority queues",
+   "tags": [
+    "data-structures",
+    "heap",
+    "priority-queue",
+    "top-k",
+    "complexity"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/heaps-and-priority-queues.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "background-jobs-and-schedulers",
+    "collections-framework",
+    "concurrent-collections",
+    "data-structures",
+    "executors-and-thread-pools",
+    "load-balancing",
+    "shortest-paths-dijkstra",
+    "sorting-algorithms",
+    "trees-and-bst"
+   ],
+   "words": 1031
+  },
+  {
+   "id": "linked-lists",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Linked lists",
+   "tags": [
+    "data-structures",
+    "linked-list",
+    "memory",
+    "complexity"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/linked-lists.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "collections-framework",
+    "concurrent-collections",
+    "cpu-caches-and-cache-lines",
+    "data-structures",
+    "garbage-collection",
+    "hash-tables",
+    "hashmap-internals",
+    "heaps-and-priority-queues",
+    "immutability-and-side-effects",
+    "lock-free-and-cas",
+    "lru-cache-design",
+    "recursion-and-backtracking",
+    "stacks-and-queues"
+   ],
+   "words": 917
+  },
+  {
+   "id": "lru-cache-design",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "LRU cache design",
+   "tags": [
+    "data-structures",
+    "cache",
+    "lru",
+    "linked-hash-map",
+    "eviction"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/lru-cache-design.md",
+   "links": [
+    "bloom-filters-and-probabilistic",
+    "caching",
+    "concurrent-collections",
+    "distributed-cache-coherence",
+    "hash-tables",
+    "hashmap-internals",
+    "linked-lists",
+    "lock-free-and-cas",
+    "redis-patterns-and-persistence",
+    "spring-cache-abstraction",
+    "virtual-memory-and-paging"
+   ],
+   "words": 1074
+  },
+  {
+   "id": "stacks-and-queues",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Stacks, queues, deques and ring buffers",
+   "tags": [
+    "data-structures",
+    "stack",
+    "queue",
+    "deque",
+    "ring-buffer"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/stacks-and-queues.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "backpressure-and-flow-control",
+    "collections-framework",
+    "concurrent-collections",
+    "data-structures",
+    "executors-and-thread-pools",
+    "fork-join-framework",
+    "graph-traversal-bfs-dfs",
+    "heaps-and-priority-queues",
+    "linked-lists",
+    "message-queues-and-streams",
+    "stack-and-monotonic-stack",
+    "stack-vs-heap-memory"
+   ],
+   "words": 844
+  },
+  {
+   "id": "trees-and-bst",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Trees, binary search trees and balanced trees",
+   "tags": [
+    "data-structures",
+    "trees",
+    "bst",
+    "red-black-tree",
+    "b-tree"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/trees-and-bst.md",
+   "links": [
+    "binary-search-and-variants",
+    "collections-framework",
+    "column-and-wide-column-stores",
+    "concurrent-collections",
+    "data-structures",
+    "database-indexes",
+    "graphs-representation",
+    "hash-tables",
+    "heaps-and-priority-queues",
+    "immutable-objects",
+    "postgres-indexes",
+    "prefix-sums-and-intervals",
+    "query-planning-and-execution",
+    "recursion-and-backtracking",
+    "stack-vs-heap-memory",
+    "stacks-and-queues",
+    "tries"
+   ],
+   "words": 1135
+  },
+  {
+   "id": "tries",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Tries (prefix trees)",
+   "tags": [
+    "data-structures",
+    "trie",
+    "prefix-search",
+    "autocomplete",
+    "strings"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/data-structures/tries.md",
+   "links": [
+    "binary-search-and-variants",
+    "bloom-filters-and-probabilistic",
+    "data-structures",
+    "design-news-feed",
+    "elasticsearch-basics",
+    "hash-tables",
+    "heaps-and-priority-queues",
+    "ip-addressing-ports-nat",
+    "postgres-indexes",
+    "string-algorithms",
+    "text-encodings-and-unicode"
+   ],
+   "words": 1038
+  },
+  {
+   "id": "cpu-scheduling",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "CPU scheduling: preemption, priorities and load",
+   "tags": [
+    "operating-systems",
+    "scheduling",
+    "linux",
+    "performance"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/cpu-scheduling.md",
+   "links": [
+    "cpu-caches-and-cache-lines",
+    "docker-containers-and-resources",
+    "executors-and-thread-pools",
+    "kubernetes-basics",
+    "linux-processes",
+    "processes-and-threads",
+    "virtual-threads"
+   ],
+   "words": 1040
+  },
+  {
+   "id": "deadlocks-and-synchronization-primitives",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Deadlocks and OS synchronization primitives",
+   "tags": [
+    "operating-systems",
+    "deadlock",
+    "mutex",
+    "semaphore",
+    "linux"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/deadlocks-and-synchronization-primitives.md",
+   "links": [
+    "concurrency-hazards",
+    "distributed-locks-and-fencing",
+    "executors-and-thread-pools",
+    "immutability-and-side-effects",
+    "lock-free-and-cas",
+    "locks-and-lock-free",
+    "mutex-semaphore-monitor",
+    "postgres-locks",
+    "synchronization-and-monitors"
+   ],
+   "words": 1075
+  },
+  {
+   "id": "io-models-blocking-nonblocking-epoll",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "IO models: blocking, non-blocking, multiplexing and async",
+   "tags": [
+    "operating-systems",
+    "io",
+    "epoll",
+    "linux",
+    "networking"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/io-models-blocking-nonblocking-epoll.md",
+   "links": [
+    "cpu-scheduling",
+    "java-nio",
+    "processes-and-threads",
+    "sockets-and-connection-pooling",
+    "spring-reactive-webclient-sse",
+    "syscalls-and-file-descriptors",
+    "tcp-handshake-and-connection-states",
+    "virtual-threads"
+   ],
+   "words": 1125
+  },
+  {
+   "id": "ipc-mechanisms",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Inter-process communication mechanisms",
+   "tags": [
+    "operating-systems",
+    "ipc",
+    "sockets",
+    "pipes",
+    "shared-memory"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/ipc-mechanisms.md",
+   "links": [
+    "cpu-caches-and-cache-lines",
+    "docker-socket-dind-dood",
+    "grpc-and-protobuf",
+    "http-fundamentals",
+    "io-models-blocking-nonblocking-epoll",
+    "lock-free-and-cas",
+    "memory-models-and-visibility",
+    "message-queues-and-streams",
+    "postgres-performance-checklist",
+    "processes-and-threads",
+    "service-communication-sync-vs-async",
+    "signals-and-process-lifecycle",
+    "sockets-and-connection-pooling",
+    "syscalls-and-file-descriptors",
+    "tcp-vs-udp"
+   ],
+   "words": 1047
+  },
+  {
+   "id": "processes-and-threads",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Processes and threads from the OS point of view",
+   "tags": [
+    "operating-systems",
+    "processes",
+    "threads",
+    "scheduling"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/processes-and-threads.md",
+   "links": [
+    "cpu-caches-and-cache-lines",
+    "cpu-scheduling",
+    "executors-and-thread-pools",
+    "hikaricp-pool-sizing",
+    "ipc-mechanisms",
+    "jvm-memory-areas",
+    "latency-numbers",
+    "linux-processes",
+    "race-conditions-and-critical-sections",
+    "stack-vs-heap-memory",
+    "threads-basics",
+    "virtual-memory-and-paging",
+    "virtual-threads"
+   ],
+   "words": 982
+  },
+  {
+   "id": "signals-and-process-lifecycle",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Signals and the process lifecycle",
+   "tags": [
+    "operating-systems",
+    "signals",
+    "processes",
+    "containers",
+    "linux"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/signals-and-process-lifecycle.md",
+   "links": [
+    "docker-containers-and-resources",
+    "dockerfile-and-images",
+    "kubernetes-basics",
+    "linux-processes",
+    "outbox-pattern",
+    "spring-bean-lifecycle",
+    "spring-kafka-consumer",
+    "threads-basics",
+    "virtual-memory-and-paging"
+   ],
+   "words": 1142
+  },
+  {
+   "id": "stack-vs-heap-memory",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Stack vs heap memory",
+   "tags": [
+    "operating-systems",
+    "memory",
+    "stack",
+    "heap"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/stack-vs-heap-memory.md",
+   "links": [
+    "cpu-caches-and-cache-lines",
+    "garbage-collection",
+    "jpa-entities-and-relationships",
+    "jvm-memory-areas",
+    "lock-free-and-cas",
+    "processes-and-threads",
+    "recursion-and-backtracking",
+    "spring-aop",
+    "virtual-memory-and-paging",
+    "virtual-threads"
+   ],
+   "words": 970
+  },
+  {
+   "id": "syscalls-and-file-descriptors",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "System calls and file descriptors",
+   "tags": [
+    "operating-systems",
+    "syscalls",
+    "linux",
+    "file-descriptors"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/syscalls-and-file-descriptors.md",
+   "links": [
+    "io-models-blocking-nonblocking-epoll",
+    "java-io-streams",
+    "java-nio",
+    "linux-memory-filesystems-io",
+    "linux-processes",
+    "processes-and-threads",
+    "sockets-and-connection-pooling",
+    "synchronization-and-monitors",
+    "virtual-memory-and-paging"
+   ],
+   "words": 1017
+  },
+  {
+   "id": "virtual-memory-and-paging",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Virtual memory and paging",
+   "tags": [
+    "operating-systems",
+    "memory",
+    "paging",
+    "linux"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/virtual-memory-and-paging.md",
+   "links": [
+    "cpu-caches-and-cache-lines",
+    "docker-containers-and-resources",
+    "java-nio",
+    "jvm-memory-areas",
+    "kafka-architecture",
+    "linux-memory-filesystems-io",
+    "linux-processes",
+    "stack-vs-heap-memory"
+   ],
+   "words": 1033
+  },
+  {
+   "id": "error-handling-strategies",
+   "sec": "computer-science",
+   "sub": "programming",
+   "title": "Error handling strategies",
+   "tags": [
+    "programming",
+    "exceptions",
+    "result-types",
+    "fail-fast",
+    "retries",
+    "resilience"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/programming/error-handling-strategies.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "error-tracking-with-sentry",
+    "exceptions",
+    "failure-modes-and-timeouts",
+    "idempotency",
+    "observability-three-pillars",
+    "postgres-performance-checklist",
+    "rest-and-http",
+    "saga",
+    "schema-migrations-flyway-liquibase",
+    "service-communication-sync-vs-async",
+    "spring-kafka-consumer",
+    "spring-mvc-validation-and-uploads",
+    "temporal-concepts",
+    "type-systems",
+    "value-objects-and-entities"
+   ],
+   "words": 1076
+  },
+  {
+   "id": "immutability-and-side-effects",
+   "sec": "computer-science",
+   "sub": "programming",
+   "title": "Immutability and side effects",
+   "tags": [
+    "programming",
+    "immutability",
+    "side-effects",
+    "pure-functions",
+    "concurrency"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/programming/immutability-and-side-effects.md",
+   "links": [
+    "aggregates-and-invariants",
+    "domain-events-and-integration-events",
+    "dynamic-programming",
+    "equals-and-hashcode",
+    "event-sourcing",
+    "garbage-collection",
+    "hash-tables",
+    "hexagonal-architecture",
+    "idempotency",
+    "immutable-objects",
+    "java-memory-model",
+    "java-nio",
+    "jpa-n-plus-one",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "programming-paradigms",
+    "race-conditions-and-critical-sections",
+    "stacks-and-queues",
+    "temporal-concepts",
+    "testing-async-and-kafka-flows",
+    "use-cases-and-application-layer"
+   ],
+   "words": 958
+  },
+  {
+   "id": "programming-paradigms",
+   "sec": "computer-science",
+   "sub": "programming",
+   "title": "Programming paradigms",
+   "tags": [
+    "programming",
+    "paradigms",
+    "oop",
+    "functional",
+    "declarative"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/programming/programming-paradigms.md",
+   "links": [
+    "actor-and-message-passing-models",
+    "aggregates-and-invariants",
+    "coupling-cohesion-and-general-principles",
+    "error-handling-strategies",
+    "event-driven-architecture",
+    "functional-interfaces",
+    "hexagonal-architecture",
+    "immutability-and-side-effects",
+    "oop-principles",
+    "query-planning-and-execution",
+    "recursion-and-backtracking",
+    "solid",
+    "spring-aop",
+    "stream-api",
+    "type-systems"
+   ],
+   "words": 980
+  },
+  {
+   "id": "type-systems",
+   "sec": "computer-science",
+   "sub": "programming",
+   "title": "Type systems",
+   "tags": [
+    "programming",
+    "type-systems",
+    "generics",
+    "variance",
+    "static-typing"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/programming/type-systems.md",
+   "links": [
+    "error-handling-strategies",
+    "generics",
+    "message-schema-evolution",
+    "methods-overloading-overriding",
+    "oop-principles",
+    "primitives-and-wrappers",
+    "programming-paradigms",
+    "value-objects-and-entities"
+   ],
+   "words": 1048
+  },
+  {
+   "id": "hashing-vs-encryption",
+   "sec": "computer-science",
+   "sub": "security-basics",
+   "title": "Hashing vs encryption",
+   "tags": [
+    "security",
+    "hashing",
+    "encryption",
+    "passwords",
+    "cryptography"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/security-basics/hashing-vs-encryption.md",
+   "links": [
+    "api-security-checklist",
+    "emv-card-processing",
+    "equals-and-hashcode",
+    "hash-tables",
+    "idempotency",
+    "jwt-authentication",
+    "owasp-top-10-for-backend",
+    "secrets-management",
+    "spring-security-basics",
+    "symmetric-and-asymmetric-crypto"
+   ],
+   "words": 1011
+  },
+  {
+   "id": "owasp-top-10-for-backend",
+   "sec": "computer-science",
+   "sub": "security-basics",
+   "title": "OWASP Top 10 for backend developers",
+   "tags": [
+    "security",
+    "owasp",
+    "injection",
+    "ssrf",
+    "spring-security"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/security-basics/owasp-top-10-for-backend.md",
+   "links": [
+    "api-security-checklist",
+    "authentication-vs-authorization",
+    "cookies-sessions-and-cors",
+    "error-tracking-with-sentry",
+    "hashing-vs-encryption",
+    "jwt-authentication",
+    "logging-stacks",
+    "maven",
+    "rest-clients",
+    "sebep-incident-analysis",
+    "secrets-management",
+    "spring-mvc-validation-and-uploads",
+    "spring-security-basics",
+    "symmetric-and-asymmetric-crypto"
+   ],
+   "words": 1258
+  },
+  {
+   "id": "secrets-management",
+   "sec": "computer-science",
+   "sub": "security-basics",
+   "title": "Secrets management",
+   "tags": [
+    "security",
+    "secrets",
+    "vault",
+    "kubernetes",
+    "configuration"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/security-basics/secrets-management.md",
+   "links": [
+    "api-security-checklist",
+    "docker-swarm",
+    "dockerfile-and-images",
+    "jwt-authentication",
+    "kubernetes-basics",
+    "mtls-and-service-to-service-auth",
+    "owasp-top-10-for-backend",
+    "spring-boot-properties-and-profiles",
+    "symmetric-and-asymmetric-crypto",
+    "testcontainers"
+   ],
+   "words": 1040
+  },
+  {
+   "id": "symmetric-and-asymmetric-crypto",
+   "sec": "computer-science",
+   "sub": "security-basics",
+   "title": "Symmetric and asymmetric cryptography",
+   "tags": [
+    "security",
+    "cryptography",
+    "aes",
+    "rsa",
+    "signatures"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/security-basics/symmetric-and-asymmetric-crypto.md",
+   "links": [
+    "api-security-checklist",
+    "emv-card-processing",
+    "hashing-vs-encryption",
+    "jwt-authentication",
+    "mtls-and-service-to-service-auth",
+    "secrets-management",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 1135
+  },
+  {
+   "id": "data-modeling-for-services",
+   "sec": "databases",
+   "sub": "design",
+   "title": "Data modeling for services: ownership, aggregates, soft delete, audit",
+   "tags": [
+    "data-modeling",
+    "microservices",
+    "postgres",
+    "schema-design"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/design/data-modeling-for-services.md",
+   "links": [
+    "aggregates-and-invariants",
+    "bounded-contexts-and-context-mapping",
+    "constraints-and-relationships",
+    "event-driven-architecture",
+    "idempotency",
+    "jpa-locking",
+    "monolith-vs-microservices",
+    "multi-tenancy-strategies",
+    "normalization-and-denormalization",
+    "observability-three-pillars",
+    "outbox-pattern",
+    "postgres-jsonb-and-full-text",
+    "postgres-partitioning",
+    "postgres-replication-and-failover",
+    "saga",
+    "schema-migrations-flyway-liquibase",
+    "sharding-strategies",
+    "time-money-and-ids"
+   ],
+   "words": 1085
+  },
+  {
+   "id": "multi-tenancy-strategies",
+   "sec": "databases",
+   "sub": "design",
+   "title": "Multi-tenancy strategies: shared schema, schema per tenant, database per tenant",
+   "tags": [
+    "multi-tenancy",
+    "data-modeling",
+    "postgres",
+    "saas"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/design/multi-tenancy-strategies.md",
+   "links": [
+    "api-security-checklist",
+    "authentication-vs-authorization",
+    "data-modeling-for-services",
+    "elasticsearch-basics",
+    "hikaricp-pool-sizing",
+    "multi-region-basics",
+    "postgres-partitioning",
+    "rate-limiting",
+    "sharding-strategies"
+   ],
+   "words": 1146
+  },
+  {
+   "id": "schema-migrations-flyway-liquibase",
+   "sec": "databases",
+   "sub": "design",
+   "title": "Schema migrations with Flyway and Liquibase, and zero-downtime changes",
+   "tags": [
+    "migrations",
+    "flyway",
+    "liquibase",
+    "postgres",
+    "deployment"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/design/schema-migrations-flyway-liquibase.md",
+   "links": [
+    "data-modeling-for-services",
+    "database-scaling-path",
+    "jpa-entities-and-relationships",
+    "message-schema-evolution",
+    "postgres-indexes",
+    "postgres-locks",
+    "testcontainers"
+   ],
+   "words": 1174
+  },
+  {
+   "id": "time-money-and-ids",
+   "sec": "databases",
+   "sub": "design",
+   "title": "Storing time, money and identifiers correctly",
+   "tags": [
+    "data-modeling",
+    "postgres",
+    "uuid",
+    "money",
+    "timestamps"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/design/time-money-and-ids.md",
+   "links": [
+    "data-modeling-for-services",
+    "database-indexes",
+    "design-payment-processing",
+    "emv-card-processing",
+    "idempotency",
+    "numbers-bits-and-floating-point",
+    "postgres-partitioning",
+    "postgres-vacuum-and-bloat",
+    "time-and-clocks",
+    "value-objects-and-entities"
+   ],
+   "words": 1081
   },
   {
    "id": "constraints-and-relationships",
@@ -603,6 +2891,30 @@
    "words": 765
   },
   {
+   "id": "query-planning-and-execution",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Query planning and execution: from SQL text to rows",
+   "tags": [
+    "databases",
+    "query-planner",
+    "performance",
+    "statistics"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/fundamentals/query-planning-and-execution.md",
+   "links": [
+    "database-indexes",
+    "explain-analyze",
+    "jpa-n-plus-one",
+    "postgres-indexes",
+    "postgres-performance-checklist",
+    "postgres-vacuum-and-bloat",
+    "sql-joins-and-commands"
+   ],
+   "words": 1115
+  },
+  {
    "id": "sql-joins-and-commands",
    "sec": "databases",
    "sub": "fundamentals",
@@ -625,6 +2937,43 @@
     "transactions-acid-and-isolation"
    ],
    "words": 854
+  },
+  {
+   "id": "sql-vs-nosql-choosing",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "SQL vs NoSQL: how to choose a database for a service",
+   "tags": [
+    "databases",
+    "nosql",
+    "system-design",
+    "data-modeling"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/fundamentals/sql-vs-nosql-choosing.md",
+   "links": [
+    "cap-and-pacelc",
+    "column-and-wide-column-stores",
+    "consistency-models",
+    "constraints-and-relationships",
+    "database-fundamentals",
+    "database-scaling-path",
+    "elasticsearch-basics",
+    "mongodb-basics",
+    "multi-leader-and-leaderless",
+    "normalization-and-denormalization",
+    "outbox-pattern",
+    "postgres-jsonb-and-full-text",
+    "postgres-partitioning",
+    "redis-data-structures",
+    "redis-patterns-and-persistence",
+    "schema-migrations-flyway-liquibase",
+    "search-and-indexing-services",
+    "sharding-strategies",
+    "storage-choices",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 880
   },
   {
    "id": "transactions-acid-and-isolation",
@@ -652,6 +3001,90 @@
    "words": 985
   },
   {
+   "id": "column-and-wide-column-stores",
+   "sec": "databases",
+   "sub": "nosql",
+   "title": "Column-oriented and wide-column stores: Cassandra and ClickHouse",
+   "tags": [
+    "nosql",
+    "cassandra",
+    "clickhouse",
+    "column-store",
+    "time-series"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/nosql/column-and-wide-column-stores.md",
+   "links": [
+    "bloom-filters-and-probabilistic",
+    "consistent-hashing",
+    "database-indexes",
+    "kafka-architecture",
+    "multi-leader-and-leaderless",
+    "postgres-partitioning",
+    "postgres-vacuum-and-bloat",
+    "quorums-and-leader-election",
+    "redis-patterns-and-persistence",
+    "sharding-strategies",
+    "sql-vs-nosql-choosing",
+    "storage-choices",
+    "time-and-clocks"
+   ],
+   "words": 1118
+  },
+  {
+   "id": "elasticsearch-basics",
+   "sec": "databases",
+   "sub": "nosql",
+   "title": "Elasticsearch basics: inverted index, mappings, when to use it",
+   "tags": [
+    "elasticsearch",
+    "search",
+    "nosql",
+    "inverted-index"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/nosql/elasticsearch-basics.md",
+   "links": [
+    "column-and-wide-column-stores",
+    "cross-shard-queries-and-transactions",
+    "idempotency",
+    "outbox-pattern",
+    "postgres-jsonb-and-full-text",
+    "quorums-and-leader-election",
+    "search-and-indexing-services"
+   ],
+   "words": 1027
+  },
+  {
+   "id": "mongodb-basics",
+   "sec": "databases",
+   "sub": "nosql",
+   "title": "MongoDB basics: documents, indexes, aggregation, transactions",
+   "tags": [
+    "mongodb",
+    "nosql",
+    "document-store",
+    "data-modeling"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/nosql/mongodb-basics.md",
+   "links": [
+    "aggregates-and-invariants",
+    "database-indexes",
+    "explain-analyze",
+    "idempotency",
+    "leader-follower-replication",
+    "normalization-and-denormalization",
+    "raft-explained",
+    "read-replicas-and-stale-reads",
+    "schema-migrations-flyway-liquibase",
+    "sharding-strategies",
+    "sql-vs-nosql-choosing",
+    "time-money-and-ids"
+   ],
+   "words": 1047
+  },
+  {
    "id": "redis-data-structures",
    "sec": "databases",
    "sub": "nosql",
@@ -669,6 +3102,57 @@
     "spring-cache-abstraction"
    ],
    "words": 304
+  },
+  {
+   "id": "redis-patterns-and-persistence",
+   "sec": "databases",
+   "sub": "nosql",
+   "title": "Redis patterns and persistence: cache, locks, rate limits, streams",
+   "tags": [
+    "redis",
+    "cache",
+    "distributed-lock",
+    "persistence"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/nosql/redis-patterns-and-persistence.md",
+   "links": [
+    "caching",
+    "design-rate-limiter",
+    "distributed-cache-coherence",
+    "distributed-locks-and-fencing",
+    "idempotency",
+    "kafka-architecture",
+    "leader-follower-replication",
+    "message-queues-and-streams",
+    "postgres-locks",
+    "rate-limiting",
+    "redis-data-structures",
+    "spring-cache-abstraction",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 1019
+  },
+  {
+   "id": "explain-analyze",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Reading EXPLAIN ANALYZE plans in Postgres",
+   "tags": [
+    "postgres",
+    "performance",
+    "query-planner",
+    "explain"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/postgres/explain-analyze.md",
+   "links": [
+    "postgres-indexes",
+    "postgres-locks",
+    "postgres-performance-checklist",
+    "query-planning-and-execution"
+   ],
+   "words": 1041
   },
   {
    "id": "postgres-indexes",
@@ -709,6 +3193,156 @@
     "spring-transactional"
    ],
    "words": 218
+  },
+  {
+   "id": "postgres-jsonb-and-full-text",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Postgres jsonb and full-text search basics",
+   "tags": [
+    "postgres",
+    "jsonb",
+    "full-text-search",
+    "gin"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/postgres/postgres-jsonb-and-full-text.md",
+   "links": [
+    "data-modeling-for-services",
+    "elasticsearch-basics",
+    "explain-analyze",
+    "postgres-indexes",
+    "postgres-vacuum-and-bloat",
+    "search-and-indexing-services",
+    "sql-vs-nosql-choosing"
+   ],
+   "words": 980
+  },
+  {
+   "id": "postgres-locks",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Postgres locks: row, table, advisory, and deadlocks",
+   "tags": [
+    "postgres",
+    "locks",
+    "concurrency",
+    "deadlock"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/postgres/postgres-locks.md",
+   "links": [
+    "deadlocks-and-synchronization-primitives",
+    "distributed-locks-and-fencing",
+    "jpa-locking",
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "race-conditions-and-critical-sections",
+    "schema-migrations-flyway-liquibase"
+   ],
+   "words": 1072
+  },
+  {
+   "id": "postgres-partitioning",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Postgres declarative partitioning",
+   "tags": [
+    "postgres",
+    "partitioning",
+    "performance",
+    "retention"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/postgres/postgres-partitioning.md",
+   "links": [
+    "database-scaling-path",
+    "explain-analyze",
+    "postgres-indexes",
+    "postgres-vacuum-and-bloat",
+    "sharding-strategies",
+    "time-money-and-ids"
+   ],
+   "words": 1061
+  },
+  {
+   "id": "postgres-performance-checklist",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Postgres performance checklist for a Spring service",
+   "tags": [
+    "postgres",
+    "performance",
+    "monitoring",
+    "connection-pool"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/postgres/postgres-performance-checklist.md",
+   "links": [
+    "database-indexes",
+    "database-scaling-path",
+    "explain-analyze",
+    "grafana-dashboards-and-red-use",
+    "hikaricp-pool-sizing",
+    "jpa-n-plus-one",
+    "postgres-indexes",
+    "postgres-locks",
+    "postgres-partitioning",
+    "postgres-replication-and-failover",
+    "postgres-vacuum-and-bloat",
+    "query-planning-and-execution",
+    "slo-sli-and-alerting",
+    "spring-transactional"
+   ],
+   "words": 886
+  },
+  {
+   "id": "postgres-replication-and-failover",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Postgres streaming replication and failover mechanics",
+   "tags": [
+    "postgres",
+    "replication",
+    "high-availability",
+    "wal"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/postgres/postgres-replication-and-failover.md",
+   "links": [
+    "database-scaling-path",
+    "leader-follower-replication",
+    "leases-heartbeats-and-health",
+    "outbox-pattern",
+    "postgres-vacuum-and-bloat",
+    "quorums-and-leader-election",
+    "read-replicas-and-stale-reads",
+    "read-write-splitting-and-cqrs-lite"
+   ],
+   "words": 990
+  },
+  {
+   "id": "postgres-vacuum-and-bloat",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Postgres MVCC, vacuum and bloat",
+   "tags": [
+    "postgres",
+    "mvcc",
+    "vacuum",
+    "maintenance"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/databases/postgres/postgres-vacuum-and-bloat.md",
+   "links": [
+    "postgres-indexes",
+    "postgres-isolation-levels",
+    "postgres-partitioning",
+    "postgres-performance-checklist",
+    "postgres-replication-and-failover",
+    "query-planning-and-execution"
+   ],
+   "words": 1035
   },
   {
    "id": "maven",
@@ -1113,6 +3747,66 @@
    "words": 872
   },
   {
+   "id": "error-tracking-with-sentry",
+   "sec": "devops",
+   "sub": "observability",
+   "title": "Error tracking with Sentry — events, issues, sampling, self-hosting",
+   "tags": [
+    "observability",
+    "sentry",
+    "spring-boot",
+    "incidents"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/devops/observability/error-tracking-with-sentry.md",
+   "links": [
+    "distributed-tracing",
+    "docker-fundamentals",
+    "exceptions",
+    "grafana-dashboards-and-red-use",
+    "logging-stacks",
+    "observability-three-pillars",
+    "owasp-top-10-for-backend",
+    "sebep-incident-analysis",
+    "secrets-management",
+    "slo-sli-and-alerting",
+    "spring-kafka-consumer"
+   ],
+   "words": 1022
+  },
+  {
+   "id": "grafana-dashboards-and-red-use",
+   "sec": "devops",
+   "sub": "observability",
+   "title": "Grafana dashboards — RED and USE methods for a service",
+   "tags": [
+    "observability",
+    "grafana",
+    "prometheus",
+    "dashboards",
+    "metrics"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/devops/observability/grafana-dashboards-and-red-use.md",
+   "links": [
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "distributed-tracing",
+    "executors-and-thread-pools",
+    "garbage-collection",
+    "hikaricp-pool-sizing",
+    "kafka-consumer",
+    "kubernetes-basics",
+    "linux-memory-filesystems-io",
+    "logging-stacks",
+    "observability-three-pillars",
+    "otel-metric-types",
+    "outbox-pattern",
+    "slo-sli-and-alerting"
+   ],
+   "words": 1061
+  },
+  {
    "id": "logging-stacks",
    "sec": "devops",
    "sub": "observability",
@@ -1136,6 +3830,36 @@
    "words": 1171
   },
   {
+   "id": "observability-three-pillars",
+   "sec": "devops",
+   "sub": "observability",
+   "title": "Observability — logs, metrics, traces and how they connect",
+   "tags": [
+    "observability",
+    "opentelemetry",
+    "grafana",
+    "logging",
+    "metrics"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/devops/observability/observability-three-pillars.md",
+   "links": [
+    "circuit-breaker",
+    "distributed-tracing",
+    "error-tracking-with-sentry",
+    "grafana-dashboards-and-red-use",
+    "hikaricp-pool-sizing",
+    "kubernetes-basics",
+    "logging-stacks",
+    "otel-metric-types",
+    "owasp-top-10-for-backend",
+    "sebep-incident-analysis",
+    "slo-sli-and-alerting",
+    "spring-boot-starters-and-autoconfiguration"
+   ],
+   "words": 902
+  },
+  {
    "id": "otel-metric-types",
    "sec": "devops",
    "sub": "observability",
@@ -1156,6 +3880,36 @@
     "spring-boot-starters-and-autoconfiguration"
    ],
    "words": 712
+  },
+  {
+   "id": "slo-sli-and-alerting",
+   "sec": "devops",
+   "sub": "observability",
+   "title": "SLOs, SLIs, error budgets and alerting that does not wake you for nothing",
+   "tags": [
+    "observability",
+    "sre",
+    "alerting",
+    "grafana",
+    "prometheus"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/devops/observability/slo-sli-and-alerting.md",
+   "links": [
+    "dead-letter-queues-and-retries",
+    "error-tracking-with-sentry",
+    "failure-modes-and-timeouts",
+    "grafana-dashboards-and-red-use",
+    "kafka-consumer",
+    "leases-heartbeats-and-health",
+    "load-balancers-l4-vs-l7",
+    "observability-three-pillars",
+    "otel-metric-types",
+    "outbox-pattern",
+    "requirements-and-constraints",
+    "sebep-incident-analysis"
+   ],
+   "words": 1021
   },
   {
    "id": "devops-resources",
@@ -1192,6 +3946,555 @@
     "spring-resources"
    ],
    "words": 443
+  },
+  {
+   "id": "distributed-locks-and-fencing",
+   "sec": "distributed-systems",
+   "sub": "consensus",
+   "title": "Distributed locks and fencing tokens",
+   "tags": [
+    "distributed-systems",
+    "locks",
+    "redis",
+    "etcd",
+    "reliability"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/consensus/distributed-locks-and-fencing.md",
+   "links": [
+    "circuit-breaker",
+    "deadlocks-and-synchronization-primitives",
+    "failure-modes-and-timeouts",
+    "idempotency",
+    "jpa-locking",
+    "kafka-consumer",
+    "leases-heartbeats-and-health",
+    "lock-free-and-cas",
+    "postgres-locks",
+    "quorums-and-leader-election",
+    "raft-explained",
+    "redis-patterns-and-persistence",
+    "sharding-strategies",
+    "temporal-concepts",
+    "time-and-clocks"
+   ],
+   "words": 1046
+  },
+  {
+   "id": "quorums-and-leader-election",
+   "sec": "distributed-systems",
+   "sub": "consensus",
+   "title": "Quorums, split brain and leader election",
+   "tags": [
+    "distributed-systems",
+    "consensus",
+    "availability",
+    "theory"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/consensus/quorums-and-leader-election.md",
+   "links": [
+    "cap-and-pacelc",
+    "distributed-locks-and-fencing",
+    "failure-modes-and-timeouts",
+    "kafka-architecture",
+    "leases-heartbeats-and-health",
+    "multi-leader-and-leaderless",
+    "postgres-locks",
+    "postgres-replication-and-failover",
+    "raft-explained",
+    "redis-patterns-and-persistence",
+    "time-and-clocks"
+   ],
+   "words": 1032
+  },
+  {
+   "id": "raft-explained",
+   "sec": "distributed-systems",
+   "sub": "consensus",
+   "title": "Raft consensus explained",
+   "tags": [
+    "distributed-systems",
+    "consensus",
+    "raft",
+    "kafka"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/consensus/raft-explained.md",
+   "links": [
+    "consistency-models",
+    "distributed-locks-and-fencing",
+    "kafka-architecture",
+    "leases-heartbeats-and-health",
+    "quorums-and-leader-election",
+    "time-and-clocks"
+   ],
+   "words": 963
+  },
+  {
+   "id": "cap-and-pacelc",
+   "sec": "distributed-systems",
+   "sub": "fundamentals",
+   "title": "CAP and PACELC, what the letters really mean",
+   "tags": [
+    "distributed-systems",
+    "consistency",
+    "availability",
+    "theory"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/fundamentals/cap-and-pacelc.md",
+   "links": [
+    "consistency-models",
+    "exactly-once-myth",
+    "failure-modes-and-timeouts",
+    "idempotency",
+    "kafka-architecture",
+    "kafka-producer",
+    "latency-numbers",
+    "multi-leader-and-leaderless",
+    "multi-region-basics",
+    "postgres-replication-and-failover",
+    "quorums-and-leader-election",
+    "slo-sli-and-alerting"
+   ],
+   "words": 897
+  },
+  {
+   "id": "consistency-models",
+   "sec": "distributed-systems",
+   "sub": "fundamentals",
+   "title": "Consistency models from linearizable to eventual",
+   "tags": [
+    "distributed-systems",
+    "consistency",
+    "replication",
+    "theory"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/fundamentals/consistency-models.md",
+   "links": [
+    "cap-and-pacelc",
+    "distributed-cache-coherence",
+    "distributed-locks-and-fencing",
+    "kafka-consumer",
+    "latency-numbers",
+    "leader-follower-replication",
+    "leases-heartbeats-and-health",
+    "multi-leader-and-leaderless",
+    "postgres-isolation-levels",
+    "postgres-replication-and-failover",
+    "raft-explained",
+    "read-replicas-and-stale-reads",
+    "time-and-clocks",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 935
+  },
+  {
+   "id": "delivery-guarantees",
+   "sec": "distributed-systems",
+   "sub": "fundamentals",
+   "title": "Delivery guarantees, at-most-once to exactly-once",
+   "tags": [
+    "distributed-systems",
+    "messaging",
+    "kafka",
+    "reliability"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/fundamentals/delivery-guarantees.md",
+   "links": [
+    "cross-shard-queries-and-transactions",
+    "dead-letter-queues-and-retries",
+    "exactly-once-myth",
+    "failure-modes-and-timeouts",
+    "idempotency",
+    "kafka-consumer",
+    "kafka-producer",
+    "message-queues-and-streams",
+    "outbox-pattern",
+    "postgres-indexes",
+    "spring-kafka-consumer"
+   ],
+   "words": 962
+  },
+  {
+   "id": "failure-modes-and-timeouts",
+   "sec": "distributed-systems",
+   "sub": "fundamentals",
+   "title": "Failure modes and why timeouts are the only detector",
+   "tags": [
+    "distributed-systems",
+    "reliability",
+    "timeouts",
+    "theory"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/fundamentals/failure-modes-and-timeouts.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "cap-and-pacelc",
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "distributed-locks-and-fencing",
+    "distributed-tracing",
+    "exactly-once-myth",
+    "grpc-and-protobuf",
+    "hikaricp-pool-sizing",
+    "idempotency",
+    "kubernetes-basics",
+    "leases-heartbeats-and-health",
+    "quorums-and-leader-election",
+    "rest-clients",
+    "service-communication-sync-vs-async",
+    "sockets-and-connection-pooling",
+    "spring-kafka-consumer",
+    "tcp-handshake-and-connection-states"
+   ],
+   "words": 988
+  },
+  {
+   "id": "time-and-clocks",
+   "sec": "distributed-systems",
+   "sub": "fundamentals",
+   "title": "Time and clocks in distributed systems",
+   "tags": [
+    "distributed-systems",
+    "clocks",
+    "ordering",
+    "theory"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/fundamentals/time-and-clocks.md",
+   "links": [
+    "consistency-models",
+    "distributed-locks-and-fencing",
+    "distributed-tracing",
+    "failure-modes-and-timeouts",
+    "garbage-collection",
+    "jwt-authentication",
+    "kafka-architecture",
+    "leases-heartbeats-and-health",
+    "multi-leader-and-leaderless",
+    "testing-async-and-kafka-flows",
+    "time-money-and-ids"
+   ],
+   "words": 880
+  },
+  {
+   "id": "consistent-hashing",
+   "sec": "distributed-systems",
+   "sub": "partitioning",
+   "title": "Consistent hashing, the ring and virtual nodes",
+   "tags": [
+    "distributed-systems",
+    "partitioning",
+    "hashing",
+    "kafka"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/partitioning/consistent-hashing.md",
+   "links": [
+    "caching",
+    "distributed-cache-coherence",
+    "hash-tables",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kafka-producer",
+    "load-balancing",
+    "rate-limiting",
+    "redis-patterns-and-persistence",
+    "sharding-strategies"
+   ],
+   "words": 1055
+  },
+  {
+   "id": "cross-shard-queries-and-transactions",
+   "sec": "distributed-systems",
+   "sub": "partitioning",
+   "title": "Cross-shard queries and transactions, scatter-gather and 2PC",
+   "tags": [
+    "distributed-systems",
+    "partitioning",
+    "transactions",
+    "2pc"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/partitioning/cross-shard-queries-and-transactions.md",
+   "links": [
+    "api-design-for-system-design",
+    "bloom-filters-and-probabilistic",
+    "completable-future",
+    "cqrs",
+    "design-payment-processing",
+    "executors-and-thread-pools",
+    "failure-modes-and-timeouts",
+    "idempotency",
+    "latency-numbers",
+    "outbox-pattern",
+    "postgres-locks",
+    "postgres-vacuum-and-bloat",
+    "raft-explained",
+    "saga",
+    "search-and-indexing-services",
+    "sharding-strategies",
+    "temporal-concepts",
+    "transactions-acid-and-isolation",
+    "virtual-threads"
+   ],
+   "words": 1004
+  },
+  {
+   "id": "sharding-strategies",
+   "sec": "distributed-systems",
+   "sub": "partitioning",
+   "title": "Sharding strategies, range, hash and directory",
+   "tags": [
+    "distributed-systems",
+    "partitioning",
+    "sharding",
+    "scaling"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/partitioning/sharding-strategies.md",
+   "links": [
+    "aggregates-and-invariants",
+    "caching",
+    "consistent-hashing",
+    "cqrs",
+    "cross-shard-queries-and-transactions",
+    "database-scaling-path",
+    "design-payment-processing",
+    "failure-modes-and-timeouts",
+    "kafka-architecture",
+    "multi-tenancy-strategies",
+    "postgres-partitioning",
+    "postgres-performance-checklist",
+    "read-replicas-and-stale-reads",
+    "schema-migrations-flyway-liquibase",
+    "search-and-indexing-services"
+   ],
+   "words": 964
+  },
+  {
+   "id": "backpressure-and-flow-control",
+   "sec": "distributed-systems",
+   "sub": "patterns",
+   "title": "Backpressure and flow control",
+   "tags": [
+    "distributed-systems",
+    "reliability",
+    "kafka",
+    "reactive"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/patterns/backpressure-and-flow-control.md",
+   "links": [
+    "amdahls-law-and-parallel-speedup",
+    "api-gateway-and-service-discovery",
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "executors-and-thread-pools",
+    "failure-modes-and-timeouts",
+    "grafana-dashboards-and-red-use",
+    "grpc-and-protobuf",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kafka-producer",
+    "leases-heartbeats-and-health",
+    "rabbitmq-basics",
+    "rate-limiting",
+    "spring-kafka-consumer",
+    "spring-reactive-webclient-sse",
+    "tcp-vs-udp"
+   ],
+   "words": 912
+  },
+  {
+   "id": "distributed-cache-coherence",
+   "sec": "distributed-systems",
+   "sub": "patterns",
+   "title": "Distributed cache coherence, invalidation and thundering herds",
+   "tags": [
+    "distributed-systems",
+    "caching",
+    "redis",
+    "consistency"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/patterns/distributed-cache-coherence.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "caching",
+    "cdn",
+    "consistency-models",
+    "consistent-hashing",
+    "cpu-caches-and-cache-lines",
+    "event-driven-architecture",
+    "http-caching",
+    "kubernetes-basics",
+    "outbox-pattern",
+    "read-replicas-and-stale-reads",
+    "redis-patterns-and-persistence",
+    "spring-cache-abstraction",
+    "spring-transactional"
+   ],
+   "words": 1047
+  },
+  {
+   "id": "exactly-once-myth",
+   "sec": "distributed-systems",
+   "sub": "patterns",
+   "title": "The exactly-once myth and effectively-once processing",
+   "tags": [
+    "distributed-systems",
+    "kafka",
+    "idempotency",
+    "reliability"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/patterns/exactly-once-myth.md",
+   "links": [
+    "dead-letter-queues-and-retries",
+    "delivery-guarantees",
+    "distributed-locks-and-fencing",
+    "esim-provisioning-platform",
+    "failure-modes-and-timeouts",
+    "idempotency",
+    "kafka-architecture",
+    "kafka-producer",
+    "outbox-pattern",
+    "postgres-indexes",
+    "saga"
+   ],
+   "words": 936
+  },
+  {
+   "id": "leases-heartbeats-and-health",
+   "sec": "distributed-systems",
+   "sub": "patterns",
+   "title": "Leases, heartbeats and health checks",
+   "tags": [
+    "distributed-systems",
+    "reliability",
+    "kubernetes",
+    "kafka"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/patterns/leases-heartbeats-and-health.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "delivery-guarantees",
+    "distributed-locks-and-fencing",
+    "failure-modes-and-timeouts",
+    "garbage-collection",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kubernetes-basics",
+    "postgres-replication-and-failover",
+    "quorums-and-leader-election",
+    "raft-explained",
+    "signals-and-process-lifecycle",
+    "slo-sli-and-alerting",
+    "spring-boot-starters-and-autoconfiguration",
+    "temporal-concepts",
+    "time-and-clocks"
+   ],
+   "words": 1056
+  },
+  {
+   "id": "leader-follower-replication",
+   "sec": "distributed-systems",
+   "sub": "replication",
+   "title": "Leader-follower replication, sync vs async and failover",
+   "tags": [
+    "distributed-systems",
+    "replication",
+    "postgres",
+    "kafka"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/replication/leader-follower-replication.md",
+   "links": [
+    "cap-and-pacelc",
+    "consistency-models",
+    "database-scaling-path",
+    "distributed-locks-and-fencing",
+    "esim-provisioning-platform",
+    "failure-modes-and-timeouts",
+    "grafana-dashboards-and-red-use",
+    "kafka-architecture",
+    "multi-leader-and-leaderless",
+    "postgres-replication-and-failover",
+    "postgres-vacuum-and-bloat",
+    "quorums-and-leader-election",
+    "raft-explained",
+    "read-replicas-and-stale-reads"
+   ],
+   "words": 951
+  },
+  {
+   "id": "multi-leader-and-leaderless",
+   "sec": "distributed-systems",
+   "sub": "replication",
+   "title": "Multi-leader and leaderless replication",
+   "tags": [
+    "distributed-systems",
+    "replication",
+    "conflicts",
+    "crdt"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/replication/multi-leader-and-leaderless.md",
+   "links": [
+    "cap-and-pacelc",
+    "column-and-wide-column-stores",
+    "consistency-models",
+    "event-sourcing",
+    "leader-follower-replication",
+    "multi-region-basics",
+    "postgres-replication-and-failover",
+    "sharding-strategies",
+    "time-and-clocks",
+    "time-money-and-ids"
+   ],
+   "words": 928
+  },
+  {
+   "id": "read-replicas-and-stale-reads",
+   "sec": "distributed-systems",
+   "sub": "replication",
+   "title": "Read replicas and stale reads in practice",
+   "tags": [
+    "distributed-systems",
+    "replication",
+    "postgres",
+    "spring"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/distributed-systems/replication/read-replicas-and-stale-reads.md",
+   "links": [
+    "caching",
+    "consistency-models",
+    "database-scaling-path",
+    "distributed-cache-coherence",
+    "distributed-tracing",
+    "event-driven-architecture",
+    "failure-modes-and-timeouts",
+    "hikaricp-pool-sizing",
+    "leader-follower-replication",
+    "load-balancing",
+    "postgres-isolation-levels",
+    "postgres-locks",
+    "postgres-replication-and-failover",
+    "postgres-vacuum-and-bloat",
+    "read-write-splitting-and-cqrs-lite",
+    "slo-sli-and-alerting",
+    "spring-transactional",
+    "time-and-clocks"
+   ],
+   "words": 910
   },
   {
    "id": "collections-framework",
@@ -2266,6 +5569,526 @@
    "words": 1554
   },
   {
+   "id": "dns-resolution",
+   "sec": "networking",
+   "sub": "dns-and-routing",
+   "title": "DNS resolution",
+   "tags": [
+    "networking",
+    "dns",
+    "kubernetes",
+    "java",
+    "caching"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/dns-and-routing/dns-resolution.md",
+   "links": [
+    "grpc-and-protobuf",
+    "http-1-1-vs-2-vs-3",
+    "ip-addressing-ports-nat",
+    "kubernetes-basics",
+    "linux-networking",
+    "load-balancers-l4-vs-l7",
+    "multi-region-basics",
+    "network-debugging-toolkit",
+    "sockets-and-connection-pooling",
+    "tcp-vs-udp"
+   ],
+   "words": 1035
+  },
+  {
+   "id": "load-balancers-l4-vs-l7",
+   "sec": "networking",
+   "sub": "dns-and-routing",
+   "title": "Load balancers, L4 vs L7",
+   "tags": [
+    "networking",
+    "load-balancing",
+    "l4",
+    "l7",
+    "health-checks"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/dns-and-routing/load-balancers-l4-vs-l7.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "consistent-hashing",
+    "cookies-sessions-and-cors",
+    "dns-resolution",
+    "failure-modes-and-timeouts",
+    "grpc-and-protobuf",
+    "horizontal-vs-vertical-scaling",
+    "idempotency",
+    "kubernetes-basics",
+    "load-balancing",
+    "reverse-proxy-nginx-basics",
+    "tcp-handshake-and-connection-states",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 1111
+  },
+  {
+   "id": "reverse-proxy-nginx-basics",
+   "sec": "networking",
+   "sub": "dns-and-routing",
+   "title": "Reverse proxy basics with nginx",
+   "tags": [
+    "networking",
+    "nginx",
+    "reverse-proxy",
+    "tls-termination",
+    "timeouts"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/dns-and-routing/reverse-proxy-nginx-basics.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "cdn",
+    "distributed-tracing",
+    "dns-resolution",
+    "idempotency",
+    "load-balancers-l4-vs-l7",
+    "mtls-and-service-to-service-auth",
+    "observability-three-pillars",
+    "rate-limiting",
+    "tcp-handshake-and-connection-states",
+    "tls-handshake-and-certificates",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 1123
+  },
+  {
+   "id": "ip-addressing-ports-nat",
+   "sec": "networking",
+   "sub": "fundamentals",
+   "title": "IP addressing, ports and NAT",
+   "tags": [
+    "networking",
+    "ip",
+    "nat",
+    "docker",
+    "kubernetes"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/fundamentals/ip-addressing-ports-nat.md",
+   "links": [
+    "dns-resolution",
+    "docker-fundamentals",
+    "kubernetes-basics",
+    "linux-networking",
+    "osi-and-tcp-ip-models",
+    "reverse-proxy-nginx-basics",
+    "sockets-and-connection-pooling",
+    "tcp-handshake-and-connection-states"
+   ],
+   "words": 983
+  },
+  {
+   "id": "osi-and-tcp-ip-models",
+   "sec": "networking",
+   "sub": "fundamentals",
+   "title": "OSI and TCP/IP models with real examples",
+   "tags": [
+    "networking",
+    "osi",
+    "tcp-ip",
+    "fundamentals"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/fundamentals/osi-and-tcp-ip-models.md",
+   "links": [
+    "cdn",
+    "http-1-1-vs-2-vs-3",
+    "http-fundamentals",
+    "ip-addressing-ports-nat",
+    "linux-networking",
+    "load-balancers-l4-vs-l7",
+    "mtls-and-service-to-service-auth",
+    "network-debugging-toolkit",
+    "reverse-proxy-nginx-basics",
+    "tcp-handshake-and-connection-states",
+    "tcp-vs-udp",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 915
+  },
+  {
+   "id": "sockets-and-connection-pooling",
+   "sec": "networking",
+   "sub": "fundamentals",
+   "title": "Sockets and connection pooling",
+   "tags": [
+    "networking",
+    "sockets",
+    "connection-pool",
+    "java"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/fundamentals/sockets-and-connection-pooling.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "circuit-breaker",
+    "dns-resolution",
+    "hikaricp-pool-sizing",
+    "io-models-blocking-nonblocking-epoll",
+    "java-nio",
+    "kafka-producer",
+    "rest-clients",
+    "spring-reactive-webclient-sse",
+    "spring-transactional",
+    "tcp-handshake-and-connection-states",
+    "tcp-vs-udp",
+    "virtual-threads"
+   ],
+   "words": 983
+  },
+  {
+   "id": "tcp-handshake-and-connection-states",
+   "sec": "networking",
+   "sub": "fundamentals",
+   "title": "TCP handshake and connection states",
+   "tags": [
+    "networking",
+    "tcp",
+    "time-wait",
+    "keep-alive"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/fundamentals/tcp-handshake-and-connection-states.md",
+   "links": [
+    "docker-fundamentals",
+    "failure-modes-and-timeouts",
+    "hikaricp-pool-sizing",
+    "http-fundamentals",
+    "linux-networking",
+    "sockets-and-connection-pooling",
+    "tcp-vs-udp",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 1000
+  },
+  {
+   "id": "tcp-vs-udp",
+   "sec": "networking",
+   "sub": "fundamentals",
+   "title": "TCP vs UDP",
+   "tags": [
+    "networking",
+    "tcp",
+    "udp",
+    "transport"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/fundamentals/tcp-vs-udp.md",
+   "links": [
+    "delivery-guarantees",
+    "dns-resolution",
+    "http-1-1-vs-2-vs-3",
+    "idempotency",
+    "io-models-blocking-nonblocking-epoll",
+    "osi-and-tcp-ip-models",
+    "sockets-and-connection-pooling",
+    "tcp-handshake-and-connection-states"
+   ],
+   "words": 948
+  },
+  {
+   "id": "cookies-sessions-and-cors",
+   "sec": "networking",
+   "sub": "http",
+   "title": "Cookies, sessions, same-origin policy and CORS",
+   "tags": [
+    "networking",
+    "http",
+    "cookies",
+    "cors",
+    "csrf"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/http/cookies-sessions-and-cors.md",
+   "links": [
+    "api-security-checklist",
+    "authentication-vs-authorization",
+    "http-1-1-vs-2-vs-3",
+    "http-caching",
+    "jwt-authentication",
+    "load-balancers-l4-vs-l7",
+    "rest-and-http",
+    "spring-security-basics"
+   ],
+   "words": 1019
+  },
+  {
+   "id": "grpc-and-protobuf",
+   "sec": "networking",
+   "sub": "http",
+   "title": "gRPC and Protocol Buffers",
+   "tags": [
+    "networking",
+    "grpc",
+    "protobuf",
+    "http2",
+    "rpc"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/http/grpc-and-protobuf.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "distributed-tracing",
+    "dns-resolution",
+    "failure-modes-and-timeouts",
+    "http-1-1-vs-2-vs-3",
+    "http-caching",
+    "load-balancers-l4-vs-l7",
+    "message-schema-evolution",
+    "mtls-and-service-to-service-auth",
+    "openapi-swagger",
+    "rest-and-http",
+    "service-communication-sync-vs-async",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 962
+  },
+  {
+   "id": "http-1-1-vs-2-vs-3",
+   "sec": "networking",
+   "sub": "http",
+   "title": "HTTP/1.1 vs HTTP/2 vs HTTP/3",
+   "tags": [
+    "networking",
+    "http2",
+    "http3",
+    "quic",
+    "multiplexing"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/http/http-1-1-vs-2-vs-3.md",
+   "links": [
+    "cdn",
+    "dns-resolution",
+    "grpc-and-protobuf",
+    "kubernetes-basics",
+    "load-balancers-l4-vs-l7",
+    "rest-clients",
+    "tcp-vs-udp",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 999
+  },
+  {
+   "id": "http-caching",
+   "sec": "networking",
+   "sub": "http",
+   "title": "HTTP caching",
+   "tags": [
+    "networking",
+    "http",
+    "caching",
+    "etag",
+    "cdn"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/http/http-caching.md",
+   "links": [
+    "caching",
+    "cdn",
+    "cookies-sessions-and-cors",
+    "http-fundamentals",
+    "jpa-locking",
+    "reverse-proxy-nginx-basics"
+   ],
+   "words": 920
+  },
+  {
+   "id": "http-fundamentals",
+   "sec": "networking",
+   "sub": "http",
+   "title": "HTTP fundamentals",
+   "tags": [
+    "networking",
+    "http",
+    "headers",
+    "status-codes"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/http/http-fundamentals.md",
+   "links": [
+    "authentication-vs-authorization",
+    "cookies-sessions-and-cors",
+    "distributed-tracing",
+    "http-1-1-vs-2-vs-3",
+    "http-caching",
+    "idempotency",
+    "jwt-authentication",
+    "rest-and-http",
+    "reverse-proxy-nginx-basics",
+    "spring-mvc-request-lifecycle",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 917
+  },
+  {
+   "id": "websockets-sse-and-long-polling",
+   "sec": "networking",
+   "sub": "http",
+   "title": "WebSockets, SSE and long polling",
+   "tags": [
+    "networking",
+    "websocket",
+    "sse",
+    "real-time"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/http/websockets-sse-and-long-polling.md",
+   "links": [
+    "design-chat-service",
+    "http-1-1-vs-2-vs-3",
+    "load-balancers-l4-vs-l7",
+    "notifications-and-push",
+    "redis-patterns-and-persistence",
+    "reverse-proxy-nginx-basics",
+    "spring-reactive-webclient-sse",
+    "tcp-handshake-and-connection-states",
+    "virtual-threads"
+   ],
+   "words": 1033
+  },
+  {
+   "id": "api-security-checklist",
+   "sec": "networking",
+   "sub": "security",
+   "title": "API security checklist",
+   "tags": [
+    "networking",
+    "security",
+    "api",
+    "webhooks",
+    "rate-limiting"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/security/api-security-checklist.md",
+   "links": [
+    "authentication-vs-authorization",
+    "circuit-breaker",
+    "cookies-sessions-and-cors",
+    "design-rate-limiter",
+    "emv-card-processing",
+    "error-tracking-with-sentry",
+    "http-fundamentals",
+    "idempotency",
+    "mtls-and-service-to-service-auth",
+    "owasp-top-10-for-backend",
+    "rate-limiting",
+    "reverse-proxy-nginx-basics",
+    "secrets-management",
+    "sockets-and-connection-pooling",
+    "spring-mvc-validation-and-uploads",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 1050
+  },
+  {
+   "id": "authentication-vs-authorization",
+   "sec": "networking",
+   "sub": "security",
+   "title": "Authentication vs authorization, tokens and OAuth2/OIDC flows",
+   "tags": [
+    "networking",
+    "security",
+    "oauth2",
+    "oidc",
+    "tokens"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/security/authentication-vs-authorization.md",
+   "links": [
+    "api-security-checklist",
+    "cookies-sessions-and-cors",
+    "jwt-authentication",
+    "mtls-and-service-to-service-auth",
+    "owasp-top-10-for-backend",
+    "spring-security-basics"
+   ],
+   "words": 1087
+  },
+  {
+   "id": "mtls-and-service-to-service-auth",
+   "sec": "networking",
+   "sub": "security",
+   "title": "mTLS and service-to-service authentication",
+   "tags": [
+    "networking",
+    "mtls",
+    "service-auth",
+    "spiffe",
+    "zero-trust"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/security/mtls-and-service-to-service-auth.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "api-security-checklist",
+    "authentication-vs-authorization",
+    "load-balancers-l4-vs-l7",
+    "reverse-proxy-nginx-basics",
+    "secrets-management",
+    "spring-security-basics",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 1011
+  },
+  {
+   "id": "tls-handshake-and-certificates",
+   "sec": "networking",
+   "sub": "security",
+   "title": "TLS handshake and certificates",
+   "tags": [
+    "networking",
+    "tls",
+    "certificates",
+    "pki",
+    "java"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/security/tls-handshake-and-certificates.md",
+   "links": [
+    "mtls-and-service-to-service-auth",
+    "network-debugging-toolkit",
+    "spring-boot-properties-and-profiles",
+    "symmetric-and-asymmetric-crypto"
+   ],
+   "words": 1278
+  },
+  {
+   "id": "network-debugging-toolkit",
+   "sec": "networking",
+   "sub": "tools",
+   "title": "Network debugging toolkit",
+   "tags": [
+    "networking",
+    "troubleshooting",
+    "curl",
+    "tcpdump",
+    "dns"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/tools/network-debugging-toolkit.md",
+   "links": [
+    "distributed-tracing",
+    "dns-resolution",
+    "hikaricp-pool-sizing",
+    "kubernetes-basics",
+    "linux-networking",
+    "load-balancers-l4-vs-l7",
+    "osi-and-tcp-ip-models",
+    "reverse-proxy-nginx-basics",
+    "sockets-and-connection-pooling",
+    "tcp-handshake-and-connection-states",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 988
+  },
+  {
    "id": "emv-card-processing",
    "sec": "projects",
    "sub": "stories",
@@ -2781,6 +6604,33 @@
    "words": 663
   },
   {
+   "id": "contract-testing-and-wiremock",
+   "sec": "spring",
+   "sub": "testing",
+   "title": "Contract testing and WireMock",
+   "tags": [
+    "testing",
+    "wiremock",
+    "contract-testing",
+    "pact",
+    "spring-boot-test"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/spring/testing/contract-testing-and-wiremock.md",
+   "links": [
+    "circuit-breaker",
+    "junit-and-mockito",
+    "message-schema-evolution",
+    "monolith-vs-microservices",
+    "openapi-swagger",
+    "rest-clients",
+    "strangler-fig-migration",
+    "testcontainers",
+    "testing-async-and-kafka-flows"
+   ],
+   "words": 992
+  },
+  {
    "id": "junit-and-mockito",
    "sec": "spring",
    "sub": "testing",
@@ -2829,6 +6679,35 @@
     "testing-types-and-dev-cycles"
    ],
    "words": 951
+  },
+  {
+   "id": "testing-async-and-kafka-flows",
+   "sec": "spring",
+   "sub": "testing",
+   "title": "Testing asynchronous and Kafka flows",
+   "tags": [
+    "testing",
+    "kafka",
+    "awaitility",
+    "async",
+    "spring-kafka"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/spring/testing/testing-async-and-kafka-flows.md",
+   "links": [
+    "completable-future",
+    "contract-testing-and-wiremock",
+    "dead-letter-queues-and-retries",
+    "exactly-once-myth",
+    "idempotency",
+    "outbox-pattern",
+    "spring-aop",
+    "spring-kafka-consumer",
+    "spring-reactive-webclient-sse",
+    "temporal-concepts",
+    "testcontainers"
+   ],
+   "words": 1080
   },
   {
    "id": "testing-types-and-dev-cycles",
@@ -2999,6 +6878,707 @@
    "words": 727
   },
   {
+   "id": "background-jobs-and-schedulers",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "Background jobs and schedulers — cron vs queue vs workflow engine",
+   "tags": [
+    "system-design",
+    "scheduling",
+    "async",
+    "temporal",
+    "reliability"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/background-jobs-and-schedulers.md",
+   "links": [
+    "async-processing-and-event-driven-scaling",
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "design-esim-provisioning",
+    "esim-provisioning-platform",
+    "hikaricp-pool-sizing",
+    "horizontal-vs-vertical-scaling",
+    "idempotency",
+    "kubernetes-basics",
+    "message-queues-and-streams",
+    "outbox-pattern",
+    "postgres-locks",
+    "rate-limiting",
+    "saga",
+    "temporal-concepts",
+    "time-and-clocks",
+    "workflow-engines-vs-sagas"
+   ],
+   "words": 1312
+  },
+  {
+   "id": "caching",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "Caching strategies — cache-aside, read/write-through, write-behind, TTL, invalidation, stampede",
+   "tags": [
+    "system-design",
+    "caching",
+    "redis",
+    "performance"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/caching.md",
+   "links": [
+    "back-of-envelope-estimation",
+    "bloom-filters-and-probabilistic",
+    "cdn",
+    "distributed-cache-coherence",
+    "distributed-locks-and-fencing",
+    "domain-events-and-integration-events",
+    "grafana-dashboards-and-red-use",
+    "hibernate-caching",
+    "http-caching",
+    "lru-cache-design",
+    "outbox-pattern",
+    "postgres-performance-checklist",
+    "redis-data-structures",
+    "redis-patterns-and-persistence",
+    "spring-cache-abstraction"
+   ],
+   "words": 1343
+  },
+  {
+   "id": "cdn",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "CDN — edge caching, static vs dynamic content, invalidation and signed URLs",
+   "tags": [
+    "system-design",
+    "cdn",
+    "caching",
+    "networking"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/cdn.md",
+   "links": [
+    "back-of-envelope-estimation",
+    "caching",
+    "dns-resolution",
+    "file-and-blob-storage",
+    "http-1-1-vs-2-vs-3",
+    "http-caching",
+    "load-balancing",
+    "rate-limiting",
+    "symmetric-and-asymmetric-crypto",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 1222
+  },
+  {
+   "id": "file-and-blob-storage",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "File and blob storage — S3-style object storage, presigned URLs, multipart upload",
+   "tags": [
+    "system-design",
+    "storage",
+    "s3",
+    "files"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/file-and-blob-storage.md",
+   "links": [
+    "background-jobs-and-schedulers",
+    "cdn",
+    "hashing-vs-encryption",
+    "horizontal-vs-vertical-scaling",
+    "outbox-pattern",
+    "owasp-top-10-for-backend",
+    "postgres-vacuum-and-bloat",
+    "requirements-and-constraints",
+    "secrets-management",
+    "storage-choices"
+   ],
+   "words": 1344
+  },
+  {
+   "id": "load-balancing",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "Load balancing — algorithms, health checks, stickiness and global balancing",
+   "tags": [
+    "system-design",
+    "load-balancing",
+    "availability",
+    "networking"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/load-balancing.md",
+   "links": [
+    "api-design-for-system-design",
+    "api-gateway-and-service-discovery",
+    "caching",
+    "cdn",
+    "circuit-breaker",
+    "consistent-hashing",
+    "cookies-sessions-and-cors",
+    "design-chat-service",
+    "dns-resolution",
+    "failure-modes-and-timeouts",
+    "horizontal-vs-vertical-scaling",
+    "idempotency",
+    "kubernetes-basics",
+    "leader-follower-replication",
+    "leases-heartbeats-and-health",
+    "load-balancers-l4-vs-l7",
+    "mtls-and-service-to-service-auth",
+    "multi-region-basics",
+    "reverse-proxy-nginx-basics",
+    "signals-and-process-lifecycle"
+   ],
+   "words": 1174
+  },
+  {
+   "id": "message-queues-and-streams",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "Message queues and streams as a building block — queue vs log, Kafka vs RabbitMQ vs SQS",
+   "tags": [
+    "system-design",
+    "messaging",
+    "kafka",
+    "rabbitmq",
+    "async"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/message-queues-and-streams.md",
+   "links": [
+    "activemq-basics",
+    "async-processing-and-event-driven-scaling",
+    "back-of-envelope-estimation",
+    "background-jobs-and-schedulers",
+    "backpressure-and-flow-control",
+    "dead-letter-queues-and-retries",
+    "delivery-guarantees",
+    "design-notification-service",
+    "error-handling-strategies",
+    "esim-provisioning-platform",
+    "event-driven-architecture",
+    "exactly-once-myth",
+    "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kafka-producer",
+    "message-schema-evolution",
+    "outbox-pattern",
+    "rabbitmq-basics",
+    "requirements-and-constraints",
+    "service-communication-sync-vs-async",
+    "sharding-strategies",
+    "slo-sli-and-alerting",
+    "spring-kafka-consumer",
+    "workflow-engines-vs-sagas"
+   ],
+   "words": 1126
+  },
+  {
+   "id": "notifications-and-push",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "Notifications and push as a building block — fan-out, channels, retries, deduplication",
+   "tags": [
+    "system-design",
+    "notifications",
+    "push",
+    "kafka",
+    "reliability"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/notifications-and-push.md",
+   "links": [
+    "api-design-for-system-design",
+    "async-processing-and-event-driven-scaling",
+    "back-of-envelope-estimation",
+    "caching",
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "design-news-feed",
+    "design-notification-service",
+    "error-handling-strategies",
+    "grafana-dashboards-and-red-use",
+    "idempotency",
+    "message-queues-and-streams",
+    "outbox-pattern",
+    "rate-limiting",
+    "requirements-and-constraints",
+    "spring-kafka-consumer",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 1325
+  },
+  {
+   "id": "rate-limiting",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "Rate limiting — token bucket, leaky bucket, sliding window, distributed limits in Redis",
+   "tags": [
+    "system-design",
+    "rate-limiting",
+    "redis",
+    "resilience"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/rate-limiting.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "back-of-envelope-estimation",
+    "backpressure-and-flow-control",
+    "cdn",
+    "circuit-breaker",
+    "design-rate-limiter",
+    "failure-modes-and-timeouts",
+    "message-queues-and-streams",
+    "multi-tenancy-strategies",
+    "redis-data-structures",
+    "slo-sli-and-alerting",
+    "time-and-clocks"
+   ],
+   "words": 1303
+  },
+  {
+   "id": "search-and-indexing-services",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "Search and indexing services — when to add Elasticsearch and how to keep it in sync",
+   "tags": [
+    "system-design",
+    "search",
+    "elasticsearch",
+    "cdc"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/search-and-indexing-services.md",
+   "links": [
+    "api-design-for-system-design",
+    "elasticsearch-basics",
+    "idempotency",
+    "logging-stacks",
+    "message-queues-and-streams",
+    "multi-tenancy-strategies",
+    "normalization-and-denormalization",
+    "outbox-pattern",
+    "postgres-jsonb-and-full-text",
+    "read-replicas-and-stale-reads",
+    "storage-choices"
+   ],
+   "words": 1161
+  },
+  {
+   "id": "storage-choices",
+   "sec": "system-design",
+   "sub": "building-blocks",
+   "title": "Storage choices — RDBMS, key-value, document, wide-column, blob, search, time-series by access pattern",
+   "tags": [
+    "system-design",
+    "databases",
+    "storage",
+    "nosql"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/building-blocks/storage-choices.md",
+   "links": [
+    "back-of-envelope-estimation",
+    "caching",
+    "column-and-wide-column-stores",
+    "consistency-models",
+    "data-modeling-for-services",
+    "database-scaling-path",
+    "design-notification-service",
+    "file-and-blob-storage",
+    "message-queues-and-streams",
+    "mongodb-basics",
+    "normalization-and-denormalization",
+    "postgres-indexes",
+    "postgres-jsonb-and-full-text",
+    "postgres-partitioning",
+    "postgres-vacuum-and-bloat",
+    "redis-patterns-and-persistence",
+    "requirements-and-constraints",
+    "search-and-indexing-services",
+    "sharding-strategies",
+    "sql-vs-nosql-choosing",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 1229
+  },
+  {
+   "id": "design-chat-service",
+   "sec": "system-design",
+   "sub": "case-studies",
+   "title": "Design a chat service",
+   "tags": [
+    "system-design",
+    "case-study",
+    "websockets",
+    "messaging",
+    "ordering"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/case-studies/design-chat-service.md",
+   "links": [
+    "async-processing-and-event-driven-scaling",
+    "column-and-wide-column-stores",
+    "consistency-models",
+    "design-news-feed",
+    "design-notification-service",
+    "file-and-blob-storage",
+    "idempotency",
+    "kafka-architecture",
+    "leases-heartbeats-and-health",
+    "load-balancing",
+    "notifications-and-push",
+    "redis-data-structures",
+    "storage-choices",
+    "time-and-clocks",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 1065
+  },
+  {
+   "id": "design-esim-provisioning",
+   "sec": "system-design",
+   "sub": "case-studies",
+   "title": "Design an eSIM provisioning system",
+   "tags": [
+    "system-design",
+    "case-study",
+    "temporal",
+    "orchestration",
+    "telecom"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/case-studies/design-esim-provisioning.md",
+   "links": [
+    "async-processing-and-event-driven-scaling",
+    "background-jobs-and-schedulers",
+    "design-notification-service",
+    "design-payment-processing",
+    "distributed-tracing",
+    "esim-provisioning-platform",
+    "horizontal-vs-vertical-scaling",
+    "idempotency",
+    "observability-three-pillars",
+    "outbox-pattern",
+    "read-write-splitting-and-cqrs-lite",
+    "saga",
+    "temporal-concepts",
+    "workflow-engines-vs-sagas"
+   ],
+   "words": 1224
+  },
+  {
+   "id": "design-news-feed",
+   "sec": "system-design",
+   "sub": "case-studies",
+   "title": "Design a news feed",
+   "tags": [
+    "system-design",
+    "case-study",
+    "fan-out",
+    "caching",
+    "ranking"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/case-studies/design-news-feed.md",
+   "links": [
+    "api-design-for-system-design",
+    "async-processing-and-event-driven-scaling",
+    "caching",
+    "cdn",
+    "circuit-breaker",
+    "consistency-models",
+    "database-scaling-path",
+    "design-chat-service",
+    "distributed-cache-coherence",
+    "graphs-representation",
+    "idempotency",
+    "message-queues-and-streams",
+    "read-write-splitting-and-cqrs-lite",
+    "redis-data-structures",
+    "storage-choices",
+    "system-design-basics"
+   ],
+   "words": 1058
+  },
+  {
+   "id": "design-notification-service",
+   "sec": "system-design",
+   "sub": "case-studies",
+   "title": "Design a notification service",
+   "tags": [
+    "system-design",
+    "case-study",
+    "kafka",
+    "notifications",
+    "reliability"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/case-studies/design-notification-service.md",
+   "links": [
+    "api-design-for-system-design",
+    "async-processing-and-event-driven-scaling",
+    "caching",
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "design-rate-limiter",
+    "distributed-tracing",
+    "idempotency",
+    "kafka-architecture",
+    "message-queues-and-streams",
+    "notifications-and-push",
+    "outbox-pattern",
+    "postgres-partitioning",
+    "rate-limiting",
+    "redis-patterns-and-persistence",
+    "slo-sli-and-alerting",
+    "storage-choices",
+    "system-design-basics"
+   ],
+   "words": 966
+  },
+  {
+   "id": "design-payment-processing",
+   "sec": "system-design",
+   "sub": "case-studies",
+   "title": "Design a payment processing system",
+   "tags": [
+    "system-design",
+    "case-study",
+    "payments",
+    "idempotency",
+    "ledger"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/case-studies/design-payment-processing.md",
+   "links": [
+    "api-security-checklist",
+    "circuit-breaker",
+    "emv-card-processing",
+    "event-sourcing",
+    "failure-modes-and-timeouts",
+    "idempotency",
+    "multi-region-basics",
+    "numbers-bits-and-floating-point",
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "postgres-locks",
+    "saga",
+    "temporal-concepts",
+    "time-money-and-ids",
+    "transactions-acid-and-isolation",
+    "workflow-engines-vs-sagas"
+   ],
+   "words": 1160
+  },
+  {
+   "id": "design-rate-limiter",
+   "sec": "system-design",
+   "sub": "case-studies",
+   "title": "Design a distributed rate limiter",
+   "tags": [
+    "system-design",
+    "case-study",
+    "rate-limiting",
+    "redis"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/case-studies/design-rate-limiter.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "api-security-checklist",
+    "backpressure-and-flow-control",
+    "caching",
+    "load-balancing",
+    "rate-limiting",
+    "redis-data-structures",
+    "redis-patterns-and-persistence",
+    "reverse-proxy-nginx-basics",
+    "time-and-clocks"
+   ],
+   "words": 1032
+  },
+  {
+   "id": "design-url-shortener",
+   "sec": "system-design",
+   "sub": "case-studies",
+   "title": "Design a URL shortener",
+   "tags": [
+    "system-design",
+    "case-study",
+    "caching",
+    "key-generation"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/case-studies/design-url-shortener.md",
+   "links": [
+    "async-processing-and-event-driven-scaling",
+    "bloom-filters-and-probabilistic",
+    "caching",
+    "cdn",
+    "distributed-cache-coherence",
+    "hash-tables",
+    "http-caching",
+    "idempotency",
+    "load-balancing",
+    "multi-region-basics",
+    "owasp-top-10-for-backend",
+    "postgres-partitioning",
+    "storage-choices",
+    "system-design-basics",
+    "time-money-and-ids"
+   ],
+   "words": 1070
+  },
+  {
+   "id": "api-design-for-system-design",
+   "sec": "system-design",
+   "sub": "method",
+   "title": "API design for system design — REST vs gRPC vs async, pagination, versioning, idempotency",
+   "tags": [
+    "system-design",
+    "api",
+    "rest",
+    "grpc",
+    "interview"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/method/api-design-for-system-design.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "authentication-vs-authorization",
+    "bff-and-api-composition",
+    "dead-letter-queues-and-retries",
+    "design-chat-service",
+    "design-payment-processing",
+    "error-handling-strategies",
+    "failure-modes-and-timeouts",
+    "grpc-and-protobuf",
+    "idempotency",
+    "message-schema-evolution",
+    "mtls-and-service-to-service-auth",
+    "openapi-swagger",
+    "outbox-pattern",
+    "postgres-indexes",
+    "rate-limiting",
+    "rest-and-http",
+    "service-communication-sync-vs-async",
+    "sharding-strategies",
+    "system-design-basics",
+    "temporal-concepts",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 1228
+  },
+  {
+   "id": "back-of-envelope-estimation",
+   "sec": "system-design",
+   "sub": "method",
+   "title": "Back-of-envelope estimation — QPS, storage and bandwidth math",
+   "tags": [
+    "system-design",
+    "interview",
+    "capacity-planning",
+    "estimation"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/method/back-of-envelope-estimation.md",
+   "links": [
+    "database-scaling-path",
+    "design-notification-service",
+    "file-and-blob-storage",
+    "hikaricp-pool-sizing",
+    "io-models-blocking-nonblocking-epoll",
+    "latency-numbers",
+    "message-queues-and-streams",
+    "outbox-pattern",
+    "postgres-partitioning",
+    "rate-limiting",
+    "requirements-and-constraints",
+    "sharding-strategies",
+    "storage-choices",
+    "virtual-threads"
+   ],
+   "words": 1147
+  },
+  {
+   "id": "latency-numbers",
+   "sec": "system-design",
+   "sub": "method",
+   "title": "Latency numbers — the ladder from L1 cache to cross-region and what it implies",
+   "tags": [
+    "system-design",
+    "performance",
+    "latency",
+    "interview"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/method/latency-numbers.md",
+   "links": [
+    "back-of-envelope-estimation",
+    "caching",
+    "cdn",
+    "cpu-caches-and-cache-lines",
+    "failure-modes-and-timeouts",
+    "grafana-dashboards-and-red-use",
+    "hikaricp-pool-sizing",
+    "http-1-1-vs-2-vs-3",
+    "io-models-blocking-nonblocking-epoll",
+    "jpa-n-plus-one",
+    "kafka-architecture",
+    "leader-follower-replication",
+    "multi-region-basics",
+    "postgres-indexes",
+    "requirements-and-constraints",
+    "sockets-and-connection-pooling",
+    "tls-handshake-and-certificates",
+    "virtual-threads"
+   ],
+   "words": 1371
+  },
+  {
+   "id": "requirements-and-constraints",
+   "sec": "system-design",
+   "sub": "method",
+   "title": "Requirements and constraints — what to ask before drawing boxes",
+   "tags": [
+    "system-design",
+    "interview",
+    "slo",
+    "requirements"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/method/requirements-and-constraints.md",
+   "links": [
+    "api-design-for-system-design",
+    "back-of-envelope-estimation",
+    "cap-and-pacelc",
+    "consistency-models",
+    "database-scaling-path",
+    "design-payment-processing",
+    "failure-modes-and-timeouts",
+    "idempotency",
+    "latency-numbers",
+    "message-queues-and-streams",
+    "monolith-vs-microservices",
+    "multi-region-basics",
+    "multi-tenancy-strategies",
+    "outbox-pattern",
+    "postgres-replication-and-failover",
+    "rate-limiting",
+    "read-replicas-and-stale-reads",
+    "slo-sli-and-alerting",
+    "system-design-basics"
+   ],
+   "words": 986
+  },
+  {
    "id": "system-design-basics",
    "sec": "system-design",
    "sub": "method",
@@ -3039,6 +7619,199 @@
     "transactions-acid-and-isolation"
    ],
    "words": 1055
+  },
+  {
+   "id": "async-processing-and-event-driven-scaling",
+   "sec": "system-design",
+   "sub": "scaling",
+   "title": "Async processing and event-driven scaling",
+   "tags": [
+    "system-design",
+    "scaling",
+    "kafka",
+    "async",
+    "reliability"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/scaling/async-processing-and-event-driven-scaling.md",
+   "links": [
+    "background-jobs-and-schedulers",
+    "backpressure-and-flow-control",
+    "circuit-breaker",
+    "dead-letter-queues-and-retries",
+    "esim-provisioning-platform",
+    "event-driven-architecture",
+    "exactly-once-myth",
+    "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kubernetes-basics",
+    "message-queues-and-streams",
+    "outbox-pattern",
+    "postgres-partitioning",
+    "rate-limiting",
+    "saga",
+    "service-communication-sync-vs-async",
+    "spring-kafka-consumer",
+    "spring-reactive-webclient-sse",
+    "temporal-concepts",
+    "testing-async-and-kafka-flows",
+    "websockets-sse-and-long-polling",
+    "workflow-engines-vs-sagas"
+   ],
+   "words": 858
+  },
+  {
+   "id": "database-scaling-path",
+   "sec": "system-design",
+   "sub": "scaling",
+   "title": "Database scaling path — from indexes to sharding",
+   "tags": [
+    "system-design",
+    "scaling",
+    "postgres",
+    "databases"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/scaling/database-scaling-path.md",
+   "links": [
+    "back-of-envelope-estimation",
+    "caching",
+    "column-and-wide-column-stores",
+    "consistent-hashing",
+    "cross-shard-queries-and-transactions",
+    "database-indexes",
+    "explain-analyze",
+    "hikaricp-pool-sizing",
+    "horizontal-vs-vertical-scaling",
+    "jpa-n-plus-one",
+    "leader-follower-replication",
+    "postgres-indexes",
+    "postgres-locks",
+    "postgres-partitioning",
+    "postgres-performance-checklist",
+    "postgres-replication-and-failover",
+    "postgres-vacuum-and-bloat",
+    "read-replicas-and-stale-reads",
+    "read-write-splitting-and-cqrs-lite",
+    "sharding-strategies",
+    "sockets-and-connection-pooling",
+    "spring-transactional",
+    "sql-vs-nosql-choosing",
+    "storage-choices",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 903
+  },
+  {
+   "id": "horizontal-vs-vertical-scaling",
+   "sec": "system-design",
+   "sub": "scaling",
+   "title": "Horizontal vs vertical scaling and stateless services",
+   "tags": [
+    "system-design",
+    "scaling",
+    "stateless",
+    "kubernetes"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/scaling/horizontal-vs-vertical-scaling.md",
+   "links": [
+    "amdahls-law-and-parallel-speedup",
+    "api-gateway-and-service-discovery",
+    "background-jobs-and-schedulers",
+    "caching",
+    "database-scaling-path",
+    "distributed-cache-coherence",
+    "distributed-locks-and-fencing",
+    "file-and-blob-storage",
+    "hikaricp-pool-sizing",
+    "idempotency",
+    "jwt-authentication",
+    "kafka-consumer",
+    "kubernetes-basics",
+    "leader-follower-replication",
+    "load-balancing",
+    "outbox-pattern",
+    "read-write-splitting-and-cqrs-lite",
+    "redis-data-structures",
+    "sharding-strategies",
+    "spring-boot-properties-and-profiles",
+    "virtual-threads"
+   ],
+   "words": 919
+  },
+  {
+   "id": "multi-region-basics",
+   "sec": "system-design",
+   "sub": "scaling",
+   "title": "Multi-region basics — active/passive, active/active, data residency",
+   "tags": [
+    "system-design",
+    "scaling",
+    "availability",
+    "multi-region",
+    "consistency"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/scaling/multi-region-basics.md",
+   "links": [
+    "caching",
+    "cap-and-pacelc",
+    "cdn",
+    "consistency-models",
+    "distributed-locks-and-fencing",
+    "dns-resolution",
+    "failure-modes-and-timeouts",
+    "file-and-blob-storage",
+    "horizontal-vs-vertical-scaling",
+    "idempotency",
+    "latency-numbers",
+    "leader-follower-replication",
+    "leases-heartbeats-and-health",
+    "load-balancing",
+    "multi-leader-and-leaderless",
+    "observability-three-pillars",
+    "postgres-replication-and-failover",
+    "quorums-and-leader-election",
+    "raft-explained",
+    "sharding-strategies",
+    "time-and-clocks"
+   ],
+   "words": 953
+  },
+  {
+   "id": "read-write-splitting-and-cqrs-lite",
+   "sec": "system-design",
+   "sub": "scaling",
+   "title": "Read/write splitting and CQRS-lite",
+   "tags": [
+    "system-design",
+    "scaling",
+    "cqrs",
+    "consistency",
+    "postgres"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/system-design/scaling/read-write-splitting-and-cqrs-lite.md",
+   "links": [
+    "aggregates-and-invariants",
+    "caching",
+    "consistency-models",
+    "cqrs",
+    "database-scaling-path",
+    "event-driven-architecture",
+    "event-sourcing",
+    "idempotency",
+    "jpa-n-plus-one",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "outbox-pattern",
+    "postgres-replication-and-failover",
+    "read-replicas-and-stale-reads",
+    "search-and-indexing-services",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 865
   }
  ]
 }
