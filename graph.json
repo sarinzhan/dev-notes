@@ -976,7 +976,7 @@
    "id": "operating-system-architecture",
    "sec": "computer-science",
    "sub": "operating-systems",
-   "title": "Operating system architecture",
+   "title": "System architecture overview",
    "tags": [
     "operating-systems",
     "kernel",
@@ -3899,6 +3899,10 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "operating-system-introduction"
   },
   {
@@ -6371,6 +6375,10 @@
   },
   {
    "source": "cpu-caches-and-cache-lines",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "cpu-caches-and-cache-lines",
    "target": "processes-and-threads"
   },
   {
@@ -7923,10 +7931,6 @@
   },
   {
    "source": "docker-containers-and-resources",
-   "target": "operating-system-architecture"
-  },
-  {
-   "source": "docker-containers-and-resources",
    "target": "operating-system-introduction"
   },
   {
@@ -7980,6 +7984,10 @@
   {
    "source": "docker-fundamentals",
    "target": "linux-networking"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "operating-system-architecture"
   },
   {
    "source": "docker-fundamentals",
@@ -9691,10 +9699,6 @@
   },
   {
    "source": "how-cpu-executes-code",
-   "target": "operating-system-architecture"
-  },
-  {
-   "source": "how-cpu-executes-code",
    "target": "processes-and-threads"
   },
   {
@@ -10136,10 +10140,6 @@
   {
    "source": "io-models-blocking-nonblocking-epoll",
    "target": "latency-numbers"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "operating-system-architecture"
   },
   {
    "source": "io-models-blocking-nonblocking-epoll",
@@ -11772,6 +11772,14 @@
   {
    "source": "operating-system-architecture",
    "target": "operating-system-introduction"
+  },
+  {
+   "source": "operating-system-architecture",
+   "target": "osi-and-tcp-ip-models"
+  },
+  {
+   "source": "operating-system-architecture",
+   "target": "processes-and-threads"
   },
   {
    "source": "operating-system-architecture",
