@@ -79,7 +79,7 @@ paths:
                 priority:     { type: string, enum: [HIGH, NORMAL, LOW], default: NORMAL }   # added in 1.2, optional
       responses:
         "202": { description: Accepted, content: { application/json: { schema: { $ref: "#/components/schemas/Accepted" } } } }
-        "409": { description: Same Idempotency-Key with a different body }
+        "422": { description: Same Idempotency-Key with a different body }
         "429": { description: Rate limited, headers: { Retry-After: { schema: { type: integer } } } }
     get:
       summary: List notifications of a subscriber, newest first

@@ -1,0 +1,122 @@
+---
+title: Event sourcing
+tags: [event-sourcing, architecture, ddd, postgres]
+learned: 2026-10-27
+---
+## Кратко
+При event sourcing **источником истины служит журнал доменных событий только на добавление** (append-only) для каждого агрегата (`SimRegistered`, `ProfileActivated`, `SimSuspended`), а не строка с текущим состоянием. Текущее состояние восстанавливается проигрыванием событий, **снимки** (snapshots) сокращают длинные истории, а **проекции** превращают журнал в удобные для запросов таблицы ([[cqrs]]). Получается полный аудиторский след, временные запросы («каким было состояние на 1 марта») и естественные интеграционные события — ценой другой модели программирования, эволюции схем событий, которые живут вечно, и согласованности в конечном счёте для каждой модели чтения. Это решение на уровне агрегата, а не всей системы; бухгалтерская книга или история авторизаций карт — хороший кандидат, каталог тарифов — нет.
+
+## Основное
+
+### Модель
+- **Хранилище событий** (event store): таблица `events(stream_id, version, type, payload, metadata, occurred_at)` с уникальным `(stream_id, version)`; один поток (stream) на агрегат. Добавления — единственные записи. Для большинства команд хватает Postgres; альтернативы — EventStoreDB, Axon Server или Kafka (осторожно: нет оптимистичной конкурентности по ключу).
+- **Загрузка**: прочитать поток и по порядку применить (`apply`) каждое событие к пустому агрегату. Методы `apply` агрегата только устанавливают состояние и никогда не бросают исключений; методы `decide` (команды) проверяют инварианты против этого состояния и возвращают новые события ([[aggregates-and-invariants]]).
+- **Сохранение**: добавить новые события с `expectedVersion`; конфликт означает, что другой писатель добавил раньше, поэтому нужно перезагрузить и повторить (оптимистичная конкурентность без колонки `@Version`).
+- **Снимок**: каждые N событий сохраняется сериализованное состояние с его версией; загрузка начинается со снимка и проигрывает только хвост. Снимки — это кэш, их можно удалить в любой момент.
+- **Проекция**: потребитель хранилища (опрос по глобальной позиции или Kafka через outbox/CDC), который строит таблицы для чтения. Перестраивается сбросом позиции в ноль.
+
+### Event sourcing, хранение состояния и таблица аудита
+| | Строка с текущим состоянием | Состояние + таблица аудита/истории | Event sourcing |
+|---|---|---|---|
+| Источник истины | Строка | Строка (история производна) | События (состояние производно) |
+| Полнота аудита | Нет | То, что не забыли залогировать | Полная, по построению |
+| Запрос текущего состояния | Напрямую | Напрямую | Через проекцию или replay |
+| Эволюция схемы | Миграция | Миграция | Upcasting старых событий, вечно |
+| Конкурентность | `@Version` | `@Version` | Ожидаемая версия потока |
+| Интеграционные события | Нужен [[outbox-pattern]] | То же | События *и есть* источник интеграции (всё равно через outbox/relay) |
+- Таблица истории даёт большую часть выгоды для аудита без смены модели программирования; её стоит выбрать, когда аудит — единственная причина.
+
+### Где окупается
+- Деньги и бухгалтерские книги: баланс = сумма проводок, а проводки — юридическая запись ([[design-payment-processing]], потоки авторизации/клиринга в [[emv-card-processing]]).
+- Регуляторные вопросы «почему это произошло», разбор споров, проигрывание исправления бага по истории.
+- Домены, где бизнес и так мыслит событиями (жизненный цикл подписки, жизненный цикл заказа).
+
+### Версионирование событий
+- События неизменяемы, и старые читаются вечно: никогда не переименовывать поле, добавлять только необязательные поля и делать **upcasting** (`ProfileActivatedV1` → `V2` в конвертере при чтении), когда форма должна измениться. Реестр схем помогает даже без Kafka ([[message-schema-evolution]]).
+- Не класть всю сущность в каждое событие; записывать *изменение* и намерение (`PriceChanged(old, new, reason)`).
+- Персональные данные в неизменяемых событиях и удаление по GDPR: шифровать PII отдельно для каждого субъекта ключом, который можно выбросить (crypto-shredding), или держать PII вне событий и ссылаться на изменяемый профиль.
+
+### Эксплуатационная реальность
+- Чтение длинного потока без снимков медленное; `Subscriber` со 100 тыс. событий использования — ошибка в дизайне потоков (разделить агрегат, закрывать потоки по периодам).
+- Проекции отстают; UI, читающий проекцию сразу после команды, видит устаревшие данные (варианты обсуждаются в [[cqrs]]).
+- Тестировать приятно: дано события, когда команда, тогда события — чистые функции, без базы данных ([[junit-and-mockito]]).
+
+## Пример
+Хранилище событий на Postgres с оптимистичными добавлениями и агрегат `Sim` на event sourcing, разделённый на decide/apply.
+
+```sql
+CREATE TABLE sim_events (
+  global_pos  bigserial PRIMARY KEY,                 -- проекции опрашивают по этому полю
+  stream_id   uuid        NOT NULL,
+  version     int         NOT NULL,
+  type        text        NOT NULL,
+  payload     jsonb       NOT NULL,
+  occurred_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (stream_id, version)                        -- оптимистичная конкурентность
+);
+```
+
+```java
+public final class Sim {
+    private UUID id; private int version; private String activeIccid; private boolean suspended;
+    private final List<DomainEvent> pending = new ArrayList<>();
+
+    public static Sim load(List<DomainEvent> history) {
+        var sim = new Sim();
+        history.forEach(sim::apply);
+        return sim;
+    }
+
+    // decide: проверить, породить событие; никогда не менять состояние напрямую
+    public void activate(Iccid iccid) {
+        if (suspended) throw new InvariantViolation("suspended SIM cannot activate a profile");
+        if (iccid.value().equals(activeIccid)) return;                 // идемпотентный no-op
+        emit(new ProfileActivated(id, iccid.value()));
+    }
+
+    // apply: чистый переход состояния, используется и для новых событий, и для replay
+    private void apply(DomainEvent e) {
+        switch (e) {
+            case SimRegistered r     -> id = r.simId();
+            case ProfileActivated a  -> activeIccid = a.iccid();
+            case SimSuspended s      -> suspended = true;
+            default -> {}                                               // неизвестные старые типы игнорируются
+        }
+        version++;
+    }
+
+    private void emit(DomainEvent e) { apply(e); pending.add(e); }
+    public int version() { return version; }
+    public List<DomainEvent> pending() { return List.copyOf(pending); }
+}
+
+@Repository
+@RequiredArgsConstructor
+public class SimEventStore {
+    private final JdbcClient jdbc; private final EventCodec codec;
+
+    public Sim load(UUID simId) {
+        var events = jdbc.sql("SELECT type, payload FROM sim_events WHERE stream_id = :id ORDER BY version")
+                .param("id", simId).query((rs, i) -> codec.decode(rs.getString(1), rs.getString(2))).list();
+        return Sim.load(events);
+    }
+
+    @Transactional
+    public void append(UUID simId, int expectedVersion, List<DomainEvent> events) {
+        int v = expectedVersion;
+        for (DomainEvent e : events) {
+            v++;
+            jdbc.sql("INSERT INTO sim_events (stream_id, version, type, payload) VALUES (:id, :v, :t, :p::jsonb)")
+                .param("id", simId).param("v", v).param("t", codec.typeOf(e)).param("p", codec.encode(e))
+                .update();                       // нарушение уникальности здесь = конкурентный писатель -> повторить команду
+        }
+    }
+}
+```
+
+## Подводные камни
+- Event sourcing для всей системы: каталог, настройки и справочные данные ничего не выигрывают и теряют простые `UPDATE`.
+- Kafka в роли хранилища событий: нет оптимистичной конкурентности на поток, нет пути чтения «загрузить один агрегат», compaction удаляет историю. Kafka — транспорт для проекций, а не хранилище.
+- События, раскрывающие реализацию (`RowUpdated(columns...)`), вместо намерения; после рефакторинга журнал становится нечитаемым и непригодным для replay.
+- Забыть, что хранилище событий и интеграционная шина — разные вещи: публикации из хранилища всё равно нужен outbox/relay или CDC, иначе при падении события теряются.
+- Связанные заметки: [[cqrs]], [[domain-events-and-integration-events]], [[aggregates-and-invariants]], [[event-driven-architecture]], [[time-money-and-ids]].

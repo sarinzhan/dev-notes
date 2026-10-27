@@ -1,0 +1,93 @@
+---
+title: Событийно-ориентированная архитектура
+tags: [microservices, events, kafka, architecture]
+learned: 2026-10-27
+---
+## Кратко
+В событийно-ориентированной архитектуре (event-driven architecture, EDA) сервисы общаются, публикуя **факты** (`OrderPaid`, `ProfileActivated`) в брокер и реагируя на факты других, вместо того чтобы вызывать друг друга. Producer не знает своих consumer-ов, поэтому добавление consumer-а ничего не стоит на стороне producer-а, а медленный consumer не замедляет producer. Цена: согласованность в конечном счёте, дубликаты, вопросы порядка и контракт (схема события), который развивать сложнее, чем REST endpoint, потому что не видно, кто от него зависит. EDA — это хореографическая половина [[saga]], построенная на [[outbox-pattern]] + [[idempotency]].
+
+## Основное
+
+### События, команды и запросы
+| | Событие | Команда | Запрос |
+|---|---|---|---|
+| Смысл | Что-то произошло (прошедшее время) | Сделай что-то (повелительное наклонение) | Скажи мне что-то |
+| Получатели | 0..n, неизвестны отправителю | Ровно один обработчик | Один отвечающий |
+| Можно отклонить | Нет, это факт | Да | н/д |
+| Транспорт | Топик, fan-out | Очередь или прямой вызов | Синхронный вызов |
+| Связанность | Consumer зависит от схемы producer-а | Отправитель зависит от API обработчика | Вызывающий зависит от отвечающего |
+- Топик `send-sms`, несущий `{to, text}`, — это команда поверх Kafka: законно, но у неё один consumer, и отправитель ожидает, что она будет выполнена. Переименование в `sms.requested` не делает её событием.
+- Уведомление о событии (event notification: только id, за данными — обратный вызов) и перенос состояния в событии (event-carried state transfer: payload содержит данные): второе развязывает по доступности, первое держит payload маленьким ([[domain-events-and-integration-events]]).
+
+### Топологии
+- **Топология брокера** (хореография): каждый сервис реагирует и порождает события; центрального координатора нет. Просто начать, трудно отследить после десяти сервисов («кто реагирует на `OrderPaid`?»).
+- **Топология медиатора** (оркестрация): координатор потребляет события и отдаёт команды; эту роль играет Temporal или оркестратор саги ([[temporal-concepts]]).
+- Большинство систем смешивают: хореография для разветвлённых побочных эффектов (уведомления, аналитика, аудит), оркестрация для многошаговых бизнес-процессов с компенсациями.
+
+### Связанность consumer-ов — скрытая цена
+- Схема — это контракт. Удаление поля ломает consumer-ов, о которых ты даже не слышал; только добавлять поля, версионировать при ломающих изменениях, вести реестр ([[message-schema-evolution]]).
+- **Семантическая связанность**: consumer-ы, которые выводят из `status == "ACTIVE"`, что «нужно выставить абоненту счёт», привязываются к внутренней машине состояний producer-а. Публиковать события нужно на уровне бизнеса (`SubscriptionStarted`), а не на уровне изменения строки.
+- **Временная связанность** исчезает (producer работает, consumer лежит — это нормально); появляется **связанность по порядку**: `ProfileActivated` раньше `SimRegistered`, потому что они в разных партициях. Ключ — id агрегата ([[aggregates-and-invariants]], [[kafka-producer]]), и consumer-ы должны терпеть нарушение порядка между разными агрегатами.
+
+### Семантика доставки, которую должен выдерживать consumer
+- At-least-once: дедупликация по id события в той же транзакции, что и эффект ([[idempotency]], [[exactly-once-myth]]).
+- Replay: consumer-ы, которые можно перезапустить с offset 0 (перестроить проекцию), — мечта; consumer-ам с побочными эффектами (SMS) нужен флаг «режим replay» или защита по времени.
+- Ядовитые сообщения: retry с backoff, затем dead letter topic с алертами ([[dead-letter-queues-and-retries]]).
+- Обратное давление (backpressure): consumer, который не успевает, проявляется как lag, а не как ошибки; алерт на lag ([[kafka-consumer]], [[backpressure-and-flow-control]]).
+
+### Когда EDA подходит, а когда нет
+- Подходит: много consumer-ов одного факта, долгая или всплесковая работа, потоки аудита/аналитики, развязка команд, интеграция новой системы без изменения producer-ов ([[async-processing-and-event-driven-scaling]]).
+- Не подходит: вызывающему нужен ответ сейчас (проверка цены, аутентификация), строгое «читаю свои записи» (read-your-writes), простой CRUD с одним consumer-ом. Нужен синхронный вызов, а событие оставить для побочных эффектов ([[service-communication-sync-vs-async]]).
+- Как подать на собеседовании: «Я использую события для фактов, которые важны другим сервисам, и синхронные вызовы для вопросов, на которые мне нужен ответ; каждое событие идёт через outbox, и каждый consumer идемпотентен».
+
+## Пример
+Соглашения о топиках и consumer-ах для платформы eSIM: один топик на тип агрегата с типом события в заголовке, ключ — id агрегата, consumer-ы сгруппированы по сервису.
+
+```yaml
+# topics.yaml (применяется админской задачей Kafka / CR KafkaTopic в Strimzi)
+topics:
+  - name: esim.sim.events          # все факты об одной Sim, упорядочены по ключу (id sim)
+    partitions: 12
+    replicationFactor: 3
+    config:
+      retention.ms: 2592000000     # 30 дней: отсюда можно перестроить consumer-ов
+      cleanup.policy: delete
+  - name: esim.sim.events.DLT
+    partitions: 12
+    replicationFactor: 3
+    config:
+      retention.ms: 7776000000     # 90 дней для разборов инцидентов
+
+# сторона consumer-а (application.yaml сервиса биллинга)
+spring:
+  kafka:
+    consumer:
+      group-id: billing              # одна группа на сервис, а не на экземпляр
+      auto-offset-reset: earliest    # новый сервис при первом старте перечитывает историю
+      enable-auto-commit: false
+    listener:
+      ack-mode: record
+```
+
+```java
+@KafkaListener(topics = "esim.sim.events", groupId = "billing")
+@Transactional
+public void on(ConsumerRecord<String, byte[]> rec, Acknowledgment ack) {
+    String type = header(rec, "type");              // "ProfileActivated.v1"
+    UUID eventId = UUID.fromString(header(rec, "event-id"));
+    if (!processed.insertIfAbsent(eventId)) { ack.acknowledge(); return; }   // идемпотентно
+    switch (type) {
+        case "ProfileActivated.v1" -> billing.startSubscription(codec.decode(rec.value(), ProfileActivatedV1.class));
+        case "SimTerminated.v1"    -> billing.closeSubscription(codec.decode(rec.value(), SimTerminatedV1.class));
+        default -> log.debug("ignoring {}", type);   // неизвестные типы — не ошибки
+    }
+    ack.acknowledge();
+}
+```
+
+## Подводные камни
+- События как удалённый вызов процедуры: producer публикует `X.requested` и ждёт `X.completed` с correlation id и таймаутом. Получился медленный синхронный вызов без всякого инструментария; лучше синхронный API или движок workflow.
+- Общая библиотека событий с доменными классами producer-а: каждый consumer теперь компилируется против внутренностей producer-а ([[coupling-cohesion-and-general-principles]]).
+- Нет каталога событий: через полгода никто не знает, какие топики существуют, что они значат и кто их потребляет. Нужно вести документ AsyncAPI или хотя бы README на каждый топик.
+- Отладка без корреляции: `traceparent` и id саги/агрегата стоит класть в заголовки с первого дня ([[distributed-tracing]]).
+- Связанные заметки: [[cqrs]], [[event-sourcing]], [[message-queues-and-streams]], [[kafka-architecture]], [[design-notification-service]].

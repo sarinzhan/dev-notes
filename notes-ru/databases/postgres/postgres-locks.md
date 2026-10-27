@@ -1,0 +1,76 @@
+---
+title: Блокировки в Postgres: строки, таблицы, advisory и deadlock
+tags: [postgres, locks, concurrency, deadlock]
+learned: 2026-10-27
+---
+## Кратко
+Postgres берёт **блокировки строк** для `UPDATE`/`DELETE`/`SELECT ... FOR UPDATE` и **блокировки таблиц** для каждого оператора, включая обычный `SELECT` (`ACCESS SHARE`) и DDL (`ACCESS EXCLUSIVE`). Благодаря MVCC читатели и писатели не блокируют друг друга, но два писателя одной строки выполняются по очереди, а DDL ждёт всех и заставляет всех ждать за собой. Взаимные блокировки (deadlock) обнаруживаются через `deadlock_timeout` (1 с), и одна транзакция убивается; `lock_timeout` не даёт оператору стоять в очереди вечно. **Advisory-блокировки (advisory locks)** — блокировки, определяемые приложением, на произвольный 64-битный ключ, удобные для задачи «один воркер на задание». Сторона конкурентности, связанная с изоляцией, — в [[postgres-isolation-levels]].
+
+## Основное
+
+### Блокировки строк
+| Режим | Кто берёт | Конфликтует с |
+|---|---|---|
+| `FOR UPDATE` | `UPDATE`, `DELETE`, `SELECT ... FOR UPDATE` | всеми остальными блокировками строк |
+| `FOR NO KEY UPDATE` | `UPDATE`, не меняющий ключевые столбцы | всем, кроме `FOR KEY SHARE` |
+| `FOR SHARE` | `SELECT ... FOR SHARE` | `FOR UPDATE`, `FOR NO KEY UPDATE` |
+| `FOR KEY SHARE` | проверки внешнего ключа при вставке/обновлении ссылающейся строки | только `FOR UPDATE` |
+
+- Блокировки строк живут в заголовке кортежа (`xmax` плюс флаги), а не в разделяемой памяти, поэтому блокировка миллиона строк стоит записей на диск, а не слотов в таблице блокировок; блокировка строки снимается в конце транзакции, никогда раньше.
+- `SELECT ... FOR UPDATE` — пессимистичная блокировка: прочитать строку, удерживать её, обновить, закоммитить. При READ COMMITTED оператор после ожидания заново вычисляет `WHERE`; при REPEATABLE READ он падает с ошибкой `could not serialize access due to concurrent update`. В JPA это `PESSIMISTIC_WRITE` ([[jpa-locking]]).
+- `FOR UPDATE SKIP LOCKED` пропускает строки, которые держит другая сессия: строительный блок для очередей задач и для relay в [[outbox-pattern]]. `NOWAIT` вместо ожидания выдаёт ошибку.
+- Из-за внешнего ключа вставки в дочернюю таблицу берут `FOR KEY SHARE` на родительскую строку; `UPDATE` неключевого столбца родителя берёт `FOR NO KEY UPDATE` и с ним совместим. Обновление первичного ключа родителя — нет.
+
+### Блокировки таблиц
+- Каждый оператор берёт блокировку на каждую используемую таблицу; режимы образуют матрицу конфликтов. На практике важны следующие:
+  - `ACCESS SHARE` (`SELECT`): конфликтует только с `ACCESS EXCLUSIVE`.
+  - `ROW EXCLUSIVE` (`INSERT`/`UPDATE`/`DELETE`): конфликтует с `SHARE` (обычный `CREATE INDEX`) и более сильными.
+  - `SHARE UPDATE EXCLUSIVE` (`VACUUM`, `CREATE INDEX CONCURRENTLY`, `ALTER TABLE ... SET`): конфликтует сам с собой, пропускает чтение и запись.
+  - `ACCESS EXCLUSIVE` (`ALTER TABLE` с добавлением столбца с volatile-значением по умолчанию, `DROP`, `TRUNCATE`, `VACUUM FULL`, `LOCK TABLE`): конфликтует со всем, включая `SELECT`.
+- Запросы на блокировку выстраиваются в очередь по порядку. `ALTER TABLE`, ждущий завершения длинного `SELECT`, блокирует за собой каждый следующий `SELECT`, хотя те были бы совместимы с выполняющимся. Миграция на 50 мс может остановить сервис на время самой длинной открытой транзакции. Всегда выполняй DDL с `lock_timeout` и повторами ([[schema-migrations-flyway-liquibase]]).
+
+### Таймауты и диагностика
+- `lock_timeout`: прервать оператор, который ждёт блокировку дольше этого времени. Задавай его на сессию миграции (`SET lock_timeout = '3s'`) и не включай для обычного трафика или задай щедрое глобальное значение.
+- `statement_timeout` ограничивает весь оператор; `idle_in_transaction_session_timeout` убивает сессии, которые держат блокировки, ничего не делая (метод `@Transactional`, ждущий HTTP-вызова).
+- `pg_locks` в join с `pg_stat_activity` показывает, кто держит и кто ждёт; `pg_blocking_pids(pid)` сразу возвращает блокирующих. `log_lock_waits = on` пишет строку в лог на каждое ожидание дольше `deadlock_timeout`.
+
+### Взаимные блокировки
+- Две транзакции держат каждая строку, нужную другой: T1 обновляет строку A, затем строку B, T2 обновляет B, затем A. Postgres проверяет граф ожиданий через `deadlock_timeout` и прерывает одну с `SQLSTATE 40P01`; другая продолжает. Приложение должно повторить прерванную транзакцию.
+- Предотвращение: блокируй строки в согласованном порядке (сортируй id перед `UPDATE ... WHERE id IN (...)` или блокируй их через `SELECT ... FOR UPDATE ORDER BY id`), держи транзакции короткими, не обновляй родительские и дочерние таблицы в разном порядке в разных ветках кода. Проверки внешних ключей — частый скрытый участник.
+- Взаимные блокировки между базой данных и чем-то ещё (блоком `synchronized` в JVM или блокировкой в Redis) никто не обнаруживает; см. [[deadlocks-and-synchronization-primitives]].
+
+### Advisory-блокировки
+- `pg_advisory_lock(key)` / `pg_try_advisory_lock(key)` (на уровне сессии, требуют явного снятия) и `pg_advisory_xact_lock(key)` (снимается при коммите) блокируют определённый приложением `bigint` или пару `(int, int)` без участия таблиц.
+- Применение: ночное задание выполняет только один экземпляр планировщика (`SELECT pg_try_advisory_lock(hashtext('billing-run'))`), сериализация всех записей для одного абонента без блокировки строк, которых ещё может не существовать, предотвращение дублирующих вставок, пока уникальное ограничение невозможно. Это блокировка в пределах одной базы; как распределённая блокировка между сервисами она имеет те же проблемы с fencing, что и любая аренда (lease) ([[distributed-locks-and-fencing]]).
+- Advisory-блокировки уровня сессии переживают откат транзакции и снимаются при закрытии соединения; с пулом соединений утёкшая блокировка навсегда остаётся у соединения в пуле. Предпочитай варианты `_xact_`.
+
+## Пример
+```sql
+-- Найти, что что блокирует (выполнять во время инцидента)
+SELECT blocked.pid       AS blocked_pid,
+       blocked.query     AS blocked_query,
+       blocking.pid      AS blocking_pid,
+       blocking.state    AS blocking_state,
+       now() - blocking.xact_start AS blocking_xact_age
+FROM pg_stat_activity blocked
+JOIN LATERAL unnest(pg_blocking_pids(blocked.pid)) AS b(pid) ON true
+JOIN pg_stat_activity blocking ON blocking.pid = b.pid
+WHERE cardinality(pg_blocking_pids(blocked.pid)) > 0;
+--  blocked_pid | blocked_query                      | blocking_pid | blocking_state      | blocking_xact_age
+--  5120        | ALTER TABLE sim ADD COLUMN eid text| 4982         | idle in transaction | 00:04:12
+-- Исправление: SELECT pg_terminate_backend(4982); затем перезапустить миграцию с lock_timeout.
+
+-- Пакетное обновление без deadlock: сначала заблокировать в фиксированном порядке
+BEGIN;
+SELECT id FROM accounts WHERE id IN (17, 3, 42) ORDER BY id FOR UPDATE;
+UPDATE accounts SET balance = balance - 10 WHERE id = 42;
+UPDATE accounts SET balance = balance + 10 WHERE id = 3;
+COMMIT;
+```
+
+## Подводные камни
+- Миграция без `lock_timeout` встаёт в очередь за одной длинной транзакцией и роняет сервис; с `lock_timeout = '3s'` она быстро падает, и её можно повторить.
+- `SELECT ... FOR UPDATE` на родительской строке, чтобы «сериализовать» вставки в дочернюю таблицу, работает, но `FOR SHARE`, которые берут проверки внешних ключей из других сессий, под нагрузкой всё равно с ним конфликтуют.
+- `pg_advisory_lock` с HikariCP: блокировка привязана к физическому соединению, а не к твоему потоку; исключение до `pg_advisory_unlock` оставляет её захваченной.
+- `deadlock_timeout` — это ещё и порог для `log_lock_waits`; если уменьшить его ради более быстрого обнаружения deadlock, растут накладные расходы на каждое ожидание блокировки.
+- Связанные заметки: [[jpa-locking]] — сторона ORM, [[postgres-isolation-levels]] — ошибки сериализации, похожие на ошибки блокировок, [[race-conditions-and-critical-sections]] — общая концепция.

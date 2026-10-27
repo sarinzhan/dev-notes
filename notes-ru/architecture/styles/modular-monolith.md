@@ -1,0 +1,93 @@
+---
+title: Модульный монолит — принудительные границы, Spring Modulith, ArchUnit
+tags: [architecture, modular-monolith, spring-modulith, archunit, postgres]
+learned: 2026-10-27
+---
+## Кратко
+Модульный монолит (modular monolith) — это одна единица развёртывания, код которой разбит на **модули с принудительными границами**: каждый модуль владеет своими данными и выставляет небольшой публичный API (Java-типы или события), а сборка падает, когда другой модуль лезет в его внутренности. Он сохраняет эксплуатационную простоту монолита — один процесс, одна база данных, локальные транзакции, один deploy — и при этом оставляет возможность позже вырезать модуль в отдельный сервис. Spring Modulith даёт соглашение о модулях, проверку и асинхронные события; ArchUnit проверяет любое правило, которое не проверяет Modulith.
+
+## Основное
+### Пакеты по слоям vs пакеты по фичам
+- **Пакеты по слоям** (package-by-layer: `controller/`, `service/`, `repository/`) группируют по технической роли; каждая фича размазана по всем пакетам, и всё публично ([[layered-architecture]]).
+- **Пакеты по фичам** (package-by-feature: `order/`, `profile/`, `billing/`) группируют по бизнес-возможности; одна фича — одна папка, и package-private видимость в Java становится реальным инструментом: `public` только те типы, которые модуль экспортирует.
+- Модули обычно соответствуют ограниченным контекстам (bounded contexts, [[ddd-basics]]); внутри модуля по-прежнему применимы слои или [[hexagonal-architecture]].
+
+### Правила модуля
+- У модуля есть публичный API (несколько интерфейсов, команд, DTO, событий) и внутренности (сущности, репозитории, классы реализации), которые другие модули трогать не могут.
+- Модули общаются через API другого модуля (прямой вызов, та же транзакция) или через **события** (слабая связанность, согласованность в конечном счёте — eventual consistency). Циклов между модулями нет.
+- Каждый модуль владеет своими таблицами. Другие модули никогда к ним не обращаются; они спрашивают модуль-владелец или подписываются на его события.
+
+### Spring Modulith (1.x, Spring Boot 3.x)
+- Соглашение: каждый прямой подпакет главного пакета приложения — это модуль (`com.beeline.esim.order`, `com.beeline.esim.profile`). Типы в корневом пакете модуля — его API; вложенные пакеты внутренние, если не выставлены через `@NamedInterface` в `package-info.java`.
+- `@ApplicationModule(allowedDependencies = "profile")` ограничивает, какие модули можно использовать; `ApplicationModules.of(App.class).verify()` в тесте падает на циклах, доступе к внутренностям и необъявленных зависимостях.
+- `@ApplicationModuleListener` на методе = `@Async` + `@Transactional(propagation = REQUIRES_NEW)` + `@TransactionalEventListener(phase = AFTER_COMMIT)`: листенер выполняется после commit у публикующей стороны, в своей транзакции и своём потоке.
+- **Реестр публикаций событий** (event publication registry, `spring-modulith-starter-jpa` или `-jdbc`): каждое событие, опубликованное через `ApplicationEventPublisher`, сохраняется в таблицу `event_publication` в той же транзакции, что и бизнес-изменение, и помечается завершённым, когда отработает каждый листенер. Незавершённые публикации переотправляются при перезапуске — это [[outbox-pattern]] внутри процесса, без Kafka.
+- `@Externalized("esim.profile.activated")` вместе с `spring-modulith-events-kafka` публикует то же событие в топик, так что модуль, который позже станет сервисом, сохраняет тот же контракт ([[kafka-producer]]).
+- `@ApplicationModuleTest` поднимает один модуль (плюс объявленные зависимости) для интеграционных тестов; `Documenter` генерирует C4-диаграммы из кода.
+
+### ArchUnit (1.x) для всего остального
+- Читает байткод и проверяет правила в виде JUnit-тестов: правила слоёв внутри модуля, «никакого `@Transactional` на контроллерах», «доменный пакет не должен зависеть от `jakarta.persistence`», «репозитории package-private».
+- Работает без Spring Modulith; это инструмент для принудительного соблюдения колец [[clean-architecture]] или направления зависимостей гексагональной архитектуры в любом проекте.
+
+### Одна база данных, схема на модуль
+- Один экземпляр Postgres, один пул соединений ([[hikaricp-pool-sizing]]), но у каждого модуля своя схема (`order.*`, `profile.*`) или хотя бы свой префикс таблиц и своя папка миграций Flyway/Liquibase.
+- Никаких внешних ключей или join между схемами модулей; ссылки между модулями — просто id. Когда модуль уходит, его схема уже отделима.
+
+### Когда этого достаточно и как он делится
+- Достаточно для большинства команд примерно до 10–20 разработчиков, когда ритм релизов общий, а потребности в масштабировании однородны; локальные вызовы и локальные транзакции — это преимущества, а не долги.
+- Выделяй модуль в сервис, когда ему нужно независимое масштабирование, другой ритм релизов, отдельная команда или другая среда выполнения ([[monolith-vs-microservices]]).
+- Путь: события уже идут через реестр → вынести их в Kafka → перенести схему модуля в отдельную базу данных → развернуть модуль как отдельное Spring Boot-приложение с той же раскладкой пакетов → направить трафик через шлюз ([[api-gateway-and-service-discovery]]). Вызовы между модулями внутри процесса превращаются в вызовы REST/gRPC или в [[saga]].
+
+## Пример
+Раскладка модулей для eSIM-платформы и тесты, которые держат её в порядке.
+
+```text
+com.beeline.esim
+├── EsimApplication.java
+├── order/                       module "order"
+│   ├── OrderService.java        public API (interface + commands)
+│   ├── OrderPlaced.java         public event
+│   ├── package-info.java        @ApplicationModule(allowedDependencies = {"profile", "billing::api"})
+│   └── internal/                entities, JPA repositories, OrderServiceImpl (package-private)
+├── profile/                     module "profile"
+│   ├── ProfileActivation.java   listens to OrderPlaced
+│   └── internal/
+└── billing/
+    ├── api/                     @NamedInterface("api") in package-info.java
+    └── internal/
+```
+
+```java
+@Component
+@RequiredArgsConstructor
+class ProfileActivation {
+    private final ProfileRepository profiles;
+
+    @ApplicationModuleListener                      // асинхронно, после commit транзакции заказа, своя транзакция
+    void on(OrderPlaced event) {
+        profiles.reserveFor(event.orderId(), event.tariff());
+    }
+}
+```
+
+```java
+class ModularityTests {
+    ApplicationModules modules = ApplicationModules.of(EsimApplication.class);
+
+    @Test void modulesRespectBoundaries() { modules.verify(); }
+
+    @Test void domainDoesNotDependOnJpa() {
+        JavaClasses classes = new ClassFileImporter().importPackages("com.beeline.esim");
+        noClasses().that().resideInAPackage("..domain..")
+            .should().dependOnClassesThat().resideInAnyPackage("jakarta.persistence..", "org.springframework..")
+            .check(classes);
+    }
+}
+```
+
+## Подводные камни
+- «Модульный» монолит с одним общим модулем `common`, от которого зависят все модули, — это слоистый монолит с лишними папками; ограничь общий код объектами-значениями и ничем, что хранит состояние.
+- Синхронные вызовы между модулями в одной транзакции удобны, но каждый такой вызов — будущий сетевой переход; для всего, что не является запросом на чтение, предпочитай события.
+- `@ApplicationModuleListener` асинхронный: HTTP-ответ возвращается до того, как листенер закончит, и его исключения никогда не доходят до вызывающего; следи за зависшими записями в `event_publication` и чисти завершённые (в Modulith 1.1+ есть режимы завершения и API очистки).
+- Внешние ключи и join между схемами незаметно восстанавливают ту связанность, которую разбиение на модули должно было убрать; запрещай их в миграциях и при ревью SQL в духе ArchUnit.
+- Связанные заметки: [[monolith-vs-microservices]], [[outbox-pattern]], [[layered-architecture]], [[ddd-basics]], [[testcontainers]].

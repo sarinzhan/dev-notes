@@ -10,6 +10,16 @@
     "computation": "Computation & hardware",
     "programming": "Programming concepts",
     "security-basics": "Security basics"
+   },
+   "name_ru": "Информатика",
+   "subs_ru": {
+    "algorithms": "Алгоритмы",
+    "data-structures": "Структуры данных",
+    "operating-systems": "Операционные системы",
+    "concurrency-theory": "Теория конкурентности",
+    "computation": "Вычисления и железо",
+    "programming": "Концепции программирования",
+    "security-basics": "Основы безопасности"
    }
   },
   "java": {
@@ -22,6 +32,16 @@
     "concurrency": "Concurrency",
     "jvm": "JVM & GC",
     "jdbc": "JDBC & pools"
+   },
+   "name_ru": "Java",
+   "subs_ru": {
+    "core": "Основы языка",
+    "collections": "Коллекции",
+    "streams": "Стримы и функциональщина",
+    "io": "IO и NIO",
+    "concurrency": "Многопоточность",
+    "jvm": "JVM и GC",
+    "jdbc": "JDBC и пулы"
    }
   },
   "spring": {
@@ -35,6 +55,17 @@
     "kafka": "Kafka",
     "testing": "Testing",
     "resources": "Resources"
+   },
+   "name_ru": "Spring",
+   "subs_ru": {
+    "core": "Ядро и AOP",
+    "boot": "Boot",
+    "web": "Web и REST",
+    "data": "Данные и транзакции",
+    "security": "Безопасность",
+    "kafka": "Kafka",
+    "testing": "Тестирование",
+    "resources": "Ресурсы"
    }
   },
   "databases": {
@@ -44,6 +75,13 @@
     "postgres": "PostgreSQL",
     "nosql": "NoSQL",
     "design": "Data modeling & migrations"
+   },
+   "name_ru": "Базы данных",
+   "subs_ru": {
+    "fundamentals": "Основы",
+    "postgres": "PostgreSQL",
+    "nosql": "NoSQL",
+    "design": "Моделирование и миграции"
    }
   },
   "messaging": {
@@ -51,6 +89,11 @@
    "subs": {
     "kafka": "Kafka",
     "rabbitmq": "RabbitMQ & ActiveMQ"
+   },
+   "name_ru": "Очереди сообщений",
+   "subs_ru": {
+    "kafka": "Kafka",
+    "rabbitmq": "RabbitMQ и ActiveMQ"
    }
   },
   "networking": {
@@ -61,6 +104,14 @@
     "security": "TLS & auth",
     "dns-and-routing": "DNS, proxies & load balancing",
     "tools": "Tools"
+   },
+   "name_ru": "Сети",
+   "subs_ru": {
+    "fundamentals": "Основы",
+    "http": "HTTP",
+    "security": "TLS и аутентификация",
+    "dns-and-routing": "DNS, прокси и балансировка",
+    "tools": "Инструменты"
    }
   },
   "distributed-systems": {
@@ -71,6 +122,14 @@
     "replication": "Replication",
     "partitioning": "Partitioning",
     "patterns": "Patterns"
+   },
+   "name_ru": "Распределённые системы",
+   "subs_ru": {
+    "fundamentals": "Основы",
+    "consensus": "Консенсус и координация",
+    "replication": "Репликация",
+    "partitioning": "Партиционирование",
+    "patterns": "Паттерны"
    }
   },
   "system-design": {
@@ -80,6 +139,13 @@
     "building-blocks": "Building blocks",
     "scaling": "Scaling",
     "case-studies": "Case studies"
+   },
+   "name_ru": "Системный дизайн",
+   "subs_ru": {
+    "method": "Метод и оценки",
+    "building-blocks": "Строительные блоки",
+    "scaling": "Масштабирование",
+    "case-studies": "Разборы задач"
    }
   },
   "architecture": {
@@ -93,6 +159,17 @@
     "messaging": "Messaging & reliability",
     "workflows": "Workflow orchestration",
     "resources": "Resources"
+   },
+   "name_ru": "Архитектура",
+   "subs_ru": {
+    "principles": "Принципы",
+    "styles": "Архитектурные стили",
+    "ddd": "Domain-driven design",
+    "patterns": "Паттерны проектирования",
+    "microservices": "Микросервисы и устойчивость",
+    "messaging": "Сообщения и надёжность",
+    "workflows": "Оркестрация процессов",
+    "resources": "Ресурсы"
    }
   },
   "devops": {
@@ -105,12 +182,26 @@
     "build": "Build tools",
     "observability": "Observability",
     "resources": "Resources"
+   },
+   "name_ru": "DevOps",
+   "subs_ru": {
+    "linux": "Linux",
+    "docker": "Docker",
+    "kubernetes": "Kubernetes",
+    "git": "Git",
+    "build": "Сборка",
+    "observability": "Наблюдаемость",
+    "resources": "Ресурсы"
    }
   },
   "projects": {
    "name": "Projects",
    "subs": {
     "stories": "Project stories"
+   },
+   "name_ru": "Проекты",
+   "subs_ru": {
+    "stories": "Истории проектов"
    }
   }
  },
@@ -149,7 +240,9 @@
     "use-cases-and-application-layer",
     "value-objects-and-entities"
    ],
-   "words": 830
+   "words": 830,
+   "ru": "notes-ru/architecture/ddd/aggregates-and-invariants.md",
+   "title_ru": "Агрегаты, инварианты и границы транзакции"
   },
   {
    "id": "bounded-contexts-and-context-mapping",
@@ -181,7 +274,9 @@
     "service-communication-sync-vs-async",
     "strangler-fig-migration"
    ],
-   "words": 818
+   "words": 818,
+   "ru": "notes-ru/architecture/ddd/bounded-contexts-and-context-mapping.md",
+   "title_ru": "Ограниченные контексты и карта контекстов"
   },
   {
    "id": "ddd-basics",
@@ -213,7 +308,9 @@
     "spring-data-repositories",
     "structural-patterns"
    ],
-   "words": 845
+   "words": 845,
+   "ru": "notes-ru/architecture/ddd/ddd-basics.md",
+   "title_ru": "Основы DDD и словарь архитектуры"
   },
   {
    "id": "domain-events-and-integration-events",
@@ -244,7 +341,9 @@
     "spring-kafka-consumer",
     "spring-transactional"
    ],
-   "words": 831
+   "words": 831,
+   "ru": "notes-ru/architecture/ddd/domain-events-and-integration-events.md",
+   "title_ru": "Доменные и интеграционные события"
   },
   {
    "id": "use-cases-and-application-layer",
@@ -277,7 +376,9 @@
     "temporal-concepts",
     "testing-types-and-dev-cycles"
    ],
-   "words": 829
+   "words": 829,
+   "ru": "notes-ru/architecture/ddd/use-cases-and-application-layer.md",
+   "title_ru": "Сценарии использования и прикладной слой"
   },
   {
    "id": "value-objects-and-entities",
@@ -304,7 +405,9 @@
     "spring-mvc-validation-and-uploads",
     "time-money-and-ids"
    ],
-   "words": 879
+   "words": 879,
+   "ru": "notes-ru/architecture/ddd/value-objects-and-entities.md",
+   "title_ru": "Объекты-значения и сущности"
   },
   {
    "id": "dead-letter-queues-and-retries",
@@ -332,7 +435,9 @@
     "slo-sli-and-alerting",
     "spring-kafka-consumer"
    ],
-   "words": 956
+   "words": 956,
+   "ru": "notes-ru/architecture/messaging/dead-letter-queues-and-retries.md",
+   "title_ru": "Очереди недоставленных сообщений, retry-топики и ядовитые сообщения"
   },
   {
    "id": "idempotency",
@@ -359,7 +464,9 @@
     "spring-kafka-consumer",
     "spring-transactional"
    ],
-   "words": 805
+   "words": 805,
+   "ru": "notes-ru/architecture/messaging/idempotency.md",
+   "title_ru": "Идемпотентные потребители и API"
   },
   {
    "id": "message-schema-evolution",
@@ -385,7 +492,9 @@
     "kafka-producer",
     "outbox-pattern"
    ],
-   "words": 957
+   "words": 957,
+   "ru": "notes-ru/architecture/messaging/message-schema-evolution.md",
+   "title_ru": "Эволюция схем сообщений — JSON, Avro, Protobuf и schema registry"
   },
   {
    "id": "outbox-pattern",
@@ -410,7 +519,9 @@
     "saga",
     "spring-transactional"
    ],
-   "words": 826
+   "words": 826,
+   "ru": "notes-ru/architecture/messaging/outbox-pattern.md",
+   "title_ru": "Паттерн transactional outbox"
   },
   {
    "id": "api-gateway-and-service-discovery",
@@ -443,7 +554,9 @@
     "spring-security-basics",
     "system-design-basics"
    ],
-   "words": 833
+   "words": 833,
+   "ru": "notes-ru/architecture/microservices/api-gateway-and-service-discovery.md",
+   "title_ru": "API gateway, обнаружение сервисов и сервер конфигурации"
   },
   {
    "id": "bff-and-api-composition",
@@ -474,7 +587,9 @@
     "spring-reactive-webclient-sse",
     "virtual-threads"
    ],
-   "words": 933
+   "words": 933,
+   "ru": "notes-ru/architecture/microservices/bff-and-api-composition.md",
+   "title_ru": "Backend for frontend и композиция API"
   },
   {
    "id": "circuit-breaker",
@@ -501,7 +616,9 @@
     "system-design-basics",
     "virtual-threads"
    ],
-   "words": 827
+   "words": 827,
+   "ru": "notes-ru/architecture/microservices/circuit-breaker.md",
+   "title_ru": "Circuit breaker, retry, bulkhead — Resilience4j в Spring Boot"
   },
   {
    "id": "cqrs",
@@ -533,7 +650,9 @@
     "spring-transactional",
     "use-cases-and-application-layer"
    ],
-   "words": 928
+   "words": 928,
+   "ru": "notes-ru/architecture/microservices/cqrs.md",
+   "title_ru": "CQRS — раздельные модели чтения и записи"
   },
   {
    "id": "distributed-tracing",
@@ -557,7 +676,9 @@
     "spring-kafka-consumer",
     "system-design-basics"
    ],
-   "words": 957
+   "words": 957,
+   "ru": "notes-ru/architecture/microservices/distributed-tracing.md",
+   "title_ru": "Распределённая трассировка с OpenTelemetry в Spring Boot 3"
   },
   {
    "id": "event-driven-architecture",
@@ -595,7 +716,9 @@
     "service-communication-sync-vs-async",
     "temporal-concepts"
    ],
-   "words": 910
+   "words": 910,
+   "ru": "notes-ru/architecture/microservices/event-driven-architecture.md",
+   "title_ru": "Событийно-ориентированная архитектура"
   },
   {
    "id": "event-sourcing",
@@ -622,7 +745,9 @@
     "outbox-pattern",
     "time-money-and-ids"
    ],
-   "words": 1041
+   "words": 1041,
+   "ru": "notes-ru/architecture/microservices/event-sourcing.md",
+   "title_ru": "Event sourcing"
   },
   {
    "id": "saga",
@@ -647,7 +772,9 @@
     "system-design-basics",
     "temporal-concepts"
    ],
-   "words": 798
+   "words": 798,
+   "ru": "notes-ru/architecture/microservices/saga.md",
+   "title_ru": "Паттерн «Сага» — оркестрация и хореография, компенсации"
   },
   {
    "id": "service-communication-sync-vs-async",
@@ -682,7 +809,9 @@
     "saga",
     "temporal-concepts"
    ],
-   "words": 885
+   "words": 885,
+   "ru": "notes-ru/architecture/microservices/service-communication-sync-vs-async.md",
+   "title_ru": "Взаимодействие сервисов — синхронное и асинхронное"
   },
   {
    "id": "strangler-fig-migration",
@@ -710,7 +839,9 @@
     "schema-migrations-flyway-liquibase",
     "slo-sli-and-alerting"
    ],
-   "words": 906
+   "words": 906,
+   "ru": "notes-ru/architecture/microservices/strangler-fig-migration.md",
+   "title_ru": "Миграция «фикус-душитель» — постепенная декомпозиция монолита"
   },
   {
    "id": "behavioral-patterns",
@@ -744,7 +875,9 @@
     "structural-patterns",
     "threads-basics"
    ],
-   "words": 758
+   "words": 758,
+   "ru": "notes-ru/architecture/patterns/behavioral-patterns.md",
+   "title_ru": "Поведенческие паттерны проектирования"
   },
   {
    "id": "creational-patterns",
@@ -773,7 +906,9 @@
     "spring-ioc-and-di",
     "structural-patterns"
    ],
-   "words": 680
+   "words": 680,
+   "ru": "notes-ru/architecture/patterns/creational-patterns.md",
+   "title_ru": "Порождающие паттерны проектирования"
   },
   {
    "id": "structural-patterns",
@@ -804,7 +939,9 @@
     "spring-transactional",
     "strings-and-string-pool"
    ],
-   "words": 692
+   "words": 692,
+   "ru": "notes-ru/architecture/patterns/structural-patterns.md",
+   "title_ru": "Структурные паттерны проектирования"
   },
   {
    "id": "coupling-cohesion-and-general-principles",
@@ -836,7 +973,9 @@
     "spring-aop",
     "structural-patterns"
    ],
-   "words": 932
+   "words": 932,
+   "ru": "notes-ru/architecture/principles/coupling-cohesion-and-general-principles.md",
+   "title_ru": "Связанность, связность и общие принципы проектирования"
   },
   {
    "id": "solid",
@@ -864,7 +1003,9 @@
     "structural-patterns",
     "testing-types-and-dev-cycles"
    ],
-   "words": 659
+   "words": 659,
+   "ru": "notes-ru/architecture/principles/solid.md",
+   "title_ru": "Принципы SOLID"
   },
   {
    "id": "architecture-resources",
@@ -895,7 +1036,9 @@
     "spring-resources",
     "transactions-acid-and-isolation"
    ],
-   "words": 495
+   "words": 495,
+   "ru": "notes-ru/architecture/resources/architecture-resources.md",
+   "title_ru": "Материалы по архитектуре и system design"
   },
   {
    "id": "clean-architecture",
@@ -921,7 +1064,9 @@
     "spring-boot-starters-and-autoconfiguration",
     "spring-transactional"
    ],
-   "words": 929
+   "words": 929,
+   "ru": "notes-ru/architecture/styles/clean-architecture.md",
+   "title_ru": "Чистая архитектура — кольца, правило зависимостей, сценарии использования"
   },
   {
    "id": "hexagonal-architecture",
@@ -959,7 +1104,9 @@
     "testcontainers",
     "testing-types-and-dev-cycles"
    ],
-   "words": 924
+   "words": 924,
+   "ru": "notes-ru/architecture/styles/hexagonal-architecture.md",
+   "title_ru": "Гексагональная архитектура — порты и адаптеры"
   },
   {
    "id": "layered-architecture",
@@ -989,7 +1136,9 @@
     "spring-mvc-request-lifecycle",
     "spring-transactional"
    ],
-   "words": 810
+   "words": 810,
+   "ru": "notes-ru/architecture/styles/layered-architecture.md",
+   "title_ru": "Слоистая архитектура — контроллер, сервис, репозиторий"
   },
   {
    "id": "modular-monolith",
@@ -1018,7 +1167,9 @@
     "saga",
     "testcontainers"
    ],
-   "words": 910
+   "words": 910,
+   "ru": "notes-ru/architecture/styles/modular-monolith.md",
+   "title_ru": "Модульный монолит — принудительные границы, Spring Modulith, ArchUnit"
   },
   {
    "id": "monolith-vs-microservices",
@@ -1051,7 +1202,9 @@
     "testcontainers",
     "transactions-acid-and-isolation"
    ],
-   "words": 930
+   "words": 930,
+   "ru": "notes-ru/architecture/styles/monolith-vs-microservices.md",
+   "title_ru": "Монолит vs микросервисы — компромиссы, когда делить, strangler fig"
   },
   {
    "id": "temporal-concepts",
@@ -1075,7 +1228,9 @@
     "saga",
     "system-design-basics"
    ],
-   "words": 1101
+   "words": 1101,
+   "ru": "notes-ru/architecture/workflows/temporal-concepts.md",
+   "title_ru": "Основы Temporal — workflow, activity, replay, Spring Boot"
   },
   {
    "id": "workflow-engines-vs-sagas",
@@ -1103,7 +1258,9 @@
     "temporal-concepts",
     "use-cases-and-application-layer"
    ],
-   "words": 1267
+   "words": 1267,
+   "ru": "notes-ru/architecture/workflows/workflow-engines-vs-sagas.md",
+   "title_ru": "Движки workflow vs самописные саги — Temporal, Camunda, конечные автоматы"
   },
   {
    "id": "big-o-and-complexity",
@@ -1136,7 +1293,9 @@
     "topological-sort-and-union-find",
     "trees-and-bst"
    ],
-   "words": 948
+   "words": 948,
+   "ru": "notes-ru/computer-science/algorithms/big-o-and-complexity.md",
+   "title_ru": "Big-O и анализ сложности"
   },
   {
    "id": "binary-search-and-variants",
@@ -1158,7 +1317,9 @@
     "trees-and-bst",
     "two-pointers-and-sliding-window"
    ],
-   "words": 889
+   "words": 889,
+   "ru": "notes-ru/computer-science/algorithms/binary-search-and-variants.md",
+   "title_ru": "Бинарный поиск и его варианты"
   },
   {
    "id": "bit-manipulation",
@@ -1186,7 +1347,9 @@
     "ip-addressing-ports-nat",
     "numbers-bits-and-floating-point"
    ],
-   "words": 1001
+   "words": 1001,
+   "ru": "notes-ru/computer-science/algorithms/bit-manipulation.md",
+   "title_ru": "Битовые операции"
   },
   {
    "id": "dynamic-programming",
@@ -1212,7 +1375,9 @@
     "recursion-and-backtracking",
     "stack-vs-heap-memory"
    ],
-   "words": 964
+   "words": 964,
+   "ru": "notes-ru/computer-science/algorithms/dynamic-programming.md",
+   "title_ru": "Динамическое программирование"
   },
   {
    "id": "graph-traversal-bfs-dfs",
@@ -1243,7 +1408,9 @@
     "topological-sort-and-union-find",
     "trees-and-bst"
    ],
-   "words": 882
+   "words": 882,
+   "ru": "notes-ru/computer-science/algorithms/graph-traversal-bfs-dfs.md",
+   "title_ru": "Обход графа с помощью BFS и DFS"
   },
   {
    "id": "greedy-algorithms",
@@ -1274,7 +1441,9 @@
     "topological-sort-and-union-find",
     "two-pointers-and-sliding-window"
    ],
-   "words": 891
+   "words": 891,
+   "ru": "notes-ru/computer-science/algorithms/greedy-algorithms.md",
+   "title_ru": "Жадные алгоритмы"
   },
   {
    "id": "interview-problem-patterns",
@@ -1318,7 +1487,9 @@
     "tries",
     "two-pointers-and-sliding-window"
    ],
-   "words": 1281
+   "words": 1281,
+   "ru": "notes-ru/computer-science/algorithms/interview-problem-patterns.md",
+   "title_ru": "Шпаргалка по паттернам задач на собеседовании"
   },
   {
    "id": "prefix-sums-and-intervals",
@@ -1341,7 +1512,9 @@
     "slo-sli-and-alerting",
     "two-pointers-and-sliding-window"
    ],
-   "words": 867
+   "words": 867,
+   "ru": "notes-ru/computer-science/algorithms/prefix-sums-and-intervals.md",
+   "title_ru": "Префиксные суммы, разностные массивы и задачи на интервалы"
   },
   {
    "id": "recursion-and-backtracking",
@@ -1372,7 +1545,9 @@
     "temporal-concepts",
     "trees-and-bst"
    ],
-   "words": 827
+   "words": 827,
+   "ru": "notes-ru/computer-science/algorithms/recursion-and-backtracking.md",
+   "title_ru": "Рекурсия и перебор с возвратом"
   },
   {
    "id": "shortest-paths-dijkstra",
@@ -1398,7 +1573,9 @@
     "osi-and-tcp-ip-models",
     "topological-sort-and-union-find"
    ],
-   "words": 786
+   "words": 786,
+   "ru": "notes-ru/computer-science/algorithms/shortest-paths-dijkstra.md",
+   "title_ru": "Кратчайшие пути: Дейкстра и родственные алгоритмы"
   },
   {
    "id": "sorting-algorithms",
@@ -1426,7 +1603,9 @@
     "time-money-and-ids",
     "trees-and-bst"
    ],
-   "words": 922
+   "words": 922,
+   "ru": "notes-ru/computer-science/algorithms/sorting-algorithms.md",
+   "title_ru": "Алгоритмы сортировки и что на самом деле использует Java"
   },
   {
    "id": "stack-and-monotonic-stack",
@@ -1451,7 +1630,9 @@
     "stacks-and-queues",
     "two-pointers-and-sliding-window"
    ],
-   "words": 975
+   "words": 975,
+   "ru": "notes-ru/computer-science/algorithms/stack-and-monotonic-stack.md",
+   "title_ru": "Задачи на стек и монотонный стек"
   },
   {
    "id": "string-algorithms",
@@ -1483,7 +1664,9 @@
     "tries",
     "two-pointers-and-sliding-window"
    ],
-   "words": 924
+   "words": 924,
+   "ru": "notes-ru/computer-science/algorithms/string-algorithms.md",
+   "title_ru": "Строковые алгоритмы для собеседований и бэкенда"
   },
   {
    "id": "topological-sort-and-union-find",
@@ -1510,7 +1693,9 @@
     "spring-ioc-and-di",
     "temporal-concepts"
    ],
-   "words": 928
+   "words": 928,
+   "ru": "notes-ru/computer-science/algorithms/topological-sort-and-union-find.md",
+   "title_ru": "Топологическая сортировка и union-find"
   },
   {
    "id": "two-pointers-and-sliding-window",
@@ -1539,7 +1724,9 @@
     "stack-and-monotonic-stack",
     "string-algorithms"
    ],
-   "words": 833
+   "words": 833,
+   "ru": "notes-ru/computer-science/algorithms/two-pointers-and-sliding-window.md",
+   "title_ru": "Два указателя и скользящее окно"
   },
   {
    "id": "compilation-interpretation-jit",
@@ -1563,7 +1750,9 @@
     "jvm-memory-areas",
     "type-systems"
    ],
-   "words": 1110
+   "words": 1110,
+   "ru": "notes-ru/computer-science/computation/compilation-interpretation-jit.md",
+   "title_ru": "Компиляция, интерпретация и JIT"
   },
   {
    "id": "cpu-caches-and-cache-lines",
@@ -1594,7 +1783,9 @@
     "memory-models-and-visibility",
     "virtual-memory-and-paging"
    ],
-   "words": 1032
+   "words": 1032,
+   "ru": "notes-ru/computer-science/computation/cpu-caches-and-cache-lines.md",
+   "title_ru": "Кэши процессора, кэш-линии и ложное разделение"
   },
   {
    "id": "how-cpu-executes-code",
@@ -1626,7 +1817,9 @@
     "stack-vs-heap-memory",
     "virtual-threads"
    ],
-   "words": 977
+   "words": 977,
+   "ru": "notes-ru/computer-science/computation/how-cpu-executes-code.md",
+   "title_ru": "Как процессор выполняет код"
   },
   {
    "id": "numbers-bits-and-floating-point",
@@ -1651,7 +1844,9 @@
     "text-encodings-and-unicode",
     "time-money-and-ids"
    ],
-   "words": 950
+   "words": 950,
+   "ru": "notes-ru/computer-science/computation/numbers-bits-and-floating-point.md",
+   "title_ru": "Числа, биты и плавающая точка"
   },
   {
    "id": "text-encodings-and-unicode",
@@ -1672,7 +1867,9 @@
     "postgres-indexes",
     "strings-and-string-pool"
    ],
-   "words": 1018
+   "words": 1018,
+   "ru": "notes-ru/computer-science/computation/text-encodings-and-unicode.md",
+   "title_ru": "Кодировки текста и Unicode"
   },
   {
    "id": "actor-and-message-passing-models",
@@ -1708,7 +1905,9 @@
     "virtual-threads",
     "workflow-engines-vs-sagas"
    ],
-   "words": 1130
+   "words": 1130,
+   "ru": "notes-ru/computer-science/concurrency-theory/actor-and-message-passing-models.md",
+   "title_ru": "Модели акторов и передачи сообщений"
   },
   {
    "id": "amdahls-law-and-parallel-speedup",
@@ -1743,7 +1942,9 @@
     "syscalls-and-file-descriptors",
     "virtual-threads"
    ],
-   "words": 1087
+   "words": 1087,
+   "ru": "notes-ru/computer-science/concurrency-theory/amdahls-law-and-parallel-speedup.md",
+   "title_ru": "Закон Амдала, параллельное ускорение и закон Литтла"
   },
   {
    "id": "lock-free-and-cas",
@@ -1774,7 +1975,9 @@
     "race-conditions-and-critical-sections",
     "rate-limiting"
    ],
-   "words": 1112
+   "words": 1112,
+   "ru": "notes-ru/computer-science/concurrency-theory/lock-free-and-cas.md",
+   "title_ru": "Lock-free-программирование и сравнение с обменом (CAS)"
   },
   {
    "id": "memory-models-and-visibility",
@@ -1800,7 +2003,9 @@
     "race-conditions-and-critical-sections",
     "time-and-clocks"
    ],
-   "words": 1117
+   "words": 1117,
+   "ru": "notes-ru/computer-science/concurrency-theory/memory-models-and-visibility.md",
+   "title_ru": "Модели памяти, переупорядочивание и видимость"
   },
   {
    "id": "mutex-semaphore-monitor",
@@ -1826,7 +2031,9 @@
     "synchronization-and-monitors",
     "synchronizers"
    ],
-   "words": 1108
+   "words": 1108,
+   "ru": "notes-ru/computer-science/concurrency-theory/mutex-semaphore-monitor.md",
+   "title_ru": "Мьютекс, семафор и монитор"
   },
   {
    "id": "race-conditions-and-critical-sections",
@@ -1859,7 +2066,9 @@
     "synchronizers",
     "transactions-acid-and-isolation"
    ],
-   "words": 1065
+   "words": 1065,
+   "ru": "notes-ru/computer-science/concurrency-theory/race-conditions-and-critical-sections.md",
+   "title_ru": "Состояния гонки, гонки данных и критические секции"
   },
   {
    "id": "arrays-and-dynamic-arrays",
@@ -1892,7 +2101,9 @@
     "stacks-and-queues",
     "two-pointers-and-sliding-window"
    ],
-   "words": 820
+   "words": 820,
+   "ru": "notes-ru/computer-science/data-structures/arrays-and-dynamic-arrays.md",
+   "title_ru": "Массивы и динамические массивы"
   },
   {
    "id": "bloom-filters-and-probabilistic",
@@ -1920,7 +2131,9 @@
     "rate-limiting",
     "redis-data-structures"
    ],
-   "words": 1138
+   "words": 1138,
+   "ru": "notes-ru/computer-science/data-structures/bloom-filters-and-probabilistic.md",
+   "title_ru": "Фильтры Блума и вероятностные структуры данных"
   },
   {
    "id": "data-structures",
@@ -1945,7 +2158,9 @@
     "iterators-and-fail-fast",
     "postgres-indexes"
    ],
-   "words": 967
+   "words": 967,
+   "ru": "notes-ru/computer-science/data-structures/data-structures.md",
+   "title_ru": "Основные структуры данных и алгоритмы"
   },
   {
    "id": "graphs-representation",
@@ -1975,7 +2190,9 @@
     "topological-sort-and-union-find",
     "trees-and-bst"
    ],
-   "words": 935
+   "words": 935,
+   "ru": "notes-ru/computer-science/data-structures/graphs-representation.md",
+   "title_ru": "Представления графов"
   },
   {
    "id": "hash-tables",
@@ -2007,7 +2224,9 @@
     "sharding-strategies",
     "trees-and-bst"
    ],
-   "words": 1091
+   "words": 1091,
+   "ru": "notes-ru/computer-science/data-structures/hash-tables.md",
+   "title_ru": "Хеш-таблицы"
   },
   {
    "id": "heaps-and-priority-queues",
@@ -2035,7 +2254,9 @@
     "sorting-algorithms",
     "trees-and-bst"
    ],
-   "words": 1031
+   "words": 1031,
+   "ru": "notes-ru/computer-science/data-structures/heaps-and-priority-queues.md",
+   "title_ru": "Кучи и очереди с приоритетом"
   },
   {
    "id": "linked-lists",
@@ -2066,7 +2287,9 @@
     "recursion-and-backtracking",
     "stacks-and-queues"
    ],
-   "words": 917
+   "words": 917,
+   "ru": "notes-ru/computer-science/data-structures/linked-lists.md",
+   "title_ru": "Связные списки"
   },
   {
    "id": "lru-cache-design",
@@ -2095,7 +2318,9 @@
     "spring-cache-abstraction",
     "virtual-memory-and-paging"
    ],
-   "words": 1074
+   "words": 1074,
+   "ru": "notes-ru/computer-science/data-structures/lru-cache-design.md",
+   "title_ru": "Устройство LRU-кэша"
   },
   {
    "id": "stacks-and-queues",
@@ -2126,7 +2351,9 @@
     "stack-and-monotonic-stack",
     "stack-vs-heap-memory"
    ],
-   "words": 844
+   "words": 844,
+   "ru": "notes-ru/computer-science/data-structures/stacks-and-queues.md",
+   "title_ru": "Стеки, очереди, деки и кольцевые буферы"
   },
   {
    "id": "trees-and-bst",
@@ -2161,7 +2388,9 @@
     "stacks-and-queues",
     "tries"
    ],
-   "words": 1135
+   "words": 1135,
+   "ru": "notes-ru/computer-science/data-structures/trees-and-bst.md",
+   "title_ru": "Деревья, двоичные деревья поиска и сбалансированные деревья"
   },
   {
    "id": "tries",
@@ -2190,7 +2419,9 @@
     "string-algorithms",
     "text-encodings-and-unicode"
    ],
-   "words": 1038
+   "words": 1038,
+   "ru": "notes-ru/computer-science/data-structures/tries.md",
+   "title_ru": "Префиксные деревья (tries)"
   },
   {
    "id": "cpu-scheduling",
@@ -2214,7 +2445,9 @@
     "processes-and-threads",
     "virtual-threads"
    ],
-   "words": 1040
+   "words": 1040,
+   "ru": "notes-ru/computer-science/operating-systems/cpu-scheduling.md",
+   "title_ru": "Планирование CPU: вытеснение, приоритеты и нагрузка"
   },
   {
    "id": "deadlocks-and-synchronization-primitives",
@@ -2241,7 +2474,9 @@
     "postgres-locks",
     "synchronization-and-monitors"
    ],
-   "words": 1075
+   "words": 1075,
+   "ru": "notes-ru/computer-science/operating-systems/deadlocks-and-synchronization-primitives.md",
+   "title_ru": "Взаимоблокировки и примитивы синхронизации ОС"
   },
   {
    "id": "io-models-blocking-nonblocking-epoll",
@@ -2267,7 +2502,9 @@
     "tcp-handshake-and-connection-states",
     "virtual-threads"
    ],
-   "words": 1125
+   "words": 1125,
+   "ru": "notes-ru/computer-science/operating-systems/io-models-blocking-nonblocking-epoll.md",
+   "title_ru": "Модели ввода-вывода: блокирующий, неблокирующий, мультиплексирование и асинхронный"
   },
   {
    "id": "ipc-mechanisms",
@@ -2300,7 +2537,9 @@
     "syscalls-and-file-descriptors",
     "tcp-vs-udp"
    ],
-   "words": 1047
+   "words": 1047,
+   "ru": "notes-ru/computer-science/operating-systems/ipc-mechanisms.md",
+   "title_ru": "Механизмы межпроцессного взаимодействия"
   },
   {
    "id": "processes-and-threads",
@@ -2330,7 +2569,9 @@
     "virtual-memory-and-paging",
     "virtual-threads"
    ],
-   "words": 982
+   "words": 982,
+   "ru": "notes-ru/computer-science/operating-systems/processes-and-threads.md",
+   "title_ru": "Процессы и потоки с точки зрения ОС"
   },
   {
    "id": "signals-and-process-lifecycle",
@@ -2357,7 +2598,9 @@
     "threads-basics",
     "virtual-memory-and-paging"
    ],
-   "words": 1142
+   "words": 1142,
+   "ru": "notes-ru/computer-science/operating-systems/signals-and-process-lifecycle.md",
+   "title_ru": "Сигналы и жизненный цикл процесса"
   },
   {
    "id": "stack-vs-heap-memory",
@@ -2384,7 +2627,9 @@
     "virtual-memory-and-paging",
     "virtual-threads"
    ],
-   "words": 970
+   "words": 970,
+   "ru": "notes-ru/computer-science/operating-systems/stack-vs-heap-memory.md",
+   "title_ru": "Стек и куча"
   },
   {
    "id": "syscalls-and-file-descriptors",
@@ -2410,7 +2655,9 @@
     "synchronization-and-monitors",
     "virtual-memory-and-paging"
    ],
-   "words": 1017
+   "words": 1017,
+   "ru": "notes-ru/computer-science/operating-systems/syscalls-and-file-descriptors.md",
+   "title_ru": "Системные вызовы и файловые дескрипторы"
   },
   {
    "id": "virtual-memory-and-paging",
@@ -2435,7 +2682,9 @@
     "linux-processes",
     "stack-vs-heap-memory"
    ],
-   "words": 1033
+   "words": 1033,
+   "ru": "notes-ru/computer-science/operating-systems/virtual-memory-and-paging.md",
+   "title_ru": "Виртуальная память и страничная организация"
   },
   {
    "id": "error-handling-strategies",
@@ -2472,7 +2721,9 @@
     "type-systems",
     "value-objects-and-entities"
    ],
-   "words": 1076
+   "words": 1076,
+   "ru": "notes-ru/computer-science/programming/error-handling-strategies.md",
+   "title_ru": "Стратегии обработки ошибок"
   },
   {
    "id": "immutability-and-side-effects",
@@ -2510,7 +2761,9 @@
     "testing-async-and-kafka-flows",
     "use-cases-and-application-layer"
    ],
-   "words": 958
+   "words": 958,
+   "ru": "notes-ru/computer-science/programming/immutability-and-side-effects.md",
+   "title_ru": "Неизменяемость и побочные эффекты"
   },
   {
    "id": "programming-paradigms",
@@ -2543,7 +2796,9 @@
     "stream-api",
     "type-systems"
    ],
-   "words": 980
+   "words": 980,
+   "ru": "notes-ru/computer-science/programming/programming-paradigms.md",
+   "title_ru": "Парадигмы программирования"
   },
   {
    "id": "type-systems",
@@ -2569,7 +2824,9 @@
     "programming-paradigms",
     "value-objects-and-entities"
    ],
-   "words": 1048
+   "words": 1048,
+   "ru": "notes-ru/computer-science/programming/type-systems.md",
+   "title_ru": "Системы типов"
   },
   {
    "id": "hashing-vs-encryption",
@@ -2597,7 +2854,9 @@
     "spring-security-basics",
     "symmetric-and-asymmetric-crypto"
    ],
-   "words": 1011
+   "words": 1011,
+   "ru": "notes-ru/computer-science/security-basics/hashing-vs-encryption.md",
+   "title_ru": "Хеширование и шифрование"
   },
   {
    "id": "owasp-top-10-for-backend",
@@ -2629,7 +2888,9 @@
     "spring-security-basics",
     "symmetric-and-asymmetric-crypto"
    ],
-   "words": 1258
+   "words": 1258,
+   "ru": "notes-ru/computer-science/security-basics/owasp-top-10-for-backend.md",
+   "title_ru": "OWASP Top 10 для бэкенд-разработчиков"
   },
   {
    "id": "secrets-management",
@@ -2657,7 +2918,9 @@
     "symmetric-and-asymmetric-crypto",
     "testcontainers"
    ],
-   "words": 1040
+   "words": 1040,
+   "ru": "notes-ru/computer-science/security-basics/secrets-management.md",
+   "title_ru": "Управление секретами"
   },
   {
    "id": "symmetric-and-asymmetric-crypto",
@@ -2682,7 +2945,9 @@
     "secrets-management",
     "tls-handshake-and-certificates"
    ],
-   "words": 1135
+   "words": 1135,
+   "ru": "notes-ru/computer-science/security-basics/symmetric-and-asymmetric-crypto.md",
+   "title_ru": "Симметричная и асимметричная криптография"
   },
   {
    "id": "data-modeling-for-services",
@@ -2717,7 +2982,9 @@
     "sharding-strategies",
     "time-money-and-ids"
    ],
-   "words": 1085
+   "words": 1085,
+   "ru": "notes-ru/databases/design/data-modeling-for-services.md",
+   "title_ru": "Моделирование данных для сервисов: владение, агрегаты, мягкое удаление, аудит"
   },
   {
    "id": "multi-tenancy-strategies",
@@ -2743,7 +3010,9 @@
     "rate-limiting",
     "sharding-strategies"
    ],
-   "words": 1146
+   "words": 1146,
+   "ru": "notes-ru/databases/design/multi-tenancy-strategies.md",
+   "title_ru": "Стратегии мультиарендности: общая схема, схема на арендатора, база на арендатора"
   },
   {
    "id": "schema-migrations-flyway-liquibase",
@@ -2768,7 +3037,9 @@
     "postgres-locks",
     "testcontainers"
    ],
-   "words": 1174
+   "words": 1174,
+   "ru": "notes-ru/databases/design/schema-migrations-flyway-liquibase.md",
+   "title_ru": "Миграции схемы с Flyway и Liquibase и изменения без простоя"
   },
   {
    "id": "time-money-and-ids",
@@ -2796,7 +3067,9 @@
     "time-and-clocks",
     "value-objects-and-entities"
    ],
-   "words": 1081
+   "words": 1081,
+   "ru": "notes-ru/databases/design/time-money-and-ids.md",
+   "title_ru": "Как правильно хранить время, деньги и идентификаторы"
   },
   {
    "id": "constraints-and-relationships",
@@ -2817,7 +3090,9 @@
     "jpa-entities-and-relationships",
     "normalization-and-denormalization"
    ],
-   "words": 1047
+   "words": 1047,
+   "ru": "notes-ru/databases/fundamentals/constraints-and-relationships.md",
+   "title_ru": "Ограничения и связи между таблицами"
   },
   {
    "id": "database-fundamentals",
@@ -2844,7 +3119,9 @@
     "sql-joins-and-commands",
     "transactions-acid-and-isolation"
    ],
-   "words": 999
+   "words": 999,
+   "ru": "notes-ru/databases/fundamentals/database-fundamentals.md",
+   "title_ru": "Базы данных, СУБД, реляционные и NoSQL, представления"
   },
   {
    "id": "database-indexes",
@@ -2865,7 +3142,9 @@
     "postgres-indexes",
     "sql-joins-and-commands"
    ],
-   "words": 1004
+   "words": 1004,
+   "ru": "notes-ru/databases/fundamentals/database-indexes.md",
+   "title_ru": "Индексы в базах данных: как они работают и когда вредят"
   },
   {
    "id": "normalization-and-denormalization",
@@ -2888,7 +3167,9 @@
     "spring-data-repositories",
     "spring-transactional"
    ],
-   "words": 765
+   "words": 765,
+   "ru": "notes-ru/databases/fundamentals/normalization-and-denormalization.md",
+   "title_ru": "Нормальные формы и денормализация"
   },
   {
    "id": "query-planning-and-execution",
@@ -2912,7 +3193,9 @@
     "postgres-vacuum-and-bloat",
     "sql-joins-and-commands"
    ],
-   "words": 1115
+   "words": 1115,
+   "ru": "notes-ru/databases/fundamentals/query-planning-and-execution.md",
+   "title_ru": "Планирование и выполнение запроса: от текста SQL до строк"
   },
   {
    "id": "sql-joins-and-commands",
@@ -2936,7 +3219,9 @@
     "spring-transactional",
     "transactions-acid-and-isolation"
    ],
-   "words": 854
+   "words": 854,
+   "ru": "notes-ru/databases/fundamentals/sql-joins-and-commands.md",
+   "title_ru": "Категории команд SQL и типы join"
   },
   {
    "id": "sql-vs-nosql-choosing",
@@ -2973,7 +3258,9 @@
     "storage-choices",
     "transactions-acid-and-isolation"
    ],
-   "words": 880
+   "words": 880,
+   "ru": "notes-ru/databases/fundamentals/sql-vs-nosql-choosing.md",
+   "title_ru": "SQL или NoSQL: как выбрать базу данных для сервиса"
   },
   {
    "id": "transactions-acid-and-isolation",
@@ -2998,7 +3285,9 @@
     "spring-transactional",
     "sql-joins-and-commands"
    ],
-   "words": 985
+   "words": 985,
+   "ru": "notes-ru/databases/fundamentals/transactions-acid-and-isolation.md",
+   "title_ru": "Транзакции, ACID и аномалии изоляции"
   },
   {
    "id": "column-and-wide-column-stores",
@@ -3029,7 +3318,9 @@
     "storage-choices",
     "time-and-clocks"
    ],
-   "words": 1118
+   "words": 1118,
+   "ru": "notes-ru/databases/nosql/column-and-wide-column-stores.md",
+   "title_ru": "Колоночные и wide-column хранилища: Cassandra и ClickHouse"
   },
   {
    "id": "elasticsearch-basics",
@@ -3053,7 +3344,9 @@
     "quorums-and-leader-election",
     "search-and-indexing-services"
    ],
-   "words": 1027
+   "words": 1027,
+   "ru": "notes-ru/databases/nosql/elasticsearch-basics.md",
+   "title_ru": "Основы Elasticsearch: инвертированный индекс, маппинги, когда применять"
   },
   {
    "id": "mongodb-basics",
@@ -3082,7 +3375,9 @@
     "sql-vs-nosql-choosing",
     "time-money-and-ids"
    ],
-   "words": 1047
+   "words": 1047,
+   "ru": "notes-ru/databases/nosql/mongodb-basics.md",
+   "title_ru": "Основы MongoDB: документы, индексы, агрегация, транзакции"
   },
   {
    "id": "redis-data-structures",
@@ -3101,7 +3396,9 @@
     "kafka-architecture",
     "spring-cache-abstraction"
    ],
-   "words": 304
+   "words": 304,
+   "ru": "notes-ru/databases/nosql/redis-data-structures.md",
+   "title_ru": "Шпаргалка по структурам данных Redis"
   },
   {
    "id": "redis-patterns-and-persistence",
@@ -3131,7 +3428,9 @@
     "spring-cache-abstraction",
     "websockets-sse-and-long-polling"
    ],
-   "words": 1019
+   "words": 1019,
+   "ru": "notes-ru/databases/nosql/redis-patterns-and-persistence.md",
+   "title_ru": "Паттерны Redis и персистентность: кэш, блокировки, rate limit, stream"
   },
   {
    "id": "explain-analyze",
@@ -3152,7 +3451,9 @@
     "postgres-performance-checklist",
     "query-planning-and-execution"
    ],
-   "words": 1041
+   "words": 1041,
+   "ru": "notes-ru/databases/postgres/explain-analyze.md",
+   "title_ru": "Чтение планов EXPLAIN ANALYZE в Postgres"
   },
   {
    "id": "postgres-indexes",
@@ -3172,7 +3473,9 @@
     "outbox-pattern",
     "postgres-isolation-levels"
    ],
-   "words": 904
+   "words": 904,
+   "ru": "notes-ru/databases/postgres/postgres-indexes.md",
+   "title_ru": "Типы индексов в Postgres и когда их применять"
   },
   {
    "id": "postgres-isolation-levels",
@@ -3192,7 +3495,9 @@
     "postgres-indexes",
     "spring-transactional"
    ],
-   "words": 218
+   "words": 218,
+   "ru": "notes-ru/databases/postgres/postgres-isolation-levels.md",
+   "title_ru": "Уровни изоляции транзакций в Postgres"
   },
   {
    "id": "postgres-jsonb-and-full-text",
@@ -3216,7 +3521,9 @@
     "search-and-indexing-services",
     "sql-vs-nosql-choosing"
    ],
-   "words": 980
+   "words": 980,
+   "ru": "notes-ru/databases/postgres/postgres-jsonb-and-full-text.md",
+   "title_ru": "Основы jsonb и полнотекстового поиска в Postgres"
   },
   {
    "id": "postgres-locks",
@@ -3240,7 +3547,9 @@
     "race-conditions-and-critical-sections",
     "schema-migrations-flyway-liquibase"
    ],
-   "words": 1072
+   "words": 1072,
+   "ru": "notes-ru/databases/postgres/postgres-locks.md",
+   "title_ru": "Блокировки в Postgres: строки, таблицы, advisory и deadlock"
   },
   {
    "id": "postgres-partitioning",
@@ -3263,7 +3572,9 @@
     "sharding-strategies",
     "time-money-and-ids"
    ],
-   "words": 1061
+   "words": 1061,
+   "ru": "notes-ru/databases/postgres/postgres-partitioning.md",
+   "title_ru": "Декларативное партиционирование в Postgres"
   },
   {
    "id": "postgres-performance-checklist",
@@ -3294,7 +3605,9 @@
     "slo-sli-and-alerting",
     "spring-transactional"
    ],
-   "words": 886
+   "words": 886,
+   "ru": "notes-ru/databases/postgres/postgres-performance-checklist.md",
+   "title_ru": "Чек-лист производительности Postgres для Spring-сервиса"
   },
   {
    "id": "postgres-replication-and-failover",
@@ -3319,7 +3632,9 @@
     "read-replicas-and-stale-reads",
     "read-write-splitting-and-cqrs-lite"
    ],
-   "words": 990
+   "words": 990,
+   "ru": "notes-ru/databases/postgres/postgres-replication-and-failover.md",
+   "title_ru": "Потоковая репликация и механика failover в Postgres"
   },
   {
    "id": "postgres-vacuum-and-bloat",
@@ -3342,7 +3657,9 @@
     "postgres-replication-and-failover",
     "query-planning-and-execution"
    ],
-   "words": 1035
+   "words": 1035,
+   "ru": "notes-ru/databases/postgres/postgres-vacuum-and-bloat.md",
+   "title_ru": "MVCC, vacuum и раздувание в Postgres"
   },
   {
    "id": "maven",
@@ -3364,7 +3681,9 @@
     "spring-boot-starters-and-autoconfiguration",
     "testing-types-and-dev-cycles"
    ],
-   "words": 962
+   "words": 962,
+   "ru": "notes-ru/devops/build/maven.md",
+   "title_ru": "Жизненный цикл сборки Maven и управление зависимостями"
   },
   {
    "id": "docker-containers-and-resources",
@@ -3394,7 +3713,9 @@
     "linux-processes",
     "logging-stacks"
    ],
-   "words": 1058
+   "words": 1058,
+   "ru": "notes-ru/devops/docker/docker-containers-and-resources.md",
+   "title_ru": "Контейнеры Docker, ресурсы, политики перезапуска и логи"
   },
   {
    "id": "docker-fundamentals",
@@ -3417,7 +3738,9 @@
     "dockerfile-and-images",
     "linux-architecture-and-kernel"
    ],
-   "words": 978
+   "words": 978,
+   "ru": "notes-ru/devops/docker/docker-fundamentals.md",
+   "title_ru": "Основы Docker, контейнеры и виртуальные машины"
   },
   {
    "id": "docker-socket-dind-dood",
@@ -3442,7 +3765,9 @@
     "linux-memory-filesystems-io",
     "linux-networking"
    ],
-   "words": 978
+   "words": 978,
+   "ru": "notes-ru/devops/docker/docker-socket-dind-dood.md",
+   "title_ru": "docker.sock, Docker-in-Docker и Docker-out-of-Docker"
   },
   {
    "id": "docker-swarm-stack-deploy",
@@ -3465,7 +3790,9 @@
     "dockerfile-and-images",
     "logging-stacks"
    ],
-   "words": 826
+   "words": 826,
+   "ru": "notes-ru/devops/docker/docker-swarm-stack-deploy.md",
+   "title_ru": "Stack-файл Swarm: справочник по deploy и healthcheck"
   },
   {
    "id": "docker-swarm",
@@ -3491,7 +3818,9 @@
     "logging-stacks",
     "spring-boot-properties-and-profiles"
    ],
-   "words": 1181
+   "words": 1181,
+   "ru": "notes-ru/devops/docker/docker-swarm.md",
+   "title_ru": "Docker Swarm"
   },
   {
    "id": "docker-volumes-and-registry",
@@ -3515,7 +3844,9 @@
     "linux-basics",
     "linux-memory-filesystems-io"
    ],
-   "words": 963
+   "words": 963,
+   "ru": "notes-ru/devops/docker/docker-volumes-and-registry.md",
+   "title_ru": "Volumes, bind mounts и registry в Docker"
   },
   {
    "id": "dockerfile-and-images",
@@ -3540,7 +3871,9 @@
     "maven",
     "spring-boot-starters-and-autoconfiguration"
    ],
-   "words": 1012
+   "words": 1012,
+   "ru": "notes-ru/devops/docker/dockerfile-and-images.md",
+   "title_ru": "Dockerfile, multi-stage сборки, слои и кеш"
   },
   {
    "id": "git-commands",
@@ -3561,7 +3894,9 @@
     "linux-commands",
     "maven"
    ],
-   "words": 1147
+   "words": 1147,
+   "ru": "notes-ru/devops/git/git-commands.md",
+   "title_ru": "Команды и рабочие процессы Git"
   },
   {
    "id": "kubernetes-basics",
@@ -3590,7 +3925,9 @@
     "jvm-memory-areas",
     "spring-boot-properties-and-profiles"
    ],
-   "words": 1165
+   "words": 1165,
+   "ru": "notes-ru/devops/kubernetes/kubernetes-basics.md",
+   "title_ru": "Основы Kubernetes для Spring Boot сервиса"
   },
   {
    "id": "linux-architecture-and-kernel",
@@ -3617,7 +3954,9 @@
     "linux-memory-filesystems-io",
     "linux-processes"
    ],
-   "words": 891
+   "words": 891,
+   "ru": "notes-ru/devops/linux/linux-architecture-and-kernel.md",
+   "title_ru": "Архитектура Linux, пространство ядра и пространство пользователя"
   },
   {
    "id": "linux-basics",
@@ -3640,7 +3979,9 @@
     "linux-memory-filesystems-io",
     "linux-processes"
    ],
-   "words": 626
+   "words": 626,
+   "ru": "notes-ru/devops/linux/linux-basics.md",
+   "title_ru": "Основы Linux для backend-разработчика"
   },
   {
    "id": "linux-commands",
@@ -3664,7 +4005,9 @@
     "linux-networking",
     "linux-processes"
    ],
-   "words": 944
+   "words": 944,
+   "ru": "notes-ru/devops/linux/linux-commands.md",
+   "title_ru": "Команды Linux и скрипты на shell"
   },
   {
    "id": "linux-memory-filesystems-io",
@@ -3692,7 +4035,9 @@
     "linux-commands",
     "linux-processes"
    ],
-   "words": 1007
+   "words": 1007,
+   "ru": "notes-ru/devops/linux/linux-memory-filesystems-io.md",
+   "title_ru": "Память, файловые системы и ввод-вывод в Linux"
   },
   {
    "id": "linux-networking",
@@ -3719,7 +4064,9 @@
     "rest-and-http",
     "rest-clients"
    ],
-   "words": 911
+   "words": 911,
+   "ru": "notes-ru/devops/linux/linux-networking.md",
+   "title_ru": "Сетевой стек Linux"
   },
   {
    "id": "linux-processes",
@@ -3744,7 +4091,9 @@
     "threads-basics",
     "virtual-threads"
    ],
-   "words": 872
+   "words": 872,
+   "ru": "notes-ru/devops/linux/linux-processes.md",
+   "title_ru": "Процессы, сигналы и systemd в Linux"
   },
   {
    "id": "error-tracking-with-sentry",
@@ -3772,7 +4121,9 @@
     "slo-sli-and-alerting",
     "spring-kafka-consumer"
    ],
-   "words": 1022
+   "words": 1022,
+   "ru": "notes-ru/devops/observability/error-tracking-with-sentry.md",
+   "title_ru": "Отслеживание ошибок с Sentry — события, issues, сэмплирование, self-hosting"
   },
   {
    "id": "grafana-dashboards-and-red-use",
@@ -3804,7 +4155,9 @@
     "outbox-pattern",
     "slo-sli-and-alerting"
    ],
-   "words": 1061
+   "words": 1061,
+   "ru": "notes-ru/devops/observability/grafana-dashboards-and-red-use.md",
+   "title_ru": "Дашборды Grafana — методы RED и USE для сервиса"
   },
   {
    "id": "logging-stacks",
@@ -3827,7 +4180,9 @@
     "kafka-architecture",
     "spring-boot-properties-and-profiles"
    ],
-   "words": 1171
+   "words": 1171,
+   "ru": "notes-ru/devops/observability/logging-stacks.md",
+   "title_ru": "Стеки логирования: Loki, ELK и EFK"
   },
   {
    "id": "observability-three-pillars",
@@ -3857,7 +4212,9 @@
     "slo-sli-and-alerting",
     "spring-boot-starters-and-autoconfiguration"
    ],
-   "words": 902
+   "words": 902,
+   "ru": "notes-ru/devops/observability/observability-three-pillars.md",
+   "title_ru": "Наблюдаемость — логи, метрики, трейсы и как они связаны"
   },
   {
    "id": "otel-metric-types",
@@ -3879,7 +4236,9 @@
     "logging-stacks",
     "spring-boot-starters-and-autoconfiguration"
    ],
-   "words": 712
+   "words": 712,
+   "ru": "notes-ru/devops/observability/otel-metric-types.md",
+   "title_ru": "Типы метрик OpenTelemetry и именование"
   },
   {
    "id": "slo-sli-and-alerting",
@@ -3909,7 +4268,9 @@
     "requirements-and-constraints",
     "sebep-incident-analysis"
    ],
-   "words": 1021
+   "words": 1021,
+   "ru": "notes-ru/devops/observability/slo-sli-and-alerting.md",
+   "title_ru": "SLO, SLI, error budget и алертинг, который не будит зря"
   },
   {
    "id": "devops-resources",
@@ -3945,7 +4306,9 @@
     "otel-metric-types",
     "spring-resources"
    ],
-   "words": 443
+   "words": 443,
+   "ru": "notes-ru/devops/resources/devops-resources.md",
+   "title_ru": "Ресурсы по DevOps, ОС и общему обучению"
   },
   {
    "id": "distributed-locks-and-fencing",
@@ -3978,7 +4341,9 @@
     "temporal-concepts",
     "time-and-clocks"
    ],
-   "words": 1046
+   "words": 1046,
+   "ru": "notes-ru/distributed-systems/consensus/distributed-locks-and-fencing.md",
+   "title_ru": "Распределённые блокировки и fencing-токены"
   },
   {
    "id": "quorums-and-leader-election",
@@ -4006,7 +4371,9 @@
     "redis-patterns-and-persistence",
     "time-and-clocks"
    ],
-   "words": 1032
+   "words": 1032,
+   "ru": "notes-ru/distributed-systems/consensus/quorums-and-leader-election.md",
+   "title_ru": "Кворумы, split brain и выбор лидера"
   },
   {
    "id": "raft-explained",
@@ -4029,7 +4396,9 @@
     "quorums-and-leader-election",
     "time-and-clocks"
    ],
-   "words": 963
+   "words": 963,
+   "ru": "notes-ru/distributed-systems/consensus/raft-explained.md",
+   "title_ru": "Консенсус Raft простыми словами"
   },
   {
    "id": "cap-and-pacelc",
@@ -4058,7 +4427,9 @@
     "quorums-and-leader-election",
     "slo-sli-and-alerting"
    ],
-   "words": 897
+   "words": 897,
+   "ru": "notes-ru/distributed-systems/fundamentals/cap-and-pacelc.md",
+   "title_ru": "CAP и PACELC — что на самом деле значат буквы"
   },
   {
    "id": "consistency-models",
@@ -4089,7 +4460,9 @@
     "time-and-clocks",
     "transactions-acid-and-isolation"
    ],
-   "words": 935
+   "words": 935,
+   "ru": "notes-ru/distributed-systems/fundamentals/consistency-models.md",
+   "title_ru": "Модели согласованности от линеаризуемой до согласованности в конечном счёте"
   },
   {
    "id": "delivery-guarantees",
@@ -4117,7 +4490,9 @@
     "postgres-indexes",
     "spring-kafka-consumer"
    ],
-   "words": 962
+   "words": 962,
+   "ru": "notes-ru/distributed-systems/fundamentals/delivery-guarantees.md",
+   "title_ru": "Гарантии доставки: от at-most-once до exactly-once"
   },
   {
    "id": "failure-modes-and-timeouts",
@@ -4152,7 +4527,9 @@
     "spring-kafka-consumer",
     "tcp-handshake-and-connection-states"
    ],
-   "words": 988
+   "words": 988,
+   "ru": "notes-ru/distributed-systems/fundamentals/failure-modes-and-timeouts.md",
+   "title_ru": "Виды отказов и почему таймаут — единственный детектор"
   },
   {
    "id": "time-and-clocks",
@@ -4180,7 +4557,9 @@
     "testing-async-and-kafka-flows",
     "time-money-and-ids"
    ],
-   "words": 880
+   "words": 880,
+   "ru": "notes-ru/distributed-systems/fundamentals/time-and-clocks.md",
+   "title_ru": "Время и часы в распределённых системах"
   },
   {
    "id": "consistent-hashing",
@@ -4207,7 +4586,9 @@
     "redis-patterns-and-persistence",
     "sharding-strategies"
    ],
-   "words": 1055
+   "words": 1055,
+   "ru": "notes-ru/distributed-systems/partitioning/consistent-hashing.md",
+   "title_ru": "Консистентное хеширование, кольцо и виртуальные узлы"
   },
   {
    "id": "cross-shard-queries-and-transactions",
@@ -4243,7 +4624,9 @@
     "transactions-acid-and-isolation",
     "virtual-threads"
    ],
-   "words": 1004
+   "words": 1004,
+   "ru": "notes-ru/distributed-systems/partitioning/cross-shard-queries-and-transactions.md",
+   "title_ru": "Межшардовые запросы и транзакции, scatter-gather и 2PC"
   },
   {
    "id": "sharding-strategies",
@@ -4275,7 +4658,9 @@
     "schema-migrations-flyway-liquibase",
     "search-and-indexing-services"
    ],
-   "words": 964
+   "words": 964,
+   "ru": "notes-ru/distributed-systems/partitioning/sharding-strategies.md",
+   "title_ru": "Стратегии шардирования: по диапазону, по хешу и через справочник"
   },
   {
    "id": "backpressure-and-flow-control",
@@ -4309,7 +4694,9 @@
     "spring-reactive-webclient-sse",
     "tcp-vs-udp"
    ],
-   "words": 912
+   "words": 912,
+   "ru": "notes-ru/distributed-systems/patterns/backpressure-and-flow-control.md",
+   "title_ru": "Обратное давление и управление потоком"
   },
   {
    "id": "distributed-cache-coherence",
@@ -4340,7 +4727,9 @@
     "spring-cache-abstraction",
     "spring-transactional"
    ],
-   "words": 1047
+   "words": 1047,
+   "ru": "notes-ru/distributed-systems/patterns/distributed-cache-coherence.md",
+   "title_ru": "Согласованность распределённого кэша, инвалидация и thundering herd"
   },
   {
    "id": "exactly-once-myth",
@@ -4368,7 +4757,9 @@
     "postgres-indexes",
     "saga"
    ],
-   "words": 936
+   "words": 936,
+   "ru": "notes-ru/distributed-systems/patterns/exactly-once-myth.md",
+   "title_ru": "Миф об exactly-once и фактически однократная обработка"
   },
   {
    "id": "leases-heartbeats-and-health",
@@ -4401,7 +4792,9 @@
     "temporal-concepts",
     "time-and-clocks"
    ],
-   "words": 1056
+   "words": 1056,
+   "ru": "notes-ru/distributed-systems/patterns/leases-heartbeats-and-health.md",
+   "title_ru": "Аренды, heartbeat и проверки здоровья"
   },
   {
    "id": "leader-follower-replication",
@@ -4432,7 +4825,9 @@
     "raft-explained",
     "read-replicas-and-stale-reads"
    ],
-   "words": 951
+   "words": 951,
+   "ru": "notes-ru/distributed-systems/replication/leader-follower-replication.md",
+   "title_ru": "Репликация лидер-follower, синхронная и асинхронная, и failover"
   },
   {
    "id": "multi-leader-and-leaderless",
@@ -4459,7 +4854,9 @@
     "time-and-clocks",
     "time-money-and-ids"
    ],
-   "words": 928
+   "words": 928,
+   "ru": "notes-ru/distributed-systems/replication/multi-leader-and-leaderless.md",
+   "title_ru": "Репликация с несколькими лидерами и без лидера"
   },
   {
    "id": "read-replicas-and-stale-reads",
@@ -4494,7 +4891,9 @@
     "spring-transactional",
     "time-and-clocks"
    ],
-   "words": 910
+   "words": 910,
+   "ru": "notes-ru/distributed-systems/replication/read-replicas-and-stale-reads.md",
+   "title_ru": "Реплики для чтения и устаревшие чтения на практике"
   },
   {
    "id": "collections-framework",
@@ -4517,7 +4916,9 @@
     "hashmap-internals",
     "iterators-and-fail-fast"
    ],
-   "words": 683
+   "words": 683,
+   "ru": "notes-ru/java/collections/collections-framework.md",
+   "title_ru": "Карта Java Collections Framework"
   },
   {
    "id": "hashmap-internals",
@@ -4538,7 +4939,9 @@
     "concurrent-collections",
     "reference-types"
    ],
-   "words": 530
+   "words": 530,
+   "ru": "notes-ru/java/collections/hashmap-internals.md",
+   "title_ru": "Как устроен HashMap внутри"
   },
   {
    "id": "iterators-and-fail-fast",
@@ -4557,7 +4960,9 @@
     "collections-framework",
     "concurrent-collections"
    ],
-   "words": 359
+   "words": 359,
+   "ru": "notes-ru/java/collections/iterators-and-fail-fast.md",
+   "title_ru": "Iterator, Iterable и fail-fast против fail-safe"
   },
   {
    "id": "completable-future",
@@ -4581,7 +4986,9 @@
     "synchronizers",
     "virtual-threads"
    ],
-   "words": 797
+   "words": 797,
+   "ru": "notes-ru/java/concurrency/completable-future.md",
+   "title_ru": "Основы CompletableFuture"
   },
   {
    "id": "concurrency-hazards",
@@ -4602,7 +5009,9 @@
     "postgres-isolation-levels",
     "synchronization-and-monitors"
    ],
-   "words": 394
+   "words": 394,
+   "ru": "notes-ru/java/concurrency/concurrency-hazards.md",
+   "title_ru": "Состояние гонки, deadlock, livelock и голодание"
   },
   {
    "id": "concurrent-collections",
@@ -4621,7 +5030,9 @@
     "executors-and-thread-pools",
     "locks-and-lock-free"
    ],
-   "words": 379
+   "words": 379,
+   "ru": "notes-ru/java/concurrency/concurrent-collections.md",
+   "title_ru": "Потокобезопасные коллекции"
   },
   {
    "id": "executors-and-thread-pools",
@@ -4643,7 +5054,9 @@
     "threads-basics",
     "virtual-threads"
    ],
-   "words": 447
+   "words": 447,
+   "ru": "notes-ru/java/concurrency/executors-and-thread-pools.md",
+   "title_ru": "Пулы потоков, ExecutorService и Future"
   },
   {
    "id": "fork-join-framework",
@@ -4663,7 +5076,9 @@
     "executors-and-thread-pools",
     "virtual-threads"
    ],
-   "words": 364
+   "words": 364,
+   "ru": "notes-ru/java/concurrency/fork-join-framework.md",
+   "title_ru": "Фреймворк Fork/Join"
   },
   {
    "id": "java-memory-model",
@@ -4682,7 +5097,9 @@
     "concurrency-hazards",
     "synchronization-and-monitors"
    ],
-   "words": 560
+   "words": 560,
+   "ru": "notes-ru/java/concurrency/java-memory-model.md",
+   "title_ru": "Модель памяти Java и happens-before"
   },
   {
    "id": "locks-and-lock-free",
@@ -4703,7 +5120,9 @@
     "concurrent-collections",
     "synchronization-and-monitors"
    ],
-   "words": 429
+   "words": 429,
+   "ru": "notes-ru/java/concurrency/locks-and-lock-free.md",
+   "title_ru": "ReentrantLock, ReadWriteLock, spin lock и неблокирующие структуры"
   },
   {
    "id": "synchronization-and-monitors",
@@ -4725,7 +5144,9 @@
     "locks-and-lock-free",
     "virtual-threads"
    ],
-   "words": 520
+   "words": 520,
+   "ru": "notes-ru/java/concurrency/synchronization-and-monitors.md",
+   "title_ru": "Синхронизация, мониторы и wait/notify"
   },
   {
    "id": "synchronizers",
@@ -4743,7 +5164,9 @@
    "links": [
     "executors-and-thread-pools"
    ],
-   "words": 337
+   "words": 337,
+   "ru": "notes-ru/java/concurrency/synchronizers.md",
+   "title_ru": "CountDownLatch, CyclicBarrier и Semaphore"
   },
   {
    "id": "threads-basics",
@@ -4763,7 +5186,9 @@
     "executors-and-thread-pools",
     "virtual-threads"
    ],
-   "words": 516
+   "words": 516,
+   "ru": "notes-ru/java/concurrency/threads-basics.md",
+   "title_ru": "Потоки, процессы и Thread API"
   },
   {
    "id": "virtual-threads",
@@ -4782,30 +5207,9 @@
     "hikaricp-pool-sizing",
     "spring-kafka-consumer"
    ],
-   "words": 288
-  },
-  {
-   "id": "abstract-classes-and-interfaces-ru",
-   "sec": "java",
-   "sub": "core",
-   "title": "Абстрактные классы и интерфейсы (RU)",
-   "tags": [
-    "abstract-class",
-    "interface",
-    "default-methods",
-    "sealed",
-    "russian"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/java/core/abstract-classes-and-interfaces-ru.md",
-   "links": [
-    "abstract-classes-and-interfaces",
-    "enums",
-    "functional-interfaces",
-    "methods-overloading-overriding",
-    "oop-principles"
-   ],
-   "words": 801
+   "words": 288,
+   "ru": "notes-ru/java/concurrency/virtual-threads.md",
+   "title_ru": "Виртуальные потоки (Project Loom)"
   },
   {
    "id": "abstract-classes-and-interfaces",
@@ -4827,7 +5231,9 @@
     "methods-overloading-overriding",
     "oop-principles"
    ],
-   "words": 776
+   "words": 776,
+   "ru": "notes-ru/java/core/abstract-classes-and-interfaces.md",
+   "title_ru": "Абстрактные классы и интерфейсы"
   },
   {
    "id": "annotations",
@@ -4853,7 +5259,9 @@
     "spring-ioc-and-di",
     "spring-transactional"
    ],
-   "words": 623
+   "words": 623,
+   "ru": "notes-ru/java/core/annotations.md",
+   "title_ru": "Аннотации"
   },
   {
    "id": "casting-and-autoboxing",
@@ -4876,7 +5284,9 @@
     "oop-principles",
     "primitives-and-wrappers"
    ],
-   "words": 768
+   "words": 768,
+   "ru": "notes-ru/java/core/casting-and-autoboxing.md",
+   "title_ru": "Приведение типов, instanceof и автоупаковка"
   },
   {
    "id": "class-initialization-order",
@@ -4898,7 +5308,9 @@
     "jvm-memory-areas",
     "modifiers-final-static-access"
    ],
-   "words": 670
+   "words": 670,
+   "ru": "notes-ru/java/core/class-initialization-order.md",
+   "title_ru": "Загрузка классов и порядок инициализации"
   },
   {
    "id": "class-relationships",
@@ -4922,7 +5334,9 @@
     "spring-ioc-and-di",
     "structural-patterns"
    ],
-   "words": 597
+   "words": 597,
+   "ru": "notes-ru/java/core/class-relationships.md",
+   "title_ru": "Отношения между классами"
   },
   {
    "id": "constructors-and-initialization",
@@ -4948,7 +5362,9 @@
     "object-class-and-reflection",
     "spring-ioc-and-di"
    ],
-   "words": 680
+   "words": 680,
+   "ru": "notes-ru/java/core/constructors-and-initialization.md",
+   "title_ru": "Конструкторы и инициализация объектов"
   },
   {
    "id": "enums",
@@ -4972,7 +5388,9 @@
     "immutable-objects",
     "jpa-entities-and-relationships"
    ],
-   "words": 681
+   "words": 681,
+   "ru": "notes-ru/java/core/enums.md",
+   "title_ru": "Перечисления (enum)"
   },
   {
    "id": "equals-and-hashcode",
@@ -4997,7 +5415,9 @@
     "object-class-and-reflection",
     "strings-and-string-pool"
    ],
-   "words": 728
+   "words": 728,
+   "ru": "notes-ru/java/core/equals-and-hashcode.md",
+   "title_ru": "Контракты equals и hashCode"
   },
   {
    "id": "exceptions",
@@ -5022,7 +5442,9 @@
     "spring-transactional",
     "threads-basics"
    ],
-   "words": 859
+   "words": 859,
+   "ru": "notes-ru/java/core/exceptions.md",
+   "title_ru": "Исключения"
   },
   {
    "id": "generics",
@@ -5040,7 +5462,9 @@
    "links": [
     "collections-framework"
    ],
-   "words": 489
+   "words": 489,
+   "ru": "notes-ru/java/core/generics.md",
+   "title_ru": "Дженерики, wildcard-типы и стирание типов"
   },
   {
    "id": "immutable-objects",
@@ -5066,7 +5490,9 @@
     "primitives-and-wrappers",
     "strings-and-string-pool"
    ],
-   "words": 750
+   "words": 750,
+   "ru": "notes-ru/java/core/immutable-objects.md",
+   "title_ru": "Неизменяемые объекты"
   },
   {
    "id": "java-ee-and-jakarta",
@@ -5094,7 +5520,9 @@
     "spring-mvc-validation-and-uploads",
     "spring-transactional"
    ],
-   "words": 762
+   "words": 762,
+   "ru": "notes-ru/java/core/java-ee-and-jakarta.md",
+   "title_ru": "Java EE, Jakarta EE и как Spring использует спецификации"
   },
   {
    "id": "jvm-jre-jdk",
@@ -5118,7 +5546,9 @@
     "maven",
     "reference-types"
    ],
-   "words": 570
+   "words": 570,
+   "ru": "notes-ru/java/core/jvm-jre-jdk.md",
+   "title_ru": "JVM, JRE и JDK"
   },
   {
    "id": "methods-overloading-overriding",
@@ -5146,7 +5576,9 @@
     "oop-principles",
     "stream-api"
    ],
-   "words": 802
+   "words": 802,
+   "ru": "notes-ru/java/core/methods-overloading-overriding.md",
+   "title_ru": "Методы, сигнатуры, перегрузка и переопределение"
   },
   {
    "id": "modifiers-final-static-access",
@@ -5173,7 +5605,9 @@
     "nested-and-anonymous-classes",
     "oop-principles"
    ],
-   "words": 814
+   "words": 814,
+   "ru": "notes-ru/java/core/modifiers-final-static-access.md",
+   "title_ru": "Модификаторы доступа, final, static, this и super"
   },
   {
    "id": "nested-and-anonymous-classes",
@@ -5195,7 +5629,9 @@
     "modifiers-final-static-access",
     "structural-patterns"
    ],
-   "words": 872
+   "words": 872,
+   "ru": "notes-ru/java/core/nested-and-anonymous-classes.md",
+   "title_ru": "Вложенные, внутренние, локальные, анонимные классы и лямбды"
   },
   {
    "id": "object-class-and-reflection",
@@ -5223,7 +5659,9 @@
     "spring-ioc-and-di",
     "synchronization-and-monitors"
    ],
-   "words": 769
+   "words": 769,
+   "ru": "notes-ru/java/core/object-class-and-reflection.md",
+   "title_ru": "Класс Object, clone и рефлексия"
   },
   {
    "id": "oop-principles",
@@ -5251,7 +5689,9 @@
     "modifiers-final-static-access",
     "solid"
    ],
-   "words": 795
+   "words": 795,
+   "ru": "notes-ru/java/core/oop-principles.md",
+   "title_ru": "Принципы ООП и виды полиморфизма"
   },
   {
    "id": "primitives-and-wrappers",
@@ -5273,7 +5713,9 @@
     "stream-api",
     "strings-and-string-pool"
    ],
-   "words": 670
+   "words": 670,
+   "ru": "notes-ru/java/core/primitives-and-wrappers.md",
+   "title_ru": "Примитивные типы и классы-обёртки"
   },
   {
    "id": "strings-and-string-pool",
@@ -5298,7 +5740,9 @@
     "primitives-and-wrappers",
     "structural-patterns"
    ],
-   "words": 803
+   "words": 803,
+   "ru": "notes-ru/java/core/strings-and-string-pool.md",
+   "title_ru": "Строки, пул строк, StringBuilder и StringBuffer"
   },
   {
    "id": "java-io-streams",
@@ -5321,7 +5765,9 @@
     "structural-patterns",
     "virtual-threads"
    ],
-   "words": 663
+   "words": 663,
+   "ru": "notes-ru/java/io/java-io-streams.md",
+   "title_ru": "Потоки ввода-вывода Java IO"
   },
   {
    "id": "java-nio",
@@ -5345,7 +5791,9 @@
     "spring-reactive-webclient-sse",
     "virtual-threads"
    ],
-   "words": 757
+   "words": 757,
+   "ru": "notes-ru/java/io/java-nio.md",
+   "title_ru": "Java NIO: каналы, буферы, селекторы и NIO.2"
   },
   {
    "id": "hikaricp-pool-sizing",
@@ -5367,7 +5815,9 @@
     "spring-transactional",
     "virtual-threads"
    ],
-   "words": 806
+   "words": 806,
+   "ru": "notes-ru/java/jdbc/hikaricp-pool-sizing.md",
+   "title_ru": "Размер пула HikariCP"
   },
   {
    "id": "garbage-collection",
@@ -5391,7 +5841,9 @@
     "object-class-and-reflection",
     "reference-types"
    ],
-   "words": 1238
+   "words": 1238,
+   "ru": "notes-ru/java/jvm/garbage-collection.md",
+   "title_ru": "Сборка мусора в HotSpot"
   },
   {
    "id": "jvm-memory-areas",
@@ -5420,7 +5872,9 @@
     "strings-and-string-pool",
     "virtual-threads"
    ],
-   "words": 1039
+   "words": 1039,
+   "ru": "notes-ru/java/jvm/jvm-memory-areas.md",
+   "title_ru": "Области памяти JVM"
   },
   {
    "id": "reference-types",
@@ -5436,7 +5890,9 @@
    "learned": "2026-10-22",
    "path": "notes/java/jvm/reference-types.md",
    "links": [],
-   "words": 292
+   "words": 292,
+   "ru": "notes-ru/java/jvm/reference-types.md",
+   "title_ru": "Сильные, мягкие, слабые и фантомные ссылки"
   },
   {
    "id": "functional-interfaces",
@@ -5456,7 +5912,9 @@
     "stream-api",
     "threads-basics"
    ],
-   "words": 382
+   "words": 382,
+   "ru": "notes-ru/java/streams/functional-interfaces.md",
+   "title_ru": "Функциональные интерфейсы и лямбды"
   },
   {
    "id": "stream-api",
@@ -5476,7 +5934,9 @@
     "fork-join-framework",
     "functional-interfaces"
    ],
-   "words": 442
+   "words": 442,
+   "ru": "notes-ru/java/streams/stream-api.md",
+   "title_ru": "Stream API, параллельные стримы и gatherers"
   },
   {
    "id": "kafka-architecture",
@@ -5499,7 +5959,9 @@
     "rabbitmq-basics",
     "spring-kafka-consumer"
    ],
-   "words": 1362
+   "words": 1362,
+   "ru": "notes-ru/messaging/kafka/kafka-architecture.md",
+   "title_ru": "Архитектура Kafka — брокеры, топики, партиции, сегменты"
   },
   {
    "id": "kafka-consumer",
@@ -5522,7 +5984,9 @@
     "rabbitmq-basics",
     "spring-kafka-consumer"
    ],
-   "words": 1271
+   "words": 1271,
+   "ru": "notes-ru/messaging/kafka/kafka-consumer.md",
+   "title_ru": "Kafka consumer — группы, ребалансировка, offsets, lag"
   },
   {
    "id": "kafka-producer",
@@ -5544,7 +6008,9 @@
     "outbox-pattern",
     "spring-kafka-consumer"
    ],
-   "words": 1211
+   "words": 1211,
+   "ru": "notes-ru/messaging/kafka/kafka-producer.md",
+   "title_ru": "Kafka producer — партиционирование, acks, идемпотентность, транзакции"
   },
   {
    "id": "activemq-basics",
@@ -5567,7 +6033,9 @@
     "rabbitmq-basics",
     "spring-kafka-consumer"
    ],
-   "words": 1121
+   "words": 1121,
+   "ru": "notes-ru/messaging/rabbitmq/activemq-basics.md",
+   "title_ru": "Основы ActiveMQ — модель JMS, Classic и Artemis"
   },
   {
    "id": "rabbitmq-basics",
@@ -5589,7 +6057,9 @@
     "kafka-consumer",
     "outbox-pattern"
    ],
-   "words": 1554
+   "words": 1554,
+   "ru": "notes-ru/messaging/rabbitmq/rabbitmq-basics.md",
+   "title_ru": "Основы RabbitMQ — модель AMQP, exchange, очереди, ack"
   },
   {
    "id": "dns-resolution",
@@ -5617,7 +6087,9 @@
     "sockets-and-connection-pooling",
     "tcp-vs-udp"
    ],
-   "words": 1035
+   "words": 1035,
+   "ru": "notes-ru/networking/dns-and-routing/dns-resolution.md",
+   "title_ru": "Разрешение имён в DNS"
   },
   {
    "id": "load-balancers-l4-vs-l7",
@@ -5648,7 +6120,9 @@
     "tcp-handshake-and-connection-states",
     "websockets-sse-and-long-polling"
    ],
-   "words": 1111
+   "words": 1111,
+   "ru": "notes-ru/networking/dns-and-routing/load-balancers-l4-vs-l7.md",
+   "title_ru": "Балансировщики нагрузки, L4 и L7"
   },
   {
    "id": "reverse-proxy-nginx-basics",
@@ -5678,7 +6152,9 @@
     "tls-handshake-and-certificates",
     "websockets-sse-and-long-polling"
    ],
-   "words": 1123
+   "words": 1123,
+   "ru": "notes-ru/networking/dns-and-routing/reverse-proxy-nginx-basics.md",
+   "title_ru": "Основы обратного прокси на nginx"
   },
   {
    "id": "ip-addressing-ports-nat",
@@ -5704,7 +6180,9 @@
     "sockets-and-connection-pooling",
     "tcp-handshake-and-connection-states"
    ],
-   "words": 983
+   "words": 983,
+   "ru": "notes-ru/networking/fundamentals/ip-addressing-ports-nat.md",
+   "title_ru": "IP-адресация, порты и NAT"
   },
   {
    "id": "osi-and-tcp-ip-models",
@@ -5733,7 +6211,9 @@
     "tcp-vs-udp",
     "tls-handshake-and-certificates"
    ],
-   "words": 915
+   "words": 915,
+   "ru": "notes-ru/networking/fundamentals/osi-and-tcp-ip-models.md",
+   "title_ru": "Модели OSI и TCP/IP на реальных примерах"
   },
   {
    "id": "sockets-and-connection-pooling",
@@ -5763,7 +6243,9 @@
     "tcp-vs-udp",
     "virtual-threads"
    ],
-   "words": 983
+   "words": 983,
+   "ru": "notes-ru/networking/fundamentals/sockets-and-connection-pooling.md",
+   "title_ru": "Сокеты и пулы соединений"
   },
   {
    "id": "tcp-handshake-and-connection-states",
@@ -5788,7 +6270,9 @@
     "tcp-vs-udp",
     "tls-handshake-and-certificates"
    ],
-   "words": 1000
+   "words": 1000,
+   "ru": "notes-ru/networking/fundamentals/tcp-handshake-and-connection-states.md",
+   "title_ru": "Рукопожатие TCP и состояния соединения"
   },
   {
    "id": "tcp-vs-udp",
@@ -5813,7 +6297,9 @@
     "sockets-and-connection-pooling",
     "tcp-handshake-and-connection-states"
    ],
-   "words": 948
+   "words": 948,
+   "ru": "notes-ru/networking/fundamentals/tcp-vs-udp.md",
+   "title_ru": "TCP и UDP"
   },
   {
    "id": "cookies-sessions-and-cors",
@@ -5839,7 +6325,9 @@
     "rest-and-http",
     "spring-security-basics"
    ],
-   "words": 1019
+   "words": 1019,
+   "ru": "notes-ru/networking/http/cookies-sessions-and-cors.md",
+   "title_ru": "Cookies, сессии, политика одного источника и CORS"
   },
   {
    "id": "grpc-and-protobuf",
@@ -5870,7 +6358,9 @@
     "service-communication-sync-vs-async",
     "websockets-sse-and-long-polling"
    ],
-   "words": 962
+   "words": 962,
+   "ru": "notes-ru/networking/http/grpc-and-protobuf.md",
+   "title_ru": "gRPC и Protocol Buffers"
   },
   {
    "id": "http-1-1-vs-2-vs-3",
@@ -5896,7 +6386,9 @@
     "tcp-vs-udp",
     "tls-handshake-and-certificates"
    ],
-   "words": 999
+   "words": 999,
+   "ru": "notes-ru/networking/http/http-1-1-vs-2-vs-3.md",
+   "title_ru": "HTTP/1.1, HTTP/2 и HTTP/3"
   },
   {
    "id": "http-caching",
@@ -5920,7 +6412,9 @@
     "jpa-locking",
     "reverse-proxy-nginx-basics"
    ],
-   "words": 920
+   "words": 920,
+   "ru": "notes-ru/networking/http/http-caching.md",
+   "title_ru": "HTTP-кеширование"
   },
   {
    "id": "http-fundamentals",
@@ -5948,7 +6442,9 @@
     "spring-mvc-request-lifecycle",
     "tls-handshake-and-certificates"
    ],
-   "words": 917
+   "words": 917,
+   "ru": "notes-ru/networking/http/http-fundamentals.md",
+   "title_ru": "Основы HTTP"
   },
   {
    "id": "websockets-sse-and-long-polling",
@@ -5974,7 +6470,9 @@
     "tcp-handshake-and-connection-states",
     "virtual-threads"
    ],
-   "words": 1033
+   "words": 1033,
+   "ru": "notes-ru/networking/http/websockets-sse-and-long-polling.md",
+   "title_ru": "WebSocket, SSE и long polling"
   },
   {
    "id": "api-security-checklist",
@@ -6008,7 +6506,9 @@
     "spring-mvc-validation-and-uploads",
     "tls-handshake-and-certificates"
    ],
-   "words": 1050
+   "words": 1050,
+   "ru": "notes-ru/networking/security/api-security-checklist.md",
+   "title_ru": "Чек-лист безопасности API"
   },
   {
    "id": "authentication-vs-authorization",
@@ -6032,7 +6532,9 @@
     "owasp-top-10-for-backend",
     "spring-security-basics"
    ],
-   "words": 1087
+   "words": 1087,
+   "ru": "notes-ru/networking/security/authentication-vs-authorization.md",
+   "title_ru": "Аутентификация и авторизация, токены и потоки OAuth2/OIDC"
   },
   {
    "id": "mtls-and-service-to-service-auth",
@@ -6058,7 +6560,9 @@
     "spring-security-basics",
     "tls-handshake-and-certificates"
    ],
-   "words": 1011
+   "words": 1011,
+   "ru": "notes-ru/networking/security/mtls-and-service-to-service-auth.md",
+   "title_ru": "mTLS и аутентификация между сервисами"
   },
   {
    "id": "tls-handshake-and-certificates",
@@ -6080,7 +6584,9 @@
     "spring-boot-properties-and-profiles",
     "symmetric-and-asymmetric-crypto"
    ],
-   "words": 1278
+   "words": 1278,
+   "ru": "notes-ru/networking/security/tls-handshake-and-certificates.md",
+   "title_ru": "Рукопожатие TLS и сертификаты"
   },
   {
    "id": "network-debugging-toolkit",
@@ -6109,7 +6615,9 @@
     "tcp-handshake-and-connection-states",
     "tls-handshake-and-certificates"
    ],
-   "words": 988
+   "words": 988,
+   "ru": "notes-ru/networking/tools/network-debugging-toolkit.md",
+   "title_ru": "Набор инструментов для сетевой отладки"
   },
   {
    "id": "emv-card-processing",
@@ -6135,7 +6643,9 @@
     "spring-transactional",
     "testing-types-and-dev-cycles"
    ],
-   "words": 986
+   "words": 986,
+   "ru": "notes-ru/projects/stories/emv-card-processing.md",
+   "title_ru": "История проекта — обработка и персонализация EMV-карт в MDigital"
   },
   {
    "id": "esim-provisioning-platform",
@@ -6168,7 +6678,9 @@
     "temporal-concepts",
     "testcontainers"
    ],
-   "words": 987
+   "words": 987,
+   "ru": "notes-ru/projects/stories/esim-provisioning-platform.md",
+   "title_ru": "История проекта — платформа выдачи eSIM в Beeline"
   },
   {
    "id": "sebep-incident-analysis",
@@ -6196,7 +6708,9 @@
     "rest-and-http",
     "spring-security-basics"
    ],
-   "words": 1011
+   "words": 1011,
+   "ru": "notes-ru/projects/stories/sebep-incident-analysis.md",
+   "title_ru": "История проекта — Себеп, анализ инцидентов с помощью ИИ"
   },
   {
    "id": "spring-boot-properties-and-profiles",
@@ -6221,7 +6735,9 @@
     "spring-ioc-and-di",
     "virtual-threads"
    ],
-   "words": 667
+   "words": 667,
+   "ru": "notes-ru/spring/boot/spring-boot-properties-and-profiles.md",
+   "title_ru": "Свойства, профили и настройка встроенного сервера"
   },
   {
    "id": "spring-boot-starters-and-autoconfiguration",
@@ -6244,7 +6760,9 @@
     "spring-boot-properties-and-profiles",
     "spring-ioc-and-di"
    ],
-   "words": 695
+   "words": 695,
+   "ru": "notes-ru/spring/boot/spring-boot-starters-and-autoconfiguration.md",
+   "title_ru": "Spring Boot: стартеры, автоконфигурация и @SpringBootApplication"
   },
   {
    "id": "spring-aop",
@@ -6265,7 +6783,9 @@
     "spring-transactional",
     "structural-patterns"
    ],
-   "words": 603
+   "words": 603,
+   "ru": "notes-ru/spring/core/spring-aop.md",
+   "title_ru": "Spring AOP: аспекты, прокси и их ограничения"
   },
   {
    "id": "spring-bean-lifecycle",
@@ -6287,7 +6807,9 @@
     "spring-boot-starters-and-autoconfiguration",
     "spring-ioc-and-di"
    ],
-   "words": 600
+   "words": 600,
+   "ru": "notes-ru/spring/core/spring-bean-lifecycle.md",
+   "title_ru": "Жизненный цикл бина и запуск контекста"
   },
   {
    "id": "spring-bean-scopes-and-configuration",
@@ -6310,7 +6832,9 @@
     "spring-ioc-and-di",
     "spring-mvc-request-lifecycle"
    ],
-   "words": 651
+   "words": 651,
+   "ru": "notes-ru/spring/core/spring-bean-scopes-and-configuration.md",
+   "title_ru": "Области видимости бинов и способы их конфигурации"
   },
   {
    "id": "spring-ioc-and-di",
@@ -6334,7 +6858,9 @@
     "spring-boot-starters-and-autoconfiguration",
     "spring-transactional"
    ],
-   "words": 663
+   "words": 663,
+   "ru": "notes-ru/spring/core/spring-ioc-and-di.md",
+   "title_ru": "IoC-контейнер и внедрение зависимостей в Spring"
   },
   {
    "id": "hibernate-caching",
@@ -6356,7 +6882,9 @@
     "redis-data-structures",
     "spring-cache-abstraction"
    ],
-   "words": 784
+   "words": 784,
+   "ru": "notes-ru/spring/data/hibernate-caching.md",
+   "title_ru": "Кэш первого и второго уровня и кэш запросов в Hibernate"
   },
   {
    "id": "jpa-entities-and-relationships",
@@ -6381,7 +6909,9 @@
     "spring-ioc-and-di",
     "spring-transactional"
    ],
-   "words": 846
+   "words": 846,
+   "ru": "notes-ru/spring/data/jpa-entities-and-relationships.md",
+   "title_ru": "Сущности JPA и отображение связей"
   },
   {
    "id": "jpa-locking",
@@ -6405,7 +6935,9 @@
     "spring-transactional",
     "transactions-acid-and-isolation"
    ],
-   "words": 862
+   "words": 862,
+   "ru": "notes-ru/spring/data/jpa-locking.md",
+   "title_ru": "Оптимистическая и пессимистическая блокировка в JPA"
   },
   {
    "id": "jpa-n-plus-one",
@@ -6427,7 +6959,9 @@
     "logging-stacks",
     "sql-joins-and-commands"
    ],
-   "words": 827
+   "words": 827,
+   "ru": "notes-ru/spring/data/jpa-n-plus-one.md",
+   "title_ru": "Проблема N+1 запросов и как её исправить"
   },
   {
    "id": "jpa-persistence-context-and-entity-lifecycle",
@@ -6452,7 +6986,9 @@
     "spring-transactional",
     "transactions-acid-and-isolation"
    ],
-   "words": 913
+   "words": 913,
+   "ru": "notes-ru/spring/data/jpa-persistence-context-and-entity-lifecycle.md",
+   "title_ru": "Контекст персистентности, жизненный цикл сущности и flush"
   },
   {
    "id": "spring-cache-abstraction",
@@ -6475,7 +7011,9 @@
     "redis-data-structures",
     "spring-transactional"
    ],
-   "words": 845
+   "words": 845,
+   "ru": "notes-ru/spring/data/spring-cache-abstraction.md",
+   "title_ru": "Абстракция кэширования Spring Cache"
   },
   {
    "id": "spring-data-repositories",
@@ -6496,7 +7034,9 @@
     "jpa-persistence-context-and-entity-lifecycle",
     "spring-transactional"
    ],
-   "words": 840
+   "words": 840,
+   "ru": "notes-ru/spring/data/spring-data-repositories.md",
+   "title_ru": "Репозитории Spring Data и способы писать запросы"
   },
   {
    "id": "spring-transactional",
@@ -6524,7 +7064,9 @@
     "spring-kafka-consumer",
     "transactions-acid-and-isolation"
    ],
-   "words": 828
+   "words": 828,
+   "ru": "notes-ru/spring/data/spring-transactional.md",
+   "title_ru": "@Transactional: как это работает на самом деле"
   },
   {
    "id": "spring-kafka-consumer",
@@ -6550,7 +7092,9 @@
     "spring-transactional",
     "testcontainers"
    ],
-   "words": 819
+   "words": 819,
+   "ru": "notes-ru/spring/kafka/spring-kafka-consumer.md",
+   "title_ru": "Основы consumer'а в Spring Kafka"
   },
   {
    "id": "spring-resources",
@@ -6579,7 +7123,9 @@
     "spring-transactional",
     "testing-types-and-dev-cycles"
    ],
-   "words": 522
+   "words": 522,
+   "ru": "notes-ru/spring/resources/spring-resources.md",
+   "title_ru": "Ресурсы по Spring: ссылки, инструменты и шаблоны"
   },
   {
    "id": "jwt-authentication",
@@ -6601,7 +7147,9 @@
     "spring-boot-properties-and-profiles",
     "spring-security-basics"
    ],
-   "words": 767
+   "words": 767,
+   "ru": "notes-ru/spring/security/jwt-authentication.md",
+   "title_ru": "JWT-аутентификация в API на Spring Boot"
   },
   {
    "id": "spring-security-basics",
@@ -6624,7 +7172,9 @@
     "spring-kafka-consumer",
     "spring-mvc-request-lifecycle"
    ],
-   "words": 663
+   "words": 663,
+   "ru": "notes-ru/spring/security/spring-security-basics.md",
+   "title_ru": "Spring Security 6: цепочка фильтров, аутентификация и авторизация"
   },
   {
    "id": "contract-testing-and-wiremock",
@@ -6651,7 +7201,9 @@
     "testcontainers",
     "testing-async-and-kafka-flows"
    ],
-   "words": 992
+   "words": 992,
+   "ru": "notes-ru/spring/testing/contract-testing-and-wiremock.md",
+   "title_ru": "Контрактное тестирование и WireMock"
   },
   {
    "id": "junit-and-mockito",
@@ -6672,7 +7224,9 @@
     "testcontainers",
     "testing-types-and-dev-cycles"
    ],
-   "words": 856
+   "words": 856,
+   "ru": "notes-ru/spring/testing/junit-and-mockito.md",
+   "title_ru": "Основы JUnit 5 и Mockito"
   },
   {
    "id": "testcontainers",
@@ -6701,7 +7255,9 @@
     "spring-kafka-consumer",
     "testing-types-and-dev-cycles"
    ],
-   "words": 951
+   "words": 951,
+   "ru": "notes-ru/spring/testing/testcontainers.md",
+   "title_ru": "Testcontainers для тестов с Postgres, Kafka и Redis"
   },
   {
    "id": "testing-async-and-kafka-flows",
@@ -6730,7 +7286,9 @@
     "temporal-concepts",
     "testcontainers"
    ],
-   "words": 1080
+   "words": 1080,
+   "ru": "notes-ru/spring/testing/testing-async-and-kafka-flows.md",
+   "title_ru": "Тестирование асинхронных процессов и потоков Kafka"
   },
   {
    "id": "testing-types-and-dev-cycles",
@@ -6754,7 +7312,9 @@
     "spring-kafka-consumer",
     "spring-transactional"
    ],
-   "words": 891
+   "words": 891,
+   "ru": "notes-ru/spring/testing/testing-types-and-dev-cycles.md",
+   "title_ru": "Виды тестов, тестовые дублёры и циклы разработки"
   },
   {
    "id": "openapi-swagger",
@@ -6776,7 +7336,9 @@
     "spring-mvc-validation-and-uploads",
     "spring-security-basics"
    ],
-   "words": 516
+   "words": 516,
+   "ru": "notes-ru/spring/web/openapi-swagger.md",
+   "title_ru": "Документация API с OpenAPI и Swagger"
   },
   {
    "id": "rest-and-http",
@@ -6800,7 +7362,9 @@
     "spring-mvc-request-lifecycle",
     "spring-security-basics"
    ],
-   "words": 971
+   "words": 971,
+   "ru": "notes-ru/spring/web/rest-and-http.md",
+   "title_ru": "Принципы REST и основы HTTP"
   },
   {
    "id": "rest-clients",
@@ -6827,7 +7391,9 @@
     "testing-types-and-dev-cycles",
     "virtual-threads"
    ],
-   "words": 793
+   "words": 793,
+   "ru": "notes-ru/spring/web/rest-clients.md",
+   "title_ru": "Вызов внешних API: RestTemplate, RestClient, WebClient, Feign и их тестирование"
   },
   {
    "id": "spring-mvc-request-lifecycle",
@@ -6853,7 +7419,9 @@
     "spring-security-basics",
     "virtual-threads"
    ],
-   "words": 760
+   "words": 760,
+   "ru": "notes-ru/spring/web/spring-mvc-request-lifecycle.md",
+   "title_ru": "Spring MVC: DispatcherServlet и жизненный цикл запроса"
   },
   {
    "id": "spring-mvc-validation-and-uploads",
@@ -6875,7 +7443,9 @@
     "spring-mvc-request-lifecycle",
     "spring-transactional"
    ],
-   "words": 619
+   "words": 619,
+   "ru": "notes-ru/spring/web/spring-mvc-validation-and-uploads.md",
+   "title_ru": "Валидация запросов и загрузка файлов в Spring MVC"
   },
   {
    "id": "spring-reactive-webclient-sse",
@@ -6898,7 +7468,9 @@
     "spring-mvc-request-lifecycle",
     "virtual-threads"
    ],
-   "words": 727
+   "words": 727,
+   "ru": "notes-ru/spring/web/spring-reactive-webclient-sse.md",
+   "title_ru": "Реактивный Spring: WebFlux, WebClient и Server-Sent Events"
   },
   {
    "id": "background-jobs-and-schedulers",
@@ -6933,7 +7505,9 @@
     "time-and-clocks",
     "workflow-engines-vs-sagas"
    ],
-   "words": 1312
+   "words": 1312,
+   "ru": "notes-ru/system-design/building-blocks/background-jobs-and-schedulers.md",
+   "title_ru": "Фоновые задачи и планировщики — cron, очередь или движок workflow"
   },
   {
    "id": "caching",
@@ -6965,7 +7539,9 @@
     "redis-patterns-and-persistence",
     "spring-cache-abstraction"
    ],
-   "words": 1343
+   "words": 1343,
+   "ru": "notes-ru/system-design/building-blocks/caching.md",
+   "title_ru": "Стратегии кэширования — cache-aside, read/write-through, write-behind, TTL, инвалидация, stampede"
   },
   {
    "id": "cdn",
@@ -6992,7 +7568,9 @@
     "symmetric-and-asymmetric-crypto",
     "tls-handshake-and-certificates"
    ],
-   "words": 1222
+   "words": 1222,
+   "ru": "notes-ru/system-design/building-blocks/cdn.md",
+   "title_ru": "CDN — кэширование на edge, статический и динамический контент, инвалидация и подписанные URL"
   },
   {
    "id": "file-and-blob-storage",
@@ -7019,7 +7597,9 @@
     "secrets-management",
     "storage-choices"
    ],
-   "words": 1344
+   "words": 1344,
+   "ru": "notes-ru/system-design/building-blocks/file-and-blob-storage.md",
+   "title_ru": "Хранение файлов и блобов — объектное хранилище в стиле S3, presigned URL, multipart upload"
   },
   {
    "id": "load-balancing",
@@ -7056,7 +7636,9 @@
     "reverse-proxy-nginx-basics",
     "signals-and-process-lifecycle"
    ],
-   "words": 1174
+   "words": 1174,
+   "ru": "notes-ru/system-design/building-blocks/load-balancing.md",
+   "title_ru": "Балансировка нагрузки — алгоритмы, health checks, привязка сессий и глобальная балансировка"
   },
   {
    "id": "message-queues-and-streams",
@@ -7099,7 +7681,9 @@
     "spring-kafka-consumer",
     "workflow-engines-vs-sagas"
    ],
-   "words": 1126
+   "words": 1126,
+   "ru": "notes-ru/system-design/building-blocks/message-queues-and-streams.md",
+   "title_ru": "Очереди сообщений и потоки как строительный блок — очередь или лог, Kafka, RabbitMQ или SQS"
   },
   {
    "id": "notifications-and-push",
@@ -7134,7 +7718,9 @@
     "spring-kafka-consumer",
     "websockets-sse-and-long-polling"
    ],
-   "words": 1325
+   "words": 1325,
+   "ru": "notes-ru/system-design/building-blocks/notifications-and-push.md",
+   "title_ru": "Уведомления и push как строительный блок — fan-out, каналы, retry, дедупликация"
   },
   {
    "id": "rate-limiting",
@@ -7163,7 +7749,9 @@
     "slo-sli-and-alerting",
     "time-and-clocks"
    ],
-   "words": 1303
+   "words": 1303,
+   "ru": "notes-ru/system-design/building-blocks/rate-limiting.md",
+   "title_ru": "Ограничение частоты запросов — token bucket, leaky bucket, скользящее окно, распределённые лимиты в Redis"
   },
   {
    "id": "search-and-indexing-services",
@@ -7191,7 +7779,9 @@
     "read-replicas-and-stale-reads",
     "storage-choices"
    ],
-   "words": 1161
+   "words": 1161,
+   "ru": "notes-ru/system-design/building-blocks/search-and-indexing-services.md",
+   "title_ru": "Сервисы поиска и индексации — когда добавлять Elasticsearch и как держать его в синхроне"
   },
   {
    "id": "storage-choices",
@@ -7229,7 +7819,9 @@
     "sql-vs-nosql-choosing",
     "transactions-acid-and-isolation"
    ],
-   "words": 1229
+   "words": 1229,
+   "ru": "notes-ru/system-design/building-blocks/storage-choices.md",
+   "title_ru": "Выбор хранилища — RDBMS, key-value, документное, wide-column, блобы, поиск, временные ряды по паттерну доступа"
   },
   {
    "id": "design-chat-service",
@@ -7262,7 +7854,9 @@
     "time-and-clocks",
     "websockets-sse-and-long-polling"
    ],
-   "words": 1065
+   "words": 1065,
+   "ru": "notes-ru/system-design/case-studies/design-chat-service.md",
+   "title_ru": "Проектирование чат-сервиса"
   },
   {
    "id": "design-esim-provisioning",
@@ -7294,7 +7888,9 @@
     "temporal-concepts",
     "workflow-engines-vs-sagas"
    ],
-   "words": 1224
+   "words": 1224,
+   "ru": "notes-ru/system-design/case-studies/design-esim-provisioning.md",
+   "title_ru": "Проектирование системы выпуска eSIM"
   },
   {
    "id": "design-news-feed",
@@ -7328,7 +7924,9 @@
     "storage-choices",
     "system-design-basics"
    ],
-   "words": 1058
+   "words": 1058,
+   "ru": "notes-ru/system-design/case-studies/design-news-feed.md",
+   "title_ru": "Проектирование ленты новостей"
   },
   {
    "id": "design-notification-service",
@@ -7364,7 +7962,9 @@
     "storage-choices",
     "system-design-basics"
    ],
-   "words": 966
+   "words": 966,
+   "ru": "notes-ru/system-design/case-studies/design-notification-service.md",
+   "title_ru": "Проектирование сервиса уведомлений"
   },
   {
    "id": "design-payment-processing",
@@ -7398,7 +7998,9 @@
     "transactions-acid-and-isolation",
     "workflow-engines-vs-sagas"
    ],
-   "words": 1160
+   "words": 1171,
+   "ru": "notes-ru/system-design/case-studies/design-payment-processing.md",
+   "title_ru": "Проектирование системы обработки платежей"
   },
   {
    "id": "design-rate-limiter",
@@ -7425,7 +8027,9 @@
     "reverse-proxy-nginx-basics",
     "time-and-clocks"
    ],
-   "words": 1032
+   "words": 1032,
+   "ru": "notes-ru/system-design/case-studies/design-rate-limiter.md",
+   "title_ru": "Проектирование распределённого ограничителя запросов"
   },
   {
    "id": "design-url-shortener",
@@ -7457,7 +8061,9 @@
     "system-design-basics",
     "time-money-and-ids"
    ],
-   "words": 1070
+   "words": 1070,
+   "ru": "notes-ru/system-design/case-studies/design-url-shortener.md",
+   "title_ru": "Проектирование сокращателя ссылок"
   },
   {
    "id": "api-design-for-system-design",
@@ -7497,7 +8103,9 @@
     "temporal-concepts",
     "websockets-sse-and-long-polling"
    ],
-   "words": 1228
+   "words": 1228,
+   "ru": "notes-ru/system-design/method/api-design-for-system-design.md",
+   "title_ru": "Проектирование API в system design — REST, gRPC или async, пагинация, версионирование, идемпотентность"
   },
   {
    "id": "back-of-envelope-estimation",
@@ -7528,7 +8136,9 @@
     "storage-choices",
     "virtual-threads"
    ],
-   "words": 1147
+   "words": 1147,
+   "ru": "notes-ru/system-design/method/back-of-envelope-estimation.md",
+   "title_ru": "Оценки «на салфетке» — расчёт QPS, хранилища и пропускной способности"
   },
   {
    "id": "latency-numbers",
@@ -7563,7 +8173,9 @@
     "tls-handshake-and-certificates",
     "virtual-threads"
    ],
-   "words": 1371
+   "words": 1371,
+   "ru": "notes-ru/system-design/method/latency-numbers.md",
+   "title_ru": "Числа задержек — лестница от кеша L1 до межрегиональных вызовов и что из неё следует"
   },
   {
    "id": "requirements-and-constraints",
@@ -7599,7 +8211,9 @@
     "slo-sli-and-alerting",
     "system-design-basics"
    ],
-   "words": 986
+   "words": 986,
+   "ru": "notes-ru/system-design/method/requirements-and-constraints.md",
+   "title_ru": "Требования и ограничения — что спросить, прежде чем рисовать блоки"
   },
   {
    "id": "system-design-basics",
@@ -7641,7 +8255,9 @@
     "temporal-concepts",
     "transactions-acid-and-isolation"
    ],
-   "words": 1055
+   "words": 1055,
+   "ru": "notes-ru/system-design/method/system-design-basics.md",
+   "title_ru": "Основы system design — схема, строительные блоки, числа"
   },
   {
    "id": "async-processing-and-event-driven-scaling",
@@ -7682,7 +8298,9 @@
     "websockets-sse-and-long-polling",
     "workflow-engines-vs-sagas"
    ],
-   "words": 858
+   "words": 858,
+   "ru": "notes-ru/system-design/scaling/async-processing-and-event-driven-scaling.md",
+   "title_ru": "Асинхронная обработка и масштабирование на событиях"
   },
   {
    "id": "database-scaling-path",
@@ -7724,7 +8342,9 @@
     "storage-choices",
     "transactions-acid-and-isolation"
    ],
-   "words": 903
+   "words": 903,
+   "ru": "notes-ru/system-design/scaling/database-scaling-path.md",
+   "title_ru": "Путь масштабирования базы данных — от индексов до шардирования"
   },
   {
    "id": "horizontal-vs-vertical-scaling",
@@ -7762,7 +8382,9 @@
     "spring-boot-properties-and-profiles",
     "virtual-threads"
    ],
-   "words": 919
+   "words": 919,
+   "ru": "notes-ru/system-design/scaling/horizontal-vs-vertical-scaling.md",
+   "title_ru": "Горизонтальное и вертикальное масштабирование, сервисы без состояния"
   },
   {
    "id": "multi-region-basics",
@@ -7801,7 +8423,9 @@
     "sharding-strategies",
     "time-and-clocks"
    ],
-   "words": 953
+   "words": 953,
+   "ru": "notes-ru/system-design/scaling/multi-region-basics.md",
+   "title_ru": "Основы multi-region — active/passive, active/active, резидентность данных"
   },
   {
    "id": "read-write-splitting-and-cqrs-lite",
@@ -7834,7 +8458,9 @@
     "search-and-indexing-services",
     "transactions-acid-and-isolation"
    ],
-   "words": 865
+   "words": 865,
+   "ru": "notes-ru/system-design/scaling/read-write-splitting-and-cqrs-lite.md",
+   "title_ru": "Разделение чтения и записи и облегчённый CQRS"
   }
  ]
 }

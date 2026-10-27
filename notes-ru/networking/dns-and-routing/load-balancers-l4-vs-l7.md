@@ -1,0 +1,107 @@
+---
+title: Балансировщики нагрузки, L4 и L7
+tags: [networking, load-balancing, l4, l7, health-checks]
+learned: 2026-10-27
+---
+## Кратко
+Балансировщик L4 перенаправляет потоки TCP/UDP по IP и порту: быстро, без привязки к протоколу, один бэкенд на соединение, никакого понимания HTTP. Балансировщик L7 завершает соединение, разбирает HTTP и направляет каждый запрос по пути, хосту или заголовку, поэтому он умеет также повторять запросы, переписывать их, кешировать, завершать TLS и распределять потоки HTTP/2 по бэкендам. Проверки здоровья (health checks) и алгоритм балансировки определяют, как трафик уходит с отказывающего пода; sticky sessions — то, что добавляют, когда приложение не stateless, и о чём потом жалеют. Взгляд с точки зрения системного дизайна (глобальная балансировка, место в архитектуре) — в [[load-balancing]]; эта заметка — о сетевой механике.
+
+## Основное
+### L4 и L7
+| | L4 (транспортный) | L7 (прикладной) |
+|---|---|---|
+| Видит | IP, порт, флаги TCP; максимум TLS SNI | весь HTTP-запрос: метод, путь, заголовки, cookies, gRPC-сервис |
+| Единица балансировки | соединение (или UDP-поток) | запрос (или поток HTTP/2) |
+| TLS | passthrough (завершает бэкенд) или NAT | завершает, при необходимости заново шифрует до бэкенда |
+| IP клиента для бэкенда | сохраняется трюками DSR/NAT или через PROXY protocol | теряется; добавляется `X-Forwarded-For` / `Forwarded` ([[reverse-proxy-nginx-basics]]) |
+| Возможности | очень высокая пропускная способность, любой протокол (Postgres, Kafka, SSH) | маршрутизация по пути, canary по заголовку, retry, rate limit, аутентификация, кеширование, понимание WebSocket/gRPC |
+| Обработка отказов | на уровне соединения: мёртвый бэкенд = сброшенные соединения | на уровне запроса: повтор идемпотентных запросов на другом бэкенде |
+| Примеры | AWS NLB, Linux IPVS/kube-proxy, HAProxy `mode tcp`, MetalLB | nginx, HAProxy `mode http`, Envoy, AWS ALB, Kubernetes Ingress/Gateway API, API-шлюзы ([[api-gateway-and-service-discovery]]) |
+
+- Долгоживущие соединения (HTTP/2, gRPC, WebSocket, БД) делают балансировку на L4 неравномерной: соединение одного клиента навсегда сидит на одном бэкенде. L7 балансирует по потокам; для gRPC это разница между ровной нагрузкой и одним перегретым подом ([[grpc-and-protobuf]]).
+- Базы данных и Kafka балансируются на L4 или не балансируются вовсе (клиенты сами занимаются маршрутизацией); HTTP API — на L7.
+
+### Алгоритмы
+| Алгоритм | Поведение | Когда использовать |
+|---|---|---|
+| Round robin | каждый раз следующий бэкенд, опционально с весами | бэкенды одинаковые, запросы дешёвые и похожие |
+| Least connections | выбирает бэкенд с наименьшим числом запросов в обработке | разная длительность запросов (по умолчанию в большинстве L7-прокси) |
+| Least response time / EWMA | самый быстрый бэкенд за последнее время | разнородные узлы, чувствительность к задержке |
+| Random (power of two choices) | выбрать два случайных, взять менее загруженный | большие парки, избегает толпы на одном «наименее загруженном» бэкенде |
+| IP hash / consistent hash | тот же клиент или ключ → тот же бэкенд | локальность кеша, «прилипание» без cookies ([[consistent-hashing]]) |
+| Maglev / ring hash | консистентное хеширование с минимальными перестановками при изменениях | L4 в масштабе, service mesh |
+
+### Проверки здоровья и draining
+- **Активные**: балансировщик вызывает `/actuator/health/readiness` каждые N секунд; нездоров после K неудач, здоров после M успехов. Именно readiness, а не liveness: под, который жив, но ещё прогревается, не должен получать трафик ([[kubernetes-basics]]).
+- **Пассивные (outlier detection)**: исключить бэкенд на период остывания после подряд идущих 5xx или ошибок соединения; ловит отказы быстрее, чем интервал активной проверки.
+- **Draining** (вывод из ротации): при deploy пометить бэкенд как not-ready, перестать принимать новые соединения, дать завершиться запросам в обработке (`server.shutdown=graceful`, `spring.lifecycle.timeout-per-shutdown-phase`), затем остановить. С HTTP/2 — отправить `GOAWAY`. Без этого шага каждый rolling deploy даёт всплеск 502.
+- Внимательно проверяй цепочку зависимостей: readiness-проверка, падающая при недоступности БД, выводит весь парк разом; проваливай readiness только по условиям, локальным для экземпляра.
+
+### Sticky sessions
+- На основе cookie (`SERVERID`, `AWSALB` у ALB) или хеширования IP источника — направляют пользователя на тот же бэкенд. Нужны для HTTP-сессий в памяти, состояния SSE/WebSocket ([[websockets-sse-and-long-polling]]), локальных кешей.
+- Цена: неравномерная нагрузка, масштабирование и deploy рвут сессии, а балансировщик становится скрытой частью твоего состояния. Предпочитай внешнее хранилище сессий (Spring Session + Redis) или токены ([[cookies-sessions-and-cors]], [[horizontal-vs-vertical-scaling]]).
+
+### IP клиента и PROXY protocol
+- За L7 бэкенд видит IP балансировщика; исходный адрес — в `X-Forwarded-For` (крайний левый = клиент, крайний правый = последний доверенный прокси). Spring Boot: `server.forward-headers-strategy=framework` (или `native` для `RemoteIpValve` в Tomcat), чтобы `request.getRemoteAddr()`, `isSecure()` и URL редиректов были корректны.
+- За L4 с NAT IP клиента тоже теряется; **PROXY protocol** (HAProxy, NLB, nginx `proxy_protocol`) добавляет в начало TCP-потока заголовок с исходными адресами, и бэкенд должен быть настроен на его чтение.
+
+### Таймауты в цепочке
+- Idle timeout балансировщика (ALB 60 с, NLB 350 с) должен быть ≥ keep-alive timeout приложения, иначе балансировщик переиспользует соединение, которое приложение только что закрыло, и клиент получает 502 ([[tcp-handshake-and-connection-states]]).
+- Таймаут запроса на балансировщике должен быть чуть больше собственного таймаута приложения, чтобы возвращалась ошибка приложения, а не общий 504 от балансировщика ([[failure-modes-and-timeouts]]).
+
+## Пример
+Health check, draining и forwarded-заголовки на стороне Spring, плюс фрагмент HAProxy с обоими режимами рядом.
+```yaml
+# application.yml
+server:
+  shutdown: graceful                      # завершить запросы в обработке по SIGTERM
+  forward-headers-strategy: framework     # доверять X-Forwarded-* от балансировщика
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true                     # /actuator/health/readiness и /liveness
+      group:
+        readiness:
+          include: readinessState, db     # только локальное; не включать удалённые сервисы
+```
+```haproxy
+# L4: Postgres через балансировщик; один бэкенд на соединение, только TCP health check
+listen postgres
+    bind *:5432
+    mode tcp
+    balance leastconn
+    option tcp-check
+    server pg1 10.20.5.10:5432 check inter 2s fall 3 rise 2
+    server pg2 10.20.5.11:5432 check backup
+
+# L7: API; маршрутизация по запросам, HTTP health check, retry для идемпотентных запросов, canary по заголовку
+frontend https
+    bind *:443 ssl crt /etc/haproxy/api.pem alpn h2,http/1.1
+    mode http
+    http-request set-header X-Forwarded-Proto https
+    http-request set-header X-Forwarded-For %[src]
+    use_backend api_canary if { req.hdr(X-Canary) -m str on }
+    default_backend api
+
+backend api
+    mode http
+    balance leastconn
+    option httpchk GET /actuator/health/readiness
+    http-check expect status 200
+    retry-on conn-failure 503
+    http-request disable-l7-retry if METH_POST      # никогда не повторять автоматически неидемпотентные запросы
+    server api1 10.20.6.10:8080 check inter 3s fall 2 rise 3
+    server api2 10.20.6.11:8080 check inter 3s fall 2 rise 3
+```
+
+## Подводные камни
+- Readiness, зависящий от удалённых сервисов: одна заминка Kafka — и все поды одновременно выходят из пула.
+- Rolling deploy без graceful shutdown или с `terminationGracePeriodSeconds` короче самого долгого запроса: всплески 502/504 на каждом релизе.
+- gRPC или HTTP/2 через L4-балансировщик: один бэкенд забирает все потоки; используй L7 или балансировку на стороне клиента через headless DNS ([[dns-resolution]]).
+- Доверие `X-Forwarded-For` из интернета; первый хоп должен его перезаписывать, а приложение должно знать, сколько хопов доверенные.
+- Повтор POST на балансировщике «для повышения доступности»: дубликаты без ключа идемпотентности ([[idempotency]]).
+- Связанные заметки: [[load-balancing]] — взгляд на уровне архитектуры, [[reverse-proxy-nginx-basics]] — nginx как реализация L7, которую чаще всего придётся настраивать вручную.
