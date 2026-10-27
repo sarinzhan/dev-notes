@@ -1817,7 +1817,9 @@
     "operating-system-architecture",
     "processes-and-threads"
    ],
-   "words": 1083
+   "words": 1083,
+   "ru": "notes-ru/computer-science/computation/cpu-components-and-architecture.md",
+   "title_ru": "Компоненты и архитектура процессора"
   },
   {
    "id": "cpu-pipeline-walkthrough",
@@ -1842,7 +1844,9 @@
     "how-cpu-executes-code",
     "instruction-lifecycle-and-pipelining"
    ],
-   "words": 1340
+   "words": 1340,
+   "ru": "notes-ru/computer-science/computation/cpu-pipeline-walkthrough.md",
+   "title_ru": "Внутри процессора: разбор одного цикла"
   },
   {
    "id": "how-cpu-executes-code",
@@ -1905,7 +1909,9 @@
     "memory-models-and-visibility",
     "operating-system-architecture"
    ],
-   "words": 1229
+   "words": 1229,
+   "ru": "notes-ru/computer-science/computation/instruction-lifecycle-and-pipelining.md",
+   "title_ru": "Жизненный цикл инструкции, конвейер и параллелизм"
   },
   {
    "id": "numbers-bits-and-floating-point",
@@ -2535,7 +2541,9 @@
     "virtual-memory-and-paging",
     "virtual-threads"
    ],
-   "words": 1380
+   "words": 1380,
+   "ru": "notes-ru/computer-science/operating-systems/anatomy-of-a-process.md",
+   "title_ru": "Анатомия процесса"
   },
   {
    "id": "cpu-scheduling",
@@ -2680,7 +2688,9 @@
     "tcp-vs-udp",
     "virtual-memory-and-paging"
    ],
-   "words": 1082
+   "words": 1082,
+   "ru": "notes-ru/computer-science/operating-systems/operating-system-architecture.md",
+   "title_ru": "Архитектура операционной системы"
   },
   {
    "id": "operating-system-introduction",
@@ -2711,7 +2721,9 @@
     "virtual-memory-and-paging",
     "virtual-threads"
    ],
-   "words": 938
+   "words": 938,
+   "ru": "notes-ru/computer-science/operating-systems/operating-system-introduction.md",
+   "title_ru": "Что такое операционная система и зачем она нужна"
   },
   {
    "id": "processes-and-threads",
