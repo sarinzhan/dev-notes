@@ -4785,6 +4785,29 @@
    "words": 288
   },
   {
+   "id": "abstract-classes-and-interfaces-ru",
+   "sec": "java",
+   "sub": "core",
+   "title": "Абстрактные классы и интерфейсы (RU)",
+   "tags": [
+    "abstract-class",
+    "interface",
+    "default-methods",
+    "sealed",
+    "russian"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/java/core/abstract-classes-and-interfaces-ru.md",
+   "links": [
+    "abstract-classes-and-interfaces",
+    "enums",
+    "functional-interfaces",
+    "methods-overloading-overriding",
+    "oop-principles"
+   ],
+   "words": 801
+  },
+  {
    "id": "abstract-classes-and-interfaces",
    "sec": "java",
    "sub": "core",

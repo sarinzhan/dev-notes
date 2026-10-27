@@ -53,4 +53,5 @@ Source images live in the chapter folder under `media/`. Skip screenshots of tex
 ## Do not
 - Do not write "Section", "Chapter", or question numbers in headings.
 - Do not keep Russian text, except a proper noun in parentheses if it helps.
+- Exception: a Russian translation of an existing note lives next to it as `<id>-ru.md`, starts with a line linking the English original, and may use Russian headings. The English note stays the main version.
 - Do not add links to external courses/articles inside knowledge notes; those belong in the section's `resources` note.

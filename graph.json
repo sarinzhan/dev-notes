@@ -2083,6 +2083,19 @@
    ]
   },
   {
+   "id": "abstract-classes-and-interfaces-ru",
+   "sec": "java",
+   "sub": "core",
+   "title": "Абстрактные классы и интерфейсы (RU)",
+   "tags": [
+    "abstract-class",
+    "interface",
+    "default-methods",
+    "sealed",
+    "russian"
+   ]
+  },
+  {
    "id": "abstract-classes-and-interfaces",
    "sec": "java",
    "sub": "core",
@@ -3477,6 +3490,10 @@
  "edges": [
   {
    "source": "abstract-classes-and-interfaces",
+   "target": "abstract-classes-and-interfaces-ru"
+  },
+  {
+   "source": "abstract-classes-and-interfaces",
    "target": "casting-and-autoboxing"
   },
   {
@@ -3497,6 +3514,22 @@
   },
   {
    "source": "abstract-classes-and-interfaces",
+   "target": "oop-principles"
+  },
+  {
+   "source": "abstract-classes-and-interfaces-ru",
+   "target": "enums"
+  },
+  {
+   "source": "abstract-classes-and-interfaces-ru",
+   "target": "functional-interfaces"
+  },
+  {
+   "source": "abstract-classes-and-interfaces-ru",
+   "target": "methods-overloading-overriding"
+  },
+  {
+   "source": "abstract-classes-and-interfaces-ru",
    "target": "oop-principles"
   },
   {
