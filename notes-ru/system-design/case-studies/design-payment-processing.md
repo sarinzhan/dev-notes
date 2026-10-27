@@ -17,7 +17,7 @@ learned: 2026-10-27
 ```
 POST /v1/payments        Idempotency-Key: <uuid>
   { amount: {value: "1500.00", currency: "KGS"}, source: {token}, merchantId, capture: AUTO|MANUAL }
-  -> 201 { paymentId, status: AUTHORIZED|PENDING|DECLINED }       (same key → same response, 409 on payload mismatch)
+  -> 201 { paymentId, status: AUTHORIZED|PENDING|DECLINED }       (same key → same response, 422 on payload mismatch)
 POST /v1/payments/{id}/capture    Idempotency-Key
 POST /v1/payments/{id}/refund     Idempotency-Key   { amount }
 GET  /v1/payments/{id}
@@ -48,7 +48,7 @@ reconciliation job (nightly + hourly) ◀── provider statements / status API
 ```
 
 ### Подробно: три гарантии
-1. **Идемпотентное создание.** Сначала вставляется строка `idempotency_key` в той же транзакции, что и платёж; нарушение уникальности означает «повтор»: возвращаем сохранённый ответ. Тело запроса хешируется; тот же ключ с другим телом → `409`. Ключи живут 24 ч или дольше; в платежах их хранят весь срок жизни платежа.
+1. **Идемпотентное создание.** Сначала вставляется строка `idempotency_key` в той же транзакции, что и платёж; нарушение уникальности означает «повтор»: возвращаем сохранённый ответ. Тело запроса хешируется; тот же ключ с другим телом → `422` (повтор, пока первый запрос ещё выполняется, → `409`). Ключи живут 24 ч или дольше; в платежах их хранят весь срок жизни платежа.
 2. **Вызов провайдера с неизвестным исходом.** Вызов эквайера может завершиться таймаутом уже после списания. Правила: сгенерировать ключ идемпотентности для провайдера до вызова (`paymentId:authorize`) и сохранить строку попытки; перевести платёж в `AUTHORIZING`; при таймауте не повторять вслепую — запросить провайдера по нашей ссылке и отправить снова с тем же ключом, только если он ответил «не найдено». Если после N попыток исход всё ещё неизвестен, пометить `UNKNOWN` и оставить решение сверке. Никогда не списывать повторно, чтобы разрешить сомнение ([[failure-modes-and-timeouts]], [[circuit-breaker]]).
 3. **Реестр как истина.** Изменение состояния и движение денег — одна транзакция: статус `CAPTURED`, транзакция реестра (дебет дебиторки клиента, кредит кредиторки мерчанту, кредит комиссионного дохода), обновление баланса, событие в outbox. Балансы производные, поэтому ошибку можно исправить, заново проиграв проводки. Проводки никогда не обновляются и не удаляются; исправления — это новые сторнирующие проводки ([[event-sourcing]] — общая идея, [[transactions-acid-and-isolation]]).
 
@@ -86,9 +86,9 @@ COMMIT;
 -- позже, когда провайдер подтвердил списание: одна транзакция реестра, сумма проводок равна нулю
 INSERT INTO ledger_txn (id, type, payment_id, posted_at) VALUES ('t_01J…', 'CAPTURE', 'p_01J…', now());
 INSERT INTO ledger_entry (txn_id, account_id, debit, credit, currency) VALUES
-  ('t_01J…', 'customer_receivable', 0,       1500.00, 'KGS'),
-  ('t_01J…', 'merchant_payable:42', 1470.00, 0,       'KGS'),
-  ('t_01J…', 'fee_income',          30.00,   0,       'KGS');
+  ('t_01J…', 'customer_receivable', 1500.00, 0,       'KGS'),
+  ('t_01J…', 'merchant_payable:42', 0,       1470.00, 'KGS'),
+  ('t_01J…', 'fee_income',          0,       30.00,   'KGS');
 UPDATE payment SET status = 'CAPTURED', version = version + 1 WHERE id = 'p_01J…' AND version = 2;
 ```
 

@@ -17,7 +17,7 @@ A payment system moves money between accounts and external providers (card netwo
 ```
 POST /v1/payments        Idempotency-Key: <uuid>
   { amount: {value: "1500.00", currency: "KGS"}, source: {token}, merchantId, capture: AUTO|MANUAL }
-  -> 201 { paymentId, status: AUTHORIZED|PENDING|DECLINED }       (same key → same response, 409 on payload mismatch)
+  -> 201 { paymentId, status: AUTHORIZED|PENDING|DECLINED }       (same key → same response, 422 on payload mismatch)
 POST /v1/payments/{id}/capture    Idempotency-Key
 POST /v1/payments/{id}/refund     Idempotency-Key   { amount }
 GET  /v1/payments/{id}
@@ -48,7 +48,7 @@ reconciliation job (nightly + hourly) ◀── provider statements / status API
 ```
 
 ### Deep dive: the three guarantees
-1. **Idempotent create.** Insert the `idempotency_key` row first in the same transaction as the payment; a unique violation means "replay": return the stored response. Hash the request body; same key with a different body → `409`. Keys live 24 h or more; in payments, keep them for the payment's life.
+1. **Idempotent create.** Insert the `idempotency_key` row first in the same transaction as the payment; a unique violation means "replay": return the stored response. Hash the request body; same key with a different body → `422` (a concurrent repeat while the first is still running → `409`). Keys live 24 h or more; in payments, keep them for the payment's life.
 2. **Provider call with unknown outcome.** The call to the acquirer can time out after the charge happened. Rules: generate the provider idempotency key before the call (`paymentId:authorize`) and store the attempt row; set the payment to `AUTHORIZING`; on timeout do not retry blindly — query the provider by our reference, and only if it reports "not found" send again with the same key. If still unknown after N tries, mark `UNKNOWN` and let reconciliation decide. Never charge twice to resolve doubt ([[failure-modes-and-timeouts]], [[circuit-breaker]]).
 3. **Ledger as truth.** State changes and money movement are one transaction: `CAPTURED` status, ledger txn (debit customer receivable, credit merchant payable, credit fee income), balance update, outbox event. Balances are derived, so a bug is fixable by replaying entries. Entries are never updated or deleted; corrections are new reversing entries ([[event-sourcing]] for the general idea, [[transactions-acid-and-isolation]]).
 
@@ -86,9 +86,9 @@ COMMIT;
 -- later, after the provider confirms capture: one ledger transaction, entries sum to zero
 INSERT INTO ledger_txn (id, type, payment_id, posted_at) VALUES ('t_01J…', 'CAPTURE', 'p_01J…', now());
 INSERT INTO ledger_entry (txn_id, account_id, debit, credit, currency) VALUES
-  ('t_01J…', 'customer_receivable', 0,       1500.00, 'KGS'),
-  ('t_01J…', 'merchant_payable:42', 1470.00, 0,       'KGS'),
-  ('t_01J…', 'fee_income',          30.00,   0,       'KGS');
+  ('t_01J…', 'customer_receivable', 1500.00, 0,       'KGS'),
+  ('t_01J…', 'merchant_payable:42', 0,       1470.00, 'KGS'),
+  ('t_01J…', 'fee_income',          0,       30.00,   'KGS');
 UPDATE payment SET status = 'CAPTURED', version = version + 1 WHERE id = 'p_01J…' AND version = 2;
 ```
 
