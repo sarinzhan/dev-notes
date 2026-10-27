@@ -2667,7 +2667,7 @@
    "id": "operating-system-architecture",
    "sec": "computer-science",
    "sub": "operating-systems",
-   "title": "Operating system architecture",
+   "title": "System architecture overview",
    "tags": [
     "operating-systems",
     "kernel",
@@ -2678,19 +2678,23 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/operating-systems/operating-system-architecture.md",
    "links": [
+    "anatomy-of-a-process",
+    "cpu-caches-and-cache-lines",
+    "cpu-components-and-architecture",
     "cpu-scheduling",
-    "docker-containers-and-resources",
-    "how-cpu-executes-code",
-    "io-models-blocking-nonblocking-epoll",
+    "docker-fundamentals",
+    "instruction-lifecycle-and-pipelining",
     "linux-architecture-and-kernel",
     "operating-system-introduction",
+    "osi-and-tcp-ip-models",
+    "processes-and-threads",
     "syscalls-and-file-descriptors",
     "tcp-vs-udp",
     "virtual-memory-and-paging"
    ],
-   "words": 1082,
+   "words": 2730,
    "ru": "notes-ru/computer-science/operating-systems/operating-system-architecture.md",
-   "title_ru": "Архитектура операционной системы"
+   "title_ru": "Обзор архитектуры системы"
   },
   {
    "id": "operating-system-introduction",
