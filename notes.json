@@ -1788,6 +1788,63 @@
    "title_ru": "Кэши процессора, кэш-линии и ложное разделение"
   },
   {
+   "id": "cpu-components-and-architecture",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "CPU components and architecture",
+   "tags": [
+    "cpu",
+    "hardware",
+    "registers",
+    "cores",
+    "isa"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/computation/cpu-components-and-architecture.md",
+   "links": [
+    "anatomy-of-a-process",
+    "compilation-interpretation-jit",
+    "cpu-caches-and-cache-lines",
+    "cpu-pipeline-walkthrough",
+    "cpu-scheduling",
+    "docker-containers-and-resources",
+    "executors-and-thread-pools",
+    "how-cpu-executes-code",
+    "instruction-lifecycle-and-pipelining",
+    "java-memory-model",
+    "memory-models-and-visibility",
+    "numbers-bits-and-floating-point",
+    "operating-system-architecture",
+    "processes-and-threads"
+   ],
+   "words": 1083
+  },
+  {
+   "id": "cpu-pipeline-walkthrough",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "Inside the CPU, a walkthrough of one loop",
+   "tags": [
+    "cpu",
+    "pipeline",
+    "jit",
+    "assembly",
+    "demo"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/computation/cpu-pipeline-walkthrough.md",
+   "links": [
+    "arrays-and-dynamic-arrays",
+    "compilation-interpretation-jit",
+    "cpu-caches-and-cache-lines",
+    "cpu-components-and-architecture",
+    "garbage-collection",
+    "how-cpu-executes-code",
+    "instruction-lifecycle-and-pipelining"
+   ],
+   "words": 1340
+  },
+  {
    "id": "how-cpu-executes-code",
    "sec": "computer-science",
    "sub": "computation",
@@ -1820,6 +1877,35 @@
    "words": 977,
    "ru": "notes-ru/computer-science/computation/how-cpu-executes-code.md",
    "title_ru": "Как процессор выполняет код"
+  },
+  {
+   "id": "instruction-lifecycle-and-pipelining",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "Instruction lifecycle, pipelining and parallelism",
+   "tags": [
+    "cpu",
+    "pipeline",
+    "hazards",
+    "out-of-order",
+    "parallelism"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/computation/instruction-lifecycle-and-pipelining.md",
+   "links": [
+    "amdahls-law-and-parallel-speedup",
+    "arrays-and-dynamic-arrays",
+    "compilation-interpretation-jit",
+    "cpu-caches-and-cache-lines",
+    "cpu-components-and-architecture",
+    "cpu-pipeline-walkthrough",
+    "horizontal-vs-vertical-scaling",
+    "how-cpu-executes-code",
+    "linked-lists",
+    "memory-models-and-visibility",
+    "operating-system-architecture"
+   ],
+   "words": 1229
   },
   {
    "id": "numbers-bits-and-floating-point",
@@ -2424,6 +2510,34 @@
    "title_ru": "Префиксные деревья (tries)"
   },
   {
+   "id": "anatomy-of-a-process",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Anatomy of a process",
+   "tags": [
+    "operating-systems",
+    "process",
+    "memory-layout",
+    "stack",
+    "heap"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/anatomy-of-a-process.md",
+   "links": [
+    "compilation-interpretation-jit",
+    "docker-containers-and-resources",
+    "garbage-collection",
+    "how-cpu-executes-code",
+    "jvm-memory-areas",
+    "processes-and-threads",
+    "race-conditions-and-critical-sections",
+    "stack-vs-heap-memory",
+    "virtual-memory-and-paging",
+    "virtual-threads"
+   ],
+   "words": 1380
+  },
+  {
    "id": "cpu-scheduling",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -2540,6 +2654,64 @@
    "words": 1047,
    "ru": "notes-ru/computer-science/operating-systems/ipc-mechanisms.md",
    "title_ru": "Механизмы межпроцессного взаимодействия"
+  },
+  {
+   "id": "operating-system-architecture",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Operating system architecture",
+   "tags": [
+    "operating-systems",
+    "kernel",
+    "user-space",
+    "interrupts",
+    "architecture"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/operating-system-architecture.md",
+   "links": [
+    "cpu-scheduling",
+    "docker-containers-and-resources",
+    "how-cpu-executes-code",
+    "io-models-blocking-nonblocking-epoll",
+    "linux-architecture-and-kernel",
+    "operating-system-introduction",
+    "syscalls-and-file-descriptors",
+    "tcp-vs-udp",
+    "virtual-memory-and-paging"
+   ],
+   "words": 1082
+  },
+  {
+   "id": "operating-system-introduction",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "What an operating system is and why it exists",
+   "tags": [
+    "operating-systems",
+    "kernel",
+    "abstraction",
+    "resources",
+    "fundamentals"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/computer-science/operating-systems/operating-system-introduction.md",
+   "links": [
+    "anatomy-of-a-process",
+    "cpu-scheduling",
+    "docker-containers-and-resources",
+    "docker-fundamentals",
+    "io-models-blocking-nonblocking-epoll",
+    "kubernetes-basics",
+    "linux-architecture-and-kernel",
+    "operating-system-architecture",
+    "processes-and-threads",
+    "signals-and-process-lifecycle",
+    "syscalls-and-file-descriptors",
+    "virtual-memory-and-paging",
+    "virtual-threads"
+   ],
+   "words": 938
   },
   {
    "id": "processes-and-threads",

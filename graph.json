@@ -614,6 +614,32 @@
    ]
   },
   {
+   "id": "cpu-components-and-architecture",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "CPU components and architecture",
+   "tags": [
+    "cpu",
+    "hardware",
+    "registers",
+    "cores",
+    "isa"
+   ]
+  },
+  {
+   "id": "cpu-pipeline-walkthrough",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "Inside the CPU, a walkthrough of one loop",
+   "tags": [
+    "cpu",
+    "pipeline",
+    "jit",
+    "assembly",
+    "demo"
+   ]
+  },
+  {
    "id": "how-cpu-executes-code",
    "sec": "computer-science",
    "sub": "computation",
@@ -623,6 +649,19 @@
     "computer-architecture",
     "performance",
     "fundamentals"
+   ]
+  },
+  {
+   "id": "instruction-lifecycle-and-pipelining",
+   "sec": "computer-science",
+   "sub": "computation",
+   "title": "Instruction lifecycle, pipelining and parallelism",
+   "tags": [
+    "cpu",
+    "pipeline",
+    "hazards",
+    "out-of-order",
+    "parallelism"
    ]
   },
   {
@@ -870,6 +909,19 @@
    ]
   },
   {
+   "id": "anatomy-of-a-process",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Anatomy of a process",
+   "tags": [
+    "operating-systems",
+    "process",
+    "memory-layout",
+    "stack",
+    "heap"
+   ]
+  },
+  {
    "id": "cpu-scheduling",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -918,6 +970,32 @@
     "sockets",
     "pipes",
     "shared-memory"
+   ]
+  },
+  {
+   "id": "operating-system-architecture",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Operating system architecture",
+   "tags": [
+    "operating-systems",
+    "kernel",
+    "user-space",
+    "interrupts",
+    "architecture"
+   ]
+  },
+  {
+   "id": "operating-system-introduction",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "What an operating system is and why it exists",
+   "tags": [
+    "operating-systems",
+    "kernel",
+    "abstraction",
+    "resources",
+    "fundamentals"
    ]
   },
   {
@@ -3761,6 +3839,10 @@
   },
   {
    "source": "amdahls-law-and-parallel-speedup",
+   "target": "instruction-lifecycle-and-pipelining"
+  },
+  {
+   "source": "amdahls-law-and-parallel-speedup",
    "target": "kafka-consumer"
   },
   {
@@ -3789,6 +3871,54 @@
   },
   {
    "source": "amdahls-law-and-parallel-speedup",
+   "target": "virtual-threads"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "compilation-interpretation-jit"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "cpu-components-and-architecture"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "docker-containers-and-resources"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "garbage-collection"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "how-cpu-executes-code"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "operating-system-introduction"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "processes-and-threads"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "race-conditions-and-critical-sections"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "stack-vs-heap-memory"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "virtual-memory-and-paging"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "virtual-threads"
   },
   {
@@ -4225,6 +4355,10 @@
   },
   {
    "source": "arrays-and-dynamic-arrays",
+   "target": "cpu-pipeline-walkthrough"
+  },
+  {
+   "source": "arrays-and-dynamic-arrays",
    "target": "data-structures"
   },
   {
@@ -4242,6 +4376,10 @@
   {
    "source": "arrays-and-dynamic-arrays",
    "target": "heaps-and-priority-queues"
+  },
+  {
+   "source": "arrays-and-dynamic-arrays",
+   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "arrays-and-dynamic-arrays",
@@ -5665,6 +5803,14 @@
   },
   {
    "source": "compilation-interpretation-jit",
+   "target": "cpu-components-and-architecture"
+  },
+  {
+   "source": "compilation-interpretation-jit",
+   "target": "cpu-pipeline-walkthrough"
+  },
+  {
+   "source": "compilation-interpretation-jit",
    "target": "garbage-collection"
   },
   {
@@ -5674,6 +5820,10 @@
   {
    "source": "compilation-interpretation-jit",
    "target": "immutable-objects"
+  },
+  {
+   "source": "compilation-interpretation-jit",
+   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "compilation-interpretation-jit",
@@ -6157,6 +6307,14 @@
   },
   {
    "source": "cpu-caches-and-cache-lines",
+   "target": "cpu-components-and-architecture"
+  },
+  {
+   "source": "cpu-caches-and-cache-lines",
+   "target": "cpu-pipeline-walkthrough"
+  },
+  {
+   "source": "cpu-caches-and-cache-lines",
    "target": "cpu-scheduling"
   },
   {
@@ -6178,6 +6336,10 @@
   {
    "source": "cpu-caches-and-cache-lines",
    "target": "how-cpu-executes-code"
+  },
+  {
+   "source": "cpu-caches-and-cache-lines",
+   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "cpu-caches-and-cache-lines",
@@ -6220,6 +6382,62 @@
    "target": "virtual-memory-and-paging"
   },
   {
+   "source": "cpu-components-and-architecture",
+   "target": "cpu-pipeline-walkthrough"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "cpu-scheduling"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "docker-containers-and-resources"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "how-cpu-executes-code"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "instruction-lifecycle-and-pipelining"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "java-memory-model"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "memory-models-and-visibility"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "numbers-bits-and-floating-point"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "cpu-components-and-architecture",
+   "target": "processes-and-threads"
+  },
+  {
+   "source": "cpu-pipeline-walkthrough",
+   "target": "garbage-collection"
+  },
+  {
+   "source": "cpu-pipeline-walkthrough",
+   "target": "how-cpu-executes-code"
+  },
+  {
+   "source": "cpu-pipeline-walkthrough",
+   "target": "instruction-lifecycle-and-pipelining"
+  },
+  {
    "source": "cpu-scheduling",
    "target": "docker-containers-and-resources"
   },
@@ -6246,6 +6464,14 @@
   {
    "source": "cpu-scheduling",
    "target": "lock-free-and-cas"
+  },
+  {
+   "source": "cpu-scheduling",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "cpu-scheduling",
+   "target": "operating-system-introduction"
   },
   {
    "source": "cpu-scheduling",
@@ -7697,6 +7923,14 @@
   },
   {
    "source": "docker-containers-and-resources",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "docker-containers-and-resources",
+   "target": "operating-system-introduction"
+  },
+  {
+   "source": "docker-containers-and-resources",
    "target": "signals-and-process-lifecycle"
   },
   {
@@ -7746,6 +7980,10 @@
   {
    "source": "docker-fundamentals",
    "target": "linux-networking"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "operating-system-introduction"
   },
   {
    "source": "docker-fundamentals",
@@ -9369,6 +9607,10 @@
   },
   {
    "source": "horizontal-vs-vertical-scaling",
+   "target": "instruction-lifecycle-and-pipelining"
+  },
+  {
+   "source": "horizontal-vs-vertical-scaling",
    "target": "jwt-authentication"
   },
   {
@@ -9421,6 +9663,10 @@
   },
   {
    "source": "how-cpu-executes-code",
+   "target": "instruction-lifecycle-and-pipelining"
+  },
+  {
+   "source": "how-cpu-executes-code",
    "target": "io-models-blocking-nonblocking-epoll"
   },
   {
@@ -9442,6 +9688,10 @@
   {
    "source": "how-cpu-executes-code",
    "target": "memory-models-and-visibility"
+  },
+  {
+   "source": "how-cpu-executes-code",
+   "target": "operating-system-architecture"
   },
   {
    "source": "how-cpu-executes-code",
@@ -9808,6 +10058,18 @@
    "target": "value-objects-and-entities"
   },
   {
+   "source": "instruction-lifecycle-and-pipelining",
+   "target": "linked-lists"
+  },
+  {
+   "source": "instruction-lifecycle-and-pipelining",
+   "target": "memory-models-and-visibility"
+  },
+  {
+   "source": "instruction-lifecycle-and-pipelining",
+   "target": "operating-system-architecture"
+  },
+  {
    "source": "interview-problem-patterns",
    "target": "linked-lists"
   },
@@ -9874,6 +10136,14 @@
   {
    "source": "io-models-blocking-nonblocking-epoll",
    "target": "latency-numbers"
+  },
+  {
+   "source": "io-models-blocking-nonblocking-epoll",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "io-models-blocking-nonblocking-epoll",
+   "target": "operating-system-introduction"
   },
   {
    "source": "io-models-blocking-nonblocking-epoll",
@@ -10553,6 +10823,10 @@
   },
   {
    "source": "kubernetes-basics",
+   "target": "operating-system-introduction"
+  },
+  {
+   "source": "kubernetes-basics",
    "target": "secrets-management"
   },
   {
@@ -10750,6 +11024,14 @@
   {
    "source": "linux-architecture-and-kernel",
    "target": "linux-processes"
+  },
+  {
+   "source": "linux-architecture-and-kernel",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "linux-architecture-and-kernel",
+   "target": "operating-system-introduction"
   },
   {
    "source": "linux-basics",
@@ -11486,6 +11768,42 @@
   {
    "source": "openapi-swagger",
    "target": "system-design-basics"
+  },
+  {
+   "source": "operating-system-architecture",
+   "target": "operating-system-introduction"
+  },
+  {
+   "source": "operating-system-architecture",
+   "target": "syscalls-and-file-descriptors"
+  },
+  {
+   "source": "operating-system-architecture",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "operating-system-architecture",
+   "target": "virtual-memory-and-paging"
+  },
+  {
+   "source": "operating-system-introduction",
+   "target": "processes-and-threads"
+  },
+  {
+   "source": "operating-system-introduction",
+   "target": "signals-and-process-lifecycle"
+  },
+  {
+   "source": "operating-system-introduction",
+   "target": "syscalls-and-file-descriptors"
+  },
+  {
+   "source": "operating-system-introduction",
+   "target": "virtual-memory-and-paging"
+  },
+  {
+   "source": "operating-system-introduction",
+   "target": "virtual-threads"
   },
   {
    "source": "osi-and-tcp-ip-models",
