@@ -1,0 +1,63 @@
+---
+title: Поведенческие паттерны проектирования
+tags: [design-patterns, behavioral, strategy, observer, state]
+learned: 2026-10-22
+---
+## Кратко
+Поведенческие паттерны организуют **эффективное и безопасное взаимодействие между объектами** и распределение ответственности между ними. Большинство из них делают один и тот же трюк: превращают отдельное поведение в объект (обработчик, состояние, стратегию, команду), чтобы его можно было подменять, выстраивать в цепочку, сохранять или воспроизводить во время выполнения.
+
+## Основное
+| Паттерн | Назначение | Пример в JDK / Spring |
+|---|---|---|
+| **Цепочка обязанностей** (Chain of Responsibility) | Передавать запрос по цепочке обработчиков; каждый решает, обрабатывать ли его и передавать ли дальше. Обработчики — объекты, каждый хранит ссылку на следующий. | Цепочка `javax.servlet.Filter`; `FilterChain` в Spring Security ([[spring-security-basics]]), `HandlerInterceptor` ([[spring-mvc-request-lifecycle]]), разрешение `@ExceptionHandler` |
+| **Состояние** (State) | Позволить объекту менять поведение при смене внутреннего состояния; снаружи кажется, что сменился класс. Один класс на состояние, поведение, зависящее от состояния, перенесено в него. | Переходы `Thread.State` ([[threads-basics]]); Spring Statemachine; состояния жизненного цикла JPA-сущности ([[jpa-persistence-context-and-entity-lifecycle]]) |
+| **Наблюдатель** (Observer) | Механизм подписки: издатель хранит список подписчиков и уведомляет их о событиях; подписчики сами добавляются и удаляются. | `java.util.EventListener`, `PropertyChangeListener`, `Flow.Subscriber` (Java 9); `ApplicationEventPublisher` / `@EventListener` ([[spring-bean-lifecycle]]), `@KafkaListener` ([[spring-kafka-consumer]]) |
+| **Снимок** (Memento) | Сохранять и восстанавливать прошлое состояние объекта, не раскрывая его внутренности; снимок создаёт сам объект, потому что видит свои приватные поля. | Снимки через `Serializable`; отмена в редакторе; flush / rollback в JPA, восстанавливающие управляемое состояние |
+| **Стратегия** (Strategy) | Вынести семейство похожих алгоритмов в отдельные взаимозаменяемые классы, чтобы клиент мог их переключать. | `Comparator` в `Collections.sort()` ([[stream-api]]), `ThreadPoolExecutor.RejectedExecutionHandler` ([[executors-and-thread-pools]]); `PasswordEncoder`, `CacheManager`, `ErrorHandler` в Spring Kafka |
+| **Итератор** (Iterator) | Обходить элементы коллекции, не раскрывая её внутреннего представления. | `Iterator`, `Iterable`, расширенный `for` ([[iterators-and-fail-fast]]); `ResultSet.next()` |
+| **Команда** (Command) | Инкапсулировать запрос в объект: поставить в очередь, залогировать, отменить, выполнить позже. | `Runnable` / `Callable`, переданные в executor; `Tasklet` в Spring Batch; `TransactionCallback` |
+| **Шаблонный метод** (Template Method) | Определить скелет алгоритма в суперклассе и дать подклассам переопределить отдельные шаги. | `AbstractList.get()`, `InputStream.read(byte[])`; `JdbcTemplate`, `AbstractApplicationContext.refresh()`, `WebSecurityConfigurerAdapter` (удалён в Security 6) |
+| **Посредник** (Mediator) | Централизовать общение между объектами, чтобы они не ссылались друг на друга напрямую. | `ExecutorService` между производителями и исполнителями; `DispatcherServlet` в Spring как front controller; брокер сообщений ([[rabbitmq-basics]]) |
+| **Посетитель** (Visitor) | Добавлять новые операции к структуре объектов, не меняя их классы. | `java.nio.file.FileVisitor` ([[java-nio]]), `AnnotationVisitor` в ASM; sealed-интерфейсы + `switch` с pattern matching (Java 21) — современная замена |
+
+### Когда что подходит
+- **Цепочка обязанностей**: набор обработчиков должен определяться динамически; обработчики должны выполняться в строгом порядке; или программа должна обрабатывать разнообразные запросы несколькими способами, и заранее неизвестно, какие запросы и обработчики понадобятся.
+- **Состояние**: поведение резко меняется в зависимости от внутреннего состояния, состояний много, и их код часто меняется. Альтернатива — гигантский `switch` по enum — быстро становится нечитаемой.
+- **Наблюдатель**: одни объекты должны наблюдать за другими только в определённых случаях, или после изменения состояния одного объекта что-то должно произойти в других, и заранее неизвестно, в каких.
+- **Стратегия**: разные вариации алгоритма внутри одного объекта или множество похожих классов, отличающихся только некоторым поведением. С лямбдами стратегия часто — просто функциональный интерфейс ([[functional-interfaces]]).
+- **Снимок**: отмена, транзакции, контрольные точки; снимок непрозрачен для всех, кроме создателя.
+
+## Пример
+```java
+// Стратегия выбирается по ключу во время выполнения; Spring внедряет все реализации в map.
+public interface DiscountStrategy {
+    String code();                       // "NONE", "LOYALTY", "PROMO"
+    Money apply(Money total, Customer c);
+}
+
+@Component class LoyaltyDiscount implements DiscountStrategy {
+    public String code() { return "LOYALTY"; }
+    public Money apply(Money total, Customer c) { return total.minusPercent(c.loyaltyYears() * 2); }
+}
+
+@Service
+public class PricingService {
+    private final Map<String, DiscountStrategy> strategies;
+
+    public PricingService(List<DiscountStrategy> all) {
+        this.strategies = all.stream().collect(Collectors.toMap(DiscountStrategy::code, s -> s));
+    }
+
+    public Money price(Order order, Customer customer) {
+        DiscountStrategy s = strategies.getOrDefault(customer.discountCode(), strategies.get("NONE"));
+        return s.apply(order.total(), customer);
+    }
+}
+```
+
+## Подводные камни
+- Наблюдатель с синхронными слушателями: медленный или падающий подписчик блокирует или ломает издателя. `@EventListener` в Spring по умолчанию выполняется в потоке и транзакции вызывающего; `@TransactionalEventListener` или `@Async` нужно использовать осознанно.
+- Цепочка, в которой ни один обработчик не обработал запрос, молча проваливается; каждую цепочку нужно завершать явным терминальным обработчиком.
+- Объекты-состояния, которые меняют контекст и друг друга, порождают скрытые циклы; переходы стоит держать в одном месте (таблица или контекст), а сами состояния — без состояния.
+- Map стратегий с ключом-строкой ломается от опечаток; ключом должен быть enum.
+- Связанные заметки: [[creational-patterns]], [[structural-patterns]], [[solid]], [[ddd-basics]].
