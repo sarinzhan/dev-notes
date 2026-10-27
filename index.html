@@ -195,6 +195,22 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
 .anim-sep{width:1px;height:18px;background:var(--line);margin:0 2px}
 .anim-stage{overflow-x:auto;background:var(--bg)}
 .anim-svg{display:block;width:100%;min-width:600px;height:auto}
+.anim-steps{padding:8px 14px 2px;border-top:1px solid var(--line);background:var(--panel)}
+.anim-stepbar{display:flex;gap:4px}
+.anim-stepbar button{flex:1;height:18px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center}
+.anim-stepbar .tr{position:relative;display:block;width:100%;height:7px;border-radius:4px;background:var(--soft);overflow:hidden;outline:1px solid var(--line)}
+.anim-stepbar button:hover .tr{outline-color:var(--accent)}
+.anim-stepbar .f{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--accent)}
+.anim-stepbar button.done .f{opacity:.55}
+.anim-stepmeta{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:2px 0 6px;font:500 12px/1.4 var(--f-mono);color:var(--muted)}
+.anim-stepmeta b{color:var(--fg);font:600 13px/1.4 var(--f-body)}
+.anim-all{border-top:1px solid var(--line);padding:6px 14px 10px;background:var(--panel)}
+.anim-all summary{cursor:pointer;font:500 11px/1.9 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.anim-all ol{margin:4px 0 0;padding-left:24px;font-size:13.5px;line-height:1.45}
+.anim-all li{padding:4px 8px;border-radius:7px;cursor:pointer;color:var(--muted)}
+.anim-all li:hover{color:var(--fg)}
+.anim-all li.on{background:var(--accent-soft);color:var(--fg)}
+.anim-all li b{color:var(--fg);font-weight:600}
 .anim-say{padding:9px 14px;font:12.5px/1.5 var(--f-mono);color:var(--fg);border-top:1px solid var(--line);min-height:2.6em}
 .an-box{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
 .an-frame{fill:var(--soft);stroke:var(--line)}
@@ -298,11 +314,11 @@ const FM=/^---\s*\n[\s\S]*?\n---\s*\n/;
 // ---- language: one note per topic; the EN/RU switch picks which text is shown.
 // Russian files live in notes-ru/ under the same path and id; a note without one falls back to English.
 const UI={
-  en:{search:"Search notes, tags…",notes:"Notes",graph:"Graph",notesWord:"notes",expandAll:"Expand all",collapseAll:"Collapse all",recent:"Recently learned",learned:"learned",contents:"Contents",localGraph:"Local graph",linkedFrom:"Linked from",linksTo:"Links to",noBacklinks:"No backlinks yet",nothingLinks:"Nothing links here yet.",noOutgoing:"No outgoing links.",noMatch:"No notes match",play:"Play",pause:"Pause",speed:"Speed",openNote:"Open note",notWritten:"Note not written yet",notTranslated:"",
+  en:{search:"Search notes, tags…",notes:"Notes",graph:"Graph",notesWord:"notes",expandAll:"Expand all",collapseAll:"Collapse all",recent:"Recently learned",learned:"learned",contents:"Contents",localGraph:"Local graph",linkedFrom:"Linked from",linksTo:"Links to",noBacklinks:"No backlinks yet",nothingLinks:"Nothing links here yet.",noOutgoing:"No outgoing links.",noMatch:"No notes match",play:"Play",pause:"Pause",speed:"Speed",step:"Step",of:"of",allSteps:"All steps",openNote:"Open note",notWritten:"Note not written yet",notTranslated:"",
       depth:"Depth",d1:"1 · sections",d2:"2 · + subsections",d3:"3 · + notes",gFolders:"Folder edges",gHover:"Links only on hover",gTags:"Tags as nodes",gLabels:"Labels",kSec:"section",kSub:"subsection",kNote:"note",kTag:"tag",
       hint3:"Drag nodes, scroll to zoom, click a note to open it. Notes are grouped by section (solid outline), then by subsection (dashed). Faint lines are [[wikilinks]] between notes; hover a node to highlight its links. Tick Folder edges to also draw section → note lines.",
       hintUp:lvl=>`Links between notes are rolled up to the ${lvl===2?"subsection":"section"} level; thicker edge = more cross-links. Click a node to open its first note.`},
-  ru:{search:"Поиск по заметкам и тегам…",notes:"Заметки",graph:"Граф",notesWord:"заметок",expandAll:"Развернуть всё",collapseAll:"Свернуть всё",recent:"Недавно изученное",learned:"изучено",contents:"Содержание",localGraph:"Локальный граф",linkedFrom:"Ссылаются сюда",linksTo:"Ссылки отсюда",noBacklinks:"Пока никто не ссылается",nothingLinks:"Пока никто не ссылается.",noOutgoing:"Нет исходящих ссылок.",noMatch:"Ничего не найдено по запросу",play:"Пуск",pause:"Пауза",speed:"Скорость",openNote:"Открыть заметку",notWritten:"Заметка ещё не написана",notTranslated:"Перевода этой заметки пока нет — показан английский оригинал.",
+  ru:{search:"Поиск по заметкам и тегам…",notes:"Заметки",graph:"Граф",notesWord:"заметок",expandAll:"Развернуть всё",collapseAll:"Свернуть всё",recent:"Недавно изученное",learned:"изучено",contents:"Содержание",localGraph:"Локальный граф",linkedFrom:"Ссылаются сюда",linksTo:"Ссылки отсюда",noBacklinks:"Пока никто не ссылается",nothingLinks:"Пока никто не ссылается.",noOutgoing:"Нет исходящих ссылок.",noMatch:"Ничего не найдено по запросу",play:"Пуск",pause:"Пауза",speed:"Скорость",step:"Шаг",of:"из",allSteps:"Все шаги",openNote:"Открыть заметку",notWritten:"Заметка ещё не написана",notTranslated:"Перевода этой заметки пока нет — показан английский оригинал.",
       depth:"Глубина",d1:"1 · разделы",d2:"2 · + подразделы",d3:"3 · + заметки",gFolders:"Связи папок",gHover:"Связи только при наведении",gTags:"Теги как узлы",gLabels:"Подписи",kSec:"раздел",kSub:"подраздел",kNote:"заметка",kTag:"тег",
       hint3:"Перетаскивайте узлы, колесом меняйте масштаб, кликните по заметке, чтобы открыть её. Заметки сгруппированы по разделам (сплошной контур) и подразделам (пунктир). Тонкие линии — [[wikilinks]] между заметками; наведите на узел, чтобы подсветить его связи. Включите «Связи папок», чтобы нарисовать ещё и линии раздел → заметка.",
       hintUp:lvl=>`Связи между заметками собраны до уровня ${lvl===2?"подразделов":"разделов"}; чем толще линия, тем больше перекрёстных ссылок. Кликните по узлу, чтобы открыть его первую заметку.`}
@@ -648,6 +664,37 @@ function animShell(el, { title, vb, buttons = [], controls = true }){
     },
     onFrame(f){ frame = f; },
     kick(){ if(frame) frame(0); },
+    steps(items, onJump){                              // items: [{ title, text }] already in the current language
+      const wrap = document.createElement("div"); wrap.className = "anim-steps";
+      const bar = document.createElement("div"); bar.className = "anim-stepbar";
+      const meta = document.createElement("div"); meta.className = "anim-stepmeta"; meta.setAttribute("aria-live", "polite");
+      const jump = i => { onJump(i); api.kick(); };
+      const segs = items.map((it, i)=>{
+        const b = document.createElement("button"); b.type = "button"; b.title = `${i + 1}. ${it.title}`; b.setAttribute("aria-label", b.title);
+        const tr = document.createElement("span"); tr.className = "tr"; const f = document.createElement("span"); f.className = "f";
+        tr.appendChild(f); b.appendChild(tr); b.addEventListener("click", ()=>jump(i)); bar.appendChild(b); return { b, f };
+      });
+      wrap.append(bar, meta); el.querySelector(".anim-stage").after(wrap);
+      const all = document.createElement("details"); all.className = "anim-all"; all.open = true;
+      const sum = document.createElement("summary"); sum.textContent = t("allSteps"); all.appendChild(sum);
+      const ol = document.createElement("ol");
+      const lis = items.map((it, i)=>{
+        const li = document.createElement("li"), b = document.createElement("b"); b.textContent = it.title;
+        li.append(b, document.createTextNode(" — " + it.text)); li.addEventListener("click", ()=>jump(i)); ol.appendChild(li); return li;
+      });
+      all.appendChild(ol); sayEl.after(all);
+      let cur = -1;
+      return { set(i, frac){
+        if(i !== cur){
+          cur = i;
+          segs.forEach((s, j)=>{ s.b.classList.toggle("done", j < i); s.f.style.width = j < i ? "100%" : "0%"; });
+          lis.forEach((li, j)=> li.classList.toggle("on", j === i));
+          const no = document.createElement("span"); no.textContent = `${t("step")} ${i + 1} ${t("of")} ${items.length}`;
+          const ti = document.createElement("b"); ti.textContent = items[i].title; meta.replaceChildren(no, ti);
+        }
+        segs[i].f.style.width = (Math.max(0, Math.min(1, frac)) * 100).toFixed(1) + "%";
+      } };
+    },
     stop(){ cancelAnimationFrame(raf); if(io) io.disconnect(); }
   };
   return api;
@@ -1095,13 +1142,17 @@ ANIMS["syscall-walkthrough"] = el=>{
       en: "9 / 9 · sysret switches back to user mode. read() returns the byte count, and your code continues.",
       ru: "9 / 9 · sysret возвращает CPU в режим пользователя. read() возвращает число байтов, и ваш код продолжает работу." }
   ];
-  const STEP_MS = 4200, MOVE_MS = 1400;
+  const STEP_MS = 5200, MOVE_MS = 1400;
+  const TITLES = [["read() is called", "Вызов read()"], ["syscall: switch to kernel mode", "syscall: переход в режим ядра"], ["The thread sleeps", "Поток засыпает"],
+    ["A packet arrives (DMA)", "Приходит пакет (DMA)"], ["Interrupt → driver's ISR", "Прерывание → ISR драйвера"], ["Network stack", "Сетевой стек"],
+    ["The thread wakes up", "Поток просыпается"], ["Copy into user memory", "Копия в память пользователя"], ["Back to user mode", "Возврат в режим пользователя"]];
   const S = { i: 0, t: 0 };
   const sh = animShell(el, { title: LL("A blocking read(), step by step", "Блокирующий read() по шагам"), vb: [760, 428], buttons: [
     { id: "prev", label: LL("← Back", "← Назад"), on(){ go(S.i - 1); } },
     { id: "next", label: LL("Next →", "Дальше →"), on(){ go(S.i + 1); } }
   ]});
-  function go(i){ S.i = (i + STEPS.length) % STEPS.length; S.t = 0; const s = STEPS[S.i]; sh.say(LL(s.en, s.ru)); }
+  const steps = sh.steps(STEPS.map((s, i)=>({ title: LL(...TITLES[i]), text: LL(s.en, s.ru).replace(/^\d+ \/ \d+ · /, "") })), i=>go(i));
+  function go(i){ S.i = (i + STEPS.length) % STEPS.length; S.t = 0; const s = STEPS[S.i]; sh.say(LL(s.en, s.ru).replace(/^\d+ \/ \d+ · /, ""), 1); }
   function at(path, p){
     const pts = path.map(osC); if(pts.length === 1) return pts[0];
     const f = p * (pts.length - 1), seg = Math.min(pts.length - 2, Math.floor(f)), k = easeIO(f - seg), a = pts[seg], b = pts[seg + 1];
@@ -1115,7 +1166,7 @@ ANIMS["syscall-walkthrough"] = el=>{
     const [x, y] = at(s.path, Math.min(1, S.t / MOVE_MS));
     E(g, "circle", { cx: x, cy: y, r: 9, class: "an-dot an-flow" });
   }
-  sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); render(); });
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); steps.set(S.i, S.t / STEP_MS); render(); });
   go(0); sh.kick();
   return sh;
 };
@@ -1153,6 +1204,8 @@ ANIMS["cpu-memory-hierarchy"] = el=>{
                    : LL("Log scale: each grid step to the right is ten times slower.", "Логарифмическая шкала: каждый шаг сетки вправо в десять раз медленнее."), 4500);
     }}
   ]});
+  const steps = sh.steps(LV.map(v => ({ title: `${LL(v.en, v.ru)} · ${LL(v.lat, v.latru)}`,
+    text: LL(v.nen, v.nru) + " " + LL(`At human scale (1 ns = 1 s): ${v.hen}.`, `В человеческом масштабе (1 нс = 1 с): ${v.hru}.`) })), i=>start(i, true));
   function start(i, user){
     S.i = i; S.t = 0; const L = LV[i];
     sh.say(`${LL(L.en, L.ru)}: ${LL(L.lat, L.latru)}. ` + LL(`If one nanosecond lasted a second, this would take ${L.hen}. `, `Если бы наносекунда длилась секунду, это заняло бы ${L.hru}. `) + LL(L.nen, L.nru), user ? 1 : 0);
@@ -1207,14 +1260,14 @@ ANIMS["cpu-memory-hierarchy"] = el=>{
       E(g, "circle", { cx: O[0] + (L.x - O[0]) * k, cy: O[1] + (L.y - O[1]) * k, r: 7, class: "an-dot an-flow" });
     }
   }
-  sh.onFrame(dt=>{ S.t += dt; if(S.t > dur(LV[S.i].ns) + PAUSE) start((S.i + 1) % LV.length); render(); });
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > dur(LV[S.i].ns) + PAUSE) start((S.i + 1) % LV.length); steps.set(S.i, S.t / (dur(LV[S.i].ns) + PAUSE)); render(); });
   start(0); sh.kick();
   return sh;
 };
 
 // ============ 7. Process memory layout: stack down, heap up
 ANIMS["process-memory-layout"] = el=>{
-  const MAXF = 5, FH = 34, HH = 18, TOP = 30, HEAP0 = 312, LIM = TOP + MAXF * FH, STEP_MS = 3400, X = 150, W = 200;
+  const MAXF = 5, FH = 34, HH = 18, TOP = 30, HEAP0 = 312, LIM = TOP + MAXF * FH, STEP_MS = 4600, X = 150, W = 200;
   const CODE = [
     ["static int requestCount;", "// data", "// данные"], ["void main() {", "", ""], ["  Order o = new Order();", "// heap", "// куча"],
     ["  handle(o);", "// call", "// вызов"], ["}", "", ""], ["void handle(Order o) {", "", ""], ["  requestCount++;", "// data", "// данные"],
@@ -1247,7 +1300,10 @@ ANIMS["process-memory-layout"] = el=>{
     { id: "rec", label: LL("Recurse", "Рекурсия"), on(){ if(!S.rec) { S.rec = { n: 0, acc: 0, boom: 0 }; sh.say(LL("recurse() calls itself with no base case: every call pushes another frame…", "recurse() вызывает сама себя без условия выхода: каждый вызов кладёт ещё один фрейм…"), 1200); } } },
     { id: "reset", label: LL("Reset", "Сначала"), on(){ S.rec = null; go(0); } }
   ]});
-  function go(i){ S.i = (i + STEPS.length) % STEPS.length; S.t = 0; const s = STEPS[S.i]; sh.say(LL(s.en, s.ru)); }
+  const TITLES = [["main() starts", "Запуск main()"], ["new Order()", "new Order()"], ["Call handle(o)", "Вызов handle(o)"], ["requestCount++", "requestCount++"],
+    ["new byte[512]", "new byte[512]"], ["Call parse(buf)", "Вызов parse(buf)"], ["return n", "return n"], ["handle() returns", "Возврат из handle()"], ["GC frees byte[512]", "GC освобождает byte[512]"]];
+  const steps = sh.steps(STEPS.map((s, i)=>({ title: LL(...TITLES[i]), text: LL(s.en, s.ru) })), i=>{ S.rec = null; go(i); });
+  function go(i){ S.i = (i + STEPS.length) % STEPS.length; S.t = 0; const s = STEPS[S.i]; sh.say(LL(s.en, s.ru).replace(/^\d+ \/ \d+ · /, ""), 1); }
   function render(){
     const g = sh.svg; g.textContent = ""; const s = STEPS[S.i];
     const frames = s.stack.slice(); if(S.rec) for(let j = 0; j < S.rec.n; j++) frames.push("recurse()");
@@ -1296,6 +1352,7 @@ ANIMS["process-memory-layout"] = el=>{
           sh.say(LL("StackOverflowError: the next frame would cross the thread's stack limit, so the JVM throws instead of overwriting memory.",
                     "StackOverflowError: следующий фрейм пересёк бы предел стека потока, поэтому JVM бросает исключение, а не затирает память."), 2600); } } }
     } else { S.t += dt; if(S.t > STEP_MS) go(S.i + 1); }
+    steps.set(S.i, S.t / STEP_MS);
     render();
   });
   go(0); sh.kick();
