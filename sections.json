@@ -44,7 +44,10 @@
    "principles": "Principles & DDD",
    "patterns": "Design patterns",
    "messaging": "Messaging & reliability",
-   "resources": "Resources"
+   "resources": "Resources",
+   "microservices": "Microservices & resilience",
+   "system-design": "System design",
+   "workflows": "Workflow orchestration"
   }
  },
  "devops": {
@@ -55,7 +58,14 @@
    "git": "Git",
    "build": "Build tools",
    "observability": "Observability",
-   "resources": "Resources"
+   "resources": "Resources",
+   "kubernetes": "Kubernetes"
+  }
+ },
+ "projects": {
+  "name": "Projects",
+  "subs": {
+   "stories": "Project stories"
   }
  }
 }
