@@ -1,4 +1,16 @@
 {
+ "computer-science": {
+  "name": "Computer science",
+  "subs": {
+   "algorithms": "Algorithms",
+   "data-structures": "Data structures",
+   "operating-systems": "Operating systems",
+   "concurrency-theory": "Concurrency theory",
+   "computation": "Computation & hardware",
+   "programming": "Programming concepts",
+   "security-basics": "Security basics"
+  }
+ },
  "java": {
   "name": "Java",
   "subs": {
@@ -27,8 +39,10 @@
  "databases": {
   "name": "Databases",
   "subs": {
-   "relational": "Relational",
-   "nosql": "NoSQL"
+   "fundamentals": "Fundamentals",
+   "postgres": "PostgreSQL",
+   "nosql": "NoSQL",
+   "design": "Data modeling & migrations"
   }
  },
  "messaging": {
@@ -38,16 +52,46 @@
    "rabbitmq": "RabbitMQ & ActiveMQ"
   }
  },
+ "networking": {
+  "name": "Networking",
+  "subs": {
+   "fundamentals": "Fundamentals",
+   "http": "HTTP",
+   "security": "TLS & auth",
+   "dns-and-routing": "DNS, proxies & load balancing",
+   "tools": "Tools"
+  }
+ },
+ "distributed-systems": {
+  "name": "Distributed systems",
+  "subs": {
+   "fundamentals": "Fundamentals",
+   "consensus": "Consensus & coordination",
+   "replication": "Replication",
+   "partitioning": "Partitioning",
+   "patterns": "Patterns"
+  }
+ },
+ "system-design": {
+  "name": "System design",
+  "subs": {
+   "method": "Method & estimates",
+   "building-blocks": "Building blocks",
+   "scaling": "Scaling",
+   "case-studies": "Case studies"
+  }
+ },
  "architecture": {
   "name": "Architecture",
   "subs": {
-   "principles": "Principles & DDD",
+   "principles": "Principles",
+   "styles": "Architecture styles",
+   "ddd": "Domain-driven design",
    "patterns": "Design patterns",
-   "messaging": "Messaging & reliability",
-   "resources": "Resources",
    "microservices": "Microservices & resilience",
-   "system-design": "System design",
-   "workflows": "Workflow orchestration"
+   "messaging": "Messaging & reliability",
+   "workflows": "Workflow orchestration",
+   "resources": "Resources"
   }
  },
  "devops": {
@@ -55,11 +99,11 @@
   "subs": {
    "linux": "Linux",
    "docker": "Docker",
+   "kubernetes": "Kubernetes",
    "git": "Git",
    "build": "Build tools",
    "observability": "Observability",
-   "resources": "Resources",
-   "kubernetes": "Kubernetes"
+   "resources": "Resources"
   }
  },
  "projects": {

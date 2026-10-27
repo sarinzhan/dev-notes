@@ -1,6 +1,18 @@
 {
  "nodes": [
   {
+   "id": "ddd-basics",
+   "sec": "architecture",
+   "sub": "ddd",
+   "title": "DDD basics and the architecture vocabulary",
+   "tags": [
+    "ddd",
+    "architecture",
+    "aggregates",
+    "design-principles"
+   ]
+  },
+  {
    "id": "idempotency",
    "sec": "architecture",
    "sub": "messaging",
@@ -114,18 +126,6 @@
    ]
   },
   {
-   "id": "ddd-basics",
-   "sec": "architecture",
-   "sub": "principles",
-   "title": "DDD basics and the architecture vocabulary",
-   "tags": [
-    "ddd",
-    "architecture",
-    "aggregates",
-    "design-principles"
-   ]
-  },
-  {
    "id": "solid",
    "sec": "architecture",
    "sub": "principles",
@@ -150,18 +150,6 @@
    ]
   },
   {
-   "id": "system-design-basics",
-   "sec": "architecture",
-   "sub": "system-design",
-   "title": "System design basics — framework, building blocks, numbers",
-   "tags": [
-    "system-design",
-    "architecture",
-    "distributed-systems",
-    "interview"
-   ]
-  },
-  {
    "id": "temporal-concepts",
    "sec": "architecture",
    "sub": "workflows",
@@ -172,6 +160,91 @@
     "distributed-systems",
     "spring-boot",
     "java"
+   ]
+  },
+  {
+   "id": "data-structures",
+   "sec": "computer-science",
+   "sub": "data-structures",
+   "title": "Core data structures and algorithms",
+   "tags": [
+    "data-structures",
+    "algorithms",
+    "big-o",
+    "trees",
+    "complexity"
+   ]
+  },
+  {
+   "id": "constraints-and-relationships",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Constraints and table relationships",
+   "tags": [
+    "sql",
+    "constraints",
+    "foreign-keys",
+    "schema-design"
+   ]
+  },
+  {
+   "id": "database-fundamentals",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Databases, DBMS, relational vs NoSQL, and views",
+   "tags": [
+    "databases",
+    "sql",
+    "fundamentals",
+    "views"
+   ]
+  },
+  {
+   "id": "database-indexes",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Database indexes: how they work and when they hurt",
+   "tags": [
+    "databases",
+    "indexes",
+    "performance",
+    "b-tree"
+   ]
+  },
+  {
+   "id": "normalization-and-denormalization",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Normal forms and denormalization",
+   "tags": [
+    "databases",
+    "schema-design",
+    "normalization",
+    "sql"
+   ]
+  },
+  {
+   "id": "sql-joins-and-commands",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "SQL command categories and join types",
+   "tags": [
+    "sql",
+    "joins",
+    "ddl",
+    "dml"
+   ]
+  },
+  {
+   "id": "transactions-acid-and-isolation",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Transactions, ACID and isolation anomalies",
+   "tags": [
+    "transactions",
+    "acid",
+    "isolation",
+    "concurrency"
    ]
   },
   {
@@ -186,57 +259,9 @@
    ]
   },
   {
-   "id": "constraints-and-relationships",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Constraints and table relationships",
-   "tags": [
-    "sql",
-    "constraints",
-    "foreign-keys",
-    "schema-design"
-   ]
-  },
-  {
-   "id": "database-fundamentals",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Databases, DBMS, relational vs NoSQL, and views",
-   "tags": [
-    "databases",
-    "sql",
-    "fundamentals",
-    "views"
-   ]
-  },
-  {
-   "id": "database-indexes",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Database indexes: how they work and when they hurt",
-   "tags": [
-    "databases",
-    "indexes",
-    "performance",
-    "b-tree"
-   ]
-  },
-  {
-   "id": "normalization-and-denormalization",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Normal forms and denormalization",
-   "tags": [
-    "databases",
-    "schema-design",
-    "normalization",
-    "sql"
-   ]
-  },
-  {
    "id": "postgres-indexes",
    "sec": "databases",
-   "sub": "relational",
+   "sub": "postgres",
    "title": "Postgres index types and when to use them",
    "tags": [
     "postgres",
@@ -247,37 +272,13 @@
   {
    "id": "postgres-isolation-levels",
    "sec": "databases",
-   "sub": "relational",
+   "sub": "postgres",
    "title": "Transaction isolation levels in Postgres",
    "tags": [
     "postgres",
     "transactions",
     "concurrency",
     "mvcc"
-   ]
-  },
-  {
-   "id": "sql-joins-and-commands",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "SQL command categories and join types",
-   "tags": [
-    "sql",
-    "joins",
-    "ddl",
-    "dml"
-   ]
-  },
-  {
-   "id": "transactions-acid-and-isolation",
-   "sec": "databases",
-   "sub": "relational",
-   "title": "Transactions, ACID and isolation anomalies",
-   "tags": [
-    "transactions",
-    "acid",
-    "isolation",
-    "concurrency"
    ]
   },
   {
@@ -533,19 +534,6 @@
     "map",
     "queue",
     "big-o"
-   ]
-  },
-  {
-   "id": "data-structures",
-   "sec": "java",
-   "sub": "collections",
-   "title": "Core data structures and algorithms",
-   "tags": [
-    "data-structures",
-    "algorithms",
-    "big-o",
-    "trees",
-    "complexity"
    ]
   },
   {
@@ -1494,6 +1482,18 @@
     "webclient",
     "sse",
     "reactor"
+   ]
+  },
+  {
+   "id": "system-design-basics",
+   "sec": "system-design",
+   "sub": "method",
+   "title": "System design basics — framework, building blocks, numbers",
+   "tags": [
+    "system-design",
+    "architecture",
+    "distributed-systems",
+    "interview"
    ]
   }
  ],
