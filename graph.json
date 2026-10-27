@@ -9,7 +9,7 @@
     "reliability",
     "kafka",
     "api-design",
-    "redis"
+    "payments"
    ]
   },
   {
@@ -22,6 +22,56 @@
     "kafka",
     "reliability",
     "postgres"
+   ]
+  },
+  {
+   "id": "api-gateway-and-service-discovery",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "API gateway, service discovery and config server",
+   "tags": [
+    "microservices",
+    "spring-cloud",
+    "networking",
+    "kubernetes"
+   ]
+  },
+  {
+   "id": "circuit-breaker",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Circuit breaker, retry, bulkhead — Resilience4j in Spring Boot",
+   "tags": [
+    "microservices",
+    "resilience",
+    "resilience4j",
+    "spring-boot"
+   ]
+  },
+  {
+   "id": "distributed-tracing",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Distributed tracing with OpenTelemetry in Spring Boot 3",
+   "tags": [
+    "observability",
+    "opentelemetry",
+    "tracing",
+    "spring-boot",
+    "kafka"
+   ]
+  },
+  {
+   "id": "saga",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Saga pattern — orchestration vs choreography, compensation",
+   "tags": [
+    "microservices",
+    "distributed-systems",
+    "transactions",
+    "temporal",
+    "kafka"
    ]
   },
   {
@@ -97,6 +147,31 @@
     "system-design",
     "software-design",
     "architecture"
+   ]
+  },
+  {
+   "id": "system-design-basics",
+   "sec": "architecture",
+   "sub": "system-design",
+   "title": "System design basics — framework, building blocks, numbers",
+   "tags": [
+    "system-design",
+    "architecture",
+    "distributed-systems",
+    "interview"
+   ]
+  },
+  {
+   "id": "temporal-concepts",
+   "sec": "architecture",
+   "sub": "workflows",
+   "title": "Temporal concepts — workflows, activities, replay, Spring Boot",
+   "tags": [
+    "temporal",
+    "workflows",
+    "distributed-systems",
+    "spring-boot",
+    "java"
    ]
   },
   {
@@ -320,6 +395,19 @@
    ]
   },
   {
+   "id": "kubernetes-basics",
+   "sec": "devops",
+   "sub": "kubernetes",
+   "title": "Kubernetes basics for a Spring Boot service",
+   "tags": [
+    "kubernetes",
+    "devops",
+    "containers",
+    "spring-boot",
+    "jvm"
+   ]
+  },
+  {
    "id": "linux-architecture-and-kernel",
    "sec": "devops",
    "sub": "linux",
@@ -492,7 +580,8 @@
    "title": "CompletableFuture essentials",
    "tags": [
     "concurrency",
-    "async"
+    "async",
+    "java"
    ]
   },
   {
@@ -910,7 +999,8 @@
    "tags": [
     "jdbc",
     "performance",
-    "postgres"
+    "postgres",
+    "spring-boot"
    ]
   },
   {
@@ -1034,6 +1124,45 @@
     "amqp",
     "messaging",
     "message-broker"
+   ]
+  },
+  {
+   "id": "emv-card-processing",
+   "sec": "projects",
+   "sub": "stories",
+   "title": "Project story — EMV card processing and personalization at MDigital",
+   "tags": [
+    "project-story",
+    "interview",
+    "fintech",
+    "emv",
+    "outbox"
+   ]
+  },
+  {
+   "id": "esim-provisioning-platform",
+   "sec": "projects",
+   "sub": "stories",
+   "title": "Project story — eSIM provisioning platform at Beeline",
+   "tags": [
+    "project-story",
+    "interview",
+    "temporal",
+    "kafka",
+    "esim"
+   ]
+  },
+  {
+   "id": "sebep-incident-analysis",
+   "sec": "projects",
+   "sub": "stories",
+   "title": "Project story — Sebep, AI-powered incident analysis",
+   "tags": [
+    "project-story",
+    "interview",
+    "observability",
+    "sentry",
+    "llm"
    ]
   },
   {
@@ -1202,7 +1331,8 @@
    "tags": [
     "transactions",
     "jpa",
-    "aop"
+    "aop",
+    "spring-boot"
    ]
   },
   {
@@ -1213,7 +1343,8 @@
    "tags": [
     "kafka",
     "messaging",
-    "spring-boot"
+    "spring-boot",
+    "reliability"
    ]
   },
   {
@@ -1250,6 +1381,31 @@
     "authentication",
     "authorization",
     "filters"
+   ]
+  },
+  {
+   "id": "junit-and-mockito",
+   "sec": "spring",
+   "sub": "testing",
+   "title": "JUnit 5 and Mockito essentials",
+   "tags": [
+    "testing",
+    "junit",
+    "mockito",
+    "assertj"
+   ]
+  },
+  {
+   "id": "testcontainers",
+   "sec": "spring",
+   "sub": "testing",
+   "title": "Testcontainers for Postgres, Kafka and Redis tests",
+   "tags": [
+    "testing",
+    "testcontainers",
+    "postgres",
+    "kafka",
+    "spring-boot-test"
    ]
   },
   {
@@ -1431,6 +1587,70 @@
    "target": "spring-transactional"
   },
   {
+   "source": "api-gateway-and-service-discovery",
+   "target": "circuit-breaker"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "ddd-basics"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "distributed-tracing"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "docker-swarm"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "idempotency"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "jwt-authentication"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "kafka-architecture"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "kubernetes-basics"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "openapi-swagger"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "redis-data-structures"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "rest-and-http"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "spring-security-basics"
+  },
+  {
+   "source": "api-gateway-and-service-discovery",
+   "target": "system-design-basics"
+  },
+  {
    "source": "architecture-resources",
    "target": "database-indexes"
   },
@@ -1481,6 +1701,10 @@
   {
    "source": "architecture-resources",
    "target": "spring-resources"
+  },
+  {
+   "source": "architecture-resources",
+   "target": "system-design-basics"
   },
   {
    "source": "architecture-resources",
@@ -1565,6 +1789,54 @@
   {
    "source": "casting-and-autoboxing",
    "target": "primitives-and-wrappers"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "completable-future"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "esim-provisioning-platform"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "idempotency"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "otel-metric-types"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "rest-clients"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "saga"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "sebep-incident-analysis"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "spring-aop"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "circuit-breaker",
+   "target": "virtual-threads"
   },
   {
    "source": "class-initialization-order",
@@ -1652,6 +1924,10 @@
   },
   {
    "source": "completable-future",
+   "target": "exceptions"
+  },
+  {
+   "source": "completable-future",
    "target": "executors-and-thread-pools"
   },
   {
@@ -1669,6 +1945,14 @@
   {
    "source": "completable-future",
    "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "completable-future",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "completable-future",
+   "target": "synchronizers"
   },
   {
    "source": "completable-future",
@@ -1900,6 +2184,10 @@
   },
   {
    "source": "database-fundamentals",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "database-fundamentals",
    "target": "transactions-acid-and-isolation"
   },
   {
@@ -1925,6 +2213,10 @@
   {
    "source": "ddd-basics",
    "target": "docker-swarm"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "esim-provisioning-platform"
   },
   {
    "source": "ddd-basics",
@@ -1957,6 +2249,10 @@
   {
    "source": "ddd-basics",
    "target": "rabbitmq-basics"
+  },
+  {
+   "source": "ddd-basics",
+   "target": "saga"
   },
   {
    "source": "ddd-basics",
@@ -2000,6 +2296,10 @@
   },
   {
    "source": "devops-resources",
+   "target": "kubernetes-basics"
+  },
+  {
+   "source": "devops-resources",
    "target": "linux-architecture-and-kernel"
   },
   {
@@ -2037,6 +2337,38 @@
   {
    "source": "devops-resources",
    "target": "spring-resources"
+  },
+  {
+   "source": "distributed-tracing",
+   "target": "esim-provisioning-platform"
+  },
+  {
+   "source": "distributed-tracing",
+   "target": "kubernetes-basics"
+  },
+  {
+   "source": "distributed-tracing",
+   "target": "logging-stacks"
+  },
+  {
+   "source": "distributed-tracing",
+   "target": "otel-metric-types"
+  },
+  {
+   "source": "distributed-tracing",
+   "target": "saga"
+  },
+  {
+   "source": "distributed-tracing",
+   "target": "sebep-incident-analysis"
+  },
+  {
+   "source": "distributed-tracing",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "distributed-tracing",
+   "target": "system-design-basics"
   },
   {
    "source": "docker-containers-and-resources",
@@ -2084,6 +2416,10 @@
   },
   {
    "source": "docker-containers-and-resources",
+   "target": "kubernetes-basics"
+  },
+  {
+   "source": "docker-containers-and-resources",
    "target": "linux-architecture-and-kernel"
   },
   {
@@ -2120,6 +2456,14 @@
   },
   {
    "source": "docker-fundamentals",
+   "target": "esim-provisioning-platform"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "kubernetes-basics"
+  },
+  {
+   "source": "docker-fundamentals",
    "target": "linux-architecture-and-kernel"
   },
   {
@@ -2132,7 +2476,15 @@
   },
   {
    "source": "docker-fundamentals",
+   "target": "sebep-incident-analysis"
+  },
+  {
+   "source": "docker-fundamentals",
    "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "testcontainers"
   },
   {
    "source": "docker-fundamentals",
@@ -2168,6 +2520,10 @@
   },
   {
    "source": "docker-socket-dind-dood",
+   "target": "testcontainers"
+  },
+  {
+   "source": "docker-socket-dind-dood",
    "target": "testing-types-and-dev-cycles"
   },
   {
@@ -2181,6 +2537,10 @@
   {
    "source": "docker-swarm",
    "target": "dockerfile-and-images"
+  },
+  {
+   "source": "docker-swarm",
+   "target": "kubernetes-basics"
   },
   {
    "source": "docker-swarm",
@@ -2204,6 +2564,10 @@
   },
   {
    "source": "docker-swarm-stack-deploy",
+   "target": "kubernetes-basics"
+  },
+  {
+   "source": "docker-swarm-stack-deploy",
    "target": "logging-stacks"
   },
   {
@@ -2217,6 +2581,10 @@
   {
    "source": "docker-volumes-and-registry",
    "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "dockerfile-and-images",
+   "target": "kubernetes-basics"
   },
   {
    "source": "dockerfile-and-images",
@@ -2237,6 +2605,38 @@
   {
    "source": "dockerfile-and-images",
    "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "emv-card-processing",
+   "target": "idempotency"
+  },
+  {
+   "source": "emv-card-processing",
+   "target": "java-io-streams"
+  },
+  {
+   "source": "emv-card-processing",
+   "target": "junit-and-mockito"
+  },
+  {
+   "source": "emv-card-processing",
+   "target": "kafka-producer"
+  },
+  {
+   "source": "emv-card-processing",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "emv-card-processing",
+   "target": "postgres-isolation-levels"
+  },
+  {
+   "source": "emv-card-processing",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "emv-card-processing",
+   "target": "testing-types-and-dev-cycles"
   },
   {
    "source": "enums",
@@ -2279,8 +2679,56 @@
    "target": "structural-patterns"
   },
   {
+   "source": "esim-provisioning-platform",
+   "target": "idempotency"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "junit-and-mockito"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "jwt-authentication"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "kafka-producer"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "kubernetes-basics"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "otel-metric-types"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "saga"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "temporal-concepts"
+  },
+  {
+   "source": "esim-provisioning-platform",
+   "target": "testcontainers"
+  },
+  {
    "source": "exceptions",
    "target": "java-io-streams"
+  },
+  {
+   "source": "exceptions",
+   "target": "junit-and-mockito"
   },
   {
    "source": "exceptions",
@@ -2384,6 +2832,10 @@
   },
   {
    "source": "garbage-collection",
+   "target": "kubernetes-basics"
+  },
+  {
+   "source": "garbage-collection",
    "target": "linux-architecture-and-kernel"
   },
   {
@@ -2459,6 +2911,10 @@
    "target": "spring-cache-abstraction"
   },
   {
+   "source": "hibernate-caching",
+   "target": "system-design-basics"
+  },
+  {
    "source": "hikaricp-pool-sizing",
    "target": "java-ee-and-jakarta"
   },
@@ -2480,11 +2936,23 @@
   },
   {
    "source": "hikaricp-pool-sizing",
+   "target": "outbox-pattern"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "postgres-isolation-levels"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
    "target": "spring-boot-properties-and-profiles"
   },
   {
    "source": "hikaricp-pool-sizing",
    "target": "spring-transactional"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "testcontainers"
   },
   {
    "source": "hikaricp-pool-sizing",
@@ -2532,6 +3000,14 @@
   },
   {
    "source": "idempotency",
+   "target": "saga"
+  },
+  {
+   "source": "idempotency",
+   "target": "sebep-incident-analysis"
+  },
+  {
+   "source": "idempotency",
    "target": "spring-cache-abstraction"
   },
   {
@@ -2540,7 +3016,19 @@
   },
   {
    "source": "idempotency",
+   "target": "spring-transactional"
+  },
+  {
+   "source": "idempotency",
    "target": "structural-patterns"
+  },
+  {
+   "source": "idempotency",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "idempotency",
+   "target": "temporal-concepts"
   },
   {
    "source": "idempotency",
@@ -2720,6 +3208,10 @@
   },
   {
    "source": "jpa-locking",
+   "target": "testcontainers"
+  },
+  {
+   "source": "jpa-locking",
    "target": "transactions-acid-and-isolation"
   },
   {
@@ -2732,11 +3224,19 @@
   },
   {
    "source": "jpa-n-plus-one",
+   "target": "postgres-indexes"
+  },
+  {
+   "source": "jpa-n-plus-one",
    "target": "spring-data-repositories"
   },
   {
    "source": "jpa-n-plus-one",
    "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "jpa-n-plus-one",
+   "target": "spring-transactional"
   },
   {
    "source": "jpa-n-plus-one",
@@ -2764,11 +3264,27 @@
   },
   {
    "source": "jpa-persistence-context-and-entity-lifecycle",
+   "target": "testcontainers"
+  },
+  {
+   "source": "jpa-persistence-context-and-entity-lifecycle",
    "target": "testing-types-and-dev-cycles"
   },
   {
    "source": "jpa-persistence-context-and-entity-lifecycle",
    "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "junit-and-mockito",
+   "target": "spring-ioc-and-di"
+  },
+  {
+   "source": "junit-and-mockito",
+   "target": "testcontainers"
+  },
+  {
+   "source": "junit-and-mockito",
+   "target": "testing-types-and-dev-cycles"
   },
   {
    "source": "jvm-jre-jdk",
@@ -2781,6 +3297,10 @@
   {
    "source": "jvm-jre-jdk",
    "target": "reference-types"
+  },
+  {
+   "source": "jvm-memory-areas",
+   "target": "kubernetes-basics"
   },
   {
    "source": "jvm-memory-areas",
@@ -2827,6 +3347,10 @@
    "target": "spring-security-basics"
   },
   {
+   "source": "jwt-authentication",
+   "target": "system-design-basics"
+  },
+  {
    "source": "kafka-architecture",
    "target": "kafka-consumer"
   },
@@ -2859,6 +3383,10 @@
    "target": "spring-kafka-consumer"
   },
   {
+   "source": "kafka-architecture",
+   "target": "system-design-basics"
+  },
+  {
    "source": "kafka-consumer",
    "target": "kafka-producer"
   },
@@ -2880,7 +3408,19 @@
   },
   {
    "source": "kafka-consumer",
+   "target": "sebep-incident-analysis"
+  },
+  {
+   "source": "kafka-consumer",
    "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "kafka-consumer",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "kafka-consumer",
+   "target": "temporal-concepts"
   },
   {
    "source": "kafka-producer",
@@ -2893,6 +3433,18 @@
   {
    "source": "kafka-producer",
    "target": "structural-patterns"
+  },
+  {
+   "source": "kafka-producer",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "kubernetes-basics",
+   "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "kubernetes-basics",
+   "target": "system-design-basics"
   },
   {
    "source": "linux-architecture-and-kernel",
@@ -2972,11 +3524,23 @@
   },
   {
    "source": "logging-stacks",
+   "target": "sebep-incident-analysis"
+  },
+  {
+   "source": "logging-stacks",
    "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "logging-stacks",
+   "target": "system-design-basics"
   },
   {
    "source": "maven",
    "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "maven",
+   "target": "testcontainers"
   },
   {
    "source": "maven",
@@ -3023,6 +3587,10 @@
    "target": "sql-joins-and-commands"
   },
   {
+   "source": "normalization-and-denormalization",
+   "target": "system-design-basics"
+  },
+  {
    "source": "object-class-and-reflection",
    "target": "reference-types"
   },
@@ -3067,6 +3635,14 @@
    "target": "spring-security-basics"
   },
   {
+   "source": "openapi-swagger",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "otel-metric-types",
+   "target": "sebep-incident-analysis"
+  },
+  {
    "source": "otel-metric-types",
    "target": "spring-boot-starters-and-autoconfiguration"
   },
@@ -3080,11 +3656,27 @@
   },
   {
    "source": "outbox-pattern",
+   "target": "saga"
+  },
+  {
+   "source": "outbox-pattern",
    "target": "spring-kafka-consumer"
   },
   {
    "source": "outbox-pattern",
    "target": "spring-transactional"
+  },
+  {
+   "source": "outbox-pattern",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "outbox-pattern",
+   "target": "temporal-concepts"
+  },
+  {
+   "source": "outbox-pattern",
+   "target": "testcontainers"
   },
   {
    "source": "outbox-pattern",
@@ -3099,8 +3691,20 @@
    "target": "sql-joins-and-commands"
   },
   {
+   "source": "postgres-indexes",
+   "target": "system-design-basics"
+  },
+  {
    "source": "postgres-isolation-levels",
    "target": "spring-transactional"
+  },
+  {
+   "source": "postgres-isolation-levels",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "postgres-isolation-levels",
+   "target": "testcontainers"
   },
   {
    "source": "postgres-isolation-levels",
@@ -3119,12 +3723,28 @@
    "target": "structural-patterns"
   },
   {
+   "source": "rabbitmq-basics",
+   "target": "sebep-incident-analysis"
+  },
+  {
+   "source": "rabbitmq-basics",
+   "target": "system-design-basics"
+  },
+  {
    "source": "redis-data-structures",
    "target": "spring-cache-abstraction"
   },
   {
+   "source": "redis-data-structures",
+   "target": "system-design-basics"
+  },
+  {
    "source": "rest-and-http",
    "target": "rest-clients"
+  },
+  {
+   "source": "rest-and-http",
+   "target": "sebep-incident-analysis"
   },
   {
    "source": "rest-and-http",
@@ -3141,6 +3761,10 @@
   {
    "source": "rest-and-http",
    "target": "spring-security-basics"
+  },
+  {
+   "source": "rest-and-http",
+   "target": "system-design-basics"
   },
   {
    "source": "rest-clients",
@@ -3165,6 +3789,18 @@
   {
    "source": "rest-clients",
    "target": "virtual-threads"
+  },
+  {
+   "source": "saga",
+   "target": "system-design-basics"
+  },
+  {
+   "source": "saga",
+   "target": "temporal-concepts"
+  },
+  {
+   "source": "sebep-incident-analysis",
+   "target": "spring-security-basics"
   },
   {
    "source": "solid",
@@ -3275,6 +3911,10 @@
    "target": "spring-transactional"
   },
   {
+   "source": "spring-cache-abstraction",
+   "target": "system-design-basics"
+  },
+  {
    "source": "spring-data-repositories",
    "target": "spring-transactional"
   },
@@ -3297,6 +3937,10 @@
   {
    "source": "spring-kafka-consumer",
    "target": "spring-transactional"
+  },
+  {
+   "source": "spring-kafka-consumer",
+   "target": "testcontainers"
   },
   {
    "source": "spring-kafka-consumer",
@@ -3373,6 +4017,18 @@
   {
    "source": "synchronization-and-monitors",
    "target": "virtual-threads"
+  },
+  {
+   "source": "system-design-basics",
+   "target": "temporal-concepts"
+  },
+  {
+   "source": "system-design-basics",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "testcontainers",
+   "target": "testing-types-and-dev-cycles"
   },
   {
    "source": "threads-basics",
