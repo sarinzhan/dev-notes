@@ -217,6 +217,26 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
 .an-rcell.ok{fill:var(--ok)} .an-rcell.unc{fill:var(--unc)} .an-rcell.gone{opacity:.5}
 .an-hw{stroke:var(--fg);stroke-width:1.2;stroke-dasharray:6 4}
 .an-hwt{fill:var(--fg)}
+.an-hit{fill:transparent}
+.an-hl{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.6}
+.an-dim{opacity:.3}
+.an-sys{stroke:var(--accent);stroke-width:1.3;stroke-dasharray:6 4} .an-sys.on{stroke-width:2.6;stroke-dasharray:none}
+.an-link2{stroke:var(--muted);stroke-width:1.2} .an-link2.on{stroke:var(--accent);stroke-width:2.4}
+.an-badge-u{fill:var(--ok)} .an-badge-k{fill:var(--accent)}
+.an-rowhl{fill:var(--accent-soft)} .an-track{fill:var(--soft)}
+.an-bar{fill:var(--accent);opacity:.45} .an-bar.on{opacity:1}
+.an-heap{fill:var(--k2);fill-opacity:.22;stroke:var(--k2)} .an-heap.dead{fill:var(--muted);fill-opacity:.12;stroke:var(--muted);stroke-dasharray:3 3}
+.an-stack{fill:var(--k1);fill-opacity:.18;stroke:var(--k1)} .an-over{fill:var(--warn);fill-opacity:.25;stroke:var(--warn)}
+.an-limit{stroke:var(--warn);stroke-width:1.2;stroke-dasharray:5 4} .an-limit.on{stroke-width:3;stroke-dasharray:none}
+.an-code{font:11.5px var(--f-mono);fill:var(--fg)} .an-code.c{fill:var(--muted)}
+.an-free{fill:none;stroke:var(--line);stroke-dasharray:3 3}
+.an-map{fill:none;stroke-width:1.5;stroke-opacity:.75} .s0{stroke:var(--k0)} .s1{stroke:var(--k1)} .s2{stroke:var(--k2)} .s3{stroke:var(--k3)}
+.an-cow{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:4 3}
+.an-pl{font:600 12px var(--f-mono);fill:var(--fg);pointer-events:none}
+.an-sector{stroke:var(--bg);stroke-width:1.5;fill-opacity:.55} .an-sector.an-filew{fill-opacity:1} .an-sector.an-sel{stroke:var(--fg);stroke-width:2.5}
+.an-arm{stroke:var(--muted);stroke-width:4;stroke-linecap:round} .an-headc{fill:var(--fg)}
+.an-filebox{fill:none;stroke:var(--k0);stroke-width:2.4} .an-otherbox{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:3 3} .an-selbox{fill:none;stroke:var(--fg);stroke-width:2}
+.an-t,.an-m,.an-cell-t,.an-code{pointer-events:none}
 .mob-right{display:none;margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
 .mob-right h4{font:500 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
 .mob-right ul{list-style:none;margin:0 0 18px;padding:0}
@@ -278,11 +298,11 @@ const FM=/^---\s*\n[\s\S]*?\n---\s*\n/;
 // ---- language: one note per topic; the EN/RU switch picks which text is shown.
 // Russian files live in notes-ru/ under the same path and id; a note without one falls back to English.
 const UI={
-  en:{search:"Search notes, tags…",notes:"Notes",graph:"Graph",notesWord:"notes",expandAll:"Expand all",collapseAll:"Collapse all",recent:"Recently learned",learned:"learned",contents:"Contents",localGraph:"Local graph",linkedFrom:"Linked from",linksTo:"Links to",noBacklinks:"No backlinks yet",nothingLinks:"Nothing links here yet.",noOutgoing:"No outgoing links.",noMatch:"No notes match",openNote:"Open note",notWritten:"Note not written yet",notTranslated:"",
+  en:{search:"Search notes, tags…",notes:"Notes",graph:"Graph",notesWord:"notes",expandAll:"Expand all",collapseAll:"Collapse all",recent:"Recently learned",learned:"learned",contents:"Contents",localGraph:"Local graph",linkedFrom:"Linked from",linksTo:"Links to",noBacklinks:"No backlinks yet",nothingLinks:"Nothing links here yet.",noOutgoing:"No outgoing links.",noMatch:"No notes match",play:"Play",pause:"Pause",speed:"Speed",openNote:"Open note",notWritten:"Note not written yet",notTranslated:"",
       depth:"Depth",d1:"1 · sections",d2:"2 · + subsections",d3:"3 · + notes",gFolders:"Folder edges",gHover:"Links only on hover",gTags:"Tags as nodes",gLabels:"Labels",kSec:"section",kSub:"subsection",kNote:"note",kTag:"tag",
       hint3:"Drag nodes, scroll to zoom, click a note to open it. Notes are grouped by section (solid outline), then by subsection (dashed). Faint lines are [[wikilinks]] between notes; hover a node to highlight its links. Tick Folder edges to also draw section → note lines.",
       hintUp:lvl=>`Links between notes are rolled up to the ${lvl===2?"subsection":"section"} level; thicker edge = more cross-links. Click a node to open its first note.`},
-  ru:{search:"Поиск по заметкам и тегам…",notes:"Заметки",graph:"Граф",notesWord:"заметок",expandAll:"Развернуть всё",collapseAll:"Свернуть всё",recent:"Недавно изученное",learned:"изучено",contents:"Содержание",localGraph:"Локальный граф",linkedFrom:"Ссылаются сюда",linksTo:"Ссылки отсюда",noBacklinks:"Пока никто не ссылается",nothingLinks:"Пока никто не ссылается.",noOutgoing:"Нет исходящих ссылок.",noMatch:"Ничего не найдено по запросу",openNote:"Открыть заметку",notWritten:"Заметка ещё не написана",notTranslated:"Перевода этой заметки пока нет — показан английский оригинал.",
+  ru:{search:"Поиск по заметкам и тегам…",notes:"Заметки",graph:"Граф",notesWord:"заметок",expandAll:"Развернуть всё",collapseAll:"Свернуть всё",recent:"Недавно изученное",learned:"изучено",contents:"Содержание",localGraph:"Локальный граф",linkedFrom:"Ссылаются сюда",linksTo:"Ссылки отсюда",noBacklinks:"Пока никто не ссылается",nothingLinks:"Пока никто не ссылается.",noOutgoing:"Нет исходящих ссылок.",noMatch:"Ничего не найдено по запросу",play:"Пуск",pause:"Пауза",speed:"Скорость",openNote:"Открыть заметку",notWritten:"Заметка ещё не написана",notTranslated:"Перевода этой заметки пока нет — показан английский оригинал.",
       depth:"Глубина",d1:"1 · разделы",d2:"2 · + подразделы",d3:"3 · + заметки",gFolders:"Связи папок",gHover:"Связи только при наведении",gTags:"Теги как узлы",gLabels:"Подписи",kSec:"раздел",kSub:"подраздел",kNote:"заметка",kTag:"тег",
       hint3:"Перетаскивайте узлы, колесом меняйте масштаб, кликните по заметке, чтобы открыть её. Заметки сгруппированы по разделам (сплошной контур) и подразделам (пунктир). Тонкие линии — [[wikilinks]] между заметками; наведите на узел, чтобы подсветить его связи. Включите «Связи папок», чтобы нарисовать ещё и линии раздел → заметка.",
       hintUp:lvl=>`Связи между заметками собраны до уровня ${lvl===2?"подразделов":"разделов"}; чем толще линия, тем больше перекрёстных ссылок. Кликните по узлу, чтобы открыть его первую заметку.`}
@@ -587,27 +607,29 @@ function E(p, tag, attrs, text){
 const easeIO = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
 
 // Shell: title, Play/Pause, speed, custom buttons, an SVG stage and a narration line.
-function animShell(el, { title, vb, buttons = [] }){
+function animShell(el, { title, vb, buttons = [], controls = true }){
   el.innerHTML = `<div class="anim-head"><span class="anim-title">${title}</span><div class="anim-ctl"></div></div>
     <div class="anim-stage"><svg class="anim-svg" viewBox="0 0 ${vb[0]} ${vb[1]}" role="img" aria-label="${title}"></svg></div>
     <div class="anim-say" aria-live="polite"></div>`;
   const ctl = el.querySelector(".anim-ctl"), svg = el.querySelector("svg"), sayEl = el.querySelector(".anim-say");
   const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const st = { playing: !reduce, speed: 1, visible: true };
+  const st = { playing: controls ? !reduce : true, speed: 1, visible: true };
   const btns = {};
   for(const b of buttons){
     const x = document.createElement("button"); x.type = "button"; x.textContent = b.label;
     x.addEventListener("click", ()=>{ b.on(); api.kick(); });
     ctl.appendChild(x); btns[b.id] = x;
   }
-  const sep = document.createElement("span"); sep.className = "anim-sep"; ctl.appendChild(sep);
-  const play = document.createElement("button"); play.type = "button"; play.className = "anim-play";
-  const speed = document.createElement("button"); speed.type = "button"; speed.textContent = "1×"; speed.title = "Speed";
-  ctl.append(play, speed);
-  const syncPlay = ()=>{ play.textContent = st.playing ? "Pause" : "Play"; play.setAttribute("aria-pressed", st.playing); };
-  play.addEventListener("click", ()=>{ st.playing = !st.playing; syncPlay(); });
-  speed.addEventListener("click", ()=>{ st.speed = st.speed === 1 ? 2 : st.speed === 2 ? .5 : 1; speed.textContent = st.speed + "×"; });
-  syncPlay();
+  if(controls){
+    const sep = document.createElement("span"); sep.className = "anim-sep"; if(buttons.length) ctl.appendChild(sep);
+    const play = document.createElement("button"); play.type = "button"; play.className = "anim-play";
+    const speed = document.createElement("button"); speed.type = "button"; speed.textContent = "1×"; speed.title = t("speed");
+    ctl.append(play, speed);
+    const syncPlay = ()=>{ play.textContent = st.playing ? t("pause") : t("play"); play.setAttribute("aria-pressed", st.playing); };
+    play.addEventListener("click", ()=>{ st.playing = !st.playing; syncPlay(); });
+    speed.addEventListener("click", ()=>{ st.speed = st.speed === 1 ? 2 : st.speed === 2 ? .5 : 1; speed.textContent = st.speed + "×"; });
+    syncPlay();
+  }
   let frame = null, raf = 0, last = 0, holdUntil = 0;
   const io = "IntersectionObserver" in window ? new IntersectionObserver(es=>{ st.visible = es[0].isIntersecting; }) : null;
   if(io) io.observe(el);
@@ -927,6 +949,554 @@ ANIMS["kafka-replication"] = el=>{
   sh.onFrame(dt=>{ update(dt); render(); });
   sh.say("The producer writes to the leader; followers fetch from it. A record is committed once every in-sync replica has it. Try acks=1, then kill the leader.");
   sh.kick();
+  return sh;
+};
+
+// ============ Operating systems: visuals for the system architecture overview
+// Every label is bilingual through LL(en, ru); the note re-mounts its animations when the language changes.
+const LL = (en, ru) => LANG === "ru" ? ru : en;
+function oR(g, x, y, w, h, cls, rx = 8){ return E(g, "rect", { x, y, width: w, height: h, rx, class: cls }); }
+function oT(g, x, y, s, cls, anchor = "middle"){ return E(g, "text", { x, y, class: cls, "text-anchor": anchor }, s); }
+function oHover(node, fn){ node.addEventListener("pointerdown", fn); node.addEventListener("mouseenter", fn); node.style.cursor = "pointer"; return node; }
+function oClick(node, fn){ node.addEventListener("pointerdown", fn); node.style.cursor = "pointer"; return node; }
+
+// ---- shared layer map: user space / system call boundary / kernel / drivers / hardware
+const OSL = {
+  jvm:   [116, 30, 150, 58, "JVM + your service", "JVM + ваш сервис", "process", "процесс"],
+  pg:    [278, 30, 130, 58, "PostgreSQL", "PostgreSQL", "process", "процесс"],
+  nginx: [420, 30, 110, 58, "nginx", "nginx", "process", "процесс"],
+  tools: [542, 30, 190, 58, "shell, top, systemd", "shell, top, systemd", "distro tooling", "утилиты дистрибутива"],
+  libc:  [116, 100, 616, 32, "libc · read() write() open() malloc() pthread_create()", "libc · read() write() open() malloc() pthread_create()", null, null],
+  proc:  [116, 186, 140, 54, "Process mgmt", "Процессы", "scheduler", "планировщик"],
+  mem:   [268, 186, 140, 54, "Memory mgmt", "Память", "page tables", "таблицы страниц"],
+  fs:    [420, 186, 140, 54, "File systems", "Файловые системы", "ext4 · xfs", "ext4 · xfs"],
+  net:   [572, 186, 160, 54, "Network stack", "Сетевой стек", "TCP/IP · sockets", "TCP/IP · сокеты"],
+  nvme:  [420, 254, 140, 50, "NVMe driver", "Драйвер NVMe", "block device", "блочное устройство"],
+  nicd:  [572, 254, 160, 50, "NIC driver", "Драйвер NIC", "ring buffers · ISR", "кольц. буферы · ISR"],
+  cpu:   [116, 360, 140, 50, "CPU", "CPU", "cores + caches", "ядра + кэши"],
+  ram:   [268, 360, 140, 50, "RAM", "RAM", "fast, volatile", "энергозависимая"],
+  disk:  [420, 360, 140, 50, "SSD / HDD", "SSD / HDD", "persistent blocks", "постоянные блоки"],
+  nic:   [572, 360, 160, 50, "NIC", "NIC", "network card", "сетевая карта"]
+};
+const OSL_LINKS = [["jvm", "libc", 191, 88, 100], ["pg", "libc", 343, 88, 100], ["nginx", "libc", 475, 88, 100], ["tools", "libc", 637, 88, 100],
+  ["libc", "sys", 262, 132, 186], ["proc", "cpu", 186, 240, 360], ["mem", "ram", 338, 240, 360],
+  ["fs", "nvme", 490, 240, 254], ["nvme", "disk", 490, 304, 360], ["net", "nicd", 652, 240, 254], ["nicd", "nic", 652, 304, 360]];
+const OSL_REL = { jvm: ["jvm", "libc", "sys"], pg: ["pg", "libc", "sys"], nginx: ["nginx", "libc", "sys"], tools: ["tools", "libc", "sys"],
+  libc: ["libc", "sys", "jvm", "pg", "nginx", "tools"], sys: ["sys", "libc"], proc: ["proc", "cpu"], cpu: ["cpu", "proc"], mem: ["mem", "ram"], ram: ["ram", "mem"],
+  fs: ["fs", "nvme", "disk"], nvme: ["nvme", "fs", "disk"], disk: ["disk", "nvme", "fs"], net: ["net", "nicd", "nic"], nicd: ["nicd", "net", "nic"], nic: ["nic", "nicd", "net"] };
+const OSL_DESC = {
+  jvm: ["Your service is a user-space process. It never touches hardware: every file, socket and thread it asks for goes down through libc and a system call.",
+        "Ваш сервис — процесс в пространстве пользователя. Он не трогает оборудование: каждый файл, сокет и поток он получает через libc и системный вызов."],
+  pg: ["PostgreSQL is another process with its own address space. It cannot read the JVM's memory; the two talk over a socket.",
+       "PostgreSQL — другой процесс со своим адресным пространством. Он не может читать память JVM; они общаются через сокет."],
+  nginx: ["nginx is a process too. Same rules: its own memory, and the kernel does all of its I/O.",
+          "nginx — тоже процесс. Те же правила: своя память, а весь ввод-вывод за него делает ядро."],
+  tools: ["Shell, top and systemd are ordinary programs that ship with the distribution. top only reads /proc, which the kernel publishes.",
+          "Shell, top и systemd — обычные программы из дистрибутива. top просто читает /proc, который публикует ядро."],
+  libc: ["libc wraps system calls (read, write, open) in C functions and adds pure user-space helpers such as malloc. The JVM is built on it.",
+         "libc оборачивает системные вызовы (read, write, open) в функции C и добавляет помощники, работающие целиком в пространстве пользователя, например malloc. JVM построена на ней."],
+  sys: ["The system call boundary is the only door between a process and the kernel. Crossing it is a CPU mode switch, user to kernel, about 100–300 ns.",
+        "Граница системных вызовов — единственная дверь между процессом и ядром. Переход через неё — переключение режима CPU с пользовательского на режим ядра, около 100–300 нс."],
+  proc: ["Process management: the scheduler decides which thread runs on each core and for how long, and switches between them (context switch).",
+         "Управление процессами: планировщик решает, какой поток и как долго выполняется на каждом ядре, и переключает их (переключение контекста)."],
+  mem: ["Memory management: a page table per process maps virtual pages to physical frames in RAM; page faults, swap and the OOM killer live here.",
+        "Управление памятью: таблица страниц каждого процесса отображает виртуальные страницы на физические кадры в RAM; здесь же page faults, swap и OOM killer."],
+  fs: ["File systems turn the disk's numbered blocks into files and directories. Reads and writes go through the page cache in RAM.",
+       "Файловые системы превращают пронумерованные блоки диска в файлы и каталоги. Чтение и запись идут через страничный кэш в RAM."],
+  net: ["The network stack implements TCP/IP inside the kernel. Programs see only sockets.",
+        "Сетевой стек реализует TCP/IP внутри ядра. Программы видят только сокеты."],
+  nvme: ["The NVMe driver submits read and write commands to the SSD's queues and handles their completion interrupts.",
+         "Драйвер NVMe отправляет команды чтения и записи в очереди SSD и обрабатывает прерывания об их завершении."],
+  nicd: ["The NIC driver manages the card's ring buffers. Its interrupt service routine starts the network stack's work when a packet arrives.",
+         "Драйвер NIC управляет кольцевыми буферами карты. Его обработчик прерываний запускает работу сетевого стека, когда приходит пакет."],
+  cpu: ["The CPU's cores execute machine instructions. Each core has its own registers and L1/L2 cache; L3 is shared.",
+        "Ядра CPU выполняют машинные инструкции. У каждого ядра свои регистры и кэш L1/L2; L3 общий."],
+  ram: ["RAM is fast, volatile and limited. It holds every process's code, heap and stacks, plus the kernel's own structures.",
+        "RAM быстрая, энергозависимая и ограниченная. В ней код, куча и стеки каждого процесса, а также собственные структуры ядра."],
+  disk: ["SSD and HDD are persistent but about 1,000× slower than RAM for a random read. The OS sees them as an array of numbered blocks (LBA).",
+         "SSD и HDD хранят данные постоянно, но при случайном чтении примерно в 1000 раз медленнее RAM. ОС видит их как массив пронумерованных блоков (LBA)."],
+  nic: ["The NIC sends and receives frames. It writes incoming packets straight into RAM by DMA and raises an interrupt.",
+        "NIC отправляет и принимает кадры. Входящие пакеты она пишет прямо в RAM через DMA и генерирует прерывание."]
+};
+const osC = k => k === "sys" ? [262, 157] : k === "libc" ? [262, 116] : [OSL[k][0] + OSL[k][2] - 10, OSL[k][1] + 12];
+function osLayers(g, act, pick){
+  const has = k => !!act && act.has(k);
+  oR(g, 100, 14, 646, 128, "an-frame", 10);
+  oR(g, 100, 170, 646, 146, "an-frame", 10);
+  oR(g, 100, 342, 646, 76, "an-frame", 10);
+  oT(g, 14, 72, LL("user space", "пространство"), "an-m", "start");
+  oT(g, 14, 86, LL("(per process)", "пользователя"), "an-m", "start");
+  oT(g, 14, 238, LL("kernel space", "пространство"), "an-m", "start");
+  oT(g, 14, 252, LL("(privileged)", "ядра"), "an-m", "start");
+  oT(g, 14, 386, LL("hardware", "оборудование"), "an-m", "start");
+  E(g, "line", { x1: 100, y1: 157, x2: 746, y2: 157, class: "an-sys" + (has("sys") ? " on" : act ? " an-dim" : "") });
+  oT(g, 108, 152, LL("system call boundary · user mode above, kernel mode below", "граница системных вызовов · выше режим пользователя, ниже режим ядра"), "an-m" + (act && !has("sys") ? " an-dim" : ""), "start");
+  E(g, "line", { x1: 100, y1: 330, x2: 746, y2: 330, class: "an-lane" });
+  oT(g, 108, 327, LL("interrupts · DMA", "прерывания · DMA"), "an-m", "start");
+  for(const [a, b, x, y1, y2] of OSL_LINKS){
+    const lit = has(a) && has(b);
+    E(g, "line", { x1: x, y1, x2: x, y2, class: "an-link2" + (lit ? " on" : act ? " an-dim" : "") });
+  }
+  if(pick) oHover(oR(g, 100, 148, 646, 18, "an-hit", 0), ()=>pick("sys"));
+  for(const [k, b] of Object.entries(OSL)){
+    const [x, y, w, h, en, ru, sen, sru] = b;
+    const grp = E(g, "g", { class: act && !has(k) ? "an-dim" : "" });
+    oR(grp, x, y, w, h, "an-box" + (has(k) ? " an-hl" : ""));
+    if(sen){ oT(grp, x + w / 2, y + h / 2 - 3, LL(en, ru), "an-t an-b"); oT(grp, x + w / 2, y + h / 2 + 13, LL(sen, sru), "an-m"); }
+    else oT(grp, x + w / 2, y + h / 2 + 4.5, LL(en, ru), "an-t");
+    if(pick) oHover(grp, ()=>pick(k));
+  }
+}
+
+// ============ 4. The system at a glance (interactive layer map)
+ANIMS["os-layers"] = el=>{
+  const S = { sel: null };
+  const intro = LL("Tap or hover a box: it lights up together with the parts it works with. Tap empty space to clear.",
+                   "Нажмите или наведите на блок: он подсветится вместе с частями, с которыми работает. Нажмите на пустое место, чтобы сбросить.");
+  const sh = animShell(el, { title: LL("The system at a glance", "Система целиком"), vb: [760, 428], controls: false });
+  function pick(k){ if(S.sel === k) return; S.sel = k; render(); sh.say(LL(...OSL_DESC[k]), 1); }
+  function render(){
+    const g = sh.svg; g.textContent = "";
+    oClick(E(g, "rect", { x: 0, y: 0, width: 760, height: 428, class: "an-hit" }), ()=>{ S.sel = null; render(); sh.say(intro); });
+    osLayers(g, S.sel ? new Set(OSL_REL[S.sel]) : null, pick);
+  }
+  render(); sh.say(intro);
+  return sh;
+};
+
+// ============ 5. A blocking read(), step by step
+ANIMS["syscall-walkthrough"] = el=>{
+  const STEPS = [
+    { act: ["jvm"], path: ["jvm"], k: false,
+      en: "1 / 9 · A Tomcat thread calls socket.read(). It runs in user mode on core 2.",
+      ru: "1 / 9 · Поток Tomcat вызывает socket.read(). Он работает в режиме пользователя на ядре CPU 2." },
+    { act: ["jvm", "libc", "sys"], path: ["jvm", "libc", "sys"], k: true,
+      en: "2 / 9 · libc executes the syscall instruction: the CPU switches to kernel mode. This is one crossing of the boundary.",
+      ru: "2 / 9 · libc выполняет инструкцию syscall: CPU переключается в режим ядра. Это одно пересечение границы." },
+    { act: ["proc", "cpu"], path: ["sys", "proc"], k: true,
+      en: "3 / 9 · The socket buffer is empty. The kernel marks the thread as sleeping, and the scheduler gives core 2 to another thread.",
+      ru: "3 / 9 · Буфер сокета пуст. Ядро помечает поток как спящий, и планировщик отдаёт ядро CPU 2 другому потоку." },
+    { act: ["nic", "ram"], path: ["nic", "ram"], k: true,
+      en: "4 / 9 · A packet arrives. The NIC copies it into a ring buffer in RAM by DMA, without the CPU, then raises an interrupt.",
+      ru: "4 / 9 · Приходит пакет. NIC копирует его в кольцевой буфер в RAM через DMA, без участия CPU, и генерирует прерывание." },
+    { act: ["nic", "nicd", "cpu"], path: ["nic", "nicd"], k: true,
+      en: "5 / 9 · Core 0 is interrupted and jumps to the NIC driver's interrupt service routine. The ISR acknowledges the card and defers the rest.",
+      ru: "5 / 9 · Ядро CPU 0 прерывается и переходит в обработчик прерываний драйвера NIC. Обработчик подтверждает карте приём и откладывает остальную работу." },
+    { act: ["nicd", "net"], path: ["nicd", "net"], k: true,
+      en: "6 / 9 · The network stack checks IP and TCP, appends the bytes to the socket buffer and marks our thread runnable.",
+      ru: "6 / 9 · Сетевой стек проверяет IP и TCP, добавляет байты в буфер сокета и помечает наш поток готовым к выполнению." },
+    { act: ["proc", "cpu"], path: ["net", "proc"], k: true,
+      en: "7 / 9 · The scheduler puts the thread back on a core.",
+      ru: "7 / 9 · Планировщик снова ставит поток на ядро CPU." },
+    { act: ["net", "mem", "ram", "sys"], path: ["net", "mem", "sys"], k: true,
+      en: "8 / 9 · The kernel copies the bytes from the socket buffer into the JVM's byte[]: the one copy from kernel memory to user memory.",
+      ru: "8 / 9 · Ядро копирует байты из буфера сокета в byte[] JVM: единственная копия из памяти ядра в память пользователя." },
+    { act: ["sys", "libc", "jvm"], path: ["sys", "libc", "jvm"], k: false,
+      en: "9 / 9 · sysret switches back to user mode. read() returns the byte count, and your code continues.",
+      ru: "9 / 9 · sysret возвращает CPU в режим пользователя. read() возвращает число байтов, и ваш код продолжает работу." }
+  ];
+  const STEP_MS = 4200, MOVE_MS = 1400;
+  const S = { i: 0, t: 0 };
+  const sh = animShell(el, { title: LL("A blocking read(), step by step", "Блокирующий read() по шагам"), vb: [760, 428], buttons: [
+    { id: "prev", label: LL("← Back", "← Назад"), on(){ go(S.i - 1); } },
+    { id: "next", label: LL("Next →", "Дальше →"), on(){ go(S.i + 1); } }
+  ]});
+  function go(i){ S.i = (i + STEPS.length) % STEPS.length; S.t = 0; const s = STEPS[S.i]; sh.say(LL(s.en, s.ru)); }
+  function at(path, p){
+    const pts = path.map(osC); if(pts.length === 1) return pts[0];
+    const f = p * (pts.length - 1), seg = Math.min(pts.length - 2, Math.floor(f)), k = easeIO(f - seg), a = pts[seg], b = pts[seg + 1];
+    return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
+  }
+  function render(){
+    const g = sh.svg; g.textContent = ""; const s = STEPS[S.i];
+    osLayers(g, new Set(s.act), null);
+    oR(g, 626, 146, 116, 22, s.k ? "an-badge-k" : "an-badge-u", 11);
+    oT(g, 684, 161, s.k ? LL("kernel mode", "режим ядра") : LL("user mode", "режим польз."), "an-cell-t");
+    const [x, y] = at(s.path, Math.min(1, S.t / MOVE_MS));
+    E(g, "circle", { cx: x, cy: y, r: 9, class: "an-dot an-flow" });
+  }
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); render(); });
+  go(0); sh.kick();
+  return sh;
+};
+
+// ============ 6. How far away is the data (memory hierarchy latency)
+ANIMS["cpu-memory-hierarchy"] = el=>{
+  const LV = [
+    { k: "reg", en: "Registers", ru: "Регистры", ns: 0.3, lat: "0.3 ns", latru: "0,3 нс", hen: "0.3 s", hru: "0,3 с", x: 100, y: 88,
+      nen: "Operands already in registers: no memory access at all.", nru: "Операнды уже в регистрах: к памяти обращаться не нужно." },
+    { k: "l1", en: "L1 cache", ru: "Кэш L1", ns: 1, lat: "1 ns", latru: "1 нс", hen: "1 s", hru: "1 с", x: 100, y: 118,
+      nen: "An L1 hit: the normal case for a hot loop.", nru: "Попадание в L1: обычный случай для горячего цикла." },
+    { k: "l2", en: "L2 cache", ru: "Кэш L2", ns: 4, lat: "4 ns", latru: "4 нс", hen: "4 s", hru: "4 с", x: 100, y: 148,
+      nen: "Still inside the core, a little further away.", nru: "Всё ещё внутри ядра, чуть дальше." },
+    { k: "l3", en: "L3 (shared)", ru: "L3 (общий)", ns: 15, lat: "15 ns", latru: "15 нс", hen: "15 s", hru: "15 с", x: 170, y: 197,
+      nen: "Shared by all cores: this is where cores see each other's writes.", nru: "Общий для всех ядер: здесь ядра видят записи друг друга." },
+    { k: "ram", en: "RAM", ru: "RAM", ns: 100, lat: "100 ns", latru: "100 нс", hen: "1.7 min", hru: "1,7 мин", x: 92, y: 276,
+      nen: "A cache miss: about 300 cycles in which the core can do almost nothing.", nru: "Промах кэша: около 300 тактов, за которые ядро почти ничего не может сделать." },
+    { k: "ssd", en: "NVMe SSD", ru: "NVMe SSD", ns: 5e4, lat: "50 µs", latru: "50 мкс", hen: "14 hours", hru: "14 часов", x: 247, y: 276,
+      nen: "Off the chip: a read goes through a system call, the file system and the NVMe driver.", nru: "За пределами кристалла: чтение идёт через системный вызов, файловую систему и драйвер NVMe." },
+    { k: "net", en: "Network, same DC", ru: "Сеть, тот же ДЦ", ns: 5e5, lat: "0.5 ms", latru: "0,5 мс", hen: "6 days", hru: "6 дней", x: 92, y: 322,
+      nen: "A round trip to another server in the same data centre, such as one Redis call.", nru: "Запрос к другому серверу в том же дата-центре и обратно, например один вызов Redis." },
+    { k: "hdd", en: "HDD (random)", ru: "HDD (случ.)", ns: 5e6, lat: "5 ms", latru: "5 мс", hen: "2 months", hru: "2 месяца", x: 247, y: 322,
+      nen: "The head has to move and the platter has to turn: mechanical time.", nru: "Головка должна переместиться, а пластина — повернуться: механическое время." }
+  ];
+  const LO = Math.log10(0.3), HI = Math.log10(5e6), O = [140, 64], PAUSE = 900;
+  const S = { i: 0, t: 0, lin: false };
+  const frac = ns => Math.max(0.006, S.lin ? ns / 5e6 : (Math.log10(ns) - LO) / (HI - LO));
+  const dur = ns => 500 + 420 * Math.log10(ns / 0.3);
+  const scaleLabel = ()=> S.lin ? LL("Log scale", "Логарифм. шкала") : LL("Linear scale", "Линейная шкала");
+  const sh = animShell(el, { title: LL("How far away is the data", "Как далеко данные"), vb: [760, 352], buttons: [
+    { id: "scale", label: LL("Linear scale", "Линейная шкала"), on(){
+      S.lin = !S.lin; sh.btns.scale.textContent = scaleLabel();
+      sh.say(S.lin ? LL("Linear scale: only the network and the disk are visible. Everything on the chip, and RAM, rounds to zero next to one HDD read.",
+                        "Линейная шкала: видны только сеть и диск. Всё, что на кристалле, и RAM округляются до нуля рядом с одним чтением с HDD.")
+                   : LL("Log scale: each grid step to the right is ten times slower.", "Логарифмическая шкала: каждый шаг сетки вправо в десять раз медленнее."), 4500);
+    }}
+  ]});
+  function start(i, user){
+    S.i = i; S.t = 0; const L = LV[i];
+    sh.say(`${LL(L.en, L.ru)}: ${LL(L.lat, L.latru)}. ` + LL(`If one nanosecond lasted a second, this would take ${L.hen}. `, `Если бы наносекунда длилась секунду, это заняло бы ${L.hru}. `) + LL(L.nen, L.nru), user ? 1 : 0);
+  }
+  function render(){
+    const g = sh.svg; g.textContent = ""; const L = LV[S.i];
+    const box = (k, x, y, w, h, label, dim) => {
+      const grp = E(g, "g", { class: dim ? "an-dim" : "" });
+      oR(grp, x, y, w, h, "an-box" + (!dim && L.k === k ? " an-hl" : ""));
+      oT(grp, x + w / 2, y + h / 2 + 4.5, label, "an-t");
+    };
+    oR(g, 20, 28, 300, 214, "an-frame", 12); oT(g, 32, 44, LL("CPU chip", "Кристалл CPU"), "an-m", "start");
+    for(const [cx, n, live] of [[34, 0, true], [174, 1, false]]){
+      const grp = E(g, "g", { class: live ? "" : "an-dim" });
+      oR(grp, cx, 52, 132, 120, "an-box");
+      oT(grp, cx + 10, 68, LL("Core " + n, "Ядро " + n), "an-m", "start");
+      if(live) oT(grp, cx + 122, 68, "ALU ●", "an-m", "end");
+    }
+    for(const [cx, live] of [[34, true], [174, false]]){
+      box(live ? "reg" : "-", cx + 12, 76, 108, 24, LL("registers", "регистры"), !live);
+      box(live ? "l1" : "-", cx + 12, 106, 108, 24, "L1 · 48 KB", !live);
+      box(live ? "l2" : "-", cx + 12, 136, 108, 24, "L2 · 2 MB", !live);
+    }
+    box("l3", 34, 184, 272, 26, LL("L3 · 32 MB · shared by all cores", "L3 · 32 МБ · общий для всех ядер"));
+    oT(g, 170, 232, LL("memory controller · PCIe", "контроллер памяти · PCIe"), "an-m");
+    E(g, "line", { x1: 92, y1: 242, x2: 92, y2: 258, class: "an-link2" });
+    E(g, "line", { x1: 247, y1: 242, x2: 247, y2: 258, class: "an-link2" });
+    box("ram", 20, 258, 145, 36, LL("RAM · GBs", "RAM · ГБ"));
+    box("ssd", 175, 258, 145, 36, "NVMe SSD");
+    box("net", 20, 304, 145, 36, LL("another server", "другой сервер"));
+    box("hdd", 175, 304, 145, 36, "HDD");
+    // table
+    oT(g, 342, 40, LL("where", "где"), "an-m", "start");
+    oT(g, 500, 40, LL("latency", "задержка"), "an-m", "end");
+    oT(g, 508, 40, S.lin ? LL("linear scale", "линейная шкала") : LL("log scale", "лог. шкала"), "an-m", "start");
+    oT(g, 750, 40, LL("if 1 ns = 1 s", "если 1 нс = 1 с"), "an-m", "end");
+    const d = dur(L.ns), grow = Math.min(1, S.t / d);
+    LV.forEach((v, i)=>{
+      const y = 66 + i * 34, on = i === S.i;
+      const row = E(g, "g", {});
+      oR(row, 334, y - 18, 420, 28, on ? "an-rowhl" : "an-hit", 6);
+      oT(row, 342, y + 1, LL(v.en, v.ru), "an-t" + (on ? " an-b" : ""), "start");
+      oT(row, 500, y + 1, LL(v.lat, v.latru), "an-m", "end");
+      E(row, "rect", { x: 508, y: y - 8, width: 182, height: 10, rx: 3, class: "an-track" });
+      E(row, "rect", { x: 508, y: y - 8, width: 182 * frac(v.ns) * (on ? grow : 1), height: 10, rx: 3, class: "an-bar" + (on ? " on" : "") });
+      oT(row, 750, y + 1, LL(v.hen, v.hru), "an-m", "end");
+      oClick(row, ()=>{ start(i, true); sh.kick(); });
+    });
+    // the request
+    if(S.t < d){
+      const p = S.t / d, k = easeIO(p < .5 ? p * 2 : 2 - p * 2);
+      E(g, "circle", { cx: O[0] + (L.x - O[0]) * k, cy: O[1] + (L.y - O[1]) * k, r: 7, class: "an-dot an-flow" });
+    }
+  }
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > dur(LV[S.i].ns) + PAUSE) start((S.i + 1) % LV.length); render(); });
+  start(0); sh.kick();
+  return sh;
+};
+
+// ============ 7. Process memory layout: stack down, heap up
+ANIMS["process-memory-layout"] = el=>{
+  const MAXF = 5, FH = 34, HH = 18, TOP = 30, HEAP0 = 312, LIM = TOP + MAXF * FH, STEP_MS = 3400, X = 150, W = 200;
+  const CODE = [
+    ["static int requestCount;", "// data", "// данные"], ["void main() {", "", ""], ["  Order o = new Order();", "// heap", "// куча"],
+    ["  handle(o);", "// call", "// вызов"], ["}", "", ""], ["void handle(Order o) {", "", ""], ["  requestCount++;", "// data", "// данные"],
+    ["  byte[] buf = new byte[512];", "// heap", "// куча"], ["  int n = parse(buf);", "// call", "// вызов"], ["}", "", ""],
+    ["int parse(byte[] b) {", "", ""], ["  int n = 0;", "// stack", "// стек"], ["  return n;", "// pop", "// снятие"], ["}", "", ""]
+  ];
+  const M = "main() · o", H = "handle(o) · buf, n", P = "parse(b) · n";
+  const STEPS = [
+    { line: 1, stack: [M], heap: [], en: "main() starts: its frame is pushed at the top of the stack (the highest addresses).",
+      ru: "main() запускается: её фрейм кладётся на вершину стека (самые старшие адреса)." },
+    { line: 2, stack: [M], heap: [["Order", 0]], en: "new Order(): the object goes on the heap, which grows up. Only the reference o sits in main's frame.",
+      ru: "new Order(): объект попадает в кучу, которая растёт вверх. Во фрейме main лежит только ссылка o." },
+    { line: 5, stack: [M, H], heap: [["Order", 0]], en: "handle(o): a call pushes a new frame below main's, with the return address and the parameter o.",
+      ru: "handle(o): вызов кладёт новый фрейм под фреймом main — с адресом возврата и параметром o." },
+    { line: 6, stack: [M, H], heap: [["Order", 0]], data: true, en: "requestCount++: a static field lives in the data area. There is one copy for the whole process, shared by every thread.",
+      ru: "requestCount++: статическое поле живёт в области данных. Это одна копия на весь процесс, общая для всех потоков." },
+    { line: 7, stack: [M, H], heap: [["Order", 0], ["byte[512]", 0]], en: "new byte[512]: another heap allocation. The stack holds only the reference buf.",
+      ru: "new byte[512]: ещё одно выделение в куче. В стеке — только ссылка buf." },
+    { line: 11, stack: [M, H, P], heap: [["Order", 0], ["byte[512]", 0]], en: "parse(buf): a third frame. Its local variable n lives in this frame.",
+      ru: "parse(buf): третий фрейм. Его локальная переменная n живёт в этом фрейме." },
+    { line: 12, stack: [M, H], heap: [["Order", 0], ["byte[512]", 0]], en: "return n: parse's frame is popped. n is gone; the value travels back in a register.",
+      ru: "return n: фрейм parse снимается. n больше нет; значение возвращается через регистр." },
+    { line: 9, stack: [M], heap: [["Order", 0], ["byte[512]", 1]], en: "handle returns and its frame is popped. Nothing references byte[512] any more: it is garbage, but still on the heap.",
+      ru: "handle возвращает управление, и её фрейм снимается. На byte[512] больше никто не ссылается: это мусор, но он всё ещё в куче." },
+    { line: 4, stack: [M], heap: [["Order", 0]], en: "The garbage collector frees byte[512]. Order is still referenced from main's frame, so it stays.",
+      ru: "Сборщик мусора освобождает byte[512]. На Order всё ещё ссылается фрейм main, поэтому он остаётся." }
+  ];
+  const S = { i: 0, t: 0, rec: null };
+  const sh = animShell(el, { title: LL("Process memory: stack down, heap up", "Память процесса: стек вниз, куча вверх"), vb: [760, 420], buttons: [
+    { id: "rec", label: LL("Recurse", "Рекурсия"), on(){ if(!S.rec) { S.rec = { n: 0, acc: 0, boom: 0 }; sh.say(LL("recurse() calls itself with no base case: every call pushes another frame…", "recurse() вызывает сама себя без условия выхода: каждый вызов кладёт ещё один фрейм…"), 1200); } } },
+    { id: "reset", label: LL("Reset", "Сначала"), on(){ S.rec = null; go(0); } }
+  ]});
+  function go(i){ S.i = (i + STEPS.length) % STEPS.length; S.t = 0; const s = STEPS[S.i]; sh.say(LL(s.en, s.ru)); }
+  function render(){
+    const g = sh.svg; g.textContent = ""; const s = STEPS[S.i];
+    const frames = s.stack.slice(); if(S.rec) for(let j = 0; j < S.rec.n; j++) frames.push("recurse()");
+    oR(g, X, TOP, W, 370, "an-frame", 6);
+    oT(g, X - 6, TOP + 10, LL("max address", "макс. адрес"), "an-m", "end");
+    oT(g, X - 6, 398, LL("min address", "мин. адрес"), "an-m", "end");
+    // text, data, bss
+    oR(g, X, 360, W, 40, "an-box", 0); oT(g, X + W / 2, 377, LL("text / code", "text / код"), "an-t an-b"); oT(g, X + W / 2, 392, "main · handle · parse", "an-m");
+    oR(g, X, 334, W, 26, "an-box" + (s.data ? " an-hl" : ""), 0); oT(g, X + W / 2, 351, LL("data · requestCount", "data · requestCount"), "an-m");
+    oR(g, X, 312, W, 22, "an-box", 0); oT(g, X + W / 2, 327, LL("bss · zero-filled statics", "bss · нулевые статики"), "an-m");
+    // heap
+    s.heap.forEach(([name, dead], j)=>{
+      const y = HEAP0 - (j + 1) * HH;
+      oR(g, X + 8, y + 1, W - 16, HH - 2, "an-heap" + (dead ? " dead" : ""), 4);
+      oT(g, X + W / 2, y + 13, name + (dead ? LL(" · unreachable", " · недостижим") : ""), "an-m");
+    });
+    const heapTop = HEAP0 - s.heap.length * HH;
+    oT(g, X + W + 6, heapTop + 4, LL("← heap top", "← верх кучи"), "an-m", "start");
+    if(!s.heap.length) oT(g, X + W / 2, HEAP0 - 6, LL("heap ↑", "куча ↑"), "an-m");
+    // stack
+    const boom = S.rec && S.rec.boom > 0;
+    frames.forEach((name, j)=>{
+      const y = TOP + j * FH, over = j >= MAXF;
+      oR(g, X + 8, y + 2, W - 16, FH - 4, over ? "an-over" : "an-stack", 4);
+      oT(g, X + W / 2, y + FH / 2 + 4, name, "an-t");
+    });
+    const sp = TOP + frames.length * FH;
+    oT(g, X - 6, Math.min(sp, 300) + 4, "SP →", "an-m an-b", "end");
+    if(!frames.length) oT(g, X + W / 2, TOP + 16, LL("stack ↓", "стек ↓"), "an-m");
+    E(g, "line", { x1: X, y1: LIM, x2: X + W, y2: LIM, class: "an-limit" + (boom ? " on" : "") });
+    oT(g, X + W + 6, LIM + 4, LL("stack limit", "предел стека"), "an-m" + (boom ? " an-warn" : ""), "start");
+    if(heapTop - LIM > 34 && !boom) oT(g, X + W / 2, (LIM + heapTop) / 2 + 4, LL("unmapped", "не отображено"), "an-m");
+    // code
+    oR(g, 462, 46 + s.line * 19 - 14, 292, 19, "an-rowhl", 4);
+    CODE.forEach(([c, en, ru], i)=>{
+      oT(g, 470, 46 + i * 19, c.replace(/^ +/, m => "\u00a0".repeat(m.length)), "an-code", "start");
+      if(en) oT(g, 690, 46 + i * 19, LL(en, ru), "an-code c", "start");
+    });
+  }
+  sh.onFrame(dt=>{
+    if(S.rec){
+      const r = S.rec;
+      if(r.boom > 0){ r.boom -= dt; if(r.boom <= 0){ S.rec = null; go(S.i); } }
+      else { r.acc += dt; if(r.acc > 500){ r.acc = 0; r.n++;
+        if(STEPS[S.i].stack.length + r.n > MAXF){ r.boom = 2600;
+          sh.say(LL("StackOverflowError: the next frame would cross the thread's stack limit, so the JVM throws instead of overwriting memory.",
+                    "StackOverflowError: следующий фрейм пересёк бы предел стека потока, поэтому JVM бросает исключение, а не затирает память."), 2600); } } }
+    } else { S.t += dt; if(S.t > STEP_MS) go(S.i + 1); }
+    render();
+  });
+  go(0); sh.kick();
+  return sh;
+};
+
+// ============ 8. Virtual memory: page tables, scattered frames, fork and copy-on-write
+ANIMS["virtual-memory-mapping"] = el=>{
+  const FX = c => 500 + c * 64, FY = r => 70 + r * 44, FW = 58, FH = 30, NF = 24;
+  const PX = { A: 40, B: 130, C: 220, D: 310 }, CL = { A: 0, B: 1, C: 2, D: 3 }, NM = { A: "A", B: "B", C: "C", D: "A′" };
+  const slotY = i => 266 - i * 40;
+  const FREE = [16, 1, 22, 5, 11, 0, 20, 8, 13, 4, 18, 15, 23];
+  let S;
+  const intro = ()=> LL("Each process sees its pages as one contiguous range from 0. The kernel puts them in whatever physical frames are free. Hover a process or a frame.",
+                        "Каждый процесс видит свои страницы как один непрерывный диапазон от 0. Ядро кладёт их в любые свободные физические кадры. Наведите на процесс или кадр.");
+  function reset(){ S = { maps: { A: [9, 14, 3], B: [17, 6, 12], C: [21, 2, 19, 7, 10] }, part: { A: .35, B: 1, C: .6 }, sel: null, tw: null }; }
+  reset();
+  const owners = ()=>{ const o = new Map(); for(const [p, m] of Object.entries(S.maps)) m.forEach((f, i)=>{ if(!o.has(f)) o.set(f, []); o.get(f).push([p, i]); }); return o; };
+  const nextFree = ()=>{ const o = owners(); return FREE.find(f => !o.has(f)) ?? [...Array(NF).keys()].find(f => !o.has(f)); };
+  const sh = animShell(el, { title: LL("Virtual memory: page tables and copy-on-write", "Виртуальная память: таблицы страниц и copy-on-write"), vb: [760, 340], controls: false, buttons: [
+    { id: "alloc", label: LL("Allocate in A", "Выделить в A"), on(){
+      const m = S.maps.A;
+      if(m.length >= 5) return sh.say(LL("A's address space is full in this picture.", "На этой схеме адресное пространство A заполнено."), 2500);
+      const f = nextFree(); if(f === undefined) return sh.say(LL("Physical memory is full: now the kernel would drop page cache, swap, or call the OOM killer.", "Физическая память заполнена: теперь ядро сбросило бы страничный кэш, использовало swap или вызвало OOM killer."), 3500);
+      m.push(f); S.part.A = .5; S.tw = { p: "A", i: m.length - 1, from: null, to: f, t: 0 };
+      sh.say(LL(`A grows by one page. Virtually it is the next address after P${m.length - 1}; physically it lands in frame F${f}, wherever there was room.`,
+                `A увеличивается на одну страницу. Виртуально это следующий адрес после P${m.length - 1}; физически она попадает в кадр F${f} — туда, где было место.`), 4500);
+    }},
+    { id: "fork", label: "fork() A", on(){
+      if(S.maps.D) return sh.say(LL("A has already been forked.", "A уже разветвлён через fork()."), 2000);
+      S.maps.D = S.maps.A.slice(); S.part.D = S.part.A;
+      sh.say(LL("fork(): the child A′ gets a copy of A's page table, not of its memory. Both point to the same frames, now read-only (dashed): copy-on-write.",
+                "fork(): потомок A′ получает копию таблицы страниц A, а не её памяти. Оба указывают на одни и те же кадры, теперь только для чтения (пунктир): copy-on-write."), 5000);
+    }},
+    { id: "write", label: LL("Write in child", "Запись в потомке"), on(){
+      const D = S.maps.D; if(!D) return sh.say(LL("Fork A first.", "Сначала сделайте fork() A."), 2000);
+      const i = D.findIndex((f, j)=> S.maps.A[j] === f);
+      if(i < 0) return sh.say(LL("All of A′'s pages are already private copies.", "Все страницы A′ уже стали собственными копиями."), 2500);
+      const f = nextFree(); if(f === undefined) return sh.say(LL("No free frame left for the copy.", "Для копии не осталось свободного кадра."), 2500);
+      const old = D[i]; D[i] = f; S.tw = { p: "D", i, from: old, to: f, t: 0 };
+      sh.say(LL(`The child writes to P${i + 1}: page fault → the kernel copies F${old} into free frame F${f} and points only A′ at it. The parent keeps F${old}.`,
+                `Потомок пишет в P${i + 1}: page fault → ядро копирует F${old} в свободный кадр F${f} и перенаправляет туда только A′. У родителя остаётся F${old}.`), 5000);
+    }},
+    { id: "reset", label: LL("Reset", "Сначала"), on(){ reset(); sh.say(intro()); } }
+  ]});
+  const fpos = f => [FX(f % 4), FY(Math.floor(f / 4))];
+  function render(){
+    const g = sh.svg; g.textContent = ""; const own = owners();
+    oClick(E(g, "rect", { x: 0, y: 0, width: 760, height: 340, class: "an-hit" }), ()=>{ S.sel = null; sh.say(intro()); render(); });
+    oT(g, 36, 104, "max", "an-m", "end"); oT(g, 36, 300, "0", "an-m", "end");
+    oT(g, 624, 50, LL("Physical memory (RAM)", "Физическая память (RAM)"), "an-m");
+    // mapping lines first
+    for(const [p, m] of Object.entries(S.maps)) m.forEach((f, i)=>{
+      const x1 = PX[p] + 64, y1 = slotY(i) + 16;
+      let [fx, fy] = fpos(f);
+      if(S.tw && S.tw.p === p && S.tw.i === i){
+        const k = easeIO(Math.min(1, S.tw.t / 700)), [ox, oy] = S.tw.from === null ? [x1 + 20, y1] : fpos(S.tw.from);
+        fx = ox + (fx - ox) * k; fy = oy + (fy - oy) * k;
+      }
+      const x2 = fx, y2 = fy + FH / 2, mx = (x1 + x2) / 2;
+      E(g, "path", { d: `M${x1} ${y1}C${mx} ${y1},${mx} ${y2},${x2} ${y2}`, class: `an-map s${CL[p]}` + (S.sel && S.sel !== p ? " an-dim" : "") });
+    });
+    // virtual columns
+    for(const p of Object.keys(S.maps)){
+      const x = PX[p], m = S.maps[p], grp = E(g, "g", { class: S.sel && S.sel !== p ? "an-dim" : "" });
+      oT(grp, x + 35, 84, LL("Process ", "Процесс ") + NM[p], "an-m an-b");
+      oR(grp, x, 96, 70, 212, "an-frame", 6);
+      for(let i = 0; i < 5; i++){
+        if(i < m.length){ oR(grp, x + 6, slotY(i), 58, 32, `an-cell k${CL[p]}`, 4); oT(grp, x + 35, slotY(i) + 20, "P" + (i + 1), "an-cell-t"); }
+        else oR(grp, x + 6, slotY(i), 58, 32, "an-free", 4);
+      }
+      oHover(grp, ()=>{ if(S.sel === p) return; S.sel = p;
+        const fs = m.map(f => "F" + f).join(", ");
+        sh.say(LL(`Process ${NM[p]} sees P1–P${m.length} as one contiguous range starting at 0. In RAM they sit in frames ${fs}.`,
+                  `Процесс ${NM[p]} видит P1–P${m.length} как один непрерывный диапазон от 0. В RAM они лежат в кадрах ${fs}.`), 1); render(); });
+    }
+    // physical frames
+    for(let f = 0; f < NF; f++){
+      const [x, y] = fpos(f), o = own.get(f), grp = E(g, "g", {});
+      oT(grp, x + 2, y - 3, "F" + f, "an-m", "start");
+      if(!o){ oR(grp, x, y, FW, FH, "an-free", 4); }
+      else {
+        const [p, i] = o[0], last = i === S.maps[p].length - 1, fr = last ? S.part[p] : 1, shared = o.length > 1;
+        if(fr < 1){ oR(grp, x, y, FW, FH, "an-free", 4); oR(grp, x, y, FW * fr, FH, `an-cell k${CL[p]}`, 4); }
+        else oR(grp, x, y, FW, FH, `an-cell k${CL[p]}`, 4);
+        if(shared) oR(grp, x - 2, y - 2, FW + 4, FH + 4, "an-cow", 5);
+        oT(grp, x + FW / 2, y + 19, `${NM[p]}.P${i + 1}` + (shared ? " ⇄" : ""), fr < 1 ? "an-pl" : "an-cell-t");
+        if(S.sel && !o.some(([q]) => q === S.sel)) grp.setAttribute("class", "an-dim");
+      }
+      oHover(grp, ()=>{
+        const who = o ? o.map(([q, j]) => `${NM[q]}.P${j + 1}`).join(LL(" and ", " и ")) : null;
+        let msg = !o ? LL(`F${f} is free.`, `F${f} свободен.`)
+          : o.length > 1 ? LL(`F${f} is shared by ${who}: read-only until one of them writes (copy-on-write).`, `F${f} общий для ${who}: только для чтения, пока один из них не запишет (copy-on-write).`)
+          : LL(`F${f} holds ${who}.`, `В F${f} лежит ${who}.`);
+        if(o && o.length === 1){ const [p, i] = o[0]; if(i === S.maps[p].length - 1 && S.part[p] < 1) msg += LL(` Only ${Math.round(S.part[p] * 100)}% of it is used; the rest of the page is wasted (internal fragmentation).`, ` Занято только ${Math.round(S.part[p] * 100)}%; остаток страницы пропадает (внутренняя фрагментация).`); }
+        sh.say(msg, 1);
+      });
+    }
+  }
+  sh.onFrame(dt=>{ const had = !!S.tw; if(S.tw){ S.tw.t += dt; if(S.tw.t > 700) S.tw = null; } if(had || dt === 0) render(); });
+  sh.say(intro()); sh.kick();
+  return sh;
+};
+
+// ============ 9. Disk: platter geometry, LBA numbering, partitions and a file's blocks
+ANIMS["disk-lba-partitions"] = el=>{
+  const CX = 175, CY = 202, SPT = 8, NT = 4, rO = t => 152 - t * 30, rI = t => rO(t) - 27, PIV = [352, 380];
+  const part = l => l === 0 ? "knone" : l <= 5 ? "k3" : l <= 25 ? "k1" : "k2";
+  const lbas = b => [6 + 2 * b, 7 + 2 * b];
+  const pol = (r, a) => [CX + r * Math.cos(a * Math.PI / 180), CY + r * Math.sin(a * Math.PI / 180)];
+  const ts = l => [Math.floor(l / SPT), l % SPT];
+  const centre = l => { const [t, s] = ts(l); return pol((rO(t) + rI(t)) / 2, -90 + s * 45 + 22.5); };
+  function wedge(t, s){
+    const a0 = -90 + s * 45 + 1, a1 = a0 + 43, R = rO(t), r = rI(t), [x1, y1] = pol(R, a0), [x2, y2] = pol(R, a1), [x3, y3] = pol(r, a1), [x4, y4] = pol(r, a0);
+    return `M${x1} ${y1}A${R} ${R} 0 0 1 ${x2} ${y2}L${x3} ${y3}A${r} ${r} 0 0 0 ${x4} ${y4}Z`;
+  }
+  let S;
+  const intro = ()=> LL("The same 32 blocks two ways: where they sit on the platter (left) and the flat LBA numbering the OS sees (right). Hover a block.",
+                        "Одни и те же 32 блока двумя способами: где они лежат на пластине (слева) и плоская нумерация LBA, которую видит ОС (справа). Наведите на блок.");
+  function reset(){ S = { file: [1, 2, 5], other: [3, 4], spare: [6, 8, 7, 9], hover: null, head: centre(0), target: centre(0), read: null }; }
+  reset();
+  const fileL = ()=> new Set(S.file.flatMap(lbas)), otherL = ()=> new Set(S.other.flatMap(lbas)), inodeL = new Set(lbas(0));
+  const sh = animShell(el, { title: LL("From sectors to files", "От секторов к файлам"), vb: [760, 412], controls: false, buttons: [
+    { id: "append", label: LL("Append to app.log", "Дописать в app.log"), on(){
+      const b = S.spare.shift(); if(b === undefined) return sh.say(LL("The ext4 partition is full.", "Раздел ext4 заполнен."), 2500);
+      S.file.push(b); const [a, z] = lbas(b);
+      sh.say(LL(`app.log grows by one block, which ext4 places at LBA ${a}–${z}. The inode's block list now has ${S.file.length} entries, and the file is no longer in one piece.`,
+                `app.log растёт на один блок; ext4 размещает его в LBA ${a}–${z}. В списке блоков inode теперь ${S.file.length} записей, и файл уже не лежит одним куском.`), 4500);
+    }},
+    { id: "read", label: LL("Read app.log", "Прочитать app.log"), on(){
+      S.read = { seq: S.file.flatMap(lbas), i: -1, acc: 0, wait: 0, seeks: 0, track: null }; S.hover = null; sh.say(LL("Reading app.log block by block…", "Читаем app.log блок за блоком…"), 1);
+    }},
+    { id: "reset", label: LL("Reset", "Сначала"), on(){ reset(); sh.say(intro()); } }
+  ]});
+  function pickL(l){
+    if(S.read || S.hover === l) return; S.hover = l; S.target = centre(l); const [t, s] = ts(l);
+    const what = l === 0 ? LL("the partition table", "таблица разделов") : inodeL.has(l) ? LL("ext4's inode table", "таблица inode ext4")
+      : fileL().has(l) ? "app.log" : otherL().has(l) ? LL("another file", "другой файл") : l <= 5 ? LL("the EFI partition", "раздел EFI") : l >= 26 ? "swap" : LL("free space in ext4", "свободное место ext4");
+    sh.say(LL(`LBA ${l} → track ${t}, sector ${s} on this platter (${what}). The drive does this mapping itself; with CHS addressing the OS had to know the geometry.`,
+              `LBA ${l} → дорожка ${t}, сектор ${s} на этой пластине (${what}). Это сопоставление делает сам диск; при адресации CHS геометрию должна была знать ОС.`), 1);
+  }
+  function render(){
+    const g = sh.svg; g.textContent = ""; const fl = fileL(), ol = otherL();
+    const cur = S.read && S.read.i >= 0 ? S.read.seq[S.read.i] : S.hover;
+    oT(g, 20, 24, LL("Platter · 4 tracks × 8 sectors (simplified)", "Пластина · 4 дорожки × 8 секторов (упрощённо)"), "an-m", "start");
+    for(let t = 0; t < NT; t++) for(let s = 0; s < SPT; s++){
+      const l = t * SPT + s, cls = "an-sector " + part(l) + (fl.has(l) ? " an-filew" : "") + (l === cur ? " an-sel" : "");
+      oHover(E(g, "path", { d: wedge(t, s), class: cls }), ()=>pickL(l));
+    }
+    E(g, "circle", { cx: CX, cy: CY, r: 31, class: "an-box" });
+    oT(g, CX, CY + 4, LL("spindle", "шпиндель"), "an-m");
+    const [hx, hy] = S.head;
+    E(g, "line", { x1: PIV[0], y1: PIV[1], x2: hx, y2: hy, class: "an-arm" });
+    E(g, "circle", { cx: PIV[0], cy: PIV[1], r: 7, class: "an-headc" });
+    E(g, "circle", { cx: hx, cy: hy, r: 6, class: "an-headc" });
+    oT(g, PIV[0] - 10, PIV[1] + 22, LL("head arm", "рычаг головки"), "an-m", "end");
+    // LBA strip
+    oT(g, 390, 54, LL("LBA · what the OS sees", "LBA · то, что видит ОС"), "an-m", "start");
+    for(let l = 0; l < 32; l++){
+      const x = 390 + (l % 8) * 44, y = 64 + Math.floor(l / 8) * 40, grp = E(g, "g", {});
+      oR(grp, x, y, 40, 32, "an-cell " + part(l), 4);
+      if(fl.has(l)) oR(grp, x - 2, y - 2, 44, 36, "an-filebox", 6);
+      else if(inodeL.has(l) || ol.has(l)) oR(grp, x - 2, y - 2, 44, 36, "an-otherbox", 6);
+      if(l === cur) oR(grp, x - 3, y - 3, 46, 38, "an-selbox", 7);
+      oT(grp, x + 20, y + 21, String(l), "an-cell-t");
+      oHover(grp, ()=>pickL(l));
+    }
+    const leg = [["knone", LL("LBA 0 · partition table (GPT)", "LBA 0 · таблица разделов (GPT)")],
+      ["k3", LL("P1 · LBA 1–5 · EFI, FAT32", "P1 · LBA 1–5 · EFI, FAT32")],
+      ["k1", LL("P2 · LBA 6–25 · ext4, block = 2 LBA", "P2 · LBA 6–25 · ext4, блок = 2 LBA")],
+      ["k2", LL("P3 · LBA 26–31 · swap", "P3 · LBA 26–31 · swap")]];
+    leg.forEach(([c, s], i)=>{ oR(g, 390, 236 + i * 20, 12, 12, "an-cell " + c, 3); oT(g, 410, 246 + i * 20, s, "an-m", "start"); });
+    const ranges = S.file.map(b => lbas(b).join("–")).join(", ");
+    oR(g, 386, 322, 364, 22, "an-filebox", 6);
+    oT(g, 394, 337, LL(`app.log → inode 12 → LBA ${ranges}`, `app.log → inode 12 → LBA ${ranges}`), "an-m", "start");
+    oT(g, 390, 364, LL("dashed: inode table (LBA 6–7) and another file", "пунктир: таблица inode (LBA 6–7) и другой файл"), "an-m", "start");
+    if(S.read) oT(g, 390, 384, LL(`reading… seeks so far: ${S.read.seeks}`, `чтение… перемещений головки: ${S.read.seeks}`), "an-m an-b", "start");
+  }
+  sh.onFrame(dt=>{
+    const k = Math.min(1, dt / 160); S.head = [S.head[0] + (S.target[0] - S.head[0]) * k, S.head[1] + (S.target[1] - S.head[1]) * k];
+    const r = S.read;
+    if(r){
+      r.acc += dt;
+      if(r.acc >= r.wait){
+        r.i++; r.acc = 0;
+        if(r.i >= r.seq.length){
+          sh.say(LL(`Done: ${S.file.length} blocks, ${r.seq.length} sectors, ${r.seeks} seeks. Each seek costs milliseconds on an HDD; that is why databases and Kafka append sequentially.`,
+                    `Готово: ${S.file.length} блока(ов), ${r.seq.length} секторов, ${r.seeks} перемещений головки. На HDD каждое перемещение стоит миллисекунды; поэтому базы данных и Kafka пишут последовательно.`), 6000);
+          S.read = null;
+        } else {
+          const l = r.seq[r.i], [t] = ts(l), seek = r.track !== null && t !== r.track;
+          if(seek) r.seeks++;
+          r.track = t; r.wait = seek ? 1100 : 550; S.target = centre(l);
+          sh.say(seek ? LL(`Seek: the arm moves to track ${t} for LBA ${l}. On a real HDD this is milliseconds.`, `Перемещение: рычаг переходит на дорожку ${t} за LBA ${l}. На настоящем HDD это миллисекунды.`)
+                      : LL(`Reading LBA ${l} on track ${t}: the platter just turns under the head.`, `Чтение LBA ${l} на дорожке ${t}: пластина просто вращается под головкой.`), r.wait);
+        }
+      }
+    }
+    render();
+  });
+  sh.say(intro()); sh.kick();
   return sh;
 };
 

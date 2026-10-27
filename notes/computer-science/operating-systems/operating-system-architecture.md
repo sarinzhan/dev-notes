@@ -8,18 +8,8 @@ A computer is four kinds of hardware: a **CPU** that executes machine instructio
 
 ## Key points
 ### The big picture
-```text
- user space     ┌────────────┐ ┌────────────┐ ┌──────────┐ ┌───────────────┐
- (per process)  │ JVM + your │ │ PostgreSQL │ │  nginx   │ │ shell, top,   │
-                │  service   │ │            │ │          │ │ systemd, ...  │
-                └─────┬──────┘ └─────┬──────┘ └────┬─────┘ └──────┬────────┘
-                      └──────── libc (read, write, malloc, pthread) ┘
- ─────────────────────────── system call boundary ─────────────────────────────
- kernel space   process mgmt · memory mgmt · file systems · network stack
-                (scheduler)   (page tables)  (ext4, xfs)    (TCP/IP)
-                ─────────────── device drivers (NVMe, NIC, ...) ───────────────
- ─────────────────────────── interrupts, DMA, I/O ports ───────────────────────
- hardware          CPU cores + caches     RAM       SSD / HDD       NIC
+```anim
+os-layers
 ```
 
 ### CPU
@@ -48,6 +38,10 @@ A computer is four kinds of hardware: a **CPU** that executes machine instructio
 
 A miss that goes all the way to RAM costs ~300 cycles, during which the core can do almost nothing. This is why data layout often matters more than instruction count ([[cpu-caches-and-cache-lines]]).
 
+```anim
+cpu-memory-hierarchy
+```
+
 ### Memory (RAM)
 - **Random access**: any byte can be read in the same time, unlike a disk. **Fast but volatile**: about 1,000× faster than an SSD for a random read, but everything is lost when the power goes. That is why databases write to storage and call `fsync` before they confirm a commit.
 - **Stores process state and data**: the code, globals, heap and stacks of every running process, and the kernel's own structures, including each process's descriptor, its page tables and the saved registers of threads that are not running right now.
@@ -55,16 +49,8 @@ A miss that goes all the way to RAM costs ~300 cycles, during which the core can
 - **Slower than CPU cache**: see the table above; RAM is the slow tier from the CPU's point of view.
 - Each process sees memory laid out from a **minimum** to a **maximum address**:
 
-```text
- max address ┌──────────────────┐
-             │ stack            │  grows down: one frame per function call
-             │        ↓         │
-             │                  │  unmapped gap
-             │        ↑         │
-             │ heap             │  grows up: malloc / new
-             │ data + static    │  globals, statics (data, bss)
- min address │ text / code      │  machine instructions, read-only
-             └──────────────────┘
+```anim
+process-memory-layout
 ```
 
 The details of each region are in [[anatomy-of-a-process]].
@@ -74,6 +60,10 @@ The details of each region are in [[anatomy-of-a-process]].
 - **HDD geometry**: a stack of spinning **platters**, a **head** per surface, concentric **tracks** split into **sectors** (traditionally 512 bytes). A **cylinder** is the same track on all platters. Old operating systems addressed the disk by **CHS** (cylinder / head / sector) and had to know its physical layout. A *geometrical* sector is a pie slice of the platter; a *disk* sector is the piece of one track inside it, the unit that is actually read.
 - **LBA**: modern disks hide their geometry and expose a flat array of numbered **logical blocks** (LBA 0, 1, 2, …), usually 512 bytes or 4 KiB each. The drive maps each LBA to its physical place; on an SSD a flash translation layer does this and also spreads writes for wear.
 - Sequential I/O is still much faster than random I/O on both kinds. That is why databases append to logs (Postgres WAL, Kafka segments) instead of updating in place.
+
+```anim
+disk-lba-partitions
+```
 
 ### Network
 - The **NIC** (network interface controller) sends and receives frames on the wire. Received packets are written straight into RAM by DMA into ring buffers, and the NIC raises an interrupt.
@@ -100,6 +90,10 @@ The details of each region are in [[anatomy-of-a-process]].
 - The frames can be **anywhere in physical memory**. Process A's pages 1–4 may sit between B's and C's in random order, and A never knows. Physical RAM becomes fragmented over time, and virtual memory hides that: every process still sees one contiguous range.
 - What remains is **internal fragmentation**: memory is handed out in whole pages, so a region that needs 4.1 KiB takes two pages and wastes most of the second.
 - The same mapping enables sharing. Ten processes running the same program map the same physical code pages. After `fork`, parent and child share every page **copy-on-write**: the first write to a page makes the kernel copy it to a new frame and point only the writer's table there. The details are in [[virtual-memory-and-paging]].
+
+```anim
+virtual-memory-mapping
+```
 
 ### File systems and partitions
 - **Storage is just blocks of bytes**, but programs want **files** and directories. A **file system** is the abstraction that maps one onto the other. It records which blocks belong to which file, keeps metadata (size, owner, permissions, timestamps) in a structure such as an inode, maps names to inodes through directories, tracks free space, and usually keeps a journal so a crash cannot corrupt that bookkeeping.
@@ -144,6 +138,10 @@ A page fault is how lazy memory works: the JVM reserves 4 GB, and only the first
 
 ## Example
 A Java thread blocks on a socket read and a packet arrives, touching every part of the picture:
+
+```anim
+syscall-walkthrough
+```
 
 ```text
 1. JVM thread calls SocketInputStream.read()                       user space, CPU core 2
