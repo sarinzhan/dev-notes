@@ -47,6 +47,9 @@ Suggested order for interview prep: architecture/styles + system-design + databa
 - [x] lru-cache-design — hashmap + doubly linked list, LinkedHashMap trick
 
 ### operating-systems
+- [x] operating-system-introduction — what an OS is, its three roles, kernel vs the rest, what a running program gets
+- [x] operating-system-architecture — layers, privilege modes, syscalls/interrupts/exceptions, kernel designs
+- [x] anatomy-of-a-process — program vs process, memory layout (text/data/bss/heap/stack), execution with the stack
 - [x] processes-and-threads — address space, PCB, context switch cost, user vs kernel threads
 - [x] cpu-scheduling — preemption, priorities, CFS idea, what "load" means
 - [x] virtual-memory-and-paging — pages, page tables, TLB, page faults, swap, OOM killer
@@ -56,6 +59,13 @@ Suggested order for interview prep: architecture/styles + system-design + databa
 - [x] deadlocks-and-synchronization-primitives — four conditions, prevention/avoidance, mutex vs semaphore at OS level
 - [x] signals-and-process-lifecycle — fork/exec, zombies, SIGTERM vs SIGKILL, graceful shutdown in containers
 - [x] ipc-mechanisms — pipes, sockets, shared memory, message queues
+
+Later (after April 2027), still under operating-systems:
+- [ ] filesystems-and-durability — page cache, write-back, fsync, what "on disk" means for Postgres and Kafka
+- [ ] zero-copy-and-mmap — sendfile, memory-mapped files, why Kafka is fast
+- [ ] cgroups-and-namespaces — how containers limit CPU and memory, JVM in a container, OOM in a pod
+- [ ] performance-tooling — top, strace, perf, flame graphs, /proc: finding what a slow process does
+- [ ] resource-limits — ulimit, open files, max threads, ephemeral ports
 
 ### concurrency-theory
 - [x] race-conditions-and-critical-sections — data race vs race condition, atomicity
@@ -68,6 +78,9 @@ Suggested order for interview prep: architecture/styles + system-design + databa
 ### computation
 - [x] how-cpu-executes-code — fetch/decode/execute, registers, pipelines, branch prediction
 - [x] cpu-caches-and-cache-lines — L1/L2/L3, locality, false sharing
+- [x] cpu-components-and-architecture — control unit, ALU, registers, load/store, ISA vs microarchitecture, cores and SMT
+- [x] instruction-lifecycle-and-pipelining — stages, hazards, forwarding, out-of-order, speculation, levels of parallelism
+- [x] cpu-pipeline-walkthrough — one Java loop traced source → bytecode → JIT asm → cycles, with a miss and a misprediction
 - [x] compilation-interpretation-jit — AOT vs interpreter vs JIT in general; link jvm-jre-jdk
 - [x] numbers-bits-and-floating-point — two's complement, IEEE 754, why 0.1+0.2 != 0.3, BigDecimal for money
 - [x] text-encodings-and-unicode — ASCII, UTF-8/16, code points vs chars, normalization
