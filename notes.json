@@ -45,7 +45,10 @@
     "principles": "Principles & DDD",
     "patterns": "Design patterns",
     "messaging": "Messaging & reliability",
-    "resources": "Resources"
+    "resources": "Resources",
+    "microservices": "Microservices & resilience",
+    "system-design": "System design",
+    "workflows": "Workflow orchestration"
    }
   },
   "devops": {
@@ -56,7 +59,14 @@
     "git": "Git",
     "build": "Build tools",
     "observability": "Observability",
-    "resources": "Resources"
+    "resources": "Resources",
+    "kubernetes": "Kubernetes"
+   }
+  },
+  "projects": {
+   "name": "Projects",
+   "subs": {
+    "stories": "Project stories"
    }
   }
  },
@@ -70,17 +80,23 @@
     "reliability",
     "kafka",
     "api-design",
-    "redis"
+    "payments"
    ],
    "learned": "2026-09-05",
    "path": "notes/architecture/messaging/idempotency.md",
    "links": [
+    "circuit-breaker",
+    "emv-card-processing",
+    "kafka-consumer",
     "outbox-pattern",
     "postgres-isolation-levels",
     "redis-data-structures",
-    "spring-kafka-consumer"
+    "rest-and-http",
+    "saga",
+    "spring-kafka-consumer",
+    "spring-transactional"
    ],
-   "words": 171
+   "words": 805
   },
   {
    "id": "outbox-pattern",
@@ -96,11 +112,125 @@
    "learned": "2026-08-20",
    "path": "notes/architecture/messaging/outbox-pattern.md",
    "links": [
+    "esim-provisioning-platform",
+    "hikaricp-pool-sizing",
     "idempotency",
+    "kafka-architecture",
+    "kafka-producer",
     "postgres-indexes",
+    "saga",
     "spring-transactional"
    ],
-   "words": 172
+   "words": 826
+  },
+  {
+   "id": "api-gateway-and-service-discovery",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "API gateway, service discovery and config server",
+   "tags": [
+    "microservices",
+    "spring-cloud",
+    "networking",
+    "kubernetes"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/api-gateway-and-service-discovery.md",
+   "links": [
+    "circuit-breaker",
+    "ddd-basics",
+    "distributed-tracing",
+    "docker-swarm",
+    "idempotency",
+    "jwt-authentication",
+    "kafka-architecture",
+    "kubernetes-basics",
+    "openapi-swagger",
+    "outbox-pattern",
+    "redis-data-structures",
+    "rest-and-http",
+    "spring-boot-properties-and-profiles",
+    "spring-reactive-webclient-sse",
+    "spring-security-basics",
+    "system-design-basics"
+   ],
+   "words": 833
+  },
+  {
+   "id": "circuit-breaker",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Circuit breaker, retry, bulkhead — Resilience4j in Spring Boot",
+   "tags": [
+    "microservices",
+    "resilience",
+    "resilience4j",
+    "spring-boot"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/circuit-breaker.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "hikaricp-pool-sizing",
+    "idempotency",
+    "otel-metric-types",
+    "rest-clients",
+    "saga",
+    "spring-aop",
+    "spring-transactional",
+    "system-design-basics",
+    "virtual-threads"
+   ],
+   "words": 827
+  },
+  {
+   "id": "distributed-tracing",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Distributed tracing with OpenTelemetry in Spring Boot 3",
+   "tags": [
+    "observability",
+    "opentelemetry",
+    "tracing",
+    "spring-boot",
+    "kafka"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/distributed-tracing.md",
+   "links": [
+    "kubernetes-basics",
+    "logging-stacks",
+    "otel-metric-types",
+    "sebep-incident-analysis",
+    "spring-kafka-consumer",
+    "system-design-basics"
+   ],
+   "words": 957
+  },
+  {
+   "id": "saga",
+   "sec": "architecture",
+   "sub": "microservices",
+   "title": "Saga pattern — orchestration vs choreography, compensation",
+   "tags": [
+    "microservices",
+    "distributed-systems",
+    "transactions",
+    "temporal",
+    "kafka"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/microservices/saga.md",
+   "links": [
+    "circuit-breaker",
+    "ddd-basics",
+    "distributed-tracing",
+    "idempotency",
+    "outbox-pattern",
+    "system-design-basics",
+    "temporal-concepts"
+   ],
+   "words": 798
   },
   {
    "id": "behavioral-patterns",
@@ -288,6 +418,72 @@
    "words": 495
   },
   {
+   "id": "system-design-basics",
+   "sec": "architecture",
+   "sub": "system-design",
+   "title": "System design basics — framework, building blocks, numbers",
+   "tags": [
+    "system-design",
+    "architecture",
+    "distributed-systems",
+    "interview"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/system-design/system-design-basics.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "architecture-resources",
+    "circuit-breaker",
+    "database-fundamentals",
+    "distributed-tracing",
+    "hibernate-caching",
+    "idempotency",
+    "jwt-authentication",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kafka-producer",
+    "kubernetes-basics",
+    "logging-stacks",
+    "normalization-and-denormalization",
+    "openapi-swagger",
+    "outbox-pattern",
+    "postgres-indexes",
+    "postgres-isolation-levels",
+    "rabbitmq-basics",
+    "redis-data-structures",
+    "rest-and-http",
+    "saga",
+    "spring-cache-abstraction",
+    "temporal-concepts",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 1055
+  },
+  {
+   "id": "temporal-concepts",
+   "sec": "architecture",
+   "sub": "workflows",
+   "title": "Temporal concepts — workflows, activities, replay, Spring Boot",
+   "tags": [
+    "temporal",
+    "workflows",
+    "distributed-systems",
+    "spring-boot",
+    "java"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/architecture/workflows/temporal-concepts.md",
+   "links": [
+    "esim-provisioning-platform",
+    "idempotency",
+    "kafka-consumer",
+    "outbox-pattern",
+    "saga",
+    "system-design-basics"
+   ],
+   "words": 1101
+  },
+  {
    "id": "redis-data-structures",
    "sec": "databases",
    "sub": "nosql",
@@ -411,10 +607,12 @@
    "learned": "2026-08-29",
    "path": "notes/databases/relational/postgres-indexes.md",
    "links": [
+    "database-indexes",
+    "jpa-n-plus-one",
     "outbox-pattern",
     "postgres-isolation-levels"
    ],
-   "words": 167
+   "words": 904
   },
   {
    "id": "postgres-isolation-levels",
@@ -703,6 +901,35 @@
     "maven"
    ],
    "words": 1147
+  },
+  {
+   "id": "kubernetes-basics",
+   "sec": "devops",
+   "sub": "kubernetes",
+   "title": "Kubernetes basics for a Spring Boot service",
+   "tags": [
+    "kubernetes",
+    "devops",
+    "containers",
+    "spring-boot",
+    "jvm"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/devops/kubernetes/kubernetes-basics.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "devops-resources",
+    "distributed-tracing",
+    "docker-containers-and-resources",
+    "docker-fundamentals",
+    "docker-swarm",
+    "docker-swarm-stack-deploy",
+    "dockerfile-and-images",
+    "garbage-collection",
+    "jvm-memory-areas",
+    "spring-boot-properties-and-profiles"
+   ],
+   "words": 1165
   },
   {
    "id": "linux-architecture-and-kernel",
@@ -1034,14 +1261,22 @@
    "title": "CompletableFuture essentials",
    "tags": [
     "concurrency",
-    "async"
+    "async",
+    "java"
    ],
    "learned": "2026-09-30",
    "path": "notes/java/concurrency/completable-future.md",
    "links": [
+    "circuit-breaker",
+    "exceptions",
+    "executors-and-thread-pools",
+    "fork-join-framework",
+    "spring-reactive-webclient-sse",
+    "spring-transactional",
+    "synchronizers",
     "virtual-threads"
    ],
-   "words": 137
+   "words": 797
   },
   {
    "id": "concurrency-hazards",
@@ -1792,15 +2027,19 @@
    "tags": [
     "jdbc",
     "performance",
-    "postgres"
+    "postgres",
+    "spring-boot"
    ],
    "learned": "2026-10-02",
    "path": "notes/java/jdbc/hikaricp-pool-sizing.md",
    "links": [
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "spring-boot-properties-and-profiles",
     "spring-transactional",
     "virtual-threads"
    ],
-   "words": 146
+   "words": 806
   },
   {
    "id": "garbage-collection",
@@ -2023,6 +2262,93 @@
     "outbox-pattern"
    ],
    "words": 1554
+  },
+  {
+   "id": "emv-card-processing",
+   "sec": "projects",
+   "sub": "stories",
+   "title": "Project story — EMV card processing and personalization at MDigital",
+   "tags": [
+    "project-story",
+    "interview",
+    "fintech",
+    "emv",
+    "outbox"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/projects/stories/emv-card-processing.md",
+   "links": [
+    "idempotency",
+    "java-io-streams",
+    "junit-and-mockito",
+    "kafka-producer",
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "spring-transactional",
+    "testing-types-and-dev-cycles"
+   ],
+   "words": 986
+  },
+  {
+   "id": "esim-provisioning-platform",
+   "sec": "projects",
+   "sub": "stories",
+   "title": "Project story — eSIM provisioning platform at Beeline",
+   "tags": [
+    "project-story",
+    "interview",
+    "temporal",
+    "kafka",
+    "esim"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/projects/stories/esim-provisioning-platform.md",
+   "links": [
+    "circuit-breaker",
+    "ddd-basics",
+    "distributed-tracing",
+    "docker-fundamentals",
+    "idempotency",
+    "junit-and-mockito",
+    "jwt-authentication",
+    "kafka-producer",
+    "kubernetes-basics",
+    "otel-metric-types",
+    "outbox-pattern",
+    "saga",
+    "spring-kafka-consumer",
+    "temporal-concepts",
+    "testcontainers"
+   ],
+   "words": 987
+  },
+  {
+   "id": "sebep-incident-analysis",
+   "sec": "projects",
+   "sub": "stories",
+   "title": "Project story — Sebep, AI-powered incident analysis",
+   "tags": [
+    "project-story",
+    "interview",
+    "observability",
+    "sentry",
+    "llm"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/projects/stories/sebep-incident-analysis.md",
+   "links": [
+    "circuit-breaker",
+    "distributed-tracing",
+    "docker-fundamentals",
+    "idempotency",
+    "kafka-consumer",
+    "logging-stacks",
+    "otel-metric-types",
+    "rabbitmq-basics",
+    "rest-and-http",
+    "spring-security-basics"
+   ],
+   "words": 1011
   },
   {
    "id": "spring-boot-properties-and-profiles",
@@ -2332,16 +2658,25 @@
    "tags": [
     "transactions",
     "jpa",
-    "aop"
+    "aop",
+    "spring-boot"
    ],
    "learned": "2026-09-18",
    "path": "notes/spring/data/spring-transactional.md",
    "links": [
+    "completable-future",
+    "exceptions",
     "hikaricp-pool-sizing",
+    "jpa-locking",
+    "jpa-n-plus-one",
+    "jpa-persistence-context-and-entity-lifecycle",
     "outbox-pattern",
-    "postgres-isolation-levels"
+    "postgres-isolation-levels",
+    "spring-aop",
+    "spring-kafka-consumer",
+    "transactions-acid-and-isolation"
    ],
-   "words": 202
+   "words": 828
   },
   {
    "id": "spring-kafka-consumer",
@@ -2351,16 +2686,23 @@
    "tags": [
     "kafka",
     "messaging",
-    "spring-boot"
+    "spring-boot",
+    "reliability"
    ],
    "learned": "2026-10-08",
    "path": "notes/spring/kafka/spring-kafka-consumer.md",
    "links": [
+    "distributed-tracing",
+    "esim-provisioning-platform",
     "idempotency",
+    "kafka-architecture",
+    "kafka-consumer",
+    "kafka-producer",
     "outbox-pattern",
-    "spring-transactional"
+    "spring-transactional",
+    "testcontainers"
    ],
-   "words": 190
+   "words": 819
   },
   {
    "id": "spring-resources",
@@ -2435,6 +2777,56 @@
     "spring-mvc-request-lifecycle"
    ],
    "words": 663
+  },
+  {
+   "id": "junit-and-mockito",
+   "sec": "spring",
+   "sub": "testing",
+   "title": "JUnit 5 and Mockito essentials",
+   "tags": [
+    "testing",
+    "junit",
+    "mockito",
+    "assertj"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/spring/testing/junit-and-mockito.md",
+   "links": [
+    "exceptions",
+    "spring-ioc-and-di",
+    "testcontainers",
+    "testing-types-and-dev-cycles"
+   ],
+   "words": 856
+  },
+  {
+   "id": "testcontainers",
+   "sec": "spring",
+   "sub": "testing",
+   "title": "Testcontainers for Postgres, Kafka and Redis tests",
+   "tags": [
+    "testing",
+    "testcontainers",
+    "postgres",
+    "kafka",
+    "spring-boot-test"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/spring/testing/testcontainers.md",
+   "links": [
+    "docker-fundamentals",
+    "docker-socket-dind-dood",
+    "hikaricp-pool-sizing",
+    "jpa-locking",
+    "jpa-persistence-context-and-entity-lifecycle",
+    "junit-and-mockito",
+    "maven",
+    "outbox-pattern",
+    "postgres-isolation-levels",
+    "spring-kafka-consumer",
+    "testing-types-and-dev-cycles"
+   ],
+   "words": 951
   },
   {
    "id": "testing-types-and-dev-cycles",
