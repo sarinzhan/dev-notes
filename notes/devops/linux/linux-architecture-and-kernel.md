@@ -17,16 +17,10 @@ A Linux system is a stack: hardware, the kernel, system libraries (glibc), syste
 7. **User applications**: your JVM, Postgres, nginx.
 
 ### Kernel space vs user space
-| | Kernel space | User space |
-|---|---|---|
-| What runs there | Kernel, drivers, kernel modules, scheduler, network stack, filesystems | Shell, GUI, systemd, terminal, Docker daemon, libraries, every application |
-| CPU mode | Privileged, ring 0 | Unprivileged, ring 3 |
-| Hardware access | Full | None; every hardware operation goes through a syscall |
-| Effect of a crash | Kernel panic, the whole OS goes down | Only that process dies |
-| How to get in | Cannot be entered directly by a normal program; only via `read()`, `write()`, `open()`, `fork()`, `mmap()`, ... | — |
+- What runs where, the CPU modes, the address-space split and how a thread crosses the boundary are in [[kernel-vs-user-mode]].
 
 ### System calls
-- The kernel's API: a few hundred functions (`open`, `read`, `write`, `socket`, `clone`, `execve`, `mmap`, `futex`). Each one switches the CPU to kernel mode, runs kernel code, switches back; this context switch costs roughly a microsecond, which is why batching (buffers, `epoll`, [[java-nio]]) matters.
+- The kernel's API: a few hundred functions (`open`, `read`, `write`, `socket`, `clone`, `execve`, `mmap`, `futex`). Each one switches the CPU to kernel mode, runs kernel code and switches back; this mode switch (not a context switch) costs roughly 0.1–0.5 µs, which is why batching (buffers, `epoll`, [[java-nio]]) matters.
 - Libraries wrap them: `FileInputStream.read()` -> JNI -> glibc `read()` -> `SYS_read`.
 - `strace -f -p <pid>` shows every syscall a process makes; `strace -c` aggregates them. It is the fastest way to see *why* a program hangs (blocked in `futex`, `read` on a socket, `connect` timeout).
 

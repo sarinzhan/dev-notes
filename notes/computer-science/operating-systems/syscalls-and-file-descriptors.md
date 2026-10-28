@@ -9,9 +9,7 @@ User code cannot touch hardware, other processes or the kernel's data structures
 ## Key points
 
 ### User/kernel boundary
-- CPU privilege rings: user mode (ring 3) cannot execute privileged instructions or access kernel memory; kernel mode (ring 0) can. The boundary is what makes [[process-management|process isolation]] and [[memory-management|virtual memory]] enforceable.
-- A syscall is a controlled entry: put the syscall number and arguments in registers, execute `syscall` (x86-64), the CPU jumps to the kernel entry point, the kernel validates arguments (user pointers are checked, never trusted), does the work, returns a value or `-errno`.
-- Cost: around 100–300 ns for the trap itself after Spectre/Meltdown mitigations, plus whatever the call does. Thousands of tiny `read(fd, buf, 1)` calls are slow for the trap, not the bytes; that is why buffered streams exist ([[java-io-streams]]) and why `vDSO` maps `clock_gettime` into user space so `System.nanoTime()` does not trap at all.
+- User mode vs kernel mode, what happens inside a system call (registers saved, checks, the system call table), what a mode switch costs, the vDSO and user vs system time are in [[kernel-vs-user-mode]]. In short: a syscall puts its number and arguments in registers, executes `syscall`, and the kernel validates the arguments (user pointers are checked, never trusted) before doing the work and returning a value or `-errno`.
 - Blocking syscalls (`read` on an empty socket, `accept`, `futex` wait) put the thread to sleep; the kernel wakes it when the event arrives. This is what "a thread is blocked" means at the OS level ([[socket-management]]).
 - Libraries wrap syscalls: `fopen` → `openat`, Java `FileInputStream.read` → JNI → `read`. `strace -f -p <pid>` shows the real calls under any abstraction.
 

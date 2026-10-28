@@ -912,6 +912,20 @@
    ]
   },
   {
+   "id": "kernel-vs-user-mode",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Kernel vs user mode",
+   "tags": [
+    "operating-systems",
+    "kernel",
+    "syscalls",
+    "cpu",
+    "linux",
+    "performance"
+   ]
+  },
+  {
    "id": "memory-management",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -3872,6 +3886,10 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "kernel-vs-user-mode"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "memory-management"
   },
   {
@@ -6293,6 +6311,10 @@
   {
    "source": "cpu",
    "target": "java-memory-model"
+  },
+  {
+   "source": "cpu",
+   "target": "kernel-vs-user-mode"
   },
   {
    "source": "cpu",
@@ -10116,6 +10138,10 @@
   },
   {
    "source": "java-io-streams",
+   "target": "kernel-vs-user-mode"
+  },
+  {
+   "source": "java-io-streams",
    "target": "linux-networking"
   },
   {
@@ -10125,10 +10151,6 @@
   {
    "source": "java-io-streams",
    "target": "structural-patterns"
-  },
-  {
-   "source": "java-io-streams",
-   "target": "syscalls-and-file-descriptors"
   },
   {
    "source": "java-io-streams",
@@ -10633,6 +10655,34 @@
   {
    "source": "kafka-producer",
    "target": "system-design-basics"
+  },
+  {
+   "source": "kernel-vs-user-mode",
+   "target": "linux-architecture-and-kernel"
+  },
+  {
+   "source": "kernel-vs-user-mode",
+   "target": "memory-management"
+  },
+  {
+   "source": "kernel-vs-user-mode",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "kernel-vs-user-mode",
+   "target": "process-management"
+  },
+  {
+   "source": "kernel-vs-user-mode",
+   "target": "socket-management"
+  },
+  {
+   "source": "kernel-vs-user-mode",
+   "target": "syscalls-and-file-descriptors"
+  },
+  {
+   "source": "kernel-vs-user-mode",
+   "target": "threads-basics"
   },
   {
    "source": "kubernetes-basics",
@@ -11169,10 +11219,6 @@
   {
    "source": "memory-management",
    "target": "storage-management"
-  },
-  {
-   "source": "memory-management",
-   "target": "syscalls-and-file-descriptors"
   },
   {
    "source": "memory-models-and-visibility",

@@ -2538,6 +2538,38 @@
    "title_ru": "Механизмы межпроцессного взаимодействия"
   },
   {
+   "id": "kernel-vs-user-mode",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Kernel vs user mode",
+   "tags": [
+    "operating-systems",
+    "kernel",
+    "syscalls",
+    "cpu",
+    "linux",
+    "performance"
+   ],
+   "learned": "2026-10-28",
+   "order": 9,
+   "path": "notes/computer-science/operating-systems/kernel-vs-user-mode.md",
+   "links": [
+    "anatomy-of-a-process",
+    "cpu",
+    "java-io-streams",
+    "linux-architecture-and-kernel",
+    "memory-management",
+    "operating-system-architecture",
+    "process-management",
+    "socket-management",
+    "syscalls-and-file-descriptors",
+    "threads-basics"
+   ],
+   "words": 2085,
+   "ru": "notes-ru/computer-science/operating-systems/kernel-vs-user-mode.md",
+   "title_ru": "Режим ядра и режим пользователя"
+  },
+  {
    "id": "memory-management",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -2833,17 +2865,15 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/operating-systems/syscalls-and-file-descriptors.md",
    "links": [
-    "java-io-streams",
     "java-nio",
+    "kernel-vs-user-mode",
     "linux-memory-filesystems-io",
     "linux-processes",
-    "memory-management",
-    "process-management",
     "socket-management",
     "sockets-and-connection-pooling",
     "synchronization-and-monitors"
    ],
-   "words": 1017,
+   "words": 956,
    "ru": "notes-ru/computer-science/operating-systems/syscalls-and-file-descriptors.md",
    "title_ru": "Системные вызовы и файловые дескрипторы"
   },
@@ -4111,12 +4141,13 @@
     "garbage-collection",
     "java-nio",
     "jvm-memory-areas",
+    "kernel-vs-user-mode",
     "linux-basics",
     "linux-commands",
     "linux-memory-filesystems-io",
     "linux-processes"
    ],
-   "words": 891,
+   "words": 812,
    "ru": "notes-ru/devops/linux/linux-architecture-and-kernel.md",
    "title_ru": "Архитектура Linux, пространство ядра и пространство пользователя"
   },
