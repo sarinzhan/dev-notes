@@ -376,7 +376,7 @@ async function setLang(l){
 async function load(){
   const data=await (await fetch("notes.json")).json();
   SECTIONS=data.sections; Object.keys(SECTIONS).forEach((k,i)=>{ const s=SECTIONS[k]; s.c=PALETTE[i%PALETTE.length]; s.name_en=s.name; s.subs_en={...s.subs}; });
-  NOTES=data.notes; byId=Object.fromEntries(NOTES.map(n=>[n.id,n]));
+  NOTES=data.notes; byId=Object.fromEntries(NOTES.map(n=>[n.id,n])); NOTES.forEach(n=>(n.aliases||[]).forEach(a=>{ if(!byId[a]) byId[a]=n; }));
   NOTES.forEach(n=>n.title_en=n.title);
   await Promise.all(NOTES.map(async n=>{ n.md_en=(await (await fetch(n.path)).text()).replace(FM,""); }));
   if(LANG==="ru") await loadRu();
@@ -401,7 +401,7 @@ function md(src){
 // ---- state + routing
 let current = null;
 const $ = s=>document.querySelector(s);
-function go(id){ if(!byId[id]) return; current=id; revealCurrent(); try{ history.replaceState(null,"",`#${id}`);}catch(e){} showNotes(); renderNote(); renderSide(); renderRight(); $("#main").scrollTop=0; }
+function go(id){ if(!byId[id]) return; id=byId[id].id; current=id; revealCurrent(); try{ history.replaceState(null,"",`#${id}`);}catch(e){} showNotes(); renderNote(); renderSide(); renderRight(); $("#main").scrollTop=0; }
 function openTag(tag){ $("#q").value="#"+tag; search(); $("#q").focus(); }
 
 // ---- sidebar tree: collapsible sections and subsections
@@ -2446,6 +2446,194 @@ ANIMS["dma-transfer"] = el=>{
     const prog = Math.min(1, t / 4000);
     if(s.mode === "pio"){ oR(g, 20, TY, 720 * prog, 26, "an-pg k0", 4); oT(g, 30, TY + 18, LL("copying device → RAM", "копирование устройство → RAM"), "an-t an-b", "start"); }
     else { const b = 720 * busy; if(b) { oR(g, 20, TY, b, 26, "an-pg k0", 4); } oR(g, 20 + b, TY, (720 - b) * prog, 26, "an-pg k2", 4); oT(g, 30 + b, TY + 18, LL("free: running other threads", "свободно: выполняет другие потоки"), "an-t an-b", "start"); }
+  }});
+};
+
+// ============ 20. Inside a CPU: the components, one at a time
+ANIMS["cpu-components"] = el=>{
+  const ST = [
+    { t: ["Two cores and the uncore", "Два ядра и «нецентральная» часть"], hl: [], en: "A chip with two cores. Each core has its own ALU, control unit, registers, MMU with a TLB, and L1 and L2 caches. The L3 cache, the memory controller and the bus to RAM are shared by all cores. Step through the parts.",
+      ru: "Чип с двумя ядрами. У каждого ядра свои ALU, блок управления, регистры, MMU с TLB, кэши L1 и L2. Кэш L3, контроллер памяти и шина к RAM общие для всех ядер. Пройдите по частям по шагам." },
+    { t: ["ALU", "ALU"], hl: ["alu"], en: "The arithmetic logic unit does the actual computing: add, subtract, multiply, divide, compare, shift, AND, OR, XOR. A modern core has several integer ALUs plus floating-point and vector (SIMD) units, so it can do several operations per cycle. It reads its inputs from registers and never touches memory itself.",
+      ru: "Арифметико-логическое устройство выполняет сами вычисления: сложение, вычитание, умножение, деление, сравнение, сдвиги, AND, OR, XOR. В современном ядре несколько целочисленных ALU плюс блоки для чисел с плавающей точкой и векторных (SIMD) операций, поэтому за такт выполняется несколько операций. Входные данные ALU берёт из регистров и сам к памяти не обращается." },
+    { t: ["Control unit", "Блок управления"], hl: ["cu"], en: "The control unit runs the cycle: it fetches the instruction at the program counter, decodes it into micro-operations, sends them to the right unit, and writes the results back. It also contains the branch predictor, which guesses where the program goes next before a jump is resolved.",
+      ru: "Блок управления ведёт цикл: выбирает инструкцию по счётчику команд, декодирует её в микрооперации, отправляет их в нужный блок и записывает результаты. В нём же находится предсказатель переходов, который угадывает, куда пойдёт программа, ещё до того, как переход вычислен." },
+    { t: ["Registers", "Регистры"], hl: ["reg"], en: "Registers are the core's own storage: a few dozen 64-bit slots, read in under a cycle. PC (next instruction), IR (current instruction), SP and BP (stack), flags, and 16 (x86-64) or 31 (ARM64) general-purpose registers. Every value must be in a register before the ALU can use it.",
+      ru: "Регистры — собственная память ядра: несколько десятков 64-битных ячеек, которые читаются быстрее чем за такт. PC (следующая инструкция), IR (текущая инструкция), SP и BP (стек), флаги и 16 (x86-64) или 31 (ARM64) регистров общего назначения. Любое значение должно оказаться в регистре, прежде чем ALU сможет его использовать." },
+    { t: ["MMU and TLB", "MMU и TLB"], hl: ["mmu"], en: "The memory management unit turns every virtual address the program uses into a physical one, using the current process's page table. The TLB caches recent translations; without it every memory access would need several extra memory reads. On a context switch to another process, its entries are invalid (flushed, or tagged with PCID/ASID).",
+      ru: "Блок управления памятью превращает каждый виртуальный адрес программы в физический по таблице страниц текущего процесса. TLB кэширует недавние трансляции; без него каждое обращение к памяти требовало бы нескольких дополнительных чтений. При переключении на другой процесс его записи недействительны (сбрасываются или помечаются PCID/ASID)." },
+    { t: ["L1i and L1d", "L1i и L1d"], hl: ["l1"], en: "L1 is split in two: L1i for instructions and L1d for data, each about 32–64 KB, about 1 ns away. It is private to the core. Everything arrives here in 64-byte cache lines.",
+      ru: "L1 разделён на два: L1i для инструкций и L1d для данных, каждый примерно по 32–64 КБ, около 1 нс. Он принадлежит только этому ядру. Всё приходит сюда кэш-линиями по 64 байта." },
+    { t: ["L2", "L2"], hl: ["l2"], en: "L2 holds both code and data, 256 KB to 2 MB per core, about 4–5 ns. Still private to the core, so two cores never compete for it.",
+      ru: "L2 хранит и код, и данные, от 256 КБ до 2 МБ на ядро, около 4–5 нс. Тоже личный для ядра, поэтому два ядра за него не конкурируют." },
+    { t: ["L3, shared", "L3, общий"], hl: ["l3"], en: "L3 is shared by all cores on the chip: tens of MB, about 12–40 ns. Data one core wrote can be found here by another core. The cache coherence protocol keeps all copies of a line consistent, and that traffic is what makes contended locks and false sharing slow.",
+      ru: "L3 общий для всех ядер чипа: десятки МБ, около 12–40 нс. Данные, записанные одним ядром, другое ядро может найти здесь. Протокол когерентности кэшей поддерживает все копии линии согласованными, и именно этот трафик делает медленными блокировки под конкуренцией и false sharing." },
+    { t: ["Bus, controller, RAM", "Шина, контроллер, RAM"], hl: ["mc", "ram"], en: "On a miss in L3, the memory controller fetches the line from RAM over the memory bus: 50–100 ns, roughly 300 cycles during which the instruction waits. Devices reach the same RAM through the I/O bus (PCIe) and DMA.",
+      ru: "При промахе в L3 контроллер памяти забирает линию из RAM по шине памяти: 50–100 нс, около 300 тактов, пока инструкция ждёт. Устройства обращаются к той же RAM через шину ввода-вывода (PCIe) и DMA." }
+  ];
+  const core = (g, x, dim, hl)=>{
+    const grp = E(g, "g", { class: dim ? "an-dim" : "" });
+    oR(grp, x, 30, 200, 282, "an-frame", 10); oT(grp, x + 100, 22, dim ? LL("core 2", "ядро 2") : LL("core 1", "ядро 1"), "an-m an-b");
+    const B = (id, y, h, label, sub)=>{ const on = !dim && hl.includes(id); oR(grp, x + 12, y, 176, h, on ? "an-reg on" : "an-box", 6); oT(grp, x + 100, y + (sub ? h / 2 - 1 : h / 2 + 5), label, "an-t an-b"); if(sub) oT(grp, x + 100, y + h / 2 + 14, sub, "an-m"); };
+    B("alu", 42, 40, "ALU", LL("+ − × ÷  AND OR XOR", "+ − × ÷  AND OR XOR"));
+    B("cu", 90, 40, LL("Control unit", "Блок управления"), LL("fetch · decode · predict", "выборка · декод · прогноз"));
+    B("reg", 138, 40, LL("Registers", "Регистры"), "PC IR SP BP r0…r15 flags");
+    B("mmu", 186, 36, "MMU · TLB", LL("virtual → physical", "виртуальный → физический"));
+    const l1on = !dim && hl.includes("l1");
+    oR(grp, x + 12, 230, 84, 34, l1on ? "an-reg on" : "an-box", 6); oT(grp, x + 54, 252, "L1i", "an-t an-b");
+    oR(grp, x + 104, 230, 84, 34, l1on ? "an-reg on" : "an-box", 6); oT(grp, x + 146, 252, "L1d", "an-t an-b");
+    B("l2", 272, 32, "L2", null);
+  };
+  return steppedAnim(el, { title: LL("Inside a CPU", "Внутри CPU"), vb: [760, 420], steps: ST, stepMs: 6000, render(g, s){
+    core(g, 14, false, s.hl); core(g, 230, true, s.hl);
+    oR(g, 14, 326, 416, 34, s.hl.includes("l3") ? "an-reg on" : "an-box", 6); oT(g, 222, 348, LL("L3 · shared by all cores", "L3 · общий для всех ядер"), "an-t an-b");
+    oR(g, 14, 374, 416, 34, s.hl.includes("mc") ? "an-reg on" : "an-box", 6); oT(g, 222, 396, LL("memory controller · bus", "контроллер памяти · шина"), "an-t an-b");
+    oR(g, 560, 120, 180, 220, s.hl.includes("ram") ? "an-reg on" : "an-frame", 10); oT(g, 650, 222, "RAM", "an-t an-b"); oT(g, 650, 242, LL("50–100 ns", "50–100 нс"), "an-m");
+    E(g, "line", { x1: 430, y1: 391, x2: 560, y2: 300, class: "an-flowline" });
+    // latency labels
+    const lat = [["~0.3 ns", 158], ["~1 ns", 247], ["~4 ns", 288]];
+    for(const [l, y] of lat) oT(g, 450, y + 4, l, "an-m", "start");
+    oT(g, 450, 347, "~15 ns", "an-m", "start");
+  }});
+};
+
+// ============ 21. One instruction through the core (the course example: sub sp, sp, #12 at 640)
+ANIMS["cpu-instruction-cycle"] = el=>{
+  const CODE = [[900, "_malloc"], [800, "_free"], [704, "ret"], [700, "add  sp, sp, #12"], [696, "ldp  bp, lr, [sp, #12]"], [692, "bl   _free"], [688, "ldr  r0, [sp, #4]"], [684, "str  r1, [r0]"], [680, "add  r1, r1, #1"], [676, "str  r1, [r0]"],
+                [672, "mov  r1, #10"], [668, "str  r0, [sp, #4]"], [664, "bl   _malloc"], [660, "mov  r0, #4"], [656, "str  r1, [sp, #4]"], [652, "mov  r1, #0"], [648, "add  bp, sp, #8"], [644, "stp  bp, lr, [sp, #12]"], [640, "sub  sp, sp, #12"]];
+  const ST = [
+    { t: ["PC = 640", "PC = 640"], pc: 640, sp: 100, at: "cu", en: "The program counter holds 640, the address of the first instruction of main. The control unit needs the instruction bytes at 640, and nothing is cached yet.",
+      ru: "В счётчике команд 640 — адрес первой инструкции main. Блоку управления нужны байты инструкции по адресу 640, а в кэшах пока ничего нет." },
+    { t: ["Fetch: translate", "Выборка: трансляция"], pc: 640, sp: 100, at: "mmu", en: "640 is a virtual address. The MMU translates it to a physical address using the TLB (or a page-table walk on a TLB miss).",
+      ru: "640 — виртуальный адрес. MMU транслирует его в физический через TLB (или обходом таблицы страниц при промахе TLB)." },
+    { t: ["Fetch: cache miss", "Выборка: промах кэша"], pc: 640, sp: 100, at: "miss", en: "L1i (the instruction cache) and L2 do not have it. The request goes over the bus to RAM: about 100 ns, hundreds of cycles of waiting for the first instruction of the program.",
+      ru: "В L1i (кэше инструкций) и L2 его нет. Запрос уходит по шине в RAM: около 100 нс, сотни тактов ожидания первой инструкции программы." },
+    { t: ["64 bytes arrive", "Приходят 64 байта"], pc: 640, sp: 100, at: "line", line: true, en: "RAM returns a whole 64-byte cache line, 640–703: sixteen 4-byte instructions at once. The line is stored in L2 (a general cache) and in L1i (instructions only). `ret` at 704 is in the next line.",
+      ru: "RAM возвращает целую кэш-линию в 64 байта, 640–703: сразу шестнадцать 4-байтных инструкций. Линия сохраняется в L2 (общий кэш) и в L1i (только инструкции). `ret` по адресу 704 — уже в следующей линии." },
+    { t: ["Decode", "Декодирование"], pc: 640, sp: 100, at: "decode", line: true, ir: "sub sp, sp, #12", en: "The instruction goes into the instruction register. The control unit decodes it: operation = subtract, destination = sp, source = sp, immediate = 12. It reads the operand from the registers: sp = 100.",
+      ru: "Инструкция попадает в регистр команд. Блок управления декодирует её: операция — вычитание, приёмник — sp, источник — sp, непосредственное значение — 12. Операнд он читает из регистров: sp = 100." },
+    { t: ["Execute", "Выполнение"], pc: 640, sp: 100, at: "alu", line: true, ir: "sub sp, sp, #12", alu: "100 − 12 = 88", en: "The ALU computes 100 − 12 = 88. It only computes; it does not read or write registers itself.",
+      ru: "ALU вычисляет 100 − 12 = 88. Он только вычисляет и сам не читает и не пишет регистры." },
+    { t: ["Write back", "Запись результата"], pc: 644, sp: 88, at: "write", line: true, ir: "sub sp, sp, #12", alu: "100 − 12 = 88", en: "The control unit writes the result into sp, so sp = 88, and moves the program counter to the next instruction: PC = 644. This instruction needed no memory access step, because sub works only on registers.",
+      ru: "Блок управления записывает результат в sp, так что sp = 88, и передвигает счётчик команд на следующую инструкцию: PC = 644. Шаг обращения к памяти этой инструкции не понадобился: sub работает только с регистрами." },
+    { t: ["Next fetch: L1i hit", "Следующая выборка: попадание в L1i"], pc: 644, sp: 88, at: "hit", line: true, ir: "stp bp, lr, [sp, #12]", en: "644 is in the line that just arrived: an L1i hit in about 1 ns. The next 14 instructions are already in the core, which is why straight-line code is fast after the first miss.",
+      ru: "644 лежит в только что пришедшей линии: попадание в L1i примерно за 1 нс. Следующие 14 инструкций уже в ядре, поэтому код без переходов работает быстро после первого промаха." },
+    { t: ["Units sit idle", "Блоки простаивают"], pc: 644, sp: 88, at: "idle", line: true, ir: "stp bp, lr, [sp, #12]", en: "Notice that in every step only one part was busy: while the ALU computed, the fetch logic and the decoder waited, and vice versa. That idle time is what pipelining reclaims.",
+      ru: "Заметьте: на каждом шаге был занят только один блок. Пока ALU считал, логика выборки и декодер ждали, и наоборот. Это время простоя и забирает конвейер." }
+  ];
+  const BX = { alu: [20, 30, 260, 40], cu: [20, 78, 260, 52], reg: [20, 138, 260, 46], mmu: [20, 204, 260, 34], l1: [20, 246, 260, 34], l2: [20, 300, 260, 34] };
+  const LX = 470, LY = i => 30 + i * 21;
+  return steppedAnim(el, { title: LL("One instruction through the core", "Одна инструкция через ядро"), vb: [760, 440], steps: ST, stepMs: 5600, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1400));
+    oR(g, 10, 20, 280, 270, "an-frame", 10); oT(g, 150, 14, "CPU", "an-m an-b");
+    const on = id => ({ cu: ["cu", "decode"], mmu: ["mmu"], l1: ["miss", "line", "hit"], l2: ["miss", "line"], alu: ["alu"], reg: ["decode", "write"] })[id].includes(s.at);
+    for(const [id, [x, y, w, h]] of Object.entries(BX)) oR(g, x, y, w, h, on(id) ? "an-reg on" : (s.at === "idle" && id !== "cu" ? "an-box an-dim" : "an-box"), 6);
+    oT(g, 32, 54, "ALU", "an-t an-b", "start"); if(s.alu) oT(g, 270, 55, s.alu, "an-t an-b an-warn", "end");
+    oT(g, 32, 98, "CU", "an-t an-b", "start"); if(s.ir) oT(g, 270, 99, s.ir.replace(/ /g, " "), "an-code", "end");
+    if(s.at === "decode") oT(g, 270, 120, LL("op: sub · dst: sp · src: sp · imm: 12", "оп: sub · куда: sp · откуда: sp · знач.: 12"), "an-m", "end");
+    oT(g, 32, 158, LL("registers", "регистры"), "an-t an-b", "start");
+    oT(g, 32, 176, `PC = ${s.pc}`, "an-code", "start"); oT(g, 150, 176, `SP = ${s.sp}`, "an-code" + (s.at === "write" ? " an-b an-warn" : ""), "start");
+    oT(g, 32, 226, "MMU · TLB", "an-t an-b", "start"); if(s.at === "mmu") oT(g, 270, 226, LL("virt 640 → phys", "вирт 640 → физ"), "an-m", "end");
+    oT(g, 32, 268, "L1i", "an-t an-b", "start"); oT(g, 32, 322, "L2", "an-t an-b", "start");
+    for(const [y, lbl] of [[268, "L1i"], [322, "L2"]]){
+      if(s.at === "miss") oT(g, 270, y, LL("miss", "промах"), "an-t an-b an-warn", "end");
+      else if(s.line) oT(g, 270, y, LL("640–703 (64 bytes)", "640–703 (64 байта)"), "an-m an-b", "end");
+    }
+    if(s.at === "hit") oT(g, 58, 268, LL("hit ~1 ns", "попадание ~1 нс"), "an-m an-b an-sp", "start");
+    // RAM listing
+    oR(g, LX - 10, 8, 290, 422, "an-frame", 8); oT(g, LX + 135, 4 + 18, "", "an-m");
+    CODE.forEach(([a, c], i)=>{
+      const y = LY(i) + 10, inLine = s.line && a >= 640 && a <= 700;
+      if(inLine) oR(g, LX - 4, y - 13, 278, 19, "an-rowhl", 3);
+      oT(g, LX, y, String(a), "an-m an-sp", "start"); oT(g, LX + 34, y, c.replace(/ +/g, " "), "an-code" + (a === s.pc ? " an-b" : " c"), "start");
+      if(a === s.pc) oT(g, LX - 14, y, "pc ▶", "an-m an-b an-sp", "end");
+    });
+    oT(g, LX + 135, 434, LL("RAM · code of main", "RAM · код main"), "an-m an-b");
+    // movement
+    let path = null, n = 1;
+    if(s.at === "mmu") path = [[150, 104], [150, 221]];
+    if(s.at === "miss") path = [[150, 238], [150, 300], [300, 320], [LX - 10, 380]];
+    if(s.at === "line"){ path = [[LX - 10, 380], [300, 320], [150, 317]]; n = 4; }
+    if(s.at === "decode") path = [[150, 263], [150, 104]];
+    if(s.at === "write") path = [[150, 54], [150, 98], [190, 176]];
+    if(s.at === "hit") path = [[150, 263], [150, 104]];
+    if(path) for(let j = 0; j < n; j++){ const kk = k - j * .08; if(kk <= 0) continue; const [x, y] = polyAt(path, kk); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); }
+    if(s.at === "idle"){ oT(g, 150, 360, LL("busy: control unit only", "занят: только блок управления"), "an-m an-b an-warn"); oT(g, 150, 380, LL("idle: ALU, MMU, caches", "простаивают: ALU, MMU, кэши"), "an-m"); }
+  }});
+};
+
+// ============ 22. Pipelining: sequential vs pipelined, data hazard, branch misprediction, superscalar
+ANIMS["cpu-pipeline"] = el=>{
+  const S4 = ["F", "D", "X", "W"], CLS = { F: "k1", D: "k3", X: "k0", W: "k2" };
+  const run = (starts, extra = {}) => starts.map((c0, i) => { const ops = []; let c = c0; for(const st of S4){ const w = (extra[i] || {})[st] || 0; for(let b = 0; b < w; b++) ops.push([c++, "-"]); ops.push([c++, st]); } return ops; });
+  const ST = [
+    { t: ["Without a pipeline", "Без конвейера"], rows: run([1, 5, 9]), names: ["i1", "i2", "i3"], en: "Each instruction goes through fetch, decode, execute and write before the next one starts. Three instructions take 12 cycles, and each unit works only 1 cycle in 4.",
+      ru: "Каждая инструкция проходит выборку, декодирование, выполнение и запись, прежде чем начнётся следующая. Три инструкции занимают 12 тактов, и каждый блок работает лишь 1 такт из 4." },
+    { t: ["Pipelined", "Конвейер"], rows: run([1, 2, 3, 4, 5, 6]), names: ["i1", "i2", "i3", "i4", "i5", "i6"], en: "While i1 is decoded, i2 is fetched; while i1 executes, i2 is decoded and i3 fetched. After the pipeline fills, one instruction finishes every cycle: six in 9 cycles. No single instruction got faster; throughput went up 4×.",
+      ru: "Пока i1 декодируется, выбирается i2; пока i1 выполняется, декодируется i2 и выбирается i3. Когда конвейер заполнен, каждый такт завершается одна инструкция: шесть за 9 тактов. Ни одна инструкция не стала быстрее; пропускная способность выросла в 4 раза." },
+    { t: ["Data hazard", "Конфликт по данным"], rows: run([1, 2, 3, 4, 5], { 2: { X: 2 }, 3: { D: 2 }, 4: { F: 2 } }), names: ["i1 add", "i2 ldr r1", "i3 mul r1", "i4", "i5"], en: "i3 multiplies r1, which i2 is still loading from memory. i3 cannot execute until the value arrives, so it waits 2 cycles (bubbles), and everything behind it waits too. Forwarding passes a result straight to the next instruction, but a load from memory still costs its full latency.",
+      ru: "i3 умножает r1, который i2 ещё загружает из памяти. i3 не может выполниться, пока значение не придёт, поэтому ждёт 2 такта (пузыри), и всё, что за ней, тоже ждёт. Проброс (forwarding) передаёт результат сразу следующей инструкции, но загрузка из памяти всё равно стоит свою полную задержку." },
+    { t: ["Branch misprediction", "Неверное предсказание перехода"], rows: [...run([1, 2, 3]), [[4, "xF"], [5, "xD"]], [[5, "xF"]], ...run([6, 7])],
+      names: ["i1", "i2", "i3 jne", "i4 ✗", "i5 ✗", "t1", "t2"], en: "i3 is a conditional jump. The predictor guessed \"not taken\", so i4 and i5 were fetched. At execute (cycle 5) i3 turns out to jump: i4 and i5 are thrown away and fetching restarts at the target t1. Here it costs 2 cycles; on a real 15–20-stage pipeline about 15.",
+      ru: "i3 — условный переход. Предсказатель решил «не переходить», поэтому были выбраны i4 и i5. На выполнении (такт 5) выясняется, что i3 переходит: i4 и i5 выбрасываются, и выборка начинается заново с цели t1. Здесь это стоит 2 такта, на настоящем конвейере из 15–20 стадий — около 15." },
+    { t: ["Superscalar", "Суперскалярность"], rows: run([1, 1, 2, 2, 3, 3, 4, 4]), names: ["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8"], en: "A modern core has several of each unit and starts several independent instructions per cycle (4–8 wide), out of order when needed. Eight instructions finish in 7 cycles. Real code reaches 1–3 instructions per cycle, because dependencies, misses and mispredictions cut in.",
+      ru: "В современном ядре по несколько блоков каждого вида, и оно запускает несколько независимых инструкций за такт (ширина 4–8), при необходимости вне порядка. Восемь инструкций завершаются за 7 тактов. Реальный код достигает 1–3 инструкций за такт, потому что мешают зависимости, промахи и ошибки предсказания." }
+  ];
+  const X0 = 110, CW = 46, RH = 26, Y0 = 56, NC = 13;
+  return steppedAnim(el, { title: LL("Pipelining and its hazards", "Конвейер и его конфликты"), vb: [760, 320], steps: ST, stepMs: 6400, render(g, s, t){
+    const shown = Math.min(NC, Math.floor(t / 320) + 1);
+    oT(g, X0 - 10, 40, LL("cycle", "такт"), "an-m an-b", "end");
+    for(let c = 1; c <= NC - 1; c++) oT(g, X0 + (c - .5) * CW, 40, String(c), "an-m" + (c <= shown ? " an-b" : ""));
+    s.rows.forEach((ops, r)=>{
+      const y = Y0 + r * RH;
+      oT(g, X0 - 10, y + 17, s.names[r], "an-code", "end");
+      for(const [c, st] of ops){
+        if(c > shown || c >= NC) continue;
+        const x = X0 + (c - 1) * CW;
+        if(st === "-"){ oR(g, x + 2, y + 2, CW - 4, RH - 4, "an-free", 4); oT(g, x + CW / 2, y + 17, LL("wait", "ждёт"), "an-m"); continue; }
+        if(st[0] === "x"){ oR(g, x + 2, y + 2, CW - 4, RH - 4, "an-leak", 4); oT(g, x + CW / 2, y + 17, st[1], "an-t an-b an-warn"); continue; }
+        oR(g, x + 2, y + 2, CW - 4, RH - 4, "an-pg " + CLS[st], 4); oT(g, x + CW / 2, y + 17, st, "an-t an-b");
+      }
+    });
+    E(g, "line", { x1: X0 + shown * CW, y1: 46, x2: X0 + shown * CW, y2: Y0 + s.rows.length * RH, class: "an-flowline" });
+    const ly = 300; [["F", LL("fetch", "выборка")], ["D", LL("decode", "декодирование")], ["X", LL("execute", "выполнение")], ["W", LL("write", "запись")]].forEach(([st, l], i)=>{ oR(g, 20 + i * 160, ly - 13, 18, 18, "an-pg " + CLS[st], 3); oT(g, 44 + i * 160, ly + 1, l, "an-m", "start"); });
+    const done = s.rows.filter(ops => ops.length >= 4 && !ops.some(o => o[1][0] === "x") && ops[ops.length - 1][0] <= shown).length;
+    oT(g, 740, 40, LL(`finished: ${done}`, `завершено: ${done}`), "an-m an-b", "end");
+  }});
+};
+
+// ============ 23. Parallelism: one core vs many, Amdahl, oversubscription, SMT
+ANIMS["cpu-parallelism"] = el=>{
+  const ST = [
+    { t: ["One big task", "Одна большая задача"], mode: 0, en: "A single-threaded program runs on one core, however many the machine has. CPU 2 sits idle. The task takes 8 seconds.",
+      ru: "Однопоточная программа работает на одном ядре, сколько бы их ни было в машине. CPU 2 простаивает. Задача занимает 8 секунд." },
+    { t: ["Split across cores", "Разделение по ядрам"], mode: 1, en: "Split the task into two processes or threads, and the OS scheduler puts each on its own core. They truly run at the same time: 4 seconds. That is parallelism; concurrency is only interleaving, which one core can also do.",
+      ru: "Разделите задачу на два процесса или потока, и планировщик ОС поставит каждый на своё ядро. Они действительно работают одновременно: 4 секунды. Это параллелизм; конкурентность — лишь чередование, которое умеет и одно ядро." },
+    { t: ["The serial part (Amdahl)", "Последовательная часть (Амдал)"], mode: 2, en: "Real tasks have a part that cannot be split: reading the input, merging results, a shared lock. With 20% serial work, 2 cores give 8 → 4.8 s (1.7×), not 4 s, and even infinite cores cannot beat 1.6 s (5×). That is Amdahl's law.",
+      ru: "У реальных задач есть часть, которую нельзя разделить: чтение входа, слияние результатов, общая блокировка. При 20% последовательной работы 2 ядра дают 8 → 4,8 с (в 1,7 раза), а не 4 с, и даже бесконечное число ядер не опустится ниже 1,6 с (в 5 раз). Это закон Амдала." },
+    { t: ["More threads than cores", "Потоков больше, чем ядер"], mode: 3, en: "Four CPU-bound threads on two cores do not finish sooner: the scheduler time-slices them, and every switch adds overhead and cold caches. For CPU-bound work, size the pool to the number of cores; I/O-bound threads spend most of their time blocked, so more of them help.",
+      ru: "Четыре потока, загружающих CPU, на двух ядрах не закончат раньше: планировщик делит между ними время, и каждое переключение добавляет накладные расходы и холодные кэши. Для вычислительной работы размер пула — по числу ядер; потоки, ждущие ввода-вывода, почти всё время заблокированы, поэтому их может быть больше." },
+    { t: ["Hyper-threading (SMT)", "Hyper-threading (SMT)"], mode: 4, en: "One physical core can run two hardware threads that share its ALUs and caches. When one thread stalls on a cache miss, the other uses the idle units. It gains maybe 10–30%, not 2×. A \"vCPU\" in the cloud is one such hardware thread.",
+      ru: "Одно физическое ядро может выполнять два аппаратных потока, которые делят его ALU и кэши. Когда один поток стоит на промахе кэша, другой использует свободные блоки. Выигрыш около 10–30%, а не в 2 раза. «vCPU» в облаке — это один такой аппаратный поток." }
+  ];
+  const X0 = 150, W = 560, SEC = W / 8;
+  return steppedAnim(el, { title: LL("Parallelism: cores, threads, limits", "Параллелизм: ядра, потоки, пределы"), vb: [760, 300], steps: ST, stepMs: 6400, render(g, s, t){
+    const k = Math.min(1, t / 4200);
+    const lane = (y, label, segs)=>{
+      oT(g, X0 - 12, y + 22, label, "an-t an-b", "end"); oR(g, X0, y, W, 34, "an-frame", 5);
+      for(const [a, b, cls, txt] of segs){ const from = X0 + a * SEC, to = X0 + Math.min(b, Math.max(a, k * 8)) * SEC; if(to - from < 3) continue; oR(g, from + 1, y + 2, to - from - 2, 30, "an-pg " + cls, 4); if(txt && to - from > 40) oT(g, (from + to) / 2, y + 22, txt, "an-m an-b"); }
+    };
+    for(let sec = 0; sec <= 8; sec++){ oT(g, X0 + sec * SEC, 28, sec + LL(" s", " с"), "an-m"); E(g, "line", { x1: X0 + sec * SEC, y1: 34, x2: X0 + sec * SEC, y2: 230, class: "an-link2 an-dash" }); }
+    if(s.mode === 0){ lane(50, "CPU 1", [[0, 8, "k1", LL("big task", "большая задача")]]); lane(100, "CPU 2", []); oT(g, X0 + W / 2, 122, LL("idle", "простаивает"), "an-m"); }
+    if(s.mode === 1){ lane(50, "CPU 1", [[0, 4, "k1", LL("process 1", "процесс 1")]]); lane(100, "CPU 2", [[0, 4, "k2", LL("process 2", "процесс 2")]]); if(k * 8 >= 4) oT(g, X0 + 4 * SEC + 8, 176, LL("done in 4 s: 2×", "готово за 4 с: в 2 раза"), "an-t an-b", "start"); }
+    if(s.mode === 2){ lane(50, "CPU 1", [[0, .8, "k4", LL("serial", "посл.")], [.8, 4, "k1", LL("half 1", "половина 1")], [4, 4.8, "k4", LL("merge", "слияние")]]); lane(100, "CPU 2", [[.8, 4, "k2", LL("half 2", "половина 2")]]);
+      if(k * 8 >= 4.8) oT(g, X0 + 4.8 * SEC + 8, 176, LL("4.8 s: 1.7×, not 2×", "4,8 с: в 1,7 раза, а не в 2"), "an-t an-b an-warn", "start");
+      oT(g, X0, 216, LL("speedup = 1 / (serial + parallel / cores)", "ускорение = 1 / (посл. + парал. / ядра)"), "an-code", "start"); }
+    if(s.mode === 3){ const segs = c => { const o = []; for(let q = 0; q < 16; q++){ const th = (q % 2) + c * 2; o.push([q * .5, q * .5 + .5, ["k1", "k2", "k0", "k3"][th], "T" + (th + 1)]); } return o; };
+      lane(50, "CPU 1", segs(0)); lane(100, "CPU 2", segs(1)); oT(g, X0, 176, LL("4 threads × 2 s of work = 8 s of CPU, still 4 s on 2 cores, plus switch overhead", "4 потока × 2 с работы = 8 с CPU, всё равно 4 с на 2 ядрах, плюс переключения"), "an-m an-b", "start"); }
+    if(s.mode === 4){ const segs = th => { const o = []; for(let q = 0; q < 8; q++){ const run = (q + th) % 2 === 0; o.push([q, q + (run ? .85 : .25), run ? (th ? "k2" : "k1") : "k4", run ? ("T" + (th + 1)) : LL("miss", "промах")]); } return o; };
+      lane(50, LL("core 1, HT 1", "ядро 1, HT 1"), segs(0)); lane(100, LL("core 1, HT 2", "ядро 1, HT 2"), segs(1));
+      oT(g, X0, 176, LL("the ALUs are shared: one thread runs while the other waits on memory", "ALU общие: один поток работает, пока другой ждёт память"), "an-m an-b", "start"); }
   }});
 };
 

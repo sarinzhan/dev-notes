@@ -80,4 +80,4 @@ public class FalseSharingDemo {
 - Reasoning about Java object layout by field declaration order: HotSpot reorders fields by size and type. Check with JOL (`jol-core`) rather than guessing.
 - Benchmarks on a laptop with 2 cores or with threads pinned to the same core show no false sharing; the effect appears only across physical cores and sockets.
 - Over-sized "optimised" structures: padding everything evicts real data from L1. Pad only fields written concurrently by different threads.
-- Related: [[how-cpu-executes-code]] for the pipeline side, [[lru-cache-design]] and [[caching]] for caches at the software level, which follow the same locality logic.
+- Related: [[cpu]] for the pipeline side, [[lru-cache-design]] and [[caching]] for caches at the software level, which follow the same locality logic.

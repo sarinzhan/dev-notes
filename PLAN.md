@@ -76,11 +76,8 @@ Later (after April 2027), still under operating-systems:
 - [x] actor-and-message-passing-models — alternatives to shared memory
 
 ### computation
-- [x] how-cpu-executes-code — fetch/decode/execute, registers, pipelines, branch prediction
+- [x] cpu (now in operating-systems, merged from four notes) — components, registers, caches, NUMA, RISC vs CISC, clock and IPC, instruction lifecycle, pipelining and hazards, out-of-order, branch prediction, parallelism, a Java loop cycle by cycle
 - [x] cpu-caches-and-cache-lines — L1/L2/L3, locality, false sharing
-- [x] cpu-components-and-architecture — control unit, ALU, registers, load/store, ISA vs microarchitecture, cores and SMT
-- [x] instruction-lifecycle-and-pipelining — stages, hazards, forwarding, out-of-order, speculation, levels of parallelism
-- [x] cpu-pipeline-walkthrough — one Java loop traced source → bytecode → JIT asm → cycles, with a miss and a misprediction
 - [x] compilation-interpretation-jit — AOT vs interpreter vs JIT in general; link jvm-jre-jdk
 - [x] numbers-bits-and-floating-point — two's complement, IEEE 754, why 0.1+0.2 != 0.3, BigDecimal for money
 - [x] text-encodings-and-unicode — ASCII, UTF-8/16, code points vs chars, normalization

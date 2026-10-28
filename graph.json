@@ -614,57 +614,6 @@
    ]
   },
   {
-   "id": "cpu-components-and-architecture",
-   "sec": "computer-science",
-   "sub": "computation",
-   "title": "CPU components and architecture",
-   "tags": [
-    "cpu",
-    "hardware",
-    "registers",
-    "cores",
-    "isa"
-   ]
-  },
-  {
-   "id": "cpu-pipeline-walkthrough",
-   "sec": "computer-science",
-   "sub": "computation",
-   "title": "Inside the CPU, a walkthrough of one loop",
-   "tags": [
-    "cpu",
-    "pipeline",
-    "jit",
-    "assembly",
-    "demo"
-   ]
-  },
-  {
-   "id": "how-cpu-executes-code",
-   "sec": "computer-science",
-   "sub": "computation",
-   "title": "How a CPU executes code",
-   "tags": [
-    "cpu",
-    "computer-architecture",
-    "performance",
-    "fundamentals"
-   ]
-  },
-  {
-   "id": "instruction-lifecycle-and-pipelining",
-   "sec": "computer-science",
-   "sub": "computation",
-   "title": "Instruction lifecycle, pipelining and parallelism",
-   "tags": [
-    "cpu",
-    "pipeline",
-    "hazards",
-    "out-of-order",
-    "parallelism"
-   ]
-  },
-  {
    "id": "numbers-bits-and-floating-point",
    "sec": "computer-science",
    "sub": "computation",
@@ -931,6 +880,21 @@
     "scheduling",
     "linux",
     "performance"
+   ]
+  },
+  {
+   "id": "cpu",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "CPU",
+   "tags": [
+    "cpu",
+    "hardware",
+    "registers",
+    "pipeline",
+    "parallelism",
+    "isa",
+    "operating-systems"
    ]
   },
   {
@@ -3818,6 +3782,10 @@
   },
   {
    "source": "amdahls-law-and-parallel-speedup",
+   "target": "cpu"
+  },
+  {
+   "source": "amdahls-law-and-parallel-speedup",
    "target": "cpu-caches-and-cache-lines"
   },
   {
@@ -3835,14 +3803,6 @@
   {
    "source": "amdahls-law-and-parallel-speedup",
    "target": "horizontal-vs-vertical-scaling"
-  },
-  {
-   "source": "amdahls-law-and-parallel-speedup",
-   "target": "how-cpu-executes-code"
-  },
-  {
-   "source": "amdahls-law-and-parallel-speedup",
-   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "amdahls-law-and-parallel-speedup",
@@ -3882,11 +3842,11 @@
   },
   {
    "source": "anatomy-of-a-process",
-   "target": "cpu-caches-and-cache-lines"
+   "target": "cpu"
   },
   {
    "source": "anatomy-of-a-process",
-   "target": "cpu-components-and-architecture"
+   "target": "cpu-caches-and-cache-lines"
   },
   {
    "source": "anatomy-of-a-process",
@@ -3899,14 +3859,6 @@
   {
    "source": "anatomy-of-a-process",
    "target": "hikaricp-pool-sizing"
-  },
-  {
-   "source": "anatomy-of-a-process",
-   "target": "how-cpu-executes-code"
-  },
-  {
-   "source": "anatomy-of-a-process",
-   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "anatomy-of-a-process",
@@ -4374,11 +4326,11 @@
   },
   {
    "source": "arrays-and-dynamic-arrays",
-   "target": "cpu-caches-and-cache-lines"
+   "target": "cpu"
   },
   {
    "source": "arrays-and-dynamic-arrays",
-   "target": "cpu-pipeline-walkthrough"
+   "target": "cpu-caches-and-cache-lines"
   },
   {
    "source": "arrays-and-dynamic-arrays",
@@ -4399,10 +4351,6 @@
   {
    "source": "arrays-and-dynamic-arrays",
    "target": "heaps-and-priority-queues"
-  },
-  {
-   "source": "arrays-and-dynamic-arrays",
-   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "arrays-and-dynamic-arrays",
@@ -4962,10 +4910,6 @@
   },
   {
    "source": "big-o-and-complexity",
-   "target": "how-cpu-executes-code"
-  },
-  {
-   "source": "big-o-and-complexity",
    "target": "interview-problem-patterns"
   },
   {
@@ -5058,6 +5002,10 @@
   },
   {
    "source": "bit-manipulation",
+   "target": "cpu"
+  },
+  {
+   "source": "bit-manipulation",
    "target": "data-modeling-for-services"
   },
   {
@@ -5079,10 +5027,6 @@
   {
    "source": "bit-manipulation",
    "target": "hashmap-internals"
-  },
-  {
-   "source": "bit-manipulation",
-   "target": "how-cpu-executes-code"
   },
   {
    "source": "bit-manipulation",
@@ -5826,11 +5770,7 @@
   },
   {
    "source": "compilation-interpretation-jit",
-   "target": "cpu-components-and-architecture"
-  },
-  {
-   "source": "compilation-interpretation-jit",
-   "target": "cpu-pipeline-walkthrough"
+   "target": "cpu"
   },
   {
    "source": "compilation-interpretation-jit",
@@ -5838,15 +5778,7 @@
   },
   {
    "source": "compilation-interpretation-jit",
-   "target": "how-cpu-executes-code"
-  },
-  {
-   "source": "compilation-interpretation-jit",
    "target": "immutable-objects"
-  },
-  {
-   "source": "compilation-interpretation-jit",
-   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "compilation-interpretation-jit",
@@ -6329,12 +6261,72 @@
    "target": "structural-patterns"
   },
   {
-   "source": "cpu-caches-and-cache-lines",
-   "target": "cpu-components-and-architecture"
+   "source": "cpu",
+   "target": "cpu-caches-and-cache-lines"
   },
   {
-   "source": "cpu-caches-and-cache-lines",
-   "target": "cpu-pipeline-walkthrough"
+   "source": "cpu",
+   "target": "cpu-scheduling"
+  },
+  {
+   "source": "cpu",
+   "target": "docker-containers-and-resources"
+  },
+  {
+   "source": "cpu",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "cpu",
+   "target": "garbage-collection"
+  },
+  {
+   "source": "cpu",
+   "target": "horizontal-vs-vertical-scaling"
+  },
+  {
+   "source": "cpu",
+   "target": "java-memory-model"
+  },
+  {
+   "source": "cpu",
+   "target": "latency-numbers"
+  },
+  {
+   "source": "cpu",
+   "target": "linked-lists"
+  },
+  {
+   "source": "cpu",
+   "target": "lock-free-and-cas"
+  },
+  {
+   "source": "cpu",
+   "target": "memory-management"
+  },
+  {
+   "source": "cpu",
+   "target": "memory-models-and-visibility"
+  },
+  {
+   "source": "cpu",
+   "target": "numbers-bits-and-floating-point"
+  },
+  {
+   "source": "cpu",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "cpu",
+   "target": "processes-and-threads"
+  },
+  {
+   "source": "cpu",
+   "target": "race-conditions-and-critical-sections"
+  },
+  {
+   "source": "cpu",
+   "target": "virtual-threads"
   },
   {
    "source": "cpu-caches-and-cache-lines",
@@ -6355,14 +6347,6 @@
   {
    "source": "cpu-caches-and-cache-lines",
    "target": "hashmap-internals"
-  },
-  {
-   "source": "cpu-caches-and-cache-lines",
-   "target": "how-cpu-executes-code"
-  },
-  {
-   "source": "cpu-caches-and-cache-lines",
-   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "cpu-caches-and-cache-lines",
@@ -6407,62 +6391,6 @@
   {
    "source": "cpu-caches-and-cache-lines",
    "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "cpu-pipeline-walkthrough"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "cpu-scheduling"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "docker-containers-and-resources"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "executors-and-thread-pools"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "how-cpu-executes-code"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "instruction-lifecycle-and-pipelining"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "java-memory-model"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "memory-models-and-visibility"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "numbers-bits-and-floating-point"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "operating-system-architecture"
-  },
-  {
-   "source": "cpu-components-and-architecture",
-   "target": "processes-and-threads"
-  },
-  {
-   "source": "cpu-pipeline-walkthrough",
-   "target": "garbage-collection"
-  },
-  {
-   "source": "cpu-pipeline-walkthrough",
-   "target": "how-cpu-executes-code"
-  },
-  {
-   "source": "cpu-pipeline-walkthrough",
-   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "cpu-scheduling",
@@ -9638,10 +9566,6 @@
   },
   {
    "source": "horizontal-vs-vertical-scaling",
-   "target": "instruction-lifecycle-and-pipelining"
-  },
-  {
-   "source": "horizontal-vs-vertical-scaling",
    "target": "jwt-authentication"
   },
   {
@@ -9690,50 +9614,6 @@
   },
   {
    "source": "horizontal-vs-vertical-scaling",
-   "target": "virtual-threads"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "instruction-lifecycle-and-pipelining"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "io-models-blocking-nonblocking-epoll"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "java-memory-model"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "jvm-memory-areas"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "latency-numbers"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "lock-free-and-cas"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "memory-models-and-visibility"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "processes-and-threads"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "race-conditions-and-critical-sections"
-  },
-  {
-   "source": "how-cpu-executes-code",
-   "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "how-cpu-executes-code",
    "target": "virtual-threads"
   },
   {
@@ -10083,18 +9963,6 @@
   {
    "source": "immutable-objects",
    "target": "value-objects-and-entities"
-  },
-  {
-   "source": "instruction-lifecycle-and-pipelining",
-   "target": "linked-lists"
-  },
-  {
-   "source": "instruction-lifecycle-and-pipelining",
-   "target": "memory-models-and-visibility"
-  },
-  {
-   "source": "instruction-lifecycle-and-pipelining",
-   "target": "operating-system-architecture"
   },
   {
    "source": "interview-problem-patterns",

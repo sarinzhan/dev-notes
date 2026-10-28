@@ -31,7 +31,7 @@ Source code reaches the CPU in one of three ways. An **ahead-of-time (AOT) compi
 
 ### Where this bites a backend developer
 - **Warm-up**: the first few hundred requests after a deploy are slow. Kubernetes readiness probes and load balancers should not send full traffic to a cold pod; warm it with a few synthetic calls or use CDS/CRaC (see below).
-- **JMH** exists because naive benchmarks measure the interpreter, dead-code elimination or constant folding instead of the code ([[how-cpu-executes-code]]).
+- **JMH** exists because naive benchmarks measure the interpreter, dead-code elimination or constant folding instead of the code ([[cpu]]).
 - **Class Data Sharing (AppCDS)** and **CRaC** (checkpoint/restore) cut startup by snapshotting loaded classes or a whole warmed-up JVM.
 - **GraalVM native-image** is AOT for Java: milliseconds startup and small RSS, but a closed world (reflection, proxies and dynamic class loading must be declared), long builds and usually lower peak throughput than C2. Spring Boot 3 supports it; it makes sense for serverless and CLI tools, rarely for a long-lived Kafka consumer.
 - Project Leyden (Java 24+) adds ahead-of-time caching of profiles and compiled code to the regular JVM, moving warm-up from runtime to build time without the closed-world restriction.
