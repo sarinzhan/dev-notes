@@ -912,7 +912,7 @@
    "id": "anatomy-of-a-process",
    "sec": "computer-science",
    "sub": "operating-systems",
-   "title": "Anatomy of a process",
+   "title": "Process",
    "tags": [
     "operating-systems",
     "process",
@@ -3891,7 +3891,15 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "how-cpu-executes-code"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "instruction-lifecycle-and-pipelining"
   },
   {
    "source": "anatomy-of-a-process",
@@ -3912,6 +3920,10 @@
   {
    "source": "anatomy-of-a-process",
    "target": "race-conditions-and-critical-sections"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "signals-and-process-lifecycle"
   },
   {
    "source": "anatomy-of-a-process",

@@ -238,7 +238,7 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
 .an-hl{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.6}
 .an-dim{opacity:.3}
 .an-sys{stroke:var(--accent);stroke-width:1.3;stroke-dasharray:6 4} .an-sys.on{stroke-width:2.6;stroke-dasharray:none}
-.an-link2{stroke:var(--muted);stroke-width:1.2} .an-link2.on{stroke:var(--accent);stroke-width:2.4}
+.an-link2{stroke:var(--muted);stroke-width:1.2;fill:none} .an-link2.on{stroke:var(--accent);stroke-width:2.4}
 .an-badge-u{fill:var(--ok)} .an-badge-k{fill:var(--accent)}
 .an-rowhl{fill:var(--accent-soft)} .an-track{fill:var(--soft)}
 .an-bar{fill:var(--accent);opacity:.45} .an-bar.on{opacity:1}
@@ -254,6 +254,13 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
 .an-arm{stroke:var(--muted);stroke-width:4;stroke-linecap:round} .an-headc{fill:var(--fg)}
 .an-filebox{fill:none;stroke:var(--k0);stroke-width:2.4} .an-otherbox{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:3 3} .an-selbox{fill:none;stroke:var(--fg);stroke-width:2}
 .an-t,.an-m,.an-cell-t,.an-code{pointer-events:none}
+.an-dash{stroke-dasharray:4 4}
+.an-flowline{stroke:var(--accent);stroke-width:2;stroke-dasharray:5 4;fill:none}
+.an-reg{fill:var(--panel);stroke:var(--line);stroke-width:1.2} .an-reg.on{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.8}
+.an-big{font:600 20px var(--f-mono);fill:var(--fg);pointer-events:none;text-anchor:middle}
+.an-slot{fill-opacity:.2;stroke:var(--line)} .an-slot.dead{fill-opacity:.05;stroke-dasharray:3 3}
+.an-deadt{fill:var(--muted);text-decoration:line-through}
+.an-bp{fill:var(--k3)} .an-sp{fill:var(--accent)}
 .mob-right{display:none;margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
 .mob-right h4{font:500 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
 .mob-right ul{list-style:none;margin:0 0 18px;padding:0}
@@ -1555,6 +1562,253 @@ ANIMS["disk-lba-partitions"] = el=>{
     render();
   });
   sh.say(intro()); sh.kick();
+  return sh;
+};
+
+// ============ 10. From an ELF file to a process in memory
+ANIMS["program-to-process"] = el=>{
+  const FX = 20, FW = 210, MX = 500, MW = 210;
+  const FILE = [
+    ["hdr", "ELF header", "ELF header", 30], ["ph", "Program header table", "Program header table", 30], ["text", ".text", ".text", 52],
+    ["rodata", ".rodata", ".rodata", 30], ["data", ".data", ".data", 30], ["bss", ".bss (size only)", ".bss (только размер)", 26], ["sh", "Section header table", "Section header table", 30]
+  ];
+  const MEM = [  // top = high addresses
+    ["stack", "stack ↓", "стек ↓", 40], ["gap", "", "", 46], ["heap", "heap ↑", "куча ↑", 34], ["bss", "bss · zeroed pages", "bss · нулевые страницы", 26],
+    ["data", "data · RW-", "data · RW-", 30], ["rodata", "rodata · R--", "rodata · R--", 30], ["text", "text · R-X", "text · R-X", 52]
+  ];
+  const lay = (list, y0) => { const o = {}; let y = y0; for(const [k, , , h] of list){ o[k] = [y, h]; y += h + 4; } return o; };
+  const FP = lay(FILE, 44), MP = lay(MEM, 44);
+  const DESC = {
+    hdr: ["ELF header: the magic bytes 7f 45 4c 46, the target CPU (x86-64, ARM64…) and the entry point: the address where the PC starts.",
+          "ELF header: магические байты 7f 45 4c 46, целевой CPU (x86-64, ARM64…) и точка входа — адрес, с которого начнётся PC."],
+    ph: ["Program header table: the list of segments the loader maps, with their permissions. At exec the kernel reads this table, not the section names.",
+         "Program header table: список сегментов, которые отображает загрузчик, с их правами доступа. При exec ядро читает эту таблицу, а не имена секций."],
+    text: [".text: the machine code. Mapped read + execute, never writable, and shared between every process running this file.",
+           ".text: машинный код. Отображается на чтение и выполнение, без записи, и разделяется всеми процессами, запущенными из этого файла."],
+    rodata: [".rodata: string literals and constants. Mapped read-only: writing there crashes the process with a segmentation fault.",
+             ".rodata: строковые литералы и константы. Только для чтения: запись туда роняет процесс с segmentation fault."],
+    data: [".data: globals with an initial value. Copied into a private read-write segment, one copy per process.",
+           ".data: глобальные переменные с начальным значением. Копируются в собственный сегмент чтения-записи, по копии на процесс."],
+    bss: [".bss: zero-initialised globals. The file stores only their total size; the loader hands out fresh zero-filled pages.",
+          ".bss: глобальные переменные, инициализированные нулём. В файле хранится только их общий размер; загрузчик выдаёт новые страницы, заполненные нулями."],
+    sh: ["Section header table: names and offsets for the linker, the debugger and objdump. It is not mapped into memory at all.",
+         "Section header table: имена и смещения для компоновщика, отладчика и objdump. В память она вообще не отображается."],
+    heap: ["Heap: not in the file. Created at runtime; it grows up as malloc / new ask the kernel for more pages.",
+           "Куча: её нет в файле. Создаётся во время работы и растёт вверх, когда malloc / new просят у ядра новые страницы."],
+    stack: ["Stack: not in the file either. The kernel creates it at exec, puts argv and the environment at the top, and it grows down.",
+            "Стек: его тоже нет в файле. Ядро создаёт его при exec, кладёт наверх argv и переменные окружения, и он растёт вниз."]
+  };
+  const PAIR = { text: "text", rodata: "rodata", data: "data", bss: "bss" };
+  const S = { sel: null };
+  const intro = LL("The file on disk (left) and the process it becomes (right). Hover a part to see what it is and where it goes.",
+                   "Файл на диске (слева) и процесс, в который он превращается (справа). Наведите на часть, чтобы увидеть, что это и куда она попадает.");
+  const sh = animShell(el, { title: LL("From an ELF file to a process", "От ELF-файла к процессу"), vb: [760, 372], controls: false });
+  function pick(k){ if(S.sel === k) return; S.sel = k; render(); sh.say(LL(...DESC[k]), 1); }
+  function render(){
+    const g = sh.svg; g.textContent = ""; const s = S.sel;
+    oClick(E(g, "rect", { x: 0, y: 0, width: 760, height: 372, class: "an-hit" }), ()=>{ S.sel = null; render(); sh.say(intro, 1); });
+    oT(g, FX, 30, LL("api · ELF file on disk", "api · ELF-файл на диске"), "an-m an-b", "start");
+    oT(g, MX, 30, LL("process in memory · pid 2231", "процесс в памяти · pid 2231"), "an-m an-b", "start");
+    oT(g, MX - 6, 52, LL("high", "старшие"), "an-m", "end"); oT(g, MX - 6, 356, LL("low", "младшие"), "an-m", "end");
+    // mapping arrows
+    for(const [f, m] of Object.entries(PAIR)){
+      const [fy, fh] = FP[f], [my, mh] = MP[m], y1 = fy + fh / 2, y2 = my + mh / 2, on = !s || s === f;
+      E(g, "path", { d: `M${FX + FW} ${y1}C${(FX + FW + MX) / 2} ${y1},${(FX + FW + MX) / 2} ${y2},${MX} ${y2}`, class: "an-link2" + (s === f ? " on" : on ? "" : " an-dim") + (f === "bss" ? " an-dash" : "") });
+    }
+    const loaderOn = !s || s === "ph" || s === "hdr";
+    oT(g, (FX + FW + MX) / 2, 66, LL("exec(): the loader reads the headers", "exec(): загрузчик читает заголовки"), "an-m" + (loaderOn ? "" : " an-dim"));
+    E(g, "path", { d: `M${FX + FW} ${FP.ph[0] + 15}L${(FX + FW + MX) / 2 - 70} 70`, class: "an-link2" + (s === "ph" || s === "hdr" ? " on" : loaderOn ? "" : " an-dim") });
+    oT(g, FX + FW + 12, FP.sh[0] + 19, LL("not loaded", "не загружается"), "an-m" + (!s || s === "sh" ? "" : " an-dim"), "start");
+    // file parts
+    for(const [k, en, ru] of FILE){
+      const [y, h] = FP[k], hl = s === k, grp = E(g, "g", { class: s && !hl && PAIR[s] !== k ? "an-dim" : "" });
+      oR(grp, FX, y, FW, h, "an-box" + (hl ? " an-hl" : ""), 6);
+      oT(grp, FX + FW / 2, y + h / 2 + 4.5, LL(en, ru), ["text", "rodata", "data", "bss"].includes(k) ? "an-code" : "an-t an-b");
+      oHover(grp, ()=>pick(k));
+    }
+    // memory regions
+    for(const [k, en, ru] of MEM){
+      const [y, h] = MP[k];
+      if(k === "gap"){ oT(g, MX + MW / 2, y + h / 2 + 4, LL("unmapped gap", "неотображённый промежуток"), "an-m"); continue; }
+      const hl = s === k || PAIR[s] === k, grp = E(g, "g", { class: s && !hl ? "an-dim" : "" });
+      oR(grp, MX, y, MW, h, (k === "heap" || k === "stack" ? "an-frame" : "an-box") + (hl ? " an-hl" : ""), 6);
+      oT(grp, MX + MW / 2, y + h / 2 + 4.5, LL(en, ru), "an-t");
+      oHover(grp, ()=>pick(k));
+    }
+  }
+  render(); sh.say(intro);
+  return sh;
+};
+
+// ============ 11. The CPU's fetch–execute cycle on four instructions
+ANIMS["cpu-fetch-execute"] = el=>{
+  const INS = ["mov r0, #1", "mov r1, #3", "add r3, r0, r1", "str r3, [0xffeeddcc]"];
+  const ADDR = ["0xaabbcc00", "0xaabbcc04", "0xaabbcc08", "0xaabbcc0c"];
+  const rowY = i => 300 - i * 36, MX = 150, MW = 250;
+  const N = null;
+  const ST = [
+    { pc: 0, ir: N, r: [N, N, N, N], c: N, mv: N, hl: -1, t: ["Start", "Старт"],
+      en: "The process is in memory: its code at 0xaabbcc00 and up, and a stack slot for c at 0xffeeddcc. The PC holds the address of the first instruction; the registers are empty.",
+      ru: "Процесс в памяти: его код с адреса 0xaabbcc00 и выше, и ячейка стека для c по адресу 0xffeeddcc. PC хранит адрес первой инструкции; регистры пусты." },
+    { pc: 0, ir: 0, r: [N, N, N, N], c: N, mv: "fetch", hl: -1, t: ["Fetch mov r0, #1", "Выборка mov r0, #1"],
+      en: "Fetch: the CPU reads the instruction at PC (0xaabbcc00) into the instruction register (IR). This is a memory read, usually served from the L1 instruction cache.",
+      ru: "Выборка: CPU читает инструкцию по адресу из PC (0xaabbcc00) в регистр инструкции (IR). Это чтение памяти, обычно из кэша инструкций L1." },
+    { pc: 0, ir: 0, r: [1, N, N, N], c: N, mv: N, hl: 0, t: ["Execute: r0 = 1", "Выполнение: r0 = 1"],
+      en: "Decode and execute: mov r0, #1 puts the value 1 into register r0. No memory access: registers are inside the CPU.",
+      ru: "Декодирование и выполнение: mov r0, #1 кладёт значение 1 в регистр r0. Обращения к памяти нет: регистры находятся внутри CPU." },
+    { pc: 1, ir: 0, r: [1, N, N, N], c: N, mv: N, hl: 4, t: ["Increment PC", "Увеличение PC"],
+      en: "Increment PC: the PC moves to the next instruction, 4 bytes further, because ARM instructions are all 4 bytes long.",
+      ru: "Увеличение PC: PC переходит к следующей инструкции, на 4 байта дальше, потому что все инструкции ARM длиной 4 байта." },
+    { pc: 1, ir: 1, r: [1, N, N, N], c: N, mv: "fetch", hl: -1, t: ["Fetch mov r1, #3", "Выборка mov r1, #3"],
+      en: "Fetch the next instruction. It sits in the same 64-byte cache line as the first one, so this read costs about one cycle.",
+      ru: "Выборка следующей инструкции. Она лежит в той же 64-байтной строке кэша, что и первая, поэтому это чтение стоит около одного такта." },
+    { pc: 2, ir: 1, r: [1, 3, N, N], c: N, mv: N, hl: 1, t: ["Execute: r1 = 3, PC + 4", "Выполнение: r1 = 3, PC + 4"],
+      en: "Execute mov r1, #3, then the PC moves on to 0xaabbcc08.",
+      ru: "Выполняется mov r1, #3, затем PC переходит к 0xaabbcc08." },
+    { pc: 2, ir: 2, r: [1, 3, N, N], c: N, mv: "fetch", hl: -1, t: ["Fetch add", "Выборка add"],
+      en: "Fetch add r3, r0, r1 into the IR.",
+      ru: "Выборка add r3, r0, r1 в IR." },
+    { pc: 3, ir: 2, r: [1, 3, N, 4], c: N, mv: N, hl: 3, t: ["Execute: ALU adds", "Выполнение: сложение в ALU"],
+      en: "The ALU adds r0 and r1 and writes 4 into r3. Still no memory access. The PC moves to 0xaabbcc0c (in hex, 08 + 4 = 0c, not 12).",
+      ru: "ALU складывает r0 и r1 и записывает 4 в r3. Обращения к памяти по-прежнему нет. PC переходит к 0xaabbcc0c (в шестнадцатеричной системе 08 + 4 = 0c, а не 12)." },
+    { pc: 3, ir: 3, r: [1, 3, N, 4], c: N, mv: "fetch", hl: -1, t: ["Fetch str", "Выборка str"],
+      en: "Fetch the last instruction: str r3, [0xffeeddcc].",
+      ru: "Выборка последней инструкции: str r3, [0xffeeddcc]." },
+    { pc: 3, ir: 3, r: [1, 3, N, 4], c: 4, mv: "store", hl: 3, t: ["Store to memory", "Запись в память"],
+      en: "Store: str writes r3 to address 0xffeeddcc, the stack slot of c. The write lands in the L1 data cache first and reaches RAM later. Only the fetches and this store touched memory.",
+      ru: "Запись: str пишет r3 по адресу 0xffeeddcc, в ячейку стека переменной c. Запись сначала попадает в кэш данных L1 и доходит до RAM позже. К памяти обращались только выборки и эта запись." }
+  ];
+  const STEP_MS = 4800, MOVE_MS = 1100;
+  const S = { i: 0, t: 0 };
+  const sh = animShell(el, { title: LL("Fetch, execute, increment PC", "Выборка, выполнение, увеличение PC"), vb: [760, 372], buttons: [
+    { id: "prev", label: LL("← Back", "← Назад"), on(){ go(S.i - 1); } },
+    { id: "next", label: LL("Next →", "Дальше →"), on(){ go(S.i + 1); } }
+  ]});
+  const steps = sh.steps(ST.map(s => ({ title: LL(...s.t), text: LL(s.en, s.ru) })), i=>go(i));
+  function go(i){ S.i = (i + ST.length) % ST.length; S.t = 0; const s = ST[S.i]; sh.say(LL(s.en, s.ru), 1); }
+  const REG = [[480, 56], [570, 56], [480, 118], [570, 118]], PCB = [660, 56, 82, 44], IRB = [480, 186, 262, 40];
+  function render(){
+    const g = sh.svg; g.textContent = ""; const s = ST[S.i], p = Math.min(1, S.t / MOVE_MS);
+    // process memory
+    oR(g, MX, 34, MW, 300, "an-frame", 6);
+    oT(g, MX + MW / 2, 356, LL("process (in memory)", "процесс (в памяти)"), "an-m");
+    oT(g, MX + MW - 8, 50, LL("stack", "стек"), "an-m", "end");
+    oT(g, MX + MW / 2, 128, LL("heap · static data", "куча · статические данные"), "an-m");
+    oT(g, MX + MW - 8, rowY(3) - 22, LL("text (code)", "text (код)"), "an-m", "end");
+    oT(g, MX - 8, 76, "0xffeeddcc", "an-m", "end");
+    oR(g, MX + 10, 58, MW - 20, 28, "an-box" + (s.mv === "store" ? " an-hl" : ""), 5);
+    oT(g, MX + MW / 2, 77, "c: " + (s.c == null ? "—" : s.c), "an-t an-b");
+    ADDR.forEach((a, i)=>{
+      const y = rowY(i), cur = i === s.pc;
+      oT(g, MX - 8, y + 4, a, "an-m", "end");
+      if(cur) oR(g, MX + 6, y - 14, MW - 12, 26, "an-rowhl", 5);
+      oT(g, MX + 16, y + 4, INS[i], "an-code" + (cur ? "" : " c"), "start");
+    });
+    oT(g, MX + MW + 6, rowY(s.pc) + 4, "← pc", "an-m an-b", "start");
+    // CPU
+    oR(g, 466, 34, 286, 208, "an-frame", 10);
+    oT(g, 609, 262, "CPU", "an-t an-b");
+    REG.forEach(([x, y], i)=>{
+      oR(g, x, y, 76, 48, "an-reg" + (s.hl === i ? " on" : ""), 8);
+      oT(g, x + 8, y + 15, "r" + i, "an-m", "start");
+      oT(g, x + 38, y + 38, s.r[i] == null ? "" : String(s.r[i]), "an-big");
+    });
+    oR(g, PCB[0], PCB[1], PCB[2], PCB[3], "an-reg" + (s.hl === 4 ? " on" : ""), 8);
+    oT(g, PCB[0] + 8, PCB[1] + 15, "pc", "an-m", "start");
+    oT(g, PCB[0] + PCB[2] / 2, PCB[1] + 36, "…cc0" + ADDR[s.pc].slice(-1), "an-code");
+    oR(g, IRB[0], IRB[1], IRB[2], IRB[3], "an-reg" + (s.mv === "fetch" ? " on" : ""), 8);
+    oT(g, IRB[0] + 8, IRB[1] + 15, "ir", "an-m", "start");
+    oT(g, IRB[0] + IRB[2] / 2, IRB[1] + 30, s.ir == null ? "" : INS[s.ir], "an-code");
+    // data movement
+    if(s.mv){
+      const [x1, y1, x2, y2] = s.mv === "fetch" ? [MX + MW - 6, rowY(s.pc), IRB[0], IRB[1] + IRB[3] / 2] : [REG[3][0], REG[3][1] + 24, MX + MW - 10, 72];
+      E(g, "line", { x1, y1, x2, y2, class: "an-flowline" });
+      const k = easeIO(p); E(g, "circle", { cx: x1 + (x2 - x1) * k, cy: y1 + (y2 - y1) * k, r: 7, class: "an-dot an-flow" });
+      oT(g, (x1 + x2) / 2, (y1 + y2) / 2 - 10, s.mv === "fetch" ? LL("memory read", "чтение памяти") : LL("memory write", "запись в память"), "an-m an-b");
+    }
+  }
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); steps.set(S.i, S.t / STEP_MS); render(); });
+  go(0); sh.kick();
+  return sh;
+};
+
+// ============ 12. Stack frames: SP, BP, return address during a call
+ANIMS["call-stack-frames"] = el=>{
+  const CODE = ["int func1() {", "  int x = 5;", "  int y = 6;", "  return x + y;", "}", "", "int main() {", "  int a = 1, b = 2, c = 3;", "  func1();", "  return a;", "}"];
+  const TOP = 64, RH = 36, SX = 384, SW = 196, addrY = a => TOP + (1024 - a) / 4 * RH;
+  const A = { t: "a = 1", c: "k1" }, B = { t: "b = 2", c: "k1" }, C = { t: "c = 3", c: "k1" };
+  const RET = { t: LL("return → main+0x1c", "возврат → main+0x1c"), c: "k0", m: 1 }, OBP = { t: LL("saved bp = 1024", "сохр. bp = 1024"), c: "k3", m: 1 };
+  const X0 = { t: "x = ?", c: "k2" }, Y0 = { t: "y = ?", c: "k2" }, X = { t: "x = 5", c: "k2" }, Y = { t: "y = 6", c: "k2" };
+  const dead = o => Object.assign({}, o, { dead: 1 });
+  const ST = [
+    { bp: 1024, sp: 1012, pc: "main+0x10", line: 7, rows: [A, B, C], t: ["main's frame", "Фрейм main"],
+      en: "main runs. Its frame holds a, b and c. bp marks the top of the frame (1024) and sp its end (1012). Locals are found from bp: a = [bp-4], b = [bp-8], c = [bp-12].",
+      ru: "Выполняется main. В её фрейме лежат a, b и c. bp отмечает верх фрейма (1024), sp — его конец (1012). Локальные переменные находятся от bp: a = [bp-4], b = [bp-8], c = [bp-12]." },
+    { bp: 1024, sp: 1008, pc: "func1", line: 8, rows: [A, B, C, RET], t: ["call: push return address", "call: адрес возврата в стек"],
+      en: "call func1: the CPU pushes the return address, where main must continue, and jumps by setting PC = func1. sp moves down 4 bytes to 1008. (On ARM64, bl puts the return address in the link register x30 instead.)",
+      ru: "call func1: CPU кладёт в стек адрес возврата — место, откуда main должна продолжить, — и прыгает, устанавливая PC = func1. sp сдвигается вниз на 4 байта, до 1008. (На ARM64 bl вместо этого кладёт адрес возврата в регистр связи x30.)" },
+    { bp: 1024, sp: 1004, pc: "func1+0x1", line: 0, rows: [A, B, C, RET, OBP], t: ["push bp: save main's bp", "push bp: сохранить bp main"],
+      en: "Prologue, push bp: func1 saves main's base pointer on the stack, so main's frame can be found again after the call.",
+      ru: "Пролог, push bp: func1 сохраняет базовый указатель main в стеке, чтобы после вызова снова найти фрейм main." },
+    { bp: 1004, sp: 1004, pc: "func1+0x2", line: 0, rows: [A, B, C, RET, OBP], t: ["bp = sp: new fixed reference", "bp = sp: новая точка отсчёта"],
+      en: "mov bp, sp: bp now marks the top of func1's frame. From here on func1 finds its variables from bp, wherever sp moves.",
+      ru: "mov bp, sp: теперь bp отмечает верх фрейма func1. Дальше func1 находит свои переменные от bp, куда бы ни двигался sp." },
+    { bp: 1004, sp: 996, pc: "func1+0x5", line: 0, rows: [A, B, C, RET, OBP, X0, Y0], t: ["sp = sp − 8: allocate locals", "sp = sp − 8: место под локальные"],
+      en: "sub sp, 8 allocates func1's locals by moving sp down 8 bytes. Nothing is cleared; only the pointer moves, so x and y hold whatever bytes were there.",
+      ru: "sub sp, 8 выделяет место под локальные переменные func1, сдвигая sp на 8 байт вниз. Ничего не очищается — двигается только указатель, поэтому в x и y лежат прежние байты." },
+    { bp: 1004, sp: 996, pc: "func1+0x9", line: 2, rows: [A, B, C, RET, OBP, X, Y], t: ["func1 runs", "func1 работает"],
+      en: "func1 runs: x = [bp-4] = 5, y = [bp-8] = 6. The result, 11, is returned in a register (eax on x86-64, r0/x0 on ARM), not on the stack.",
+      ru: "func1 работает: x = [bp-4] = 5, y = [bp-8] = 6. Результат 11 возвращается в регистре (eax на x86-64, r0/x0 на ARM), а не в стеке." },
+    { bp: 1004, sp: 1004, pc: "func1+0x15", line: 3, rows: [A, B, C, RET, OBP, dead(X), dead(Y)], t: ["sp = bp: free locals", "sp = bp: освободить локальные"],
+      en: "Epilogue, mov sp, bp: one move deallocates all the locals. Their bytes are still there but now below sp: garbage that the next call will overwrite.",
+      ru: "Эпилог, mov sp, bp: одно перемещение освобождает все локальные переменные. Их байты остаются, но теперь ниже sp — это мусор, который перезапишет следующий вызов." },
+    { bp: 1024, sp: 1008, pc: "func1+0x18", line: 4, rows: [A, B, C, RET, dead(OBP), dead(X), dead(Y)], t: ["pop bp: main's bp is back", "pop bp: bp main вернулся"],
+      en: "pop bp: main's base pointer comes back, so bp = 1024 again and sp = 1008.",
+      ru: "pop bp: базовый указатель main возвращается — снова bp = 1024, а sp = 1008." },
+    { bp: 1024, sp: 1012, pc: "main+0x1c", line: 9, rows: [A, B, C, dead(RET), dead(OBP), dead(X), dead(Y)], t: ["ret: return address → PC", "ret: адрес возврата → PC"],
+      en: "ret: the return address is popped into PC. main continues right after the call, with its frame exactly as it left it.",
+      ru: "ret: адрес возврата снимается из стека в PC. main продолжает работу сразу после вызова, а её фрейм — ровно таким, каким она его оставила." }
+  ];
+  const STEP_MS = 5200, MOVE_MS = 700;
+  const S = { i: 0, t: 0, from: ST[0] };
+  const sh = animShell(el, { title: LL("A function call on the stack", "Вызов функции в стеке"), vb: [760, 384], buttons: [
+    { id: "prev", label: LL("← Back", "← Назад"), on(){ go(S.i - 1); } },
+    { id: "next", label: LL("Next →", "Дальше →"), on(){ go(S.i + 1); } }
+  ]});
+  const steps = sh.steps(ST.map(s => ({ title: LL(...s.t), text: LL(s.en, s.ru) })), i=>go(i));
+  function go(i){ S.from = ST[S.i]; S.i = (i + ST.length) % ST.length; S.t = 0; const s = ST[S.i]; sh.say(LL(s.en, s.ru), 1); }
+  function render(){
+    const g = sh.svg; g.textContent = ""; const s = ST[S.i], k = easeIO(Math.min(1, S.t / MOVE_MS));
+    // code
+    oR(g, 14, 50 + s.line * 22 - 16, 300, 22, "an-rowhl", 5);
+    CODE.forEach((c, i)=> oT(g, 22, 50 + i * 22, c.replace(/^ +/, m => " ".repeat(m.length)), "an-code" + (i === s.line ? "" : " c"), "start"));
+    // stack column
+    oT(g, SX + SW / 2, 40, LL("stack · grows down ↓", "стек · растёт вниз ↓"), "an-m");
+    oR(g, SX, TOP, SW, RH * 7, "an-frame", 4);
+    s.rows.forEach((r, i)=>{
+      const y = TOP + i * RH;
+      oR(g, SX + 4, y + 3, SW - 8, RH - 6, `an-slot ${r.c}` + (r.dead ? " dead" : ""), 4);
+      oT(g, SX + SW / 2, y + RH / 2 + 4.5, r.t, (r.m ? "an-m" : "an-t") + (r.dead ? " an-deadt" : ""));
+    });
+    for(let a = 1024; a >= 996; a -= 4) oT(g, SX - 6, addrY(a) + 4, String(a), "an-m", "end");
+    // sp / bp arrows, eased from the previous step
+    const bp = S.from.bp + (s.bp - S.from.bp) * k, sp = S.from.sp + (s.sp - S.from.sp) * k;
+    const same = Math.abs(addrY(bp) - addrY(sp)) < 12;
+    oT(g, SX + SW + 6, addrY(bp) + 4, same ? "← bp, sp" : "← bp", "an-m an-b an-bp", "start");
+    if(!same) oT(g, SX + SW + 6, addrY(sp) + 4, "← sp", "an-m an-b an-sp", "start");
+    // registers
+    oR(g, 644, 64, 108, 132, "an-frame", 8);
+    oT(g, 698, 56, LL("CPU registers", "регистры CPU"), "an-m");
+    [["sp", String(s.sp)], ["bp", String(s.bp)], ["pc", s.pc]].forEach(([n, v], i)=>{
+      const y = 94 + i * 38;
+      oT(g, 654, y, n, "an-m an-b", "start");
+      oT(g, 744, y, v, "an-code", "end");
+    });
+    oT(g, SX, 350, LL("x86-64: call pushes the return address on the stack", "x86-64: call кладёт адрес возврата в стек"), "an-m", "start");
+    oT(g, SX, 368, LL("ARM64: bl keeps it in the link register x30", "ARM64: bl хранит его в регистре связи x30"), "an-m", "start");
+  }
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); steps.set(S.i, S.t / STEP_MS); render(); });
+  S.i = 0; sh.say(LL(ST[0].en, ST[0].ru)); sh.kick();
   return sh;
 };
 

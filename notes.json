@@ -2519,7 +2519,7 @@
    "id": "anatomy-of-a-process",
    "sec": "computer-science",
    "sub": "operating-systems",
-   "title": "Anatomy of a process",
+   "title": "Process",
    "tags": [
     "operating-systems",
     "process",
@@ -2528,20 +2528,25 @@
     "heap"
    ],
    "learned": "2026-10-27",
+   "order": 3,
    "path": "notes/computer-science/operating-systems/anatomy-of-a-process.md",
    "links": [
     "compilation-interpretation-jit",
+    "cpu-components-and-architecture",
     "docker-containers-and-resources",
     "garbage-collection",
+    "hikaricp-pool-sizing",
     "how-cpu-executes-code",
+    "instruction-lifecycle-and-pipelining",
     "jvm-memory-areas",
     "processes-and-threads",
     "race-conditions-and-critical-sections",
+    "signals-and-process-lifecycle",
     "stack-vs-heap-memory",
     "virtual-memory-and-paging",
     "virtual-threads"
    ],
-   "words": 1380,
+   "words": 2671,
    "ru": "notes-ru/computer-science/operating-systems/anatomy-of-a-process.md",
    "title_ru": "Анатомия процесса"
   },
