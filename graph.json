@@ -1005,6 +1005,21 @@
    ]
   },
   {
+   "id": "storage-management",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Storage management",
+   "tags": [
+    "operating-systems",
+    "storage",
+    "ssd",
+    "hdd",
+    "file-systems",
+    "page-cache",
+    "linux"
+   ]
+  },
+  {
    "id": "syscalls-and-file-descriptors",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -7872,10 +7887,6 @@
   },
   {
    "source": "docker-fundamentals",
-   "target": "linux-memory-filesystems-io"
-  },
-  {
-   "source": "docker-fundamentals",
    "target": "linux-networking"
   },
   {
@@ -7893,6 +7904,10 @@
   {
    "source": "docker-fundamentals",
    "target": "spring-boot-properties-and-profiles"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "storage-management"
   },
   {
    "source": "docker-fundamentals",
@@ -8005,6 +8020,10 @@
   {
    "source": "docker-volumes-and-registry",
    "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "docker-volumes-and-registry",
+   "target": "storage-management"
   },
   {
    "source": "dockerfile-and-images",
@@ -8809,6 +8828,10 @@
   {
    "source": "file-and-blob-storage",
    "target": "storage-choices"
+  },
+  {
+   "source": "file-and-blob-storage",
+   "target": "storage-management"
   },
   {
    "source": "fork-join-framework",
@@ -9984,10 +10007,6 @@
   },
   {
    "source": "io-models-blocking-nonblocking-epoll",
-   "target": "memory-management"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
    "target": "operating-system-introduction"
   },
   {
@@ -10001,6 +10020,10 @@
   {
    "source": "io-models-blocking-nonblocking-epoll",
    "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "io-models-blocking-nonblocking-epoll",
+   "target": "storage-management"
   },
   {
    "source": "io-models-blocking-nonblocking-epoll",
@@ -10197,6 +10220,10 @@
   {
    "source": "java-nio",
    "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "java-nio",
+   "target": "storage-management"
   },
   {
    "source": "java-nio",
@@ -10548,6 +10575,10 @@
   },
   {
    "source": "kafka-architecture",
+   "target": "storage-management"
+  },
+  {
+   "source": "kafka-architecture",
    "target": "system-design-basics"
   },
   {
@@ -10705,6 +10736,10 @@
   {
    "source": "latency-numbers",
    "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "latency-numbers",
+   "target": "storage-management"
   },
   {
    "source": "latency-numbers",
@@ -10901,6 +10936,10 @@
   {
    "source": "linux-memory-filesystems-io",
    "target": "memory-management"
+  },
+  {
+   "source": "linux-memory-filesystems-io",
+   "target": "storage-management"
   },
   {
    "source": "linux-memory-filesystems-io",
@@ -11149,6 +11188,10 @@
   {
    "source": "memory-management",
    "target": "stack-vs-heap-memory"
+  },
+  {
+   "source": "memory-management",
+   "target": "storage-management"
   },
   {
    "source": "memory-management",
@@ -12104,6 +12147,10 @@
   },
   {
    "source": "process-management",
+   "target": "storage-management"
+  },
+  {
+   "source": "process-management",
    "target": "syscalls-and-file-descriptors"
   },
   {
@@ -12832,6 +12879,18 @@
   },
   {
    "source": "storage-choices",
+   "target": "storage-management"
+  },
+  {
+   "source": "storage-choices",
+   "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "storage-management",
+   "target": "syscalls-and-file-descriptors"
+  },
+  {
+   "source": "storage-management",
    "target": "transactions-acid-and-isolation"
   },
   {

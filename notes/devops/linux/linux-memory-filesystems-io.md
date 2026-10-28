@@ -11,24 +11,14 @@ Every process sees its own **virtual address space** mapped to physical RAM in 4
 - Virtual memory, page tables, page faults, the page cache, swap, the OOM killer and copy-on-write are explained in [[memory-management]]. This note keeps the Linux commands: `free -h` (look at `available`), `/proc/<pid>/status` and `/proc/<pid>/maps` for one process, `vm.swappiness` and `vm.overcommit_memory` in `/etc/sysctl.d/`.
 
 ### Filesystems
-| FS | Traits | Typical use |
-|---|---|---|
-| **ext4** | Journaling, mature, default on Debian/Ubuntu, fast fsck, 16 TiB files | General-purpose root and data |
-| **XFS** | Journaling, excellent with large files and parallel IO, cannot shrink, default on RHEL | Databases, Kafka log dirs, large volumes |
-| **btrfs** | Copy-on-write, snapshots, checksums, built-in RAID, compression; higher overhead | Snapshot-heavy setups, Fedora default, Docker storage driver option |
-| **overlay2** | Union FS stacking read-only layers plus one writable layer | Docker image layers ([[docker-fundamentals]]) |
-| **tmpfs** | In RAM, lost on reboot | `/run`, `/dev/shm`, `/tmp` on some distros |
-- Inodes hold metadata (owner, mode, timestamps, block pointers); file names are directory entries pointing at inodes. A hard link is a second name for the same inode; a symlink is a file containing a path. Running out of inodes (`df -i`) looks like a full disk with free space.
-- Mounting attaches a filesystem to a directory; `mount`, `/etc/fstab`, `findmnt`, `lsblk` for the device tree.
+- File systems (ext4, XFS, btrfs, overlay2, tmpfs), inodes, journaling, partitions, `mkfs`, `mount` and `/etc/fstab` are covered in [[storage-management]]. Quick commands: `lsblk -f`, `findmnt`, `blkid`, `df -i` for inodes.
 
 ### Pseudo-filesystems
 - `/proc`: process and kernel info generated on read: `/proc/<pid>/{status,maps,fd,limits}`, `/proc/meminfo`, `/proc/cpuinfo`, `/proc/sys/` tunables.
 - `/sys`: devices, drivers, buses, cgroups (`/sys/fs/cgroup`). Writing to files changes kernel state ([[linux-architecture-and-kernel]]).
 
 ### IO scheduling
-- Block layer schedulers reorder and merge requests: **mq-deadline** (bounded latency, good default for SSD/NVMe), **BFQ** (fair per-process bandwidth, desktops, slow disks), **kyber** (low-latency for fast devices), **none** (NVMe does its own queueing). CFQ was the old single-queue scheduler, removed in kernel 5.0.
-- `cat /sys/block/nvme0n1/queue/scheduler` shows the active one in brackets.
-- `iostat -x 1` for utilisation and await time, `iotop` for per-process IO, `vmstat 1` for `wa` (IO wait) and `si/so` (swap in/out).
+- IO schedulers (mq-deadline, BFQ, kyber, none) are in [[storage-management]]; `iostat -x 1`, `iotop` and `vmstat 1` (`wa`) show whether the disk is the bottleneck.
 
 ### ls vs du vs df
 | Tool | Measures | Where it can mislead |

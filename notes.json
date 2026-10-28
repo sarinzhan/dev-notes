@@ -2586,7 +2586,6 @@
     "cpu-caches-and-cache-lines",
     "docker-containers-and-resources",
     "garbage-collection",
-    "io-models-blocking-nonblocking-epoll",
     "ipc-mechanisms",
     "java-nio",
     "jvm-memory-areas",
@@ -2597,9 +2596,10 @@
     "process-management",
     "redis-patterns-and-persistence",
     "signals-and-process-lifecycle",
-    "stack-vs-heap-memory"
+    "stack-vs-heap-memory",
+    "storage-management"
    ],
-   "words": 3732,
+   "words": 3580,
    "ru": "notes-ru/computer-science/operating-systems/memory-management.md",
    "title_ru": "Управление памятью (RAM)"
   },
@@ -2772,6 +2772,42 @@
    "words": 970,
    "ru": "notes-ru/computer-science/operating-systems/stack-vs-heap-memory.md",
    "title_ru": "Стек и куча"
+  },
+  {
+   "id": "storage-management",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Storage management",
+   "tags": [
+    "operating-systems",
+    "storage",
+    "ssd",
+    "hdd",
+    "file-systems",
+    "page-cache",
+    "linux"
+   ],
+   "learned": "2026-10-28",
+   "order": 7,
+   "path": "notes/computer-science/operating-systems/storage-management.md",
+   "links": [
+    "docker-fundamentals",
+    "docker-volumes-and-registry",
+    "file-and-blob-storage",
+    "io-models-blocking-nonblocking-epoll",
+    "java-nio",
+    "kafka-architecture",
+    "latency-numbers",
+    "linux-memory-filesystems-io",
+    "memory-management",
+    "process-management",
+    "storage-choices",
+    "syscalls-and-file-descriptors",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 3601,
+   "ru": "notes-ru/computer-science/operating-systems/storage-management.md",
+   "title_ru": "Управление хранилищем"
   },
   {
    "id": "syscalls-and-file-descriptors",
@@ -4140,15 +4176,15 @@
    "learned": "2026-10-22",
    "path": "notes/devops/linux/linux-memory-filesystems-io.md",
    "links": [
-    "docker-fundamentals",
     "docker-volumes-and-registry",
     "garbage-collection",
     "java-nio",
     "linux-architecture-and-kernel",
     "linux-commands",
-    "memory-management"
+    "memory-management",
+    "storage-management"
    ],
-   "words": 790,
+   "words": 596,
    "ru": "notes-ru/devops/linux/linux-memory-filesystems-io.md",
    "title_ru": "Память, файловые системы и ввод-вывод в Linux"
   },
