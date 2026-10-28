@@ -2808,6 +2808,279 @@ ANIMS["race-condition"] = el=>{
   }});
 };
 
+// ============ 28. Hard disk: platters, heads, tracks, cylinders, sectors, CHS, LBA
+ANIMS["storage-hdd-lba"] = el=>{
+  const ST = [
+    { t: ["Platters and heads", "Пластины и головки"], spin: true, en: "A hard disk drive has several magnetic platters on one spindle, spinning together at 5,400–15,000 rpm. Each surface has its own read/write head, and all heads sit on one arm, so they always move together.",
+      ru: "Жёсткий диск состоит из нескольких магнитных пластин на одном шпинделе, которые вращаются вместе со скоростью 5 400–15 000 об/мин. У каждой поверхности своя головка чтения/записи, и все головки закреплены на одном рычаге, поэтому всегда двигаются вместе." },
+    { t: ["Tracks and cylinders", "Дорожки и цилиндры"], cyl: true, en: "Each surface is divided into concentric rings called tracks. The same track on every platter forms a cylinder (orange): the heads can read the whole cylinder without moving the arm.",
+      ru: "Каждая поверхность разбита на концентрические кольца — дорожки. Одна и та же дорожка на всех пластинах образует цилиндр (оранжевый): головки могут прочитать весь цилиндр, не двигая рычаг." },
+    { t: ["Sectors", "Секторы"], cyl: true, sect: true, wedge: true, dsec: true, en: "Radial lines cut a platter into geometrical sectors (A–G, pie slices). A disk sector is the piece of one track inside one slice: the smallest unit the drive reads or writes, 512 bytes traditionally, 4 KiB on modern drives. A cluster is a group of neighbouring sectors that a file system treats as one unit.",
+      ru: "Радиальные линии делят пластину на геометрические секторы (A–G, «куски пирога»). Сектор диска — это участок одной дорожки внутри одного куска: наименьшая единица чтения и записи, традиционно 512 байт, на современных дисках 4 KiB. Кластер — группа соседних секторов, которую файловая система считает одной единицей." },
+    { t: ["CHS addressing", "Адресация CHS"], cyl: true, sect: true, dsec: true, head: 2, chs: true, en: "Early operating systems addressed the disk by its geometry, CHS: cylinder / head / sector. The OS had to know the physical layout of the drive. Here the request is cylinder orange, head 2, sector C.",
+      ru: "Ранние операционные системы адресовали диск по его геометрии, CHS: цилиндр / головка / сектор. ОС должна была знать физическое устройство диска. Здесь запрос — цилиндр оранжевый, головка 2, сектор C." },
+    { t: ["Seek and rotation", "Позиционирование и вращение"], cyl: true, sect: true, dsec: true, head: 2, spin: true, seek: true, en: "Reading it costs a seek (moving the arm to the cylinder, about 4–9 ms) plus rotational latency (waiting for sector C to pass under the head, about 4 ms at 7,200 rpm). So a random read on an HDD takes around 10 ms, while sequential reads stream at 150–250 MB/s.",
+      ru: "Чтение стоит позиционирования (переместить рычаг к цилиндру, около 4–9 мс) плюс задержки вращения (дождаться, пока сектор C пройдёт под головкой, около 4 мс при 7 200 об/мин). Поэтому случайное чтение с HDD занимает около 10 мс, а последовательное идёт со скоростью 150–250 МБ/с." },
+    { t: ["LBA", "LBA"], cyl: true, sect: true, dsec: true, head: 2, lba: true, en: "Later drives exposed a simpler interface, Logical Block Addressing: the whole disk is an array of blocks 0…N. The OS asks for LBA 3, and the disk controller translates it to cylinder orange, head 2, sector C.",
+      ru: "Позже диски стали предоставлять более простой интерфейс — логическую адресацию блоков (LBA): весь диск — это массив блоков 0…N. ОС запрашивает LBA 3, а контроллер диска переводит его в цилиндр оранжевый, головку 2, сектор C." },
+    { t: ["Why LBA won", "Почему победил LBA"], cyl: true, sect: true, dsec: true, head: 2, lba: true, why: true, en: "The translation costs the drive a little work, but it frees the hardware: the controller can put more sectors on the longer outer tracks, remap bad sectors to spares, and later drives improve without any change in the OS. SSDs use the same LBA interface with no geometry at all.",
+      ru: "Трансляция стоит диску немного работы, зато освобождает железо: контроллер может размещать больше секторов на длинных внешних дорожках, подменять плохие секторы запасными, а новые диски улучшаются без каких-либо изменений в ОС. SSD используют тот же интерфейс LBA вообще без геометрии." }
+  ];
+  const CX = 230, PY = [62, 162, 262], RX = 150, RY = 30, RINGS = [1, .72, .46], LET = "ABCDEFG";
+  const ang = i => -Math.PI / 2 + i * 2 * Math.PI / 7;
+  const P = (cy, r, a) => [CX + RX * r * Math.cos(a), cy + RY * r * Math.sin(a)];
+  const arc = (cy, r, a, b) => { const o = []; for(let j = 0; j <= 16; j++) o.push(P(cy, r, a + (b - a) * j / 16)); return o; };
+  const pts = a => a.map(q => q.join(",")).join(" ");
+  return steppedAnim(el, { title: LL("Hard disk: CHS geometry and LBA", "Жёсткий диск: геометрия CHS и LBA"), vb: [760, 310], steps: ST, stepMs: 6600, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1400)), cy2 = PY[1];
+    PY.forEach((cy, p)=>{
+      E(g, "ellipse", { cx: CX, cy, rx: RX, ry: RY, class: "an-frame" });
+      if(p === 1 && s.wedge) E(g, "polygon", { points: pts([[CX, cy], ...arc(cy, 1, ang(2), ang(3))]), class: "an-pg k1" });
+      RINGS.forEach((r, ri)=>{ const on = s.cyl && ri === 1; E(g, "ellipse", { cx: CX, cy, rx: RX * r, ry: RY * r, class: "an-link2", style: on ? "stroke:var(--k0);stroke-width:3" : "" }); });
+      E(g, "ellipse", { cx: CX, cy, rx: RX * .16, ry: RY * .16, class: "an-box" });
+      const on = s.head === p + 1;
+      oR(g, 6, cy - 11, 66, 22, on ? "an-reg on" : "an-box", 4); oT(g, 39, cy + 4, LL(`head ${p + 1}`, `головка ${p + 1}`), "an-m an-b");
+      E(g, "line", { x1: 72, y1: cy, x2: CX - RX * (s.cyl ? .72 : .86), y2: cy, class: "an-link2" + (on ? " on" : "") });
+    });
+    if(s.sect) for(let i = 0; i < 7; i++){ const [x, y] = P(cy2, 1, ang(i)); E(g, "line", { x1: CX, y1: cy2, x2: x, y2: y, class: "an-link2", style: "stroke:var(--k3)" }); const [lx, ly] = P(cy2, .9, ang(i) + Math.PI / 7); oT(g, lx, ly + 4, LET[i], "an-m an-b"); }
+    if(s.dsec) E(g, "polyline", { points: pts(arc(cy2, .72, ang(2), ang(3))), class: "an-link2", style: "stroke:var(--k0);stroke-width:7;stroke-opacity:.9" });
+    if(s.wedge){ oT(g, 392, cy2 - 4, LL("geometrical sector C (slice)", "геометрический сектор C (кусок)"), "an-m an-b", "start"); oT(g, 392, cy2 + 12, LL("disk sector: track ∩ slice", "сектор диска: дорожка ∩ кусок"), "an-m an-b an-sp", "start"); }
+    if(s.cyl && !s.sect) oT(g, 392, cy2 + 4, LL("cylinder = same track on all platters", "цилиндр = одна дорожка на всех пластинах"), "an-m an-b", "start");
+    if(s.spin){ const a = t / 420; PY.forEach(cy => { const [x, y] = P(cy, .86, a); E(g, "circle", { cx: x, cy: y, r: 4, class: "an-dot an-flow" }); }); oT(g, CX, 300, LL("7,200 rpm: one turn every 8.3 ms", "7 200 об/мин: оборот за 8,3 мс"), "an-m"); }
+    if(s.chs){ oR(g, 430, 40, 316, 70, "an-reg on", 8); oT(g, 444, 64, LL("CHS = (cylinder, head, sector)", "CHS = (цилиндр, головка, сектор)"), "an-code", "start"); oT(g, 444, 88, LL("= (orange, 2, C)  · OS knows the geometry", "= (оранж., 2, C)  · ОС знает геометрию"), "an-code", "start"); }
+    if(s.seek){ [[LL("seek: arm to cylinder", "позиционирование"), "4–9 ms"], [LL("rotation: wait for C", "вращение: ждём C"), "~4 ms"], [LL("random read", "случайное чтение"), "~10 ms"], [LL("sequential read", "последоват. чтение"), "150–250 MB/s"]].forEach(([a, b], i)=>{ oT(g, 444, 140 + i * 22, a, "an-m", "start"); oT(g, 740, 140 + i * 22, b, "an-m an-b", "end"); }); }
+    if(s.lba){
+      oT(g, 432, 32, "LBA", "an-m an-b", "end");
+      for(let i = 0; i < 8; i++){ oR(g, 440 + i * 37, 14, 34, 28, i === 3 ? "an-reg on" : "an-box", 4); oT(g, 457 + i * 37, 33, String(i), "an-t an-b"); }
+      oR(g, 470, 76, 250, 46, "an-box", 8); oT(g, 595, 96, LL("disk controller", "контроллер диска"), "an-t an-b"); oT(g, 595, 113, "LBA 3 → (orange, 2, C)", "an-code");
+      const [sx, sy] = P(cy2, .72, (ang(2) + ang(3)) / 2), path = [[568, 42], [568, 76], [520, 122], [sx + 4, sy]];
+      E(g, "polyline", { points: pts(path), class: "an-flowline", fill: "none" }); const [dx, dy] = polyAt(path, k); E(g, "circle", { cx: dx, cy: dy, r: 6, class: "an-dot an-flow" });
+    }
+    if(s.why) [LL("+ more sectors on outer tracks", "+ больше секторов на внешних дорожках"), LL("+ bad sectors remapped to spares", "+ подмена плохих секторов"), LL("+ OS does not depend on geometry", "+ ОС не зависит от геометрии"), LL("− one more translation", "− ещё одна трансляция")].forEach((l, i)=> oT(g, 470, 160 + i * 22, l, "an-m an-b", "start"));
+  }});
+};
+
+// ============ 29. SSD: pages and blocks, FTL, out-of-place writes, GC, wear leveling, over-provisioning
+ANIMS["storage-ssd-ftl"] = el=>{
+  const ST = [
+    { t: ["Pages and blocks", "Страницы и блоки"], nof: true, b0: "1 2 - -", b1: "- - - 8", er: [0, 0], en: "An SSD stores bits in NAND flash cells, grouped into pages (4–16 KiB) and blocks (here 4 pages, really 64–512). The smallest read or write is a page, but a page can only be written when it is empty, and erasing works only on a whole block.",
+      ru: "SSD хранит биты в ячейках флеш-памяти NAND, сгруппированных в страницы (4–16 KiB) и блоки (здесь 4 страницы, на деле 64–512). Наименьшая единица чтения или записи — страница, но писать в страницу можно, только когда она пуста, а стирать можно только блок целиком." },
+    { t: ["Flash translation layer", "Слой трансляции флеш-памяти"], b0: "1 2 - -", b1: "- - - 8", er: [0, 0], en: "The OS still speaks LBAs. The SSD's controller keeps a mapping table, the flash translation layer (FTL): LBA 1 → page A, LBA 2 → B, LBA 8 → H. The OS never sees pages or blocks.",
+      ru: "ОС по-прежнему говорит на языке LBA. Контроллер SSD хранит таблицу отображения — слой трансляции флеш-памяти (FTL): LBA 1 → страница A, LBA 2 → B, LBA 8 → H. ОС никогда не видит страниц и блоков." },
+    { t: ["Overwrite = write elsewhere", "Перезапись = запись в другое место"], b0: "x 2 1! -", b1: "- - - 8", er: [0, 0], en: "The OS rewrites LBA 1. Page A cannot be overwritten in place, so the controller writes the new data into free page C, points LBA 1 at C and marks A stale. SSD writes are out of place, like appending to a log.",
+      ru: "ОС перезаписывает LBA 1. Страницу A нельзя перезаписать на месте, поэтому контроллер пишет новые данные в свободную страницу C, направляет LBA 1 на C и помечает A устаревшей. Запись в SSD всегда идёт в другое место, как дописывание в журнал." },
+    { t: ["Stale pages pile up", "Устаревшие страницы копятся"], b0: "x 2 x 1!", b1: "- - - 8", er: [0, 0], en: "Every rewrite leaves a stale page behind. LBA 1 changed again and moved to D. Block 0 is full: two live pages and two dead ones that still take space.",
+      ru: "Каждая перезапись оставляет устаревшую страницу. LBA 1 снова изменился и переехал в D. Блок 0 заполнен: две живые страницы и две мёртвые, которые всё ещё занимают место." },
+    { t: ["Garbage collection", "Сборка мусора"], b0: "- - - -", b1: "2! 1! - 8", er: [1, 0], en: "Garbage collection copies the live pages (LBAs 2 and 1) into another block, updates the FTL, then erases block 0 as a whole. These copies are writes the OS never asked for: write amplification. TRIM (fstrim, the discard mount option) tells the SSD which LBAs were deleted, so it stops copying dead data.",
+      ru: "Сборка мусора копирует живые страницы (LBA 2 и 1) в другой блок, обновляет FTL и стирает блок 0 целиком. Эти копии — записи, о которых ОС не просила: усиление записи (write amplification). TRIM (fstrim, опция монтирования discard) сообщает SSD, какие LBA удалены, чтобы он перестал копировать мёртвые данные." },
+    { t: ["Hot and cold pages", "Горячие и холодные страницы"], b0: "1c 2c 3c 4c", b1: "x 8h 7h 6h", er: [1, 2900], en: "Flash cells wear out: each survives a limited number of program/erase cycles (roughly 3,000 for TLC, 1,000 for QLC). LBAs 1–4 were written once and never touched again (cold); 6–8 change all the time (hot). Block 1 is erased again and again and will die long before block 0.",
+      ru: "Ячейки флеш-памяти изнашиваются: каждая выдерживает ограниченное число циклов записи/стирания (примерно 3 000 для TLC, 1 000 для QLC). LBA 1–4 записали один раз и больше не трогали (холодные); 6–8 меняются постоянно (горячие). Блок 1 стирается снова и снова и умрёт задолго до блока 0." },
+    { t: ["Over-provisioning", "Резервная область"], b0: "- - - -", b1: "x 8h 7h 6h", op: "1c! 2c! 3c! 4c!", er: [2, 2900, 1], en: "The drive keeps hidden spare space, the over-provisioning area (OP, typically 7–28% of raw capacity), for garbage collection and wear leveling. Wear leveling moves the cold pages into it and erases the cold block.",
+      ru: "Диск держит скрытое запасное пространство — резервную область (over-provisioning, OP, обычно 7–28% сырой ёмкости) — для сборки мусора и выравнивания износа. Выравнивание износа переносит туда холодные страницы и стирает холодный блок." },
+    { t: ["Wear leveling", "Выравнивание износа"], b0: "8h! 7h! 6h! -", b1: "- - - -", op: "1c 2c 3c 4c", er: [2, 2901, 1], en: "Now the hot LBAs move to block 0, which has hardly been erased, and the worn block 1 gets a rest. Over time every block wears at about the same rate. Endurance is quoted as TBW (terabytes written) or DWPD (drive writes per day).",
+      ru: "Теперь горячие LBA переезжают в блок 0, который почти не стирался, а изношенный блок 1 отдыхает. Со временем все блоки изнашиваются примерно одинаково. Ресурс указывают в TBW (записанные терабайты) или DWPD (полных перезаписей диска в день)." },
+    { t: ["LBA smaller than a page", "LBA меньше страницы"], b0: "1+2! - - -", b1: "- - - -", er: [2, 2901], en: "The LBA size does not have to match the page size. With 4 KiB LBAs and 8 KiB pages, LBA 1 is page A at offset 0 and LBA 2 is page A at offset 4,096. Rewriting only LBA 2 means reading page A, merging and writing a whole new page: more write amplification.",
+      ru: "Размер LBA не обязан совпадать с размером страницы. При LBA по 4 KiB и страницах по 8 KiB LBA 1 — это страница A со смещением 0, а LBA 2 — страница A со смещением 4 096. Перезапись одного LBA 2 означает прочитать страницу A, объединить данные и записать целую новую страницу: ещё больше усиление записи." }
+  ];
+  const LX = i => 250 + (i - 1) * 40, BX = [40, 310, 590], LET = ["ABCD", "EFGH", "IJKL"], PGY = j => 116 + j * 40;
+  const NAME = [LL("block 0", "блок 0"), LL("block 1", "блок 1"), LL("over-provisioning", "резерв (OP)")];
+  return steppedAnim(el, { title: LL("SSD: flash translation layer and wear leveling", "SSD: слой трансляции и выравнивание износа"), vb: [760, 334], steps: ST, stepMs: 6600, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1200)), map = [], lg = E(g, "g", {});
+    oT(g, LX(1) - 8, 37, "LBA", "an-m an-b", "end");
+    const used = new Set();
+    [s.b0, s.b1, s.op].forEach((spec, b)=>{
+      if(spec == null) return;
+      const x = BX[b];
+      oT(g, x + 60, 104, NAME[b], "an-m an-b"); oR(g, x, 108, 120, 166, b === 2 ? "an-frame an-dash" : "an-frame", 6);
+      spec.split(" ").forEach((tok, j)=>{
+        const hl = tok.endsWith("!"), v = tok.replace("!", ""), y = PGY(j), px = x + 10;
+        oT(g, x + 8, y + 22, LET[b][j], "an-m an-b", "end");
+        if(v === "-"){ oR(g, px, y, 100, 34, "an-box", 4); oT(g, px + 50, y + 22, LL("free", "свободна"), "an-m"); }
+        else if(v === "x"){ oR(g, px, y, 100, 34, "an-leak", 4); oT(g, px + 50, y + 22, LL("stale", "устарела"), "an-m an-b an-warn"); }
+        else if(v.includes("+")){ v.split("+").forEach((n, h)=>{ oR(g, px + h * 50, y, 48, 34, "an-pg k2", 4); oT(g, px + h * 50 + 24, y + 15, "LBA " + n, "an-m an-b"); oT(g, px + h * 50 + 24, y + 29, h ? "@4096" : "@0", "an-m"); map.push([+n, LET[b][j], px + h * 50 + (h ? 48 : 0), y + 17, h]); used.add(+n); }); }
+        else { const n = parseInt(v), kind = v.slice(-1); oR(g, px, y, 100, 34, "an-pg " + (kind === "c" ? "k1" : kind === "h" ? "k0" : "k2"), 4); oT(g, px + 50, y + 22, "LBA " + n + (kind === "c" ? LL(" · cold", " · холод.") : kind === "h" ? LL(" · hot", " · горяч.") : ""), "an-t an-b"); map.push([n, LET[b][j], b === 2 ? px : px + 100, y + 17]); used.add(n); }
+        if(hl){ const pulse = .5 + .5 * Math.sin(t / 150); E(g, "rect", { x: px - 3, y: y - 3, width: 106, height: 40, rx: 6, class: "an-link2 on", style: `stroke-opacity:${.4 + .6 * pulse}` }); }
+      });
+      const e = s.er[b]; if(e != null) oT(g, x + 60, 292, LL(`erases: ${e.toLocaleString("en-US")}`, `стираний: ${e.toLocaleString("ru-RU")}`), "an-m an-b" + (e > 1000 ? " an-warn" : ""));
+    });
+    for(let i = 1; i <= 8; i++){ oR(g, LX(i), 20, 36, 28, used.has(i) ? "an-pg k2" : "an-box", 4); oT(g, LX(i) + 18, 39, String(i), "an-t an-b"); }
+    for(const [n, , x, y] of map){ const x1 = LX(n) + 18; E(lg, "path", { d: `M${x1} 48C${x1} 90,${x + (x < 300 ? 60 : -60)} ${y},${x} ${y}`, class: "an-link2 on", style: "stroke-opacity:.45" }); }
+    if(!s.nof){ const txt = map.slice().sort((a, b) => a[0] - b[0]).map(m => `${m[0]}→${m[1]}${m[4] != null ? (m[4] ? "@4K" : "@0") : ""}`).join("  "); oR(g, 150, 304, 460, 22, "an-box", 5); oT(g, 380, 319, "FTL: " + (txt || "—"), "an-code"); }
+  }});
+};
+
+// ============ 30. FAT32: chain of clusters, 28-bit entries, clusters, internal fragmentation
+ANIMS["storage-fat-clusters"] = el=>{
+  const F1 = ["-", "-", "3", "E", "-", "-", "2", "-"], F2 = ["-", "-", "-", "E", "-", "-", "3", "-"];
+  const ST = [
+    { t: ["File allocation table", "Таблица размещения файлов"], view: "fat", fat: F1, read: [], en: "FAT32 keeps one big array, the file allocation table, of 32-bit entries. The index is a cluster number (an LBA in this simple picture); the value is the next cluster of the same file, or E for end of file. A directory entry stores the file name and its first cluster.",
+      ru: "FAT32 хранит один большой массив — таблицу размещения файлов (FAT) — из 32-битных записей. Индекс — номер кластера (в этой упрощённой картинке — LBA); значение — следующий кластер того же файла или E — конец файла. Запись каталога хранит имя файла и его первый кластер." },
+    { t: ["Start at 6", "Начинаем с 6"], view: "fat", fat: F1, read: [6], en: "To read test.txt the OS takes the start from the directory entry: 6. It reads LBA 6, and FAT[6] says the next one is 2.",
+      ru: "Чтобы прочитать test.txt, ОС берёт начало из записи каталога: 6. Она читает LBA 6, а FAT[6] говорит, что следующий — 2." },
+    { t: ["6 → 2", "6 → 2"], view: "fat", fat: F1, read: [6, 2], en: "FAT[2] = 3: the next one is 3.", ru: "FAT[2] = 3: следующий — 3." },
+    { t: ["2 → 3 → end", "2 → 3 → конец"], view: "fat", fat: F1, read: [6, 2, 3], en: "FAT[3] = E: end of file. The file is LBAs 6, 2 and 3, in that order, scattered over the disk. Reaching the 10th block of a file means walking 10 links, and on an HDD every jump is a seek, which is why FAT volumes needed defragmenting.",
+      ru: "FAT[3] = E: конец файла. Файл — это LBA 6, 2 и 3 именно в таком порядке, разбросанные по диску. Чтобы добраться до 10-го блока файла, нужно пройти 10 ссылок, а на HDD каждый прыжок — это позиционирование головки; поэтому тома FAT нуждались в дефрагментации." },
+    { t: ["32 bits is really 28", "32 бита — на самом деле 28"], view: "bits", en: "Only 28 of the 32 bits address clusters; 4 are reserved (end of chain, bad, free and other flags). If each entry pointed to one 512-byte LBA, that would be 2^28 × 512 B = 128 GiB: far too little for today's disks.",
+      ru: "Кластеры адресуют только 28 из 32 бит; 4 зарезервированы (конец цепочки, плохой, свободный и другие флаги). Если бы каждая запись указывала на один LBA по 512 байт, это было бы 2^28 × 512 Б = 128 ГиБ — слишком мало для нынешних дисков." },
+    { t: ["Clusters", "Кластеры"], view: "fat", fat: F2, read: [6, 3], clusters: true, en: "The trick: an entry points to a cluster, a group of LBAs, here 8 × 512 B = 4 KiB. Cluster c covers LBAs c × 8 … c × 8 + 7, so cluster 6 is LBAs 48–55 and cluster 3 is LBAs 24–31. Now 2^28 × 4 KiB = 1 TiB is addressable, and 32 KiB clusters reach 8 TiB.",
+      ru: "Хитрость: запись указывает на кластер — группу LBA, здесь 8 × 512 Б = 4 KiB. Кластер c занимает LBA c × 8 … c × 8 + 7, так что кластер 6 — это LBA 48–55, а кластер 3 — LBA 24–31. Теперь адресуется 2^28 × 4 KiB = 1 ТиБ, а с кластерами по 32 KiB — 8 ТиБ." },
+    { t: ["Internal fragmentation", "Внутренняя фрагментация"], view: "waste", en: "The larger the cluster, the more disk can be addressed, but every file occupies whole clusters. A 100-byte file still takes a full cluster: 3,996 bytes wasted with 4 KiB clusters, 32,668 with 32 KiB. Nobody else can use that space.",
+      ru: "Чем больше кластер, тем больший диск можно адресовать, но каждый файл занимает целые кластеры. Файл в 100 байт всё равно занимает кластер целиком: 3 996 байт впустую при кластерах 4 KiB и 32 668 — при 32 KiB. Этим местом больше никто не воспользуется." },
+    { t: ["FAT32 limits", "Ограничения FAT32"], view: "limits", en: "FAT32 stores a file's size in 32 bits, so no file can exceed 4 GiB − 1 byte. It has no permissions, no journal and restricted names, but every OS, camera and TV can read it, which is why USB sticks come formatted with it (vfat on Linux). exFAT removes the size limits.",
+      ru: "FAT32 хранит размер файла в 32 битах, поэтому файл не может быть больше 4 ГиБ − 1 байт. В ней нет прав доступа, журнала, а имена ограничены, зато её читают все ОС, фотоаппараты и телевизоры — поэтому флешки продаются отформатированными в FAT32 (vfat в Linux). exFAT снимает ограничения на размер." }
+  ];
+  const FX = i => 240 + i * 58;
+  return steppedAnim(el, { title: LL("FAT32: following a file through the table", "FAT32: проход по файлу через таблицу"), vb: [760, 320], steps: ST, stepMs: 6000, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1200));
+    if(s.view === "fat"){
+      oR(g, 10, 60, 180, 70, "an-box", 8); oT(g, 22, 82, LL("directory entry", "запись каталога"), "an-m an-b", "start"); oT(g, 22, 102, "name: test.txt", "an-code", "start"); oT(g, 22, 120, (s.clusters ? LL("start cluster: 6", "нач. кластер: 6") : LL("start: 6", "начало: 6")), "an-code", "start");
+      oT(g, FX(0) - 10, 58, s.clusters ? LL("cluster", "кластер") : "LBA", "an-m an-b", "end"); oT(g, FX(0) - 10, 98, "FAT", "an-m an-b", "end");
+      s.fat.forEach((v, i)=>{ const last = s.read[s.read.length - 1] === i, inR = s.read.includes(i);
+        oT(g, FX(i) + 26, 58, String(i), "an-m an-b"); oR(g, FX(i), 72, 52, 40, last ? "an-reg on" : inR ? "an-pg k2" : v === "E" ? "an-pg k0" : "an-box", 5); oT(g, FX(i) + 26, 97, v, "an-t an-b"); });
+      for(let j = 1; j < s.read.length; j++){ const a = FX(s.read[j - 1]) + 26, b = FX(s.read[j]) + 26, up = j % 2 ? 1 : -1, y0 = up > 0 ? 72 : 112, yc = y0 - up * 40;
+        E(g, "path", { d: `M${a} ${y0}C${a} ${yc},${b} ${yc},${b} ${y0}`, class: "an-link2 on" });
+        if(j === s.read.length - 1){ const q = [[a, y0], [a, yc], [b, yc], [b, y0]]; const [x, y] = polyAt(q, k); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); } }
+      E(g, "path", { d: `M190 95C215 95,${FX(6) - 20} 30,${FX(6) + 26} 70`, class: "an-link2 an-dash" });
+      if(s.read.length && !s.clusters) oT(g, 240, 170, LL("read: ", "читаем: ") + s.read.map(r => "LBA " + r).join(" → ") + (s.read.length === 3 ? " → E" : ""), "an-code", "start");
+      if(s.clusters){
+        [[6, 48, 160], [3, 24, 236]].forEach(([c, l0, y])=>{ oT(g, 236, y + 20, LL(`cluster ${c} →`, `кластер ${c} →`), "an-m an-b", "end");
+          for(let i = 0; i < 8; i++){ oR(g, 246 + i * 58, y, 52, 30, "an-pg " + (c === 6 ? "k1" : "k2"), 4); oT(g, 272 + i * 58, y + 20, "LBA " + (l0 + i), "an-m an-b"); }
+          E(g, "path", { d: `M${FX(c) + 26} 112C${FX(c) + 26} ${y - 20},${246 + 232} ${y - 20},${246 + 232} ${y}`, class: "an-link2", style: "stroke-opacity:.5" }); });
+        oT(g, 10, 300, LL("cluster c → LBAs c×8 … c×8+7 · 8 × 512 B = 4 KiB", "кластер c → LBA c×8 … c×8+7 · 8 × 512 Б = 4 KiB"), "an-code", "start");
+      }
+    }
+    if(s.view === "bits"){
+      oT(g, 380, 40, LL("one FAT32 entry: 32 bits", "одна запись FAT32: 32 бита"), "an-m an-b");
+      for(let i = 0; i < 32; i++){ oR(g, 92 + i * 18, 56, 16, 30, i < 4 ? "an-pg k4" : "an-pg k1", 3); }
+      oT(g, 92 + 36, 106, LL("4 reserved", "4 зарезерв."), "an-m an-b"); oT(g, 92 + 4 * 18 + 252, 106, LL("28 bits: cluster number", "28 бит: номер кластера"), "an-m an-b");
+      oT(g, 380, 170, "2^28 × 512 B = 128 GiB", "an-big an-warn"); oT(g, 380, 205, LL("one entry per 512-byte LBA: too small", "одна запись на LBA в 512 Б: слишком мало"), "an-m");
+      oT(g, 380, 260, "2^28 × 4 KiB = 1 TiB · 2^28 × 32 KiB = 8 TiB", "an-code"); oT(g, 380, 282, LL("→ one entry per cluster", "→ одна запись на кластер"), "an-m an-b");
+    }
+    if(s.view === "waste"){
+      const W = 560 / 32768, bar = (y, size, label)=>{ oT(g, 30, y - 8, label, "an-m an-b", "start"); oR(g, 30, y, size * W, 44, "an-pg k2", 4); oR(g, 30, y, Math.max(3, 100 * W), 44, "an-pg k0", 2); oT(g, 30 + size * W + 8, y + 27, LL(`100 B used, ${(size - 100).toLocaleString("en-US")} B wasted`, `занято 100 Б, впустую ${(size - 100).toLocaleString("ru-RU")} Б`), "an-m an-b an-warn", "start"); };
+      bar(70, 4096, LL("4 KiB cluster", "кластер 4 KiB")); bar(170, 32768, LL("32 KiB cluster", "кластер 32 KiB"));
+      oT(g, 30, 270, LL("bigger cluster → bigger disk addressable, more waste per file", "кластер больше → адресуемый диск больше, потерь на файл больше"), "an-code", "start");
+    }
+    if(s.view === "limits"){
+      [[LL("max file size", "макс. размер файла"), LL("4 GiB − 1 B (32-bit size field)", "4 ГиБ − 1 Б (32-битное поле размера)")], [LL("journal", "журнал"), LL("none: crash → run fsck / chkdsk", "нет: после сбоя — fsck / chkdsk")], [LL("permissions", "права доступа"), LL("none", "нет")], [LL("names", "имена"), LL("no  \" * : < > ? \\ |", "нельзя  \" * : < > ? \\ |")], [LL("readable by", "читается"), LL("everything: Windows, macOS, Linux, cameras", "везде: Windows, macOS, Linux, камеры")], [LL("Linux name", "имя в Linux"), "vfat · mkfs.vfat -F 32"]].forEach(([a, b], i)=>{
+        oR(g, 40, 30 + i * 44, 680, 38, i ? "an-box" : "an-reg on", 6); oT(g, 56, 54 + i * 44, a, "an-m an-b", "start"); oT(g, 250, 54 + i * 44, b, "an-code", "start"); });
+    }
+  }});
+};
+
+// ============ 31. Partitions, formatting, mounting, alignment
+ANIMS["storage-partitions"] = el=>{
+  const ST = [
+    { t: ["A disk is an array of LBAs", "Диск — массив LBA"], view: "part", lvl: 0, cmd: ["$ lsblk", "sda   931G disk", "sdb   231G disk   ← USB stick"], en: "To the OS a disk, HDD or SSD, is one big array of logical sectors (LBAs). lsblk lists the block devices: sda is the first disk, sdb the second, nvme0n1 an NVMe drive.",
+      ru: "Для ОС диск, HDD или SSD, — это один большой массив логических секторов (LBA). lsblk показывает блочные устройства: sda — первый диск, sdb — второй, nvme0n1 — NVMe-накопитель." },
+    { t: ["Partitions", "Разделы"], view: "part", lvl: 1, cmd: ["$ sudo fdisk /dev/sdb", "n  p  1  ↵  +5G", "n  p  2  ↵  +5G", "w            # write the table"], en: "A partition is a contiguous range of LBAs: P1 is LBA 1–4, P2 is 5–13, P3 is 14–16. The partition table at the start of the disk records the ranges: MBR (4 primary partitions, up to 2 TiB) or GPT (128 partitions, no practical limit). The new partitions are still raw.",
+      ru: "Раздел — это непрерывный диапазон LBA: P1 — LBA 1–4, P2 — 5–13, P3 — 14–16. Таблица разделов в начале диска хранит эти диапазоны: MBR (4 основных раздела, до 2 ТиБ) или GPT (128 разделов, практически без ограничений). Новые разделы пока «сырые»." },
+    { t: ["Format", "Форматирование"], view: "part", lvl: 2, cmd: ["$ sudo mkfs.vfat -F 32 /dev/sdb1", "$ sudo mkfs.ext4 -b 4096 /dev/sdb2", "# sdb3 stays raw"], en: "Each partition gets its own file system with its own block (cluster) size: FAT32 on P1, ext4 with 4 KiB blocks on P2, and P3 left raw. Formatting writes the file system's own structures into the partition: superblock, inode tables, journal.",
+      ru: "Каждый раздел получает свою файловую систему со своим размером блока (кластера): FAT32 на P1, ext4 с блоками 4 KiB на P2, а P3 остаётся сырым. Форматирование записывает в раздел собственные структуры файловой системы: суперблок, таблицы inode, журнал." },
+    { t: ["Mount", "Монтирование"], view: "part", lvl: 3, cmd: ["$ sudo mkdir /mnt/usb", "$ sudo mount /dev/sdb2 /mnt/usb", "$ findmnt /mnt/usb"], en: "A file system is reachable only after it is mounted onto a directory. The root partition is mounted at /; mount /dev/sdb2 /mnt/usb makes the ext4 partition look like an ordinary folder. Device names change when a drive is replugged (sdb → sdd), so /etc/fstab mounts by UUID.",
+      ru: "Файловая система доступна только после монтирования в каталог. Корневой раздел смонтирован в /; mount /dev/sdb2 /mnt/usb делает раздел ext4 похожим на обычную папку. Имена устройств меняются при повторном подключении (sdb → sdd), поэтому /etc/fstab монтирует по UUID." },
+    { t: ["Logical vs physical sectors", "Логические и физические секторы"], view: "align", start: null, en: "Many drives have 4 KiB physical sectors but still expose 512-byte logical ones (\"512e\"): one physical block (PBA) = 8 LBAs. Internally the drive can only write whole physical sectors.",
+      ru: "У многих дисков физические секторы по 4 KiB, но наружу они показывают логические по 512 байт («512e»): один физический блок (PBA) = 8 LBA. Внутри диск может записывать только целые физические секторы." },
+    { t: ["Aligned partition", "Выровненный раздел"], view: "align", start: 0, en: "The partition starts at LBA 0 (in practice at 2048 = 1 MiB, which is divisible by every sector size). Each 4 KiB file-system block covers 8 LBAs that form exactly one physical sector.",
+      ru: "Раздел начинается с LBA 0 (на практике с 2048 = 1 МиБ, что делится на любой размер сектора). Каждый блок файловой системы в 4 KiB занимает 8 LBA, которые составляют ровно один физический сектор." },
+    { t: ["Misaligned partition", "Невыровненный раздел"], view: "align", start: 2, en: "Start the partition at LBA 2 and every file-system block straddles two physical sectors: block 0 is LBAs 2–9, part in PBA 0 and part in PBA 1. Writing one block forces the drive to read, merge and write two physical sectors: slower writes and more SSD wear. Old tools that started partitions at LBA 63 caused exactly this.",
+      ru: "Начните раздел с LBA 2 — и каждый блок файловой системы ляжет на два физических сектора: блок 0 — это LBA 2–9, часть в PBA 0 и часть в PBA 1. Запись одного блока заставляет диск прочитать, объединить и записать два физических сектора: запись медленнее, износ SSD выше. Старые утилиты, начинавшие разделы с LBA 63, вызывали именно это." }
+  ];
+  const PARTS = [[1, 4, "k2", "P1", "FAT32 · 4 KiB clusters", "FAT32 · кластеры 4 KiB"], [5, 13, "k0", "P2", "ext4 · 4 KiB blocks", "ext4 · блоки 4 KiB"], [14, 16, "k4", "P3", "raw", "сырой"]];
+  const X = i => 60 + (i - 1) * 42;
+  const TREE = ["/              ← /dev/sda2 (ext4)", "├── home", "├── etc", "└── mnt", "    └── usb    ← /dev/sdb2 (ext4)"];
+  return steppedAnim(el, { title: LL("Partitions, file systems, mounts and alignment", "Разделы, файловые системы, монтирование и выравнивание"), vb: [760, 320], steps: ST, stepMs: 6600, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1200)), nb = s => s.replace(/ /g, " ");
+    if(s.view === "part"){
+      oT(g, 54, 104, "LBA", "an-m an-b", "end");
+      for(let i = 1; i <= 16; i++){ oR(g, X(i), 86, 40, 28, "an-box", 4); oT(g, X(i) + 20, 105, String(i), "an-m an-b"); }
+      if(s.lvl >= 1) PARTS.forEach(([a, b, c, n, fe, fr])=>{ const w = (X(b) + 40 - X(a)) * Math.min(1, k * 1.5); oR(g, X(a), 44, w, 34, "an-pg " + c, 5); if(w > 60) oT(g, X(a) + w / 2, 66, `${n} · LBA ${a}–${b}`, "an-t an-b");
+        if(s.lvl >= 2){ oT(g, (X(a) + X(b) + 40) / 2, 134, LL(fe, fr), "an-m an-b" + (n === "P3" ? "" : " an-sp")); } });
+      oT(g, 14, 30, "/dev/sdb", "an-code", "start");
+      oR(g, 420, 156, 330, 96, "an-frame", 8); s.cmd.forEach((c, i)=> oT(g, 432, 178 + i * 22, nb(c), "an-code", "start"));
+      if(s.lvl >= 3){ oT(g, 20, 166, LL("directory tree", "дерево каталогов"), "an-m an-b", "start"); TREE.forEach((l, i)=> oT(g, 20, 190 + i * 22, nb(l), "an-code" + (i === 4 ? " an-b" : ""), "start"));
+        const p = [[X(9) + 20, 114], [X(9) + 20, 140], [300, 278]]; E(g, "polyline", { points: p.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); }
+    } else {
+      const XA = i => 40 + i * 28;
+      oT(g, 36, 186, "LBA", "an-m an-b", "end"); oT(g, 36, 224, "PBA", "an-m an-b", "end");
+      for(let i = 0; i < 24; i++){ oR(g, XA(i), 168, 26, 26, "an-box", 3); oT(g, XA(i) + 13, 186, String(i), "an-m"); }
+      const touched = new Set();
+      if(s.start != null){
+        oT(g, 36, 136, LL("FS", "ФС"), "an-m an-b", "end");
+        for(let b = 0; s.start + b * 8 + 7 <= 23; b++){ const a = s.start + b * 8, bad = s.start % 8 !== 0;
+          oR(g, XA(a), 112, 8 * 28 - 2, 40, "an-pg " + (bad ? "k0" : "k2"), 5); oT(g, XA(a) + 111, 137, LL(`FS block ${b} · LBA ${a}–${a + 7}`, `блок ФС ${b} · LBA ${a}–${a + 7}`), "an-t an-b");
+          if(b === 0){ touched.add(Math.floor(a / 8)); touched.add(Math.floor((a + 7) / 8)); } }
+        E(g, "line", { x1: XA(s.start), y1: 96, x2: XA(s.start), y2: 250, class: "an-flowline" }); oT(g, XA(s.start) + 4, 94, LL(`partition starts at LBA ${s.start}`, `раздел начинается с LBA ${s.start}`), "an-m an-b", "start");
+      }
+      for(let p = 0; p < 3; p++){ const on = touched.has(p); oR(g, XA(p * 8), 204, 8 * 28 - 2, 32, on ? "an-reg on" : "an-box", 5); oT(g, XA(p * 8) + 111, 225, LL(`PBA ${p} · 4 KiB physical sector`, `PBA ${p} · физ. сектор 4 KiB`), "an-m an-b"); }
+      if(s.start === 2) oT(g, 380, 280, LL("1 FS block write → 2 physical sectors read-modify-written", "запись 1 блока ФС → чтение-изменение-запись 2 физ. секторов"), "an-t an-b an-warn");
+      if(s.start === 0) oT(g, 380, 280, LL("1 FS block = 1 physical sector", "1 блок ФС = 1 физический сектор"), "an-t an-b");
+    }
+  }});
+};
+
+// ============ 32. The read path: read() → metadata → page cache → disk controller → DMA → copy; write → dirty → crash / fsync
+ANIMS["storage-read-path"] = el=>{
+  const ST = [
+    { t: ["read(): 5,000 bytes", "read(): 5 000 байт"], call: "read(fd, buf, 5000)", thr: "run", rows: "1x 2y 3z", en: "The app reads all of test.dat, 5,000 bytes. Every size here is 4,096: logical sector, physical sector, memory page and file-system block, so 1 block = 1 LBA. The file needs two blocks: one full block and one holding the remaining 904 bytes.",
+      ru: "Приложение читает весь test.dat — 5 000 байт. Все размеры здесь по 4 096: логический сектор, физический сектор, страница памяти и блок файловой системы, так что 1 блок = 1 LBA. Файлу нужны два блока: один полный и один с оставшимися 904 байтами." },
+    { t: ["File system metadata", "Метаданные файловой системы"], call: "read(fd, buf, 5000)", thr: "run", rows: "1x 2y 3z", meta: true, en: "read() is a system call. The kernel's file system reads the file's metadata (directory entry, inode or FAT) and follows it from the start block to the end of the file: blocks 6 and 3. They still have to be turned into LBAs.",
+      ru: "read() — системный вызов. Файловая система ядра читает метаданные файла (запись каталога, inode или FAT) и проходит от начального блока до конца файла: блоки 6 и 3. Их ещё нужно превратить в LBA." },
+    { t: ["Check the page cache", "Проверка страничного кэша"], call: "read(fd, buf, 5000)", thr: "run", rows: "1x 2y 3z!", meta: true, miss: true, en: "Before touching the disk the OS checks the page cache, a table from block number to a page of RAM. Block 3 is cached in page z; block 6 is not.",
+      ru: "Прежде чем обращаться к диску, ОС проверяет страничный кэш — таблицу «номер блока → страница RAM». Блок 3 закэширован в странице z; блока 6 там нет." },
+    { t: ["Command to the controller", "Команда контроллеру"], call: "read(fd, buf, 5000)", thr: "blocked", rows: "1x 2y 3z", req: true, en: "For the miss, the kernel sends the drive a read command: LBA 6, length 1 (block 6 = LBA 6 here). It goes through the block layer and the NVMe or SATA driver. The thread blocks, and the CPU runs something else.",
+      ru: "Для промаха ядро отправляет диску команду чтения: LBA 6, длина 1 (здесь блок 6 = LBA 6). Она проходит через блочный уровень и драйвер NVMe или SATA. Поток блокируется, и CPU выполняет что-то другое." },
+    { t: ["LBA → PBA, DMA into RAM", "LBA → PBA, DMA в RAM"], call: "read(fd, buf, 5000)", thr: "blocked", rows: "1x 2y 3z 6j!", dma: true, en: "The disk controller translates LBA 6 to a physical address (through the FTL on an SSD), reads it and DMAs the 4,096 bytes into a free RAM page j. An interrupt tells the kernel the data has arrived, and the page cache gets a new entry 6 → j.",
+      ru: "Контроллер диска переводит LBA 6 в физический адрес (на SSD — через FTL), читает его и по DMA кладёт 4 096 байт в свободную страницу RAM j. Прерывание сообщает ядру, что данные пришли, и в страничном кэше появляется новая запись 6 → j." },
+    { t: ["Copy to the user buffer", "Копирование в буфер"], call: "read(fd, buf, 5000)", thr: "run", rows: "1x 2y 3z! 6j!", copy: true, en: "The kernel copies page j (4,096 bytes) and the first 904 bytes of z into the app's buffer, and read() returns 5,000. The thread unblocks. A cached read costs one memory copy; a miss costs a disk round trip plus the copy.",
+      ru: "Ядро копирует страницу j (4 096 байт) и первые 904 байта z в буфер приложения, и read() возвращает 5 000. Поток разблокируется. Чтение из кэша стоит одного копирования в памяти; промах — обращения к диску плюс копирование." },
+    { t: ["write(): into the cache", "write(): в кэш"], call: "write(fd, buf, 4096)", thr: "run", rows: "1x 2y 3z 6j 7k*!", write: true, en: "Now the app writes block 7. The kernel copies the data into the page cache (page k, marked dirty) and write() returns immediately. Nothing is on disk yet.",
+      ru: "Теперь приложение пишет блок 7. Ядро копирует данные в страничный кэш (страница k, помечена грязной), и write() сразу возвращается. На диске пока ничего нет." },
+    { t: ["Crash before the flush", "Сбой до сброса"], call: "write() = 4096", thr: "dead", rows: "1x 2y 3z 6j 7k#", crash: true, en: "If the power fails after write() returned but before the flush, the dirty page is lost: the app believed the data was saved. That is the page cache's trade-off: fast reads, shared by every app that opens the file, but writes are not durable until they reach the disk.",
+      ru: "Если питание пропадёт после того, как write() вернулся, но до сброса, грязная страница потеряна: приложение думало, что данные сохранены. Это и есть компромисс страничного кэша: быстрое чтение, общее для всех приложений, открывших файл, но запись не долговечна, пока не дошла до диска." },
+    { t: ["Flush or fsync()", "Сброс или fsync()"], call: "fsync(fd)", thr: "blocked", rows: "1x 2y 3z 6j 7k*", flush: true, en: "Normally kernel flusher threads write dirty pages to disk after about 30 seconds, or sooner when too much memory is dirty. fsync(fd) forces it now and waits until the drive confirms: block 7 → LBA 7. Databases call fsync on every commit; opening with O_SYNC makes every write() wait like this, which is slow.",
+      ru: "Обычно потоки сброса ядра записывают грязные страницы на диск примерно через 30 секунд или раньше, если грязной памяти слишком много. fsync(fd) делает это сразу и ждёт подтверждения от диска: блок 7 → LBA 7. Базы данных вызывают fsync при каждом коммите; открытие с O_SYNC заставляет так ждать каждый write(), что медленно." }
+  ];
+  const FAT = ["-", "-", "-", "E", "-", "-", "3", "-"], RY = i => 148 + i * 26;
+  return steppedAnim(el, { title: LL("A read and a write, layer by layer", "Чтение и запись, слой за слоем"), vb: [760, 330], steps: ST, stepMs: 6400, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1500)), rows = s.rows.split(" ").map(r => ({ b: r[0], p: r[1], hl: r.includes("!"), dirty: r.includes("*"), lost: r.includes("#") }));
+    const flushed = s.flush && k > .85;
+    // user space
+    oR(g, 10, 30, 176, 150, "an-frame", 8); oT(g, 98, 22, LL("app · user space", "приложение"), "an-m an-b");
+    oT(g, 20, 56, s.call, "an-code", "start");
+    oT(g, 20, 84, "buf", "an-m an-b", "start"); oR(g, 20, 90, 156, 26, "an-box", 4);
+    if(s.copy || (s.call.startsWith("read") && false)){ const w1 = 156 * 4096 / 5000 * Math.min(1, k * 1.4), w2 = 156 * 904 / 5000 * Math.max(0, Math.min(1, k * 1.4 - .4)); oR(g, 20, 90, w1, 26, "an-pg k1", 4); if(w2 > 1) oR(g, 20 + 156 * 4096 / 5000, 90, w2, 26, "an-pg k2", 4); if(k > .9){ oT(g, 80, 108, "j: 4096", "an-m an-b"); oT(g, 160, 132, "z: 904", "an-m an-b"); } }
+    const thr = { run: LL("thread: running", "поток: выполняется"), blocked: LL("thread: blocked", "поток: заблокирован"), dead: LL("⚡ power lost", "⚡ питание пропало") }[flushed ? "run" : s.thr];
+    oT(g, 98, 166, thr, "an-m an-b" + (s.thr === "run" || flushed ? "" : " an-warn"));
+    // kernel
+    oR(g, 210, 30, 340, 290, "an-frame", 8); oT(g, 380, 22, LL("kernel", "ядро"), "an-m an-b");
+    oT(g, 222, 52, LL("file system: test.dat → start block 6", "ФС: test.dat → начальный блок 6"), "an-m an-b", "start");
+    FAT.forEach((v, i)=>{ const on = s.meta && (i === 6 || i === 3); oR(g, 222 + i * 40, 60, 36, 26, on ? "an-reg on" : "an-box", 4); oT(g, 240 + i * 40, 78, v, "an-m an-b"); oT(g, 240 + i * 40, 98, String(i), "an-m"); });
+    oT(g, 222, 128, LL("page cache: block → RAM page", "страничный кэш: блок → страница RAM"), "an-m an-b", "start");
+    rows.forEach((r, i)=>{ const y = RY(i), cls = r.lost ? "an-leak" : r.hl ? "an-reg on" : "an-box";
+      if(r.b === "6" && s.dma && k < .65) return;
+      oR(g, 222, y, 50, 22, cls, 4); oR(g, 276, y, 50, 22, cls, 4); oT(g, 247, y + 16, r.b, "an-t an-b"); oT(g, 301, y + 16, r.p, "an-t an-b");
+      if(r.dirty && !flushed) oT(g, 334, y + 16, LL("dirty", "грязная"), "an-m an-b an-warn", "start");
+      if(r.lost) oT(g, 334, y + 16, LL("lost", "потеряна"), "an-m an-b an-warn", "start");
+      if(s.miss && r.b === "3") oT(g, 334, y + 16, LL("hit", "попадание"), "an-m an-b an-sp", "start"); });
+    if(s.miss){ oR(g, 222, RY(3), 104, 22, "an-leak", 4); oT(g, 274, RY(3) + 16, LL("6: miss", "6: промах"), "an-m an-b an-warn"); }
+    oR(g, 410, 210, 128, 46, "an-box", 6); oT(g, 474, 230, LL("block layer", "блочный уровень"), "an-m an-b"); oT(g, 474, 246, LL("+ NVMe driver", "+ драйвер NVMe"), "an-m");
+    // disk
+    oR(g, 580, 40, 170, 52, "an-box", 8); oT(g, 665, 62, LL("disk controller", "контроллер диска"), "an-t an-b"); if(s.dma || s.req) oT(g, 665, 80, "LBA 6 → PBA", "an-code"); if(s.flush) oT(g, 665, 80, "LBA 7 → PBA", "an-code");
+    oR(g, 580, 120, 170, 170, "an-frame", 8); oT(g, 665, 140, "SSD", "an-t an-b");
+    [3, 6, 7].forEach((l, i)=>{ const on = (l === 6 && (s.req || s.dma)) || (l === 7 && flushed); oR(g, 596, 152 + i * 40, 138, 30, on ? "an-reg on" : "an-box", 4); oT(g, 665, 172 + i * 40, "LBA " + l + (l === 7 ? (flushed ? LL(" · new", " · новые") : LL(" · old data", " · старые")) : ""), "an-m an-b"); });
+    // movement
+    const dot = (path, n = 1)=>{ E(g, "polyline", { points: path.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); for(let j = 0; j < n; j++){ const kk = k - j * .12; if(kk <= 0) continue; const [x, y] = polyAt(path, kk); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); } };
+    if(s.meta && !s.miss) dot([[186, 56], [222, 73]]);
+    if(s.req) dot([[326, RY(2) + 11], [410, 233], [538, 233], [580, 66]]);
+    if(s.dma){ dot([[596, 222], [560, 222], [538, 240], [326, RY(3) + 11]], 4); if(k > .6) oT(g, 560, 110, LL("DMA + interrupt", "DMA + прерывание"), "an-m an-b an-sp", "end"); }
+    if(s.copy){ dot([[222, RY(3) + 11], [186, 103]], 3); dot([[222, RY(2) + 11], [186, 110]]); }
+    if(s.write) dot([[186, 56], [222, RY(4) + 11]]);
+    if(s.flush) dot([[326, RY(4) + 11], [410, 245], [538, 245], [596, 247]]);
+    if(s.crash){ oT(g, 748, 312, LL("disk still has the old block 7", "на диске старый блок 7"), "an-m an-b an-warn", "end"); }
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }

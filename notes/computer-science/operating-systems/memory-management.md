@@ -132,7 +132,7 @@ redis-cow
 - Swapping a JVM is catastrophic because a GC cycle touches the whole heap: a 4 GiB heap half on disk turns a 50 ms pause into minutes. Production JVM and database hosts run with little or no swap (`vm.swappiness=1`) and rely on correct sizing.
 - The **OOM killer** runs when reclaim cannot free a page. It picks the task with the highest `oom_score` (roughly RSS, adjusted by `oom_score_adj`) and sends `SIGKILL`. In a container with `memory.max` the same happens inside the cgroup, and the pod shows exit code 137 / `OOMKilled` ([[docker-containers-and-resources]]).
 - `memory.max` counts RSS **plus page cache** charged to the cgroup; a service that streams big files can be killed for cache it does not control unless the kernel can reclaim it in time. Kubernetes `limits.memory` must leave room for heap, metaspace, thread stacks, direct buffers and code cache, not just `-Xmx`.
-- **Page cache**: file contents read or written stay in RAM as cache; `free -h` shows them under `buff/cache`, and they count as *available*. Writes go to the cache first (dirty pages) and are flushed later; `fsync()` forces it, which is what Postgres does at commit and Kafka deliberately does not ([[kafka-architecture]]).
+- **Page cache**: file contents read or written stay in RAM as cache; `free -h` shows them under `buff/cache`, and they count as *available*. Writes go to the cache first (dirty pages) and are flushed later or on `fsync()`; how reads, writes and flushing work is in [[storage-management]].
 - **Overcommit**: the kernel hands out more virtual memory than there is RAM, betting that not all of it will be touched (`vm.overcommit_memory`).
 
 ### Memory-mapped files
@@ -171,10 +171,7 @@ dma-transfer
 ```
 
 ### O_DIRECT: bypassing the page cache
-- A normal `read()` goes disk → DMA → **page cache** → copy → your buffer. Opening a file with `O_DIRECT` makes the DMA transfer go straight into the user-space buffer, skipping the page cache.
-- Databases that run their own cache use it to avoid **double buffering** (the same page held once in the database's buffer pool and again in the kernel's cache): MySQL InnoDB with `innodb_flush_method=O_DIRECT`, Oracle, ScyllaDB. Postgres, by contrast, relies on the page cache, which is why its `shared_buffers` is usually only about 25% of RAM.
-- Requirements: the buffer address, the file offset and the length must all be aligned to the logical block size (usually 512 B or 4 KiB), or the call fails with `EINVAL`. You also lose the kernel's read-ahead and write-behind, so it only pays off when the application caches and schedules I/O better than the kernel would ([[io-models-blocking-nonblocking-epoll]]).
-- `O_DIRECT` does not mean durable: data may still sit in the device's write cache. Use `fsync`/`fdatasync` or `O_DSYNC` for durability.
+- `O_DIRECT` makes the DMA transfer go straight into the user buffer, skipping the page cache; databases with their own cache use it to avoid double buffering. Details, alignment rules and the other `open()` modes are in [[storage-management]].
 
 ## Example
 ```bash
@@ -216,6 +213,5 @@ dmesg -T | grep -iE 'oom|killed process' | tail -3
 - Transparent huge pages set to `always` on a Redis or Postgres box: latency spikes from compaction and memory bloat from copy-on-write of 2 MiB pages; use `madvise` and let the JVM opt in.
 - Sizing a Redis host for the dataset only: `BGSAVE` and AOF rewrites need copy-on-write headroom, up to the size of the dataset on a write-heavy instance.
 - Leaving `oom_score_adj` at its default for a sidecar: the kernel may kill the main JVM (bigger RSS) instead of the leaking log shipper.
-- Using `O_DIRECT` with an unaligned buffer (`EINVAL`), or expecting it to make writes durable without `fsync`.
 - Default `vm.max_map_count` (65530) is too low for Elasticsearch and some JVM workloads, which create many mappings; raise it in `/etc/sysctl.d/`.
 - Related: [[anatomy-of-a-process]] for the layout of one address space, [[stack-vs-heap-memory]] for how allocation sits on top of pages, [[cpu-caches-and-cache-lines]] for the layer below the TLB, [[linux-memory-filesystems-io]] for the Linux commands.
