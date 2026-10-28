@@ -2548,7 +2548,7 @@
    ],
    "words": 2671,
    "ru": "notes-ru/computer-science/operating-systems/anatomy-of-a-process.md",
-   "title_ru": "Анатомия процесса"
+   "title_ru": "Процесс"
   },
   {
    "id": "cpu-scheduling",
