@@ -58,7 +58,7 @@ With `W` at 35 ms the same 240 req/s needs only `L ≈ 8.4` in-flight workers: r
 ## Pitfalls
 - Sizing a thread pool or connection pool to "max concurrent users": Little's law says it is throughput × latency, usually an order of magnitude smaller; oversized pools raise `β` (contention) and slow everything.
 - Measuring speedup on a dev laptop with 8 cores and extrapolating to 64: the `β` term shows up only at scale; test at production thread counts.
-- Treating 100% CPU as the goal: at high utilisation queueing delay dominates latency; keep headroom and scale horizontally before saturation ([[cpu-scheduling]]).
+- Treating 100% CPU as the goal: at high utilisation queueing delay dominates latency; keep headroom and scale horizontally before saturation ([[process-management]]).
 - Forgetting that Little's law needs a stable system: during a backlog burn-down arrivals ≠ departures and the formula gives averages over a window, not instantaneous values.
 - Parallelising the wrong part: speeding up a 10% step by 10× saves 9% of total time; profile first ([[latency-numbers]]).
 - Related: [[hikaricp-pool-sizing]] for the connection-pool application, [[rate-limiting]] and [[load-balancing]] for where utilisation and queueing decide behaviour under load.

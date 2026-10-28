@@ -50,8 +50,7 @@ Suggested order for interview prep: architecture/styles + system-design + databa
 - [x] operating-system-introduction — what an OS is, its three roles, kernel vs the rest, what a running program gets
 - [x] operating-system-architecture — layers, privilege modes, syscalls/interrupts/exceptions, kernel designs
 - [x] anatomy-of-a-process — program vs process, memory layout (text/data/bss/heap/stack), execution with the stack
-- [x] processes-and-threads — address space, PCB, context switch cost, user vs kernel threads
-- [x] cpu-scheduling — preemption, priorities, CFS idea, what "load" means
+- [x] process-management (merged from processes-and-threads and cpu-scheduling) — PCB, process table, threads and TCB, multi-process vs multi-threaded, shared memory, context switch, TLB flush and ASID, preemption, scheduling algorithms, CPU- vs IO-bound, load, cgroups, race conditions
 - [x] memory-management — RAM, CPU↔RAM, alignment, virtual memory, fragmentation, page tables, sharing, copy-on-write (Redis), swap, DMA, O_DIRECT
 - [x] stack-vs-heap-memory — frames, allocation cost, why stack overflow happens
 - [x] syscalls-and-file-descriptors — user/kernel boundary, fd table, everything is a file

@@ -100,7 +100,7 @@ vm-page-tables
 - **Shared libraries**: `libc.so`, `libjvm.so`, `libssl.so` are mapped read-only into hundreds of processes and occupy RAM once. `/proc/<pid>/maps` lists every mapping of a process, with the file it comes from (see the example below).
 - **Explicit shared memory**: `mmap(MAP_SHARED)` or `shm_open` maps the same pages into two processes, so communication is a plain memory write with no system call. No synchronisation comes with it ([[ipc-mechanisms]]).
 - Use cases:
-  - **Threads** share the whole address space by definition: that is what makes them threads ([[processes-and-threads]]).
+  - **Threads** share the whole address space by definition: that is what makes them threads ([[process-management]]).
   - **Postgres**: every backend process attaches to `shared_buffers`, WAL buffers and lock tables in one shared segment ([[postgres-performance-checklist]]).
   - **NGINX** and proxies: worker processes share cache metadata, rate-limit counters and upstream state in shared memory zones.
   - Java: `FileChannel.map` on a file in `/dev/shm` gives a `MappedByteBuffer` shared across processes (Chronicle Queue, Aeron).

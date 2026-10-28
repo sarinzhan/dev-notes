@@ -69,4 +69,4 @@ A default 1 MiB stack gives roughly 10–20 thousand simple Java frames; the exa
 - Assuming Java objects live on the heap always: escape analysis may scalar-replace a non-escaping object; benchmarks that "measure allocation" can be optimised away ([[jvm-memory-areas]]).
 - Confusing OS heap with Java heap when a container is OOM-killed: `-Xmx` is within limits, but direct buffers (`Netty`, Kafka client) and metaspace pushed RSS over `limits.memory`.
 - In C, returning the address of a local, or `alloca`/VLA with user-controlled size: both are stack corruption bugs that Java prevents by design.
-- Related: [[memory-management]] for how both regions are backed by pages, [[processes-and-threads]] for why each thread needs its own stack.
+- Related: [[memory-management]] for how both regions are backed by pages, [[process-management]] for why each thread needs its own stack.

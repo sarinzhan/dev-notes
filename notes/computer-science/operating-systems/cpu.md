@@ -47,7 +47,7 @@ cpu-components
 - Data moves between levels in 64-byte **cache lines**. A hardware **coherence protocol** keeps all copies of a line consistent across cores; that traffic is what makes contended locks and false sharing slow. The full story of lines, locality and false sharing is in [[cpu-caches-and-cache-lines]], and how the line comes from RAM is in [[memory-management]].
 
 ### Cores, sockets and NUMA
-- **Multi-core**: each core has its own front end, ALUs, registers, L1 and L2; cores share L3 and the memory controller. Threads on different cores run truly in parallel; the OS scheduler decides which thread runs where ([[cpu-scheduling]]).
+- **Multi-core**: each core has its own front end, ALUs, registers, L1 and L2; cores share L3 and the memory controller. Threads on different cores run truly in parallel; the OS scheduler decides which thread runs where ([[process-management]]).
 - **Multi-socket servers**: two or more chips, each with its own RAM (DIMM1 next to socket 1, DIMM2 next to socket 2), joined by an interconnect (Intel UPI, AMD Infinity Fabric). The hardware presents all RAM as one shared address space, so any core can read any address, but RAM attached to the other socket is slower (often 1.5–2×). This is **NUMA**, non-uniform memory access; the course slide calls the link a distributed shared memory (DSM).
 - Consequence: a big JVM heap that spans both sockets sees uneven latency. `numactl --hardware` shows the layout; `-XX:+UseNUMA` makes the parallel and G1 collectors allocate a thread's young objects in its local node; databases are often pinned to one socket.
 
@@ -197,7 +197,7 @@ The chain `i1 → i2 → i3 → i4` is the critical path; everything else runs i
 | The JIT sees a profile you do not | Warm-up matters: micro-benchmarks need JMH, not `System.nanoTime` |
 
 ### Where the OS and the JVM touch this
-- A **context switch** saves and restores the registers above; the cost is less the copy than the cold caches, TLB and predictor afterwards ([[processes-and-threads]]).
+- A **context switch** saves and restores the registers above; the cost is less the copy than the cold caches, TLB and predictor afterwards ([[process-management]]).
 - The **JIT** allocates Java locals to registers, inlines small methods so their values never leave registers, unrolls and vectorises simple loops. A method too large to inline, or an exception handler in the loop body, blocks those optimisations.
 - **Container CPU limits** are enforced by the scheduler in time slices, not by taking cores away: a limit of `1` on a 16-core node still lets a thread run on any core, but only for 100 ms in every 100 ms window ([[docker-containers-and-resources]]).
 - *Why is `i++` not atomic?* It is load → add → store, three steps; another core can interleave between them ([[race-conditions-and-critical-sections]]). `lock xadd` or `CAS` does it in one atomic instruction ([[lock-free-and-cas]]).
