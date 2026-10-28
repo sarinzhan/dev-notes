@@ -133,6 +133,16 @@ call-stack-frames
 - In both conventions the saved return address sits *above* the saved frame pointer, at the higher address.
 - A stack trace is this chain of frames read top-down: the exception was thrown in the newest frame, called from the one above it, and so on up to `main`.
 
+### Putting it together: a whole program running
+Everything above at once: a small C program (`main` sets `a` and `b`, calls `func1`, which computes `z = z + 1`, then `main` computes `c = a + b`), compiled to simplified ARM-style instructions and executed one instruction per step. Watch three things change together: **pc** walks the machine code and jumps on `bl` and `ret`; registers (**r0**, **r1**, **r3**) hold values only while they are being computed; and every `str` / `ldr` is a trip between the CPU and the stack in RAM. Addresses are decimal and small for readability; each instruction is 4 bytes.
+
+```anim
+program-execution
+```
+
+- `bl func1` stores the return address in the link register `lr` instead of pushing it. A function that calls nothing (a *leaf*, like `func1`) can leave it there; `main` saved its own `lr` in the prologue because `bl` overwrites it.
+- Unoptimised code (`-O0`) stores every variable in memory and reloads it each time, as here. With `-O2` the whole program shrinks to almost nothing, since the results are never used.
+
 ### Data section
 - Globals and `static` fields live here for the whole life of the process; they are not freed and not per-thread. In Java, static fields of a loaded class live in the JVM's metaspace and the objects they reference on the heap; the idea is the same: one copy, visible to every thread.
 - Because they are shared, they are the first suspect in concurrency bugs: a `static` counter incremented without synchronisation is a data race ([[race-conditions-and-critical-sections]]).
