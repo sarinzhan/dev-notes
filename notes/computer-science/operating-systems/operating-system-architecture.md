@@ -2,6 +2,7 @@
 title: System architecture overview
 tags: [operating-systems, kernel, user-space, interrupts, architecture]
 learned: 2026-10-27
+order: 2
 ---
 ## TL;DR
 A computer is four kinds of hardware: a **CPU** that executes machine instructions, **memory** (RAM) that holds running programs and their data, **storage** (SSD, HDD) that keeps data when the power is off, and a **network** card that talks to other machines. The **kernel** is the part of the OS that owns all four. It schedules processes onto CPU cores, gives each process its own virtual memory, turns disk blocks into files, drives devices through drivers, and runs the network stack. Programs live in **user space** and can reach the kernel only through **system calls**; the kernel is also entered by device **interrupts** and CPU **exceptions**. Everything a backend service does, from a SQL query to an HTTP response, is a walk down and back up through these layers.

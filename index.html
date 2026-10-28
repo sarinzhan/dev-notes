@@ -418,7 +418,7 @@ function renderSide(){
     h+=`<button class="hd sec" style="--c:${s.c}" data-toggle="sec:${k}" aria-expanded="${sOpen}">${CHEV}<i></i>${s.name}<b>${all.length}</b></button>`;
     if(!sOpen) continue;
     for(const [sk,sn] of Object.entries(s.subs)){
-      const list=all.filter(n=>n.sub===sk).sort((a,b)=>a.title.localeCompare(b.title,LANG)); if(!list.length) continue;
+      const list=all.filter(n=>n.sub===sk).sort((a,b)=>(a.order??1e9)-(b.order??1e9)||a.title.localeCompare(b.title,LANG)); if(!list.length) continue;
       const key="sub:"+k+"/"+sk, subOpen=openKeys.has(key);
       h+=`<button class="hd sub" style="--c:${subColor(k,sk)}" data-toggle="${key}" aria-expanded="${subOpen}">${CHEV}<i></i>${sn}<b>${list.length}</b></button>`;
       if(subOpen) h+=list.map(n=>`<button class="n" data-go="${n.id}" aria-current="${n.id===current}">${n.title}</button>`).join("");

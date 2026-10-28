@@ -57,6 +57,7 @@ def main():
             "title": meta.get("title", nid),
             "tags": meta.get("tags", []),
             "learned": meta.get("learned", ""),
+            **({"order": int(meta["order"])} if str(meta.get("order", "")).isdigit() else {}),
             "path": str(path.relative_to(ROOT)).replace("\\", "/"),
             "links": sorted({m.group(1) for m in WL.finditer(CODE.sub("", body))}),
             "words": len(body.split()),
