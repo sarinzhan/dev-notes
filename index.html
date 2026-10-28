@@ -3278,6 +3278,102 @@ ANIMS["io-multiplexing"] = el=>{
   }});
 };
 
+// ============ 37. A system call: user mode → kernel mode → back
+ANIMS["mode-switch-syscall"] = el=>{
+  const ST = [
+    { t: ["User mode", "Режим пользователя"], mode: "user", pc: "text", sp: "user", en: "The process runs its own code in user mode: the CPU's privilege flag says ring 3 (EL0 on ARM). It can use its own text, data, heap and stack, the lower half of its virtual address space. The kernel half is mapped into the same address space but marked supervisor-only.",
+      ru: "Процесс выполняет свой код в режиме пользователя: флаг привилегий CPU показывает ring 3 (EL0 на ARM). Ему доступны собственные код, данные, куча и стек — нижняя половина виртуального адресного пространства. Половина ядра отображена в то же пространство, но помечена как доступная только супервизору." },
+    { t: ["Touching the kernel half", "Обращение к половине ядра"], mode: "user", pc: "text", sp: "user", fault: true, en: "If user code loads from a kernel address, the MMU sees the supervisor-only bit and raises a fault; the kernel sends the process SIGSEGV. User mode can never read or write kernel memory: page tables, PCBs, socket buffers, the page cache.",
+      ru: "Если код пользователя читает адрес ядра, MMU видит бит «только супервизор» и вызывает исключение; ядро посылает процессу SIGSEGV. Из режима пользователя нельзя ни читать, ни писать память ядра: таблицы страниц, PCB, буферы сокетов, страничный кэш." },
+    { t: ["read() → syscall", "read() → syscall"], mode: "user", pc: "libc", sp: "user", args: true, en: "So the process asks. read(fd, buf, n) in libc puts the system call number (0 = read on x86-64) in rax and the arguments in rdi, rsi, rdx, then executes the syscall instruction.",
+      ru: "Поэтому процесс просит. read(fd, buf, n) в libc кладёт номер системного вызова (0 = read на x86-64) в rax, а аргументы в rdi, rsi, rdx, затем выполняет инструкцию syscall." },
+    { t: ["Switch to kernel mode", "Переход в режим ядра"], mode: "kernel", pc: "entry", sp: "kstack", en: "The CPU flips to ring 0, jumps to the kernel's fixed entry point and switches to this thread's kernel stack. It is the same process and the same page table, not another process: the kernel half is present in every process's page table, so nothing is flushed.",
+      ru: "CPU переключается в ring 0, прыгает в фиксированную точку входа ядра и переходит на стек ядра этого потока. Это тот же процесс и та же таблица страниц, а не другой процесс: половина ядра есть в таблице страниц каждого процесса, поэтому ничего не сбрасывается." },
+    { t: ["Save user registers", "Сохранение регистров пользователя"], mode: "kernel", pc: "entry", sp: "kstack", save: true, en: "The kernel saves the user's registers on the kernel stack: the return address (the user pc), sp, bp and the general-purpose registers. These are memory writes. The kernel needs the registers for its own code, and must later resume the user exactly where it stopped.",
+      ru: "Ядро сохраняет регистры пользователя в стеке ядра: адрес возврата (pc пользователя), sp, bp и регистры общего назначения. Это записи в память. Регистры нужны ядру для собственного кода, а потом оно должно продолжить пользователя ровно с того места, где он остановился." },
+    { t: ["Checks and table lookup", "Проверки и поиск в таблице"], mode: "kernel", pc: "table", sp: "kstack", save: true, table: true, en: "Security checks: does fd belong to this process, is buf really a user address, may the process read this file? Then the system call number indexes the system call table: sys_call_table[0] → sys_read. Programs are compiled against stable numbers, not kernel addresses.",
+      ru: "Проверки безопасности: принадлежит ли fd этому процессу, действительно ли buf — адрес пользователя, можно ли процессу читать этот файл? Затем номер системного вызова служит индексом в таблице системных вызовов: sys_call_table[0] → sys_read. Программы компилируются со стабильными номерами, а не с адресами ядра." },
+    { t: ["Do the work", "Выполнение работы"], mode: "kernel", pc: "sysread", sp: "kstack", save: true, copy: true, en: "sys_read runs on the kernel stack. Kernel mode can access both halves: it copies the bytes from the socket's receive buffer or the page cache (kernel half) into buf (user half). If no data is ready, the thread sleeps here.",
+      ru: "sys_read выполняется на стеке ядра. Режим ядра имеет доступ к обеим половинам: он копирует байты из буфера приёма сокета или страничного кэша (половина ядра) в buf (половина пользователя). Если данных нет, поток засыпает прямо здесь." },
+    { t: ["Restore and return", "Восстановление и возврат"], mode: "user", pc: "text2", sp: "user", restore: true, en: "The kernel restores the saved registers (memory reads), puts the result (bytes read) in rax and executes sysret: the CPU drops to ring 3 and continues at the instruction after the syscall. The time spent inside is charged to the process as system time, separate from its user time.",
+      ru: "Ядро восстанавливает сохранённые регистры (чтения из памяти), кладёт результат (число прочитанных байт) в rax и выполняет sysret: CPU возвращается в ring 3 и продолжает с инструкции после syscall. Время внутри ядра записывается процессу как системное время, отдельно от пользовательского." }
+  ];
+  const AX = 20, AW = 190;
+  const ROWS = { kernel: [30, 120], stack: [170, 40], heap: [222, 40], data: [266, 30], text: [300, 44] };
+  const PCY = { text: 316, text2: 334, libc: 326 };
+  return steppedAnim(el, { title: LL("A system call: user mode → kernel mode → back", "Системный вызов: режим пользователя → режим ядра → обратно"), vb: [760, 360], steps: ST, stepMs: 6400, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1400)), user = s.mode === "user";
+    // address space
+    oT(g, AX + AW / 2, 18, LL("one process's virtual address space", "виртуальное адресное пространство процесса"), "an-m an-b");
+    oR(g, AX, ROWS.kernel[0], AW, ROWS.kernel[1], user ? "an-pg k3 dim" : "an-pg k3", 6);
+    oT(g, AX + AW / 2, 54, LL("kernel half", "половина ядра"), "an-t an-b");
+    [LL("kernel code, sys_call_table", "код ядра, sys_call_table"), LL("page tables, PCBs", "таблицы страниц, PCB"), LL("socket buffers, page cache", "буферы сокетов, стр. кэш"), LL("kernel stacks", "стеки ядра")].forEach((l, i)=> oT(g, AX + AW / 2, 74 + i * 17, l, "an-m"));
+    if(user) oT(g, AX + AW - 8, 46, LL("🔒 supervisor-only", "🔒 только ядро"), "an-m an-b an-warn", "end");
+    oT(g, AX + 4, 160, "0xffff8000_00000000 ↑", "an-m", "start");
+    E(g, "line", { x1: AX, y1: 156, x2: AX + AW, y2: 156, class: "an-link2 an-dash" });
+    [["stack", "k0", LL("user stack", "стек пользователя")], ["heap", "k4", LL("heap · buf", "куча · buf")], ["data", "k2", LL("data", "данные")], ["text", "k1", LL("text: app code + libc", "код: приложение + libc")]].forEach(([n, c, l])=>{ const [y, h] = ROWS[n]; oR(g, AX, y, AW, h, "an-pg " + c, 4); oT(g, AX + AW / 2, y + h / 2 + 5, l, "an-t an-b"); });
+    oT(g, AX + 4, 354, "0x0000_7fffffffffff ↓ · 0", "an-m", "start");
+    // CPU
+    oR(g, 250, 30, 190, 170, user ? "an-frame" : "an-reg on", 10);
+    oT(g, 345, 52, user ? LL("CPU · user mode · ring 3", "CPU · режим польз. · ring 3") : LL("CPU · kernel mode · ring 0", "CPU · режим ядра · ring 0"), "an-m an-b" + (user ? "" : " an-warn"));
+    const pcTxt = { text: "app: …", text2: LL("after syscall", "после syscall"), libc: "libc: syscall", entry: "entry_SYSCALL_64", table: "sys_call_table[0]", sysread: "sys_read" }[s.pc];
+    const regs = [["pc", pcTxt], ["sp", s.sp === "user" ? LL("user stack", "стек польз.") : LL("kernel stack", "стек ядра")], ["rax", s.args ? "0 (read)" : s.restore ? LL("bytes read", "прочитано байт") : "…"]];
+    regs.forEach(([n, v], i)=>{ oR(g, 262, 64 + i * 42, 166, 34, "an-box", 5); oT(g, 270, 86 + i * 42, n, "an-m an-b", "start"); oT(g, 420, 86 + i * 42, v, "an-code", "end"); });
+    if(s.args) oT(g, 345, 220, "rdi=fd  rsi=buf  rdx=n", "an-code");
+    // pc pointer into memory
+    const pcY = s.pc in PCY ? PCY[s.pc] : 70;
+    E(g, "line", { x1: 262, y1: 81, x2: AX + AW, y2: pcY, class: "an-flowline" }); E(g, "circle", { cx: AX + AW, cy: pcY, r: 4, class: "an-dot an-flow" });
+    if(s.fault){ const x = 330 + (AX + AW - 330) * k, y = 250 + (90 - 250) * k; E(g, "line", { x1: 330, y1: 250, x2: AX + AW, y2: 90, class: "an-flowline" }); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); oT(g, 300, 270, LL("load [0xffff8880…] → fault → SIGSEGV", "load [0xffff8880…] → fault → SIGSEGV"), "an-m an-b an-warn"); }
+    // kernel stack and table
+    oT(g, 470, 22, LL("this thread's kernel stack", "стек ядра этого потока"), "an-m an-b", "start");
+    oR(g, 470, 30, 280, 150, s.sp === "kstack" ? "an-frame" : "an-frame an-dim", 8);
+    const saved = [LL("user pc (return address)", "pc польз. (адрес возврата)"), "user sp, bp", "rbx, r12–r15 …", "flags"];
+    if(s.save || s.restore){ const n = s.restore ? Math.max(0, 4 - Math.floor(k * 5)) : Math.min(4, 1 + Math.floor(k * 4)); saved.slice(0, n).forEach((l, i)=>{ oR(g, 480, 40 + i * 32, 260, 26, "an-pg k0", 4); oT(g, 610, 58 + i * 32, l, "an-m an-b"); }); oT(g, 610, 172, s.restore ? LL("restore: memory reads", "восстановление: чтения из памяти") : LL("save: memory writes", "сохранение: записи в память"), "an-m an-b an-sp"); }
+    if(s.table){ oT(g, 470, 204, "sys_call_table", "an-m an-b", "start"); ["0 → sys_read", "1 → sys_write", "2 → sys_open", "3 → sys_close"].forEach((l, i)=>{ oR(g, 470, 212 + i * 26, 180, 22, i === 0 ? "an-reg on" : "an-box", 4); oT(g, 480, 228 + i * 26, l, "an-code", "start"); }); oT(g, 660, 228, LL("✓ fd is ours", "✓ fd наш"), "an-m an-b", "start"); oT(g, 660, 254, LL("✓ buf is user", "✓ buf польз."), "an-m an-b", "start"); }
+    if(s.copy){ const p = [[AX + AW, 120], [300, 290], [AX + AW, 242]]; E(g, "polyline", { points: p.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); for(let j = 0; j < 3; j++){ const kk = k - j * .15; if(kk <= 0) continue; const [x, y] = polyAt(p, kk); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); } oT(g, 470, 240, LL("copy: kernel buffer → user buf", "копия: буфер ядра → buf польз."), "an-m an-b an-sp", "start"); }
+    if(s.restore) oT(g, 470, 240, LL("sysret → ring 3 · time inside = system time", "sysret → ring 3 · время внутри = системное"), "an-m an-b", "start");
+  }});
+};
+
+// ============ 38. How a thread enters the kernel: system calls, interrupts, page faults; user vs system time
+ANIMS["kernel-entries"] = el=>{
+  const EV = [
+    ["u", 0, 2], ["k", 2, 2.5, "read()"], ["u", 2.5, 4],
+    ["k", 4, 4.25, LL("timer IRQ", "IRQ таймера")], ["u", 4.25, 5.5],
+    ["k", 5.5, 5.8, LL("page fault", "page fault")], ["z", 5.8, 7.1, LL("asleep: disk", "спит: диск")], ["k", 7.1, 7.3], ["u", 7.3, 10]
+  ];
+  const ST = [
+    { t: ["User code", "Код пользователя"], upto: 1, en: "A thread runs its own code in user mode. Every few microseconds or milliseconds something sends it into the kernel; there are three ways in.",
+      ru: "Поток выполняет свой код в режиме пользователя. Каждые несколько микро- или миллисекунд что-то отправляет его в ядро; входов три." },
+    { t: ["1. System call", "1. Системный вызов"], upto: 3, en: "Deliberate: the program asks the kernel for a service (read, write, futex, epoll_wait). The switch itself costs on the order of 100 ns, a few hundred with Spectre/Meltdown mitigations, plus the work.",
+      ru: "Намеренно: программа просит ядро об услуге (read, write, futex, epoll_wait). Само переключение стоит порядка 100 нс, несколько сотен — с защитами от Spectre/Meltdown, плюс сама работа." },
+    { t: ["2. Interrupt", "2. Прерывание"], upto: 5, en: "Asynchronous: hardware interrupts whatever is running: the timer tick (the scheduler may preempt the thread here), a packet arriving at the NIC, a disk completing. The kernel handles it on behalf of nobody in particular, then returns.",
+      ru: "Асинхронно: оборудование прерывает то, что выполняется: тик таймера (здесь планировщик может вытеснить поток), пакет, пришедший на сетевую карту, завершение операции диска. Ядро обрабатывает его не от чьего-то конкретного имени и возвращается." },
+    { t: ["3. Exception: page fault", "3. Исключение: page fault"], upto: 9, en: "The instruction itself traps: a page fault (the page is swapped out or not yet mapped), divide by zero, an invalid address. A benign-looking load turns into kernel work: here a major fault starts reading the page back from swap, and the thread sleeps for milliseconds until the disk answers. That is why page faults are expensive.",
+      ru: "Ловушку вызывает сама инструкция: page fault (страница вытеснена в swap или ещё не отображена), деление на ноль, недопустимый адрес. Безобидное с виду чтение превращается в работу ядра: здесь major fault начинает читать страницу обратно из swap, и поток спит миллисекунды, пока не ответит диск. Поэтому page faults дороги." },
+    { t: ["vDSO: no switch at all", "vDSO: вообще без переключения"], upto: 9, vdso: true, en: "Some calls avoid the kernel entirely: the vDSO is a small piece of kernel code mapped into every process, so clock_gettime() (Java's System.nanoTime and currentTimeMillis) reads the time in user mode.",
+      ru: "Некоторые вызовы вообще обходятся без ядра: vDSO — небольшой кусок кода ядра, отображённый в каждый процесс, поэтому clock_gettime() (System.nanoTime и currentTimeMillis в Java) читает время в режиме пользователя." },
+    { t: ["User time and system time", "Пользовательское и системное время"], upto: 9, vdso: true, acct: true, en: "The kernel keeps the process's statistics in its PCB and counts the two modes separately: time in user mode is user time, time in kernel mode on behalf of the process is system time (time's user and sys, top's %us and %sy). Interrupts are counted apart (%hi, %si). High sys means the process spends its CPU in system calls and faults.",
+      ru: "Ядро хранит статистику процесса в его PCB и считает два режима отдельно: время в режиме пользователя — пользовательское (user), время в режиме ядра от имени процесса — системное (sys) (user и sys у time, %us и %sy у top). Прерывания считаются отдельно (%hi, %si). Высокий sys означает, что процесс тратит CPU на системные вызовы и page faults." }
+  ];
+  const X0 = 120, W = 600, MS = W / 10;
+  return steppedAnim(el, { title: LL("Three ways into the kernel", "Три пути в ядро"), vb: [760, 256], steps: ST, stepMs: 6000, render(g, s, t){
+    const k = Math.min(1, t / 2400);
+    for(let m = 0; m <= 10; m++) oT(g, X0 + m * MS, 22, m + LL(" ms", " мс"), "an-m");
+    [[LL("user mode", "режим польз."), 40], [LL("kernel mode", "режим ядра"), 100]].forEach(([l, y])=>{ oT(g, X0 - 10, y + 22, l, "an-t an-b", "end"); oR(g, X0, y, W, 34, "an-frame", 5); });
+    let us = 0, sy = 0; const idx = ST.indexOf(s), prevUp = idx > 0 ? ST[idx - 1].upto : 0;
+    EV.slice(0, s.upto).forEach(([m, a, b, label], i)=>{
+      const end = i >= prevUp && idx > 0 ? a + (b - a) * k : b; if(end <= a) return;
+      const y = m === "u" ? 40 : 100, cls = m === "u" ? "an-pg k1" : m === "z" ? "an-free" : "an-pg k0";
+      oR(g, X0 + a * MS + 1, y + 2, Math.max(2, (end - a) * MS - 2), 30, cls, 4);
+      if(label && end - a > .2){ oT(g, X0 + (a + end) / 2 * MS, y + 54, label, "an-m an-b" + (m === "z" ? " an-warn" : "")); if(m !== "z") E(g, "line", { x1: X0 + a * MS, y1: 74, x2: X0 + a * MS, y2: 100, class: "an-flowline" }); }
+      if(m === "u") us += end - a; else if(m === "k") sy += end - a;
+    });
+    if(s.vdso){ oT(g, X0 + 8.4 * MS, 32, "clock_gettime() · vDSO", "an-m an-b an-sp"); E(g, "circle", { cx: X0 + 8.4 * MS, cy: 57, r: 5, class: "an-dot an-flow" }); }
+    if(s.acct){ oR(g, X0, 190, W, 44, "an-box", 6); oT(g, X0 + 14, 217, `$ time ./app  →  real 10.0 ms   user ${us.toFixed(1)} ms   sys ${sy.toFixed(1)} ms`, "an-code", "start"); oT(g, X0 + W, 245, LL("sleeping on the disk is neither: real > user + sys", "сон в ожидании диска — ни то, ни другое: real > user + sys"), "an-m", "end"); }
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
