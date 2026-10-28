@@ -46,7 +46,7 @@ Variables that the compiler can keep in **registers** never touch memory. Only `
 
 ### Process
 - **When a program is run, we get a process.** `execve()` asks the kernel to read the ELF headers, create a new address space, map the segments, set up a stack, and jump to the entry point ([[signals-and-process-lifecycle]]).
-- **A process lives in memory.** Its code, data, heap and stacks occupy pages of RAM (virtual pages mapped to physical frames, [[virtual-memory-and-paging]]). When it exits, they are freed.
+- **A process lives in memory.** Its code, data, heap and stacks occupy pages of RAM (virtual pages mapped to physical frames, [[memory-management]]). When it exits, they are freed.
 - **It is uniquely identified by an id.** The **PID** is unique among running processes on that machine (or in that container's PID namespace).
 - **It has an instruction pointer / program counter.** The PC holds the address of the next instruction to execute. Strictly, every *thread* has its own PC and stack. A single-threaded process has one of each.
 - **The kernel keeps a Process Control Block (PCB)** for it, `task_struct` in Linux. The PCB records the PID and parent, the state (running, sleeping…), the saved registers including PC and SP, the memory map, open files, and scheduling data. A context switch saves the CPU's registers into the PCB and loads another one's ([[processes-and-threads]]).
@@ -223,5 +223,5 @@ The same program in Java moves `body` and the string to the GC-managed heap and 
 - Optimised builds often omit the frame pointer (`-fomit-frame-pointer`) to free a register. Profilers and `perf` then struggle to walk the stack. For JVM flame graphs use `-XX:+PreserveFramePointer`.
 - In C, writing past a local array can overwrite the saved return address. That is the classic *stack buffer overflow* exploit, and the reason stack canaries and non-executable stacks exist.
 - `ps` shows virtual size (VSZ) and resident size (RSS). VSZ counts every mapped page including the unused heap reserve and shared libraries; RSS is what is actually in RAM. Compare RSS, never VSZ, with a container's memory limit ([[docker-containers-and-resources]]).
-- `fork` copies the layout lazily (copy-on-write), so a process with a 4 GB heap can fork quickly, but the first write to each page after the fork costs a page fault ([[virtual-memory-and-paging]]).
+- `fork` copies the layout lazily (copy-on-write), so a process with a 4 GB heap can fork quickly, but the first write to each page after the fork costs a page fault ([[memory-management]]).
 - Related: [[stack-vs-heap-memory]] for the detailed comparison, [[jvm-memory-areas]] for how the JVM divides its part of this layout, [[processes-and-threads]] for threads, the PCB and context switches.

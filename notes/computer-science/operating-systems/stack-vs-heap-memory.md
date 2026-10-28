@@ -9,7 +9,7 @@ The **stack** is a per-thread, LIFO region where each function call pushes a **f
 ## Key points
 
 ### The stack
-- One stack per thread, allocated when the thread starts: Linux main thread default 8 MiB (`ulimit -s`), other threads 1 MiB on JVM (`-Xss`), reserved as virtual memory and committed page by page on touch ([[virtual-memory-and-paging]]).
+- One stack per thread, allocated when the thread starts: Linux main thread default 8 MiB (`ulimit -s`), other threads 1 MiB on JVM (`-Xss`), reserved as virtual memory and committed page by page on touch ([[memory-management]]).
 - A frame holds: parameters, local variables, saved registers, return address, and a saved frame pointer. The compiler knows every frame's size at compile time, so entering a function is `sub rsp, N` and leaving is `add rsp, N; ret`.
 - Grows downward on x86; a **guard page** below the stack is unmapped, so growing past it faults instead of silently overwriting the heap. The JVM catches that fault and throws `StackOverflowError`.
 - Cheap and cache-friendly: the top of the stack is almost always in L1 ([[cpu-caches-and-cache-lines]]). No fragmentation, no synchronization: each thread owns its stack.
@@ -69,4 +69,4 @@ A default 1 MiB stack gives roughly 10–20 thousand simple Java frames; the exa
 - Assuming Java objects live on the heap always: escape analysis may scalar-replace a non-escaping object; benchmarks that "measure allocation" can be optimised away ([[jvm-memory-areas]]).
 - Confusing OS heap with Java heap when a container is OOM-killed: `-Xmx` is within limits, but direct buffers (`Netty`, Kafka client) and metaspace pushed RSS over `limits.memory`.
 - In C, returning the address of a local, or `alloca`/VLA with user-controlled size: both are stack corruption bugs that Java prevents by design.
-- Related: [[virtual-memory-and-paging]] for how both regions are backed by pages, [[processes-and-threads]] for why each thread needs its own stack.
+- Related: [[memory-management]] for how both regions are backed by pages, [[processes-and-threads]] for why each thread needs its own stack.

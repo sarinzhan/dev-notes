@@ -52,7 +52,7 @@ Suggested order for interview prep: architecture/styles + system-design + databa
 - [x] anatomy-of-a-process — program vs process, memory layout (text/data/bss/heap/stack), execution with the stack
 - [x] processes-and-threads — address space, PCB, context switch cost, user vs kernel threads
 - [x] cpu-scheduling — preemption, priorities, CFS idea, what "load" means
-- [x] virtual-memory-and-paging — pages, page tables, TLB, page faults, swap, OOM killer
+- [x] memory-management — RAM, CPU↔RAM, alignment, virtual memory, fragmentation, page tables, sharing, copy-on-write (Redis), swap, DMA, O_DIRECT
 - [x] stack-vs-heap-memory — frames, allocation cost, why stack overflow happens
 - [x] syscalls-and-file-descriptors — user/kernel boundary, fd table, everything is a file
 - [x] io-models-blocking-nonblocking-epoll — blocking, non-blocking, multiplexing (select/poll/epoll), async; link java-nio

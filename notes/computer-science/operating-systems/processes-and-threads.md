@@ -10,7 +10,7 @@ A **process** is the unit of isolation: its own virtual address space, file desc
 
 ### What the kernel stores per process
 - The **process control block** (PCB; `task_struct` in Linux) holds: PID and parent, state (running, ready, blocked, zombie), saved CPU registers, pointer to the page tables, open file descriptors, signal dispositions, scheduling priority, accounting counters, cgroup membership.
-- The **address space** is private: code (text), initialised data, heap (`brk`/`mmap`), shared libraries, and one stack per thread ([[virtual-memory-and-paging]], [[stack-vs-heap-memory]]).
+- The **address space** is private: code (text), initialised data, heap (`brk`/`mmap`), shared libraries, and one stack per thread ([[memory-management]], [[stack-vs-heap-memory]]).
 - Isolation is enforced by the MMU: a process cannot read another process's memory unless both explicitly map a shared segment ([[ipc-mechanisms]]).
 
 ### Process vs thread

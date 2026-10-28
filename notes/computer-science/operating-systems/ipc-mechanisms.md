@@ -35,8 +35,7 @@ Processes have separate address spaces, so they talk through the kernel: **pipes
 ### Shared memory: fastest, most dangerous
 - The kernel maps the same physical pages into two address spaces; after that, communication is a memory write, no syscall. Throughput is bounded by memory bandwidth, latency by cache coherence ([[cpu-caches-and-cache-lines]]).
 - No synchronization comes with it: you need a mutex or semaphore in the shared segment (`PTHREAD_PROCESS_SHARED`), or a lock-free ring buffer with memory barriers ([[lock-free-and-cas]], [[memory-models-and-visibility]]). A crashed writer can leave the structure half-updated; robust mutexes exist precisely for this.
-- Postgres is the example you already run: every backend process attaches to `shared_buffers`, WAL buffers and lock tables in shared memory; `huge_pages=try` is about this segment ([[postgres-performance-checklist]]).
-- Java: `FileChannel.map` on a file in `/dev/shm` gives a `MappedByteBuffer` shared across processes (Chronicle Queue, Aeron).
+- How the mapping works and where it is used (Postgres `shared_buffers`, NGINX zones, `/dev/shm` with Java, `fork`) is in [[memory-management]].
 
 ### Choosing
 - Parent–child, one direction: pipe (`ProcessBuilder`). Same host, unrelated processes: Unix domain socket; localhost TCP only when the peer may move to another host. Same host, high volume and low latency: shared memory with a ring buffer. Different hosts: TCP, then pick the protocol ([[service-communication-sync-vs-async]], [[message-queues-and-streams]]).

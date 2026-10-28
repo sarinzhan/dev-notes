@@ -973,6 +973,21 @@
    ]
   },
   {
+   "id": "memory-management",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Memory management (RAM)",
+   "tags": [
+    "operating-systems",
+    "memory",
+    "ram",
+    "virtual-memory",
+    "paging",
+    "dma",
+    "linux"
+   ]
+  },
+  {
    "id": "operating-system-architecture",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -1045,18 +1060,6 @@
     "syscalls",
     "linux",
     "file-descriptors"
-   ]
-  },
-  {
-   "id": "virtual-memory-and-paging",
-   "sec": "computer-science",
-   "sub": "operating-systems",
-   "title": "Virtual memory and paging",
-   "tags": [
-    "operating-systems",
-    "memory",
-    "paging",
-    "linux"
    ]
   },
   {
@@ -3911,6 +3914,10 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "memory-management"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "operating-system-architecture"
   },
   {
@@ -3932,10 +3939,6 @@
   {
    "source": "anatomy-of-a-process",
    "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "anatomy-of-a-process",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "anatomy-of-a-process",
@@ -6387,6 +6390,10 @@
   },
   {
    "source": "cpu-caches-and-cache-lines",
+   "target": "memory-management"
+  },
+  {
+   "source": "cpu-caches-and-cache-lines",
    "target": "memory-models-and-visibility"
   },
   {
@@ -6400,10 +6407,6 @@
   {
    "source": "cpu-caches-and-cache-lines",
    "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "cpu-caches-and-cache-lines",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "cpu-components-and-architecture",
@@ -7947,15 +7950,15 @@
   },
   {
    "source": "docker-containers-and-resources",
+   "target": "memory-management"
+  },
+  {
+   "source": "docker-containers-and-resources",
    "target": "operating-system-introduction"
   },
   {
    "source": "docker-containers-and-resources",
    "target": "signals-and-process-lifecycle"
-  },
-  {
-   "source": "docker-containers-and-resources",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "docker-fundamentals",
@@ -9012,6 +9015,10 @@
   {
    "source": "garbage-collection",
    "target": "linux-memory-filesystems-io"
+  },
+  {
+   "source": "garbage-collection",
+   "target": "memory-management"
   },
   {
    "source": "garbage-collection",
@@ -10159,6 +10166,10 @@
   },
   {
    "source": "io-models-blocking-nonblocking-epoll",
+   "target": "memory-management"
+  },
+  {
+   "source": "io-models-blocking-nonblocking-epoll",
    "target": "operating-system-introduction"
   },
   {
@@ -10223,15 +10234,15 @@
   },
   {
    "source": "ipc-mechanisms",
+   "target": "memory-management"
+  },
+  {
+   "source": "ipc-mechanisms",
    "target": "memory-models-and-visibility"
   },
   {
    "source": "ipc-mechanisms",
    "target": "message-queues-and-streams"
-  },
-  {
-   "source": "ipc-mechanisms",
-   "target": "postgres-performance-checklist"
   },
   {
    "source": "ipc-mechanisms",
@@ -10351,6 +10362,10 @@
   },
   {
    "source": "java-nio",
+   "target": "memory-management"
+  },
+  {
+   "source": "java-nio",
    "target": "numbers-bits-and-floating-point"
   },
   {
@@ -10368,10 +10383,6 @@
   {
    "source": "java-nio",
    "target": "syscalls-and-file-descriptors"
-  },
-  {
-   "source": "java-nio",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "java-nio",
@@ -10583,7 +10594,7 @@
   },
   {
    "source": "jvm-memory-areas",
-   "target": "linux-memory-filesystems-io"
+   "target": "memory-management"
   },
   {
    "source": "jvm-memory-areas",
@@ -10608,10 +10619,6 @@
   {
    "source": "jvm-memory-areas",
    "target": "strings-and-string-pool"
-  },
-  {
-   "source": "jvm-memory-areas",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "jvm-memory-areas",
@@ -10679,11 +10686,11 @@
   },
   {
    "source": "kafka-architecture",
-   "target": "linux-memory-filesystems-io"
+   "target": "logging-stacks"
   },
   {
    "source": "kafka-architecture",
-   "target": "logging-stacks"
+   "target": "memory-management"
   },
   {
    "source": "kafka-architecture",
@@ -10728,10 +10735,6 @@
   {
    "source": "kafka-architecture",
    "target": "time-and-clocks"
-  },
-  {
-   "source": "kafka-architecture",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "kafka-consumer",
@@ -11075,15 +11078,11 @@
   },
   {
    "source": "linux-memory-filesystems-io",
-   "target": "linux-processes"
+   "target": "memory-management"
   },
   {
    "source": "linux-memory-filesystems-io",
    "target": "syscalls-and-file-descriptors"
-  },
-  {
-   "source": "linux-memory-filesystems-io",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "linux-networking",
@@ -11107,6 +11106,10 @@
   },
   {
    "source": "linux-processes",
+   "target": "memory-management"
+  },
+  {
+   "source": "linux-processes",
    "target": "processes-and-threads"
   },
   {
@@ -11124,10 +11127,6 @@
   {
    "source": "linux-processes",
    "target": "threads-basics"
-  },
-  {
-   "source": "linux-processes",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "linux-processes",
@@ -11267,15 +11266,15 @@
   },
   {
    "source": "lru-cache-design",
+   "target": "memory-management"
+  },
+  {
+   "source": "lru-cache-design",
    "target": "redis-patterns-and-persistence"
   },
   {
    "source": "lru-cache-design",
    "target": "spring-cache-abstraction"
-  },
-  {
-   "source": "lru-cache-design",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "maven",
@@ -11296,6 +11295,38 @@
   {
    "source": "maven",
    "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "memory-management",
+   "target": "operating-system-architecture"
+  },
+  {
+   "source": "memory-management",
+   "target": "operating-system-introduction"
+  },
+  {
+   "source": "memory-management",
+   "target": "postgres-performance-checklist"
+  },
+  {
+   "source": "memory-management",
+   "target": "processes-and-threads"
+  },
+  {
+   "source": "memory-management",
+   "target": "redis-patterns-and-persistence"
+  },
+  {
+   "source": "memory-management",
+   "target": "signals-and-process-lifecycle"
+  },
+  {
+   "source": "memory-management",
+   "target": "stack-vs-heap-memory"
+  },
+  {
+   "source": "memory-management",
+   "target": "syscalls-and-file-descriptors"
   },
   {
    "source": "memory-models-and-visibility",
@@ -11806,10 +11837,6 @@
    "target": "tcp-vs-udp"
   },
   {
-   "source": "operating-system-architecture",
-   "target": "virtual-memory-and-paging"
-  },
-  {
    "source": "operating-system-introduction",
    "target": "processes-and-threads"
   },
@@ -11820,10 +11847,6 @@
   {
    "source": "operating-system-introduction",
    "target": "syscalls-and-file-descriptors"
-  },
-  {
-   "source": "operating-system-introduction",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "operating-system-introduction",
@@ -12255,10 +12278,6 @@
   },
   {
    "source": "processes-and-threads",
-   "target": "virtual-memory-and-paging"
-  },
-  {
-   "source": "processes-and-threads",
    "target": "virtual-threads"
   },
   {
@@ -12642,10 +12661,6 @@
    "target": "threads-basics"
   },
   {
-   "source": "signals-and-process-lifecycle",
-   "target": "virtual-memory-and-paging"
-  },
-  {
    "source": "slo-sli-and-alerting",
    "target": "strangler-fig-migration"
   },
@@ -12975,10 +12990,6 @@
   },
   {
    "source": "stack-vs-heap-memory",
-   "target": "virtual-memory-and-paging"
-  },
-  {
-   "source": "stack-vs-heap-memory",
    "target": "virtual-threads"
   },
   {
@@ -13024,10 +13035,6 @@
   {
    "source": "synchronization-and-monitors",
    "target": "virtual-threads"
-  },
-  {
-   "source": "syscalls-and-file-descriptors",
-   "target": "virtual-memory-and-paging"
   },
   {
    "source": "system-design-basics",

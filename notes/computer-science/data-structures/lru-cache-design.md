@@ -39,7 +39,7 @@ Sentinel head and tail nodes remove every null check from the link/unlink code.
 | **LRU** | evict least recently used | simple, good temporal locality; a one-off scan of N+1 keys flushes the whole cache |
 | **LFU** | evict least frequently used | resists scans; new entries die young, needs decay; O(1) LFU uses a map of frequency buckets |
 | **LRU-K / 2Q / SLRU** | protect entries hit ≥ 2 times | scan-resistant; Postgres buffer manager uses a clock-sweep with usage counts |
-| **Clock / second chance** | ring with a reference bit, no list moves | cheap approximation used by OS page caches ([[virtual-memory-and-paging]]) |
+| **Clock / second chance** | ring with a reference bit, no list moves | cheap approximation used by OS page caches ([[memory-management]]) |
 | **TinyLFU / W-TinyLFU** | admission filter (count-min sketch) + segmented LRU | Caffeine's default; best hit rates in practice ([[bloom-filters-and-probabilistic]]) |
 | **Sampled LRU** | sample k random keys, evict the oldest | Redis `allkeys-lru`: no list, approximate, O(1) memory overhead ([[redis-patterns-and-persistence]]) |
 | **TTL** | evict by expiry, not recency | orthogonal; combine with any of the above |

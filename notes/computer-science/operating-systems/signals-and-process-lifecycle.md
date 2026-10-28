@@ -20,7 +20,7 @@ if (pid == 0) {
 int status;
 waitpid(pid, &status, 0);           // blocks; reaps the zombie, gets the exit code or killing signal
 ```
-- `fork` is cheap thanks to copy-on-write pages ([[virtual-memory-and-paging]]); `posix_spawn`/`vfork` skip even that, which is what the JDK uses for `ProcessBuilder` since JDK 12.
+- `fork` is cheap thanks to copy-on-write pages ([[memory-management]]); `posix_spawn`/`vfork` skip even that, which is what the JDK uses for `ProcessBuilder` since JDK 12.
 - Exit status: 8-bit code from `exit(n)`; if killed by a signal the shell reports `128 + signum`. Exit 137 = `SIGKILL` (OOM killer or kill timeout), 143 = `SIGTERM`, 139 = `SIGSEGV`.
 - **Zombie**: exited but not yet waited for; holds only a PID and the status. Harmless in small numbers, a PID-table leak if the parent never reaps. **Orphan**: parent died first; re-parented to PID 1 (or the nearest subreaper), which must reap it.
 - `D` (uninterruptible sleep, usually disk/NFS IO) is the one state where even `kill -9` waits until the syscall returns; other `ps` states are in [[linux-processes]].

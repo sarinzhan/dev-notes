@@ -46,7 +46,7 @@ cpu-memory-hierarchy
 ### Memory (RAM)
 - **Random access**: any byte can be read in the same time, unlike a disk. **Fast but volatile**: about 1,000× faster than an SSD for a random read, but everything is lost when the power goes. That is why databases write to storage and call `fsync` before they confirm a commit.
 - **Stores process state and data**: the code, globals, heap and stacks of every running process, and the kernel's own structures, including each process's descriptor, its page tables and the saved registers of threads that are not running right now.
-- **Limited**: when RAM runs out the kernel first drops file cache, then swaps pages to disk if swap exists, and finally the OOM killer terminates a process. In a container the limit is the cgroup's, not the machine's ([[virtual-memory-and-paging]]).
+- **Limited**: when RAM runs out the kernel first drops file cache, then swaps pages to disk if swap exists, and finally the OOM killer terminates a process. In a container the limit is the cgroup's, not the machine's ([[memory-management]]).
 - **Slower than CPU cache**: see the table above; RAM is the slow tier from the CPU's point of view.
 - Each process sees memory laid out from a **minimum** to a **maximum address**:
 
@@ -87,14 +87,8 @@ disk-lba-partitions
 - It **switches one process for another**: a context switch saves the running thread's registers into its descriptor and loads the next one's. This happens thousands of times a second; the indirect cost is cold caches ([[processes-and-threads]]).
 
 ### Memory management and virtual memory
-- Each process gets its own **virtual address space**, as if it owned all memory from 0 to the maximum. That space is cut into **pages** (4 KiB). A per-process **page table** maps each virtual page to a physical page frame in RAM.
-- The frames can be **anywhere in physical memory**. Process A's pages 1–4 may sit between B's and C's in random order, and A never knows. Physical RAM becomes fragmented over time, and virtual memory hides that: every process still sees one contiguous range.
-- What remains is **internal fragmentation**: memory is handed out in whole pages, so a region that needs 4.1 KiB takes two pages and wastes most of the second.
-- The same mapping enables sharing. Ten processes running the same program map the same physical code pages. After `fork`, parent and child share every page **copy-on-write**: the first write to a page makes the kernel copy it to a new frame and point only the writer's table there. The details are in [[virtual-memory-and-paging]].
-
-```anim
-virtual-memory-mapping
-```
+- Each process gets its own **virtual address space**, cut into 4 KiB **pages**; a per-process **page table** maps each page to a physical frame anywhere in RAM. This gives isolation, hides physical fragmentation, lets processes share code and libraries, and makes `fork` cheap through copy-on-write.
+- The full picture, with animations (how the CPU reads RAM, fragmentation, page tables, swap, copy-on-write, DMA), is in [[memory-management]].
 
 ### File systems and partitions
 - **Storage is just blocks of bytes**, but programs want **files** and directories. A **file system** is the abstraction that maps one onto the other. It records which blocks belong to which file, keeps metadata (size, owner, permissions, timestamps) in a structure such as an inode, maps names to inodes through directories, tracks free space, and usually keeps a journal so a crash cannot corrupt that bookkeeping.
