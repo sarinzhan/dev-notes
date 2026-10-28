@@ -259,6 +259,7 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
 .an-reg{fill:var(--panel);stroke:var(--line);stroke-width:1.2} .an-reg.on{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.8}
 .an-big{font:600 20px var(--f-mono);fill:var(--fg);pointer-events:none;text-anchor:middle}
 .an-slot{fill-opacity:.2;stroke:var(--line)} .an-slot.dead{fill-opacity:.05;stroke-dasharray:3 3}
+.an-slot.an-hlslot{stroke:var(--accent);stroke-width:2;fill-opacity:.35} .an-mid{font:600 15px var(--f-mono);fill:var(--fg);pointer-events:none;text-anchor:middle}
 .an-deadt{fill:var(--muted);text-decoration:line-through}
 .an-bp{fill:var(--k3)} .an-sp{fill:var(--accent)}
 .mob-right{display:none;margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
@@ -1809,6 +1810,182 @@ ANIMS["call-stack-frames"] = el=>{
   }
   sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); steps.set(S.i, S.t / STEP_MS); render(); });
   S.i = 0; sh.say(LL(ST[0].en, ST[0].ru)); sh.kick();
+  return sh;
+};
+
+// ============ 13. A whole program running: machine code + CPU registers + RAM (stack), one instruction per step
+ANIMS["program-execution"] = el=>{
+  // Simplified ARM-style code; 4-byte instructions and 4-byte stack slots; decimal addresses for readability.
+  const I = [
+    [100, "sub  sp, sp, #20", s=>{ s.r.sp -= 20; return { regs: ["sp"] }; }],
+    [104, "stp  bp, lr, [sp, #12]", s=>{ const a = s.r.sp + 12; s.m[a] = s.r.bp; s.m[a + 4] = s.r.lr; return { mem: [[a, "w", "bp"], [a + 4, "w", "lr"]] }; }],
+    [108, "add  bp, sp, #20", s=>{ s.r.bp = s.r.sp + 20; return { regs: ["bp"] }; }],
+    [112, "mov  r0, #1", s=>{ s.r.r0 = 1; return { regs: ["r0"] }; }],
+    [116, "str  r0, [bp, #-12]", s=>{ const a = s.r.bp - 12; s.m[a] = s.r.r0; return { mem: [[a, "w", "r0"]] }; }],
+    [120, "mov  r0, #3", s=>{ s.r.r0 = 3; return { regs: ["r0"] }; }],
+    [124, "str  r0, [bp, #-16]", s=>{ const a = s.r.bp - 16; s.m[a] = s.r.r0; return { mem: [[a, "w", "r0"]] }; }],
+    [128, "bl   func1", s=>{ s.r.lr = 132; s.r.pc = 160; return { regs: ["lr", "pc"], jump: true }; }],
+    [132, "ldr  r0, [bp, #-12]", s=>{ const a = s.r.bp - 12; s.r.r0 = s.m[a]; return { regs: ["r0"], mem: [[a, "r", "r0"]] }; }],
+    [136, "ldr  r1, [bp, #-16]", s=>{ const a = s.r.bp - 16; s.r.r1 = s.m[a]; return { regs: ["r1"], mem: [[a, "r", "r1"]] }; }],
+    [140, "add  r3, r0, r1", s=>{ s.r.r3 = s.r.r0 + s.r.r1; return { regs: ["r3"] }; }],
+    [144, "str  r3, [bp, #-20]", s=>{ const a = s.r.bp - 20; s.m[a] = s.r.r3; return { mem: [[a, "w", "r3"]] }; }],
+    [148, "ldp  bp, lr, [sp, #12]", s=>{ const a = s.r.sp + 12; s.r.bp = s.m[a]; s.r.lr = s.m[a + 4]; return { regs: ["bp", "lr"], mem: [[a, "r", "bp"], [a + 4, "r", "lr"]] }; }],
+    [152, "add  sp, sp, #20", s=>{ s.r.sp += 20; return { regs: ["sp"] }; }],
+    [156, "ret", s=>{ s.r.pc = s.r.lr; return { regs: ["pc"], jump: true }; }],
+    [160, "sub  sp, sp, #8", s=>{ s.r.sp -= 8; return { regs: ["sp"] }; }],
+    [164, "str  bp, [sp, #4]", s=>{ const a = s.r.sp + 4; s.m[a] = s.r.bp; return { mem: [[a, "w", "bp"]] }; }],
+    [168, "add  bp, sp, #8", s=>{ s.r.bp = s.r.sp + 8; return { regs: ["bp"] }; }],
+    [172, "mov  r0, #1", s=>{ s.r.r0 = 1; return { regs: ["r0"] }; }],
+    [176, "str  r0, [bp, #-8]", s=>{ const a = s.r.bp - 8; s.m[a] = s.r.r0; return { mem: [[a, "w", "r0"]] }; }],
+    [180, "ldr  r0, [bp, #-8]", s=>{ const a = s.r.bp - 8; s.r.r0 = s.m[a]; return { regs: ["r0"], mem: [[a, "r", "r0"]] }; }],
+    [184, "add  r0, r0, #1", s=>{ s.r.r0 += 1; return { regs: ["r0"] }; }],
+    [188, "str  r0, [bp, #-8]", s=>{ const a = s.r.bp - 8; s.m[a] = s.r.r0; return { mem: [[a, "w", "r0"]] }; }],
+    [192, "ldr  bp, [sp, #4]", s=>{ const a = s.r.sp + 4; s.r.bp = s.m[a]; return { regs: ["bp"], mem: [[a, "r", "bp"]] }; }],
+    [196, "add  sp, sp, #8", s=>{ s.r.sp += 8; return { regs: ["sp"] }; }],
+    [200, "ret", s=>{ s.r.pc = s.r.lr; return { regs: ["pc"], jump: true }; }]
+  ];
+  const byAddr = Object.fromEntries(I.map(i => [i[0], i]));
+  // C source line shown for each instruction
+  const C_SRC = ["int func1() {", "  int z = 1;", "  z = z + 1;", "  return z;", "}", "int main() {", "  int a = 1;", "  int b = 3;", "  func1();", "  int c = a + b;", "}"];
+  const C_OF = { 100: 5, 104: 5, 108: 5, 112: 6, 116: 6, 120: 7, 124: 7, 128: 8, 132: 9, 136: 9, 140: 9, 144: 9, 148: 10, 152: 10, 156: 10,
+                 160: 0, 164: 0, 168: 0, 172: 1, 176: 1, 180: 2, 184: 2, 188: 2, 192: 3, 196: 3, 200: 3 };
+  const NOTE = {
+    100: ["Prologue of main. Reserve its frame: sp moves down 20 bytes to 1004, making room for the saved bp and lr and for a, b, c. Nothing is written yet.",
+          "Пролог main. Резервируется её фрейм: sp сдвигается вниз на 20 байт, до 1004, — место под сохранённые bp и lr и под a, b, c. Пока ничего не записано."],
+    104: ["Save the caller's bp and lr in the frame (1016 and 1020). main is going to call func1, and bl overwrites lr, so lr must be saved first. Two memory writes.",
+          "Сохраняем bp и lr вызывающего во фрейме (1016 и 1020). main собирается вызвать func1, а bl перезаписывает lr, поэтому lr нужно сохранить заранее. Две записи в память."],
+    108: ["bp = sp + 20 = 1024: main's fixed reference. From now on a = [bp-12], b = [bp-16], c = [bp-20], however sp moves.",
+          "bp = sp + 20 = 1024: неподвижная точка отсчёта main. Теперь a = [bp-12], b = [bp-16], c = [bp-20], как бы ни двигался sp."],
+    112: ["int a = 1 starts in a register: r0 = 1. Registers are inside the CPU, so no memory access.",
+          "int a = 1 начинается в регистре: r0 = 1. Регистры находятся внутри CPU, обращения к памяти нет."],
+    116: ["Store r0 into a's slot, [bp-12] = 1012. A memory write.", "Записываем r0 в ячейку a, [bp-12] = 1012. Запись в память."],
+    120: ["r0 = 3. The register is reused; a is already safe in memory.", "r0 = 3. Регистр используется повторно; a уже сохранена в памяти."],
+    124: ["Store r0 into b's slot, [bp-16] = 1008.", "Записываем r0 в ячейку b, [bp-16] = 1008."],
+    128: ["Call func1: bl puts the return address 132 (main's next instruction) into the link register lr and jumps: pc = 160. On ARM the call itself puts nothing on the stack.",
+          "Вызов func1: bl кладёт адрес возврата 132 (следующую инструкцию main) в регистр связи lr и прыгает: pc = 160. На ARM сам вызов ничего не кладёт в стек."],
+    160: ["Prologue of func1: reserve 8 bytes for the saved bp and z, so sp = 996. func1 calls nothing, so it never touches lr: the return address can stay in the register.",
+          "Пролог func1: резервируем 8 байт под сохранённый bp и z, так что sp = 996. func1 никого не вызывает, поэтому lr не трогает: адрес возврата может остаться в регистре."],
+    164: ["Save main's bp (1024) at [sp+4] = 1000, because func1 is about to change bp.", "Сохраняем bp main (1024) в [sp+4] = 1000, потому что func1 сейчас изменит bp."],
+    168: ["bp = sp + 8 = 1004: func1's frame starts here, and z lives at [bp-8] = 996.", "bp = sp + 8 = 1004: здесь начинается фрейм func1, а z лежит в [bp-8] = 996."],
+    172: ["int z = 1: r0 = 1.", "int z = 1: r0 = 1."],
+    176: ["Store z: 996 ← 1.", "Записываем z: 996 ← 1."],
+    180: ["z = z + 1 begins by loading z from memory into r0; unoptimised code reloads it. A memory read.", "z = z + 1 начинается с загрузки z из памяти в r0; неоптимизированный код перечитывает её. Чтение из памяти."],
+    184: ["The ALU adds 1: r0 = 2.", "ALU прибавляет 1: r0 = 2."],
+    188: ["Store the new z back: 996 ← 2. r0 stays 2, and r0 is also where a function returns its result (return z).",
+          "Записываем новое z обратно: 996 ← 2. В r0 остаётся 2, и именно в r0 функция возвращает результат (return z)."],
+    192: ["Epilogue: restore main's bp from 1000, so bp = 1024 and main's variables are reachable again.", "Эпилог: восстанавливаем bp main из 1000 — bp = 1024, и переменные main снова доступны."],
+    196: ["Free func1's frame: sp = 1004. z and the saved bp are still in memory but now below sp: garbage.", "Освобождаем фрейм func1: sp = 1004. z и сохранённый bp ещё в памяти, но теперь ниже sp — это мусор."],
+    200: ["ret: pc = lr = 132. main continues right after the call.", "ret: pc = lr = 132. main продолжает работу сразу после вызова."],
+    132: ["Back in main. Reload a from [bp-12], because func1 overwrote r0: r0 = 1.", "Снова в main. Перечитываем a из [bp-12], потому что func1 перезаписала r0: r0 = 1."],
+    136: ["Load b from [bp-16]: r1 = 3.", "Загружаем b из [bp-16]: r1 = 3."],
+    140: ["c = a + b: the ALU adds r0 and r1, so r3 = 4.", "c = a + b: ALU складывает r0 и r1, получается r3 = 4."],
+    144: ["Store c: [bp-20] = 1004 ← 4.", "Записываем c: [bp-20] = 1004 ← 4."],
+    148: ["Epilogue of main: restore the caller's bp and lr from 1016 and 1020 (both 0 here). Two memory reads.", "Эпилог main: восстанавливаем bp и lr вызывающего из 1016 и 1020 (здесь оба 0). Два чтения из памяти."],
+    152: ["Free main's frame: sp = 1024, and the stack is empty again.", "Освобождаем фрейм main: sp = 1024, стек снова пуст."],
+    156: ["ret: pc = lr, back to the runtime that called main, which then calls exit().", "ret: pc = lr — возврат в среду выполнения, которая вызвала main и теперь вызовет exit()."]
+  };
+  // run the program once to get every state
+  const clone = s => ({ r: Object.assign({}, s.r), m: Object.assign({}, s.m) });
+  const STATES = [{ s: { r: { pc: 100, sp: 1024, bp: 0, lr: 0, r0: null, r1: null, r3: null }, m: {} }, at: null, res: {} }];
+  for(let guard = 0; guard < 40; guard++){
+    const prev = STATES[STATES.length - 1].s, ins = byAddr[prev.r.pc]; if(!ins) break;
+    const s = clone(prev), res = ins[2](s) || {}; if(!res.jump) s.r.pc += 4;
+    STATES.push({ s, at: ins[0], res });
+  }
+  const SLOT = { 1020: ["saved lr", "сохр. lr", "k0", "main"], 1016: ["saved bp", "сохр. bp", "k3", "main"], 1012: ["a", "a", "k1", "main"],
+                 1008: ["b", "b", "k1", "main"], 1004: ["c", "c", "k1", "main"], 1000: ["saved bp", "сохр. bp", "k3", "func1"], 996: ["z", "z", "k2", "func1"] };
+  const RX = 70, RW = 180, lineY = a => 50 + (1024 - a) / 4 * 30;
+  const REGS = { bp: [300, 44], sp: [359, 44], pc: [418, 44], r0: [300, 108], r1: [359, 108], r3: [418, 108], lr: [300, 172] }, RBW = 52, RBH = 46;
+  const LIST = [["main:"]].concat(I.slice(0, 15).map(i => i), [["func1:"]], I.slice(15).map(i => i));
+  const LY = k => 44 + k * 14.3, rowOf = a => LIST.findIndex(l => l[0] === a);
+  const STEP_MS = 4400, MOVE_MS = 1000;
+  const S = { i: 0, t: 0 };
+  const sh = animShell(el, { title: LL("A program running: machine code, CPU registers and RAM", "Программа в работе: машинный код, регистры CPU и RAM"), vb: [760, 488], buttons: [
+    { id: "prev", label: LL("← Back", "← Назад"), on(){ go(S.i - 1); } },
+    { id: "next", label: LL("Next →", "Дальше →"), on(){ go(S.i + 1); } }
+  ]});
+  const START = ["The process starts: the runtime calls main. pc = 100, main's first instruction; sp = 1024, the top of the stack; bp and lr hold whatever the caller left (0 here). r0, r1 and r3 are empty.",
+                 "Процесс стартует: среда выполнения вызывает main. pc = 100 — первая инструкция main; sp = 1024 — вершина стека; в bp и lr то, что оставил вызывающий (здесь 0). r0, r1 и r3 пусты."];
+  const titleOf = st => st.at == null ? LL("Start", "Старт") : `${st.at}: ${byAddr[st.at][1].replace(/ +/g, " ")}`;
+  const textOf = st => st.at == null ? LL(...START) : LL(...NOTE[st.at]);
+  const steps = sh.steps(STATES.map(st => ({ title: titleOf(st), text: textOf(st) })), i=>go(i));
+  function go(i){ S.i = (i + STATES.length) % STATES.length; S.t = 0; sh.say(textOf(STATES[S.i]), 1); }
+  const regC = n => [REGS[n][0], REGS[n][1] + RBH / 2];
+  function render(){
+    const g = sh.svg; g.textContent = ""; const st = STATES[S.i], s = st.s, res = st.res, k = easeIO(Math.min(1, S.t / MOVE_MS));
+    // ---- RAM: stack + code region
+    oT(g, RX + RW / 2, 30, LL("RAM · stack (grows down ↓)", "RAM · стек (растёт вниз ↓)"), "an-m an-b");
+    oR(g, RX, 50, RW, 210, "an-frame", 4);
+    for(let a = 1024; a >= 996; a -= 4) oT(g, RX - 6, lineY(a) + 4, String(a), "an-m", "end");
+    const touched = new Set((res.mem || []).map(m => m[0]));
+    for(const [a, [en, ru, cls, own]] of Object.entries(SLOT)){
+      const addr = +a, y = lineY(addr + 4), v = s.m[addr], dead = addr < s.r.sp && v !== undefined;
+      if(v === undefined){ oR(g, RX + 4, y + 3, RW - 8, 24, "an-free", 4); continue; }
+      oR(g, RX + 4, y + 3, RW - 8, 24, `an-slot ${cls}` + (dead ? " dead" : "") + (touched.has(addr) ? " an-hlslot" : ""), 4);
+      oT(g, RX + 12, y + 19, `${LL(en, ru)} = ${v}`, dead ? "an-m an-deadt" : "an-t", "start");
+      oT(g, RX + RW - 10, y + 19, own, "an-m", "end");
+    }
+    const arrow = (v, name) => { if(v < 996 || v > 1024) return null; return lineY(v); };
+    const yb = arrow(s.r.bp), ys = arrow(s.r.sp);
+    if(yb !== null && ys !== null && Math.abs(yb - ys) < 1) oT(g, RX + RW + 6, ys + 4, "← bp, sp", "an-m an-b an-sp", "start");
+    else { if(ys !== null) oT(g, RX + RW + 6, ys + 4, "← sp", "an-m an-b an-sp", "start"); if(yb !== null) oT(g, RX + RW + 6, yb + 4, "← bp", "an-m an-b an-bp", "start"); }
+    oT(g, RX + RW / 2, 290, "⋮", "an-m");
+    oR(g, RX, 312, RW, 70, "an-box", 6);
+    oT(g, RX + RW / 2, 340, LL("code (text)", "код (text)"), "an-t an-b");
+    oT(g, RX + RW / 2, 360, LL("addresses 100–200 →", "адреса 100–200 →"), "an-m");
+    oT(g, RX - 6, 320, "100", "an-m", "end"); oT(g, RX - 6, 380, "200", "an-m", "end");
+    // ---- CPU
+    oR(g, 290, 22, 190, 286, "an-frame", 10);
+    oT(g, 385, 326, "CPU", "an-t an-b");
+    for(const [n, [x, y]] of Object.entries(REGS)){
+      const on = (res.regs || []).includes(n) || (n === "pc" && res.jump);
+      oR(g, x, y, RBW, RBH, "an-reg" + (on ? " on" : ""), 7);
+      oT(g, x + 6, y + 13, n, "an-m", "start");
+      const v = s.r[n]; oT(g, x + RBW / 2, y + 36, v == null ? "" : String(v), "an-mid");
+    }
+    oR(g, 300, 236, 170, 54, "an-reg" + (st.at != null ? " on" : ""), 7);
+    oT(g, 306, 249, LL("ir · last executed", "ir · выполнена"), "an-m", "start");
+    oT(g, 385, 274, st.at == null ? "" : byAddr[st.at][1], "an-code");
+    // ---- C source
+    oT(g, 300, 352, LL("C source", "исходный код C"), "an-m an-b", "start");
+    const cl = st.at == null ? 5 : C_OF[st.at];
+    C_SRC.forEach((c, i)=>{
+      if(i === cl) oR(g, 294, 357 + i * 10.4, 182, 11, "an-rowhl", 3);
+      oT(g, 300, 366 + i * 10.4, c.replace(/^ +/, m => " ".repeat(m.length)), "an-m" + (i === cl ? " an-b" : ""), "start");
+    });
+    // ---- machine code listing
+    oT(g, 496, 30, LL("machine code (assembly)", "машинный код (ассемблер)"), "an-m an-b", "start");
+    LIST.forEach((l, i)=>{
+      const y = LY(i);
+      if(l.length === 1){ oT(g, 496, y + 4, l[0], "an-code an-b", "start"); return; }
+      if(l[0] === st.at) oR(g, 490, y - 7.5, 262, 14, "an-rowhl", 3);
+      oT(g, 504, y + 4, String(l[0]), "an-m an-sp", "start");
+      oT(g, 534, y + 4, l[1].replace(/ +/g, " "), "an-code" + (l[0] === st.at ? "" : " c"), "start");
+    });
+    const pr = rowOf(s.r.pc);
+    if(pr >= 0) oT(g, 752, LY(pr) + 4, "◀ pc", "an-m an-b an-sp", "end");
+    // ---- data movement: registers ↔ RAM
+    for(const [addr, dir, reg] of res.mem || []){
+      const ry = lineY(addr + 4) + 15, [cx, cy] = regC(reg), a = [RX + RW - 4, ry];
+      // registers in the left column are reached directly; r1 / r3 through the gap under their row
+      let pts = cx <= 300 ? [a, [cx, cy]] : [a, [294, REGS[reg][1] + RBH + 9], [cx + RBW / 2, REGS[reg][1] + RBH + 9], [cx + RBW / 2, REGS[reg][1] + RBH]];
+      if(dir === "w") pts = pts.slice().reverse();
+      E(g, "polyline", { points: pts.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" });
+      const segs = pts.slice(1).map((q, j) => Math.hypot(q[0] - pts[j][0], q[1] - pts[j][1])), tot = segs.reduce((x, y) => x + y, 0);
+      let d = k * tot, j = 0; while(j < segs.length - 1 && d > segs[j]){ d -= segs[j]; j++; }
+      const f = segs[j] ? d / segs[j] : 1, q0 = pts[j], q1 = pts[j + 1];
+      E(g, "circle", { cx: q0[0] + (q1[0] - q0[0]) * f, cy: q0[1] + (q1[1] - q0[1]) * f, r: 6, class: "an-dot an-flow" });
+    }
+    // ---- jumps (bl / ret): curve in the listing from the executed instruction to the new pc
+    if(res.jump && st.at != null && pr >= 0){
+      const y1 = LY(rowOf(st.at)), y2 = LY(pr), x = 488;
+      E(g, "path", { d: `M${x} ${y1}C${x - 26} ${y1},${x - 26} ${y2},${x} ${y2}`, class: "an-flowline" });
+      const t = k, bx = (1 - t) ** 3 * x + 3 * (1 - t) ** 2 * t * (x - 26) + 3 * (1 - t) * t * t * (x - 26) + t ** 3 * x, by = (1 - t) ** 3 * y1 + 3 * (1 - t) ** 2 * t * y1 + 3 * (1 - t) * t * t * y2 + t ** 3 * y2;
+      E(g, "circle", { cx: bx, cy: by, r: 5, class: "an-dot an-flow" });
+    }
+  }
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); steps.set(S.i, S.t / STEP_MS); render(); });
+  go(0); sh.kick();
   return sh;
 };
 
