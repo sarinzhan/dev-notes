@@ -2,6 +2,7 @@
 title: What an operating system is and why it exists
 tags: [operating-systems, kernel, abstraction, resources, fundamentals]
 learned: 2026-10-27
+order: 1
 ---
 ## TL;DR
 An operating system is the program that sits between the hardware and every other program. It does three jobs: it **abstracts** the hardware into simple ideas (a file, a process, a socket) so that programs do not talk to disks and network cards directly; it **shares** the CPU, memory, disk and network between many programs that all believe they own the machine; and it **protects** programs from each other and from breaking the machine. Your Spring Boot service never touches hardware: every byte it reads or sends goes through the OS.

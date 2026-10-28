@@ -10,6 +10,7 @@ tags: [lowercase, kebab-case, 2-5 of them]
 learned: 2026-10-22
 ---
 ```
+Optional `order: <n>` (in the English note only) pins a note to position n inside its subsection; notes without it follow in alphabetical order.
 
 ## Body template (use these exact H2 headings, in this order; drop a section only if truly empty)
 ```
