@@ -48,7 +48,7 @@ process-thread-tables
 ### Multi-process vs multi-threaded servers
 - **Multi-process**: the program starts several processes, isolated from each other. **NGINX** runs one worker per core; **Postgres** forks one backend process per connection. A crash or memory corruption stays in one process; the price is more memory, process creation and IPC for anything shared. That is why Postgres connections are expensive and need pooling ([[hikaricp-pool-sizing]]).
 - **Multi-threaded**: one process starts many threads that share its memory. **MySQL** runs a thread per connection; **libuv** (Node.js) uses a thread pool for file IO and DNS; the JVM is one process with many threads. Cheaper and sharing is free, but one native crash or out-of-memory takes down everything, and shared data needs synchronisation.
-- Sharing one listening socket: in a multi-process server the parent opens the socket on `:8080` and forks; every worker inherits the descriptor and calls `accept()` on it. In a multi-threaded server all threads call `accept()` on the same descriptor. Either way the kernel hands each new connection to one of the waiting callers. `SO_REUSEPORT` lets each worker have its own socket on the same port, and the kernel load-balances between them.
+- Both kinds of server have to share one listening port between their workers: by inheriting the listening socket through `fork`, or with `SO_REUSEPORT` sockets. How that works is in [[socket-management]].
 - **Fork** creates the new process: the child must have its own virtual memory, but copy-on-write means pages are shared until one side writes. Redis uses exactly this for asynchronous durability (`BGSAVE`). The details and animation are in [[memory-management]]; the lifecycle (`exec`, `wait`, zombies) is in [[signals-and-process-lifecycle]].
 
 ### Shared memory
@@ -107,7 +107,7 @@ cpu-scheduling-timeline
 ### CPU-bound vs IO-bound workloads
 - **CPU-bound** work mostly uses the CPU: encryption (TLS), compression, query planning, sorting, protocol parsing (HTTP/2, QUIC), JSON serialisation. It uses every time slice it gets; the scheduler has to make sure it does not starve, and does not starve others.
 - **IO-bound** work mostly waits: database queries, network reads and writes, file reads and writes. It runs briefly and blocks. A fair scheduler rewards it with quick wakeups, because it has used little CPU.
-- Consequence for sizing: CPU-bound thread pools ≈ number of cores (more threads only add switches); IO-bound pools can be much larger, or use virtual threads or non-blocking IO ([[executors-and-thread-pools]], [[io-models-blocking-nonblocking-epoll]]).
+- Consequence for sizing: CPU-bound thread pools ≈ number of cores (more threads only add switches); IO-bound pools can be much larger, or use virtual threads or non-blocking IO ([[executors-and-thread-pools]], [[socket-management]]).
 
 ### Linux specifics you can observe
 - Scheduling classes: `SCHED_OTHER` (normal, CFS/EEVDF), `SCHED_BATCH`, `SCHED_IDLE`, and real-time `SCHED_FIFO`/`SCHED_RR` (fixed priorities 1–99, preempt everything normal; used by audio and some trading systems, dangerous because a spinning RT thread can lock a core).

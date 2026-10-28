@@ -52,10 +52,10 @@ Suggested order for interview prep: architecture/styles + system-design + databa
 - [x] anatomy-of-a-process — program vs process, memory layout (text/data/bss/heap/stack), execution with the stack
 - [x] process-management (merged from processes-and-threads and cpu-scheduling) — PCB, process table, threads and TCB, multi-process vs multi-threaded, shared memory, context switch, TLB flush and ASID, preemption, scheduling algorithms, CPU- vs IO-bound, load, cgroups, race conditions
 - [x] storage-management — persistence, HDD (CHS, LBA), SSD (NAND, FTL, wear leveling, over-provisioning), PBA/LBA/FS block, file systems, FAT32 and clusters, partitions and alignment, mkfs and mount, page cache, open() modes, a read layer by layer, IO schedulers
+- [ ] socket-management (parts 1–2 of 5 written; io-models-blocking-nonblocking-epoll merged in) — socket as fd, listening on IP:port, lifecycle, SYN/accept queues, backlog, SYN flood, SO_REUSEPORT, send/receive buffers, blocking, select, epoll, io_uring
 - [x] memory-management — RAM, CPU↔RAM, alignment, virtual memory, fragmentation, page tables, sharing, copy-on-write (Redis), swap, DMA, O_DIRECT
 - [x] stack-vs-heap-memory — frames, allocation cost, why stack overflow happens
 - [x] syscalls-and-file-descriptors — user/kernel boundary, fd table, everything is a file
-- [x] io-models-blocking-nonblocking-epoll — blocking, non-blocking, multiplexing (select/poll/epoll), async; link java-nio
 - [x] deadlocks-and-synchronization-primitives — four conditions, prevention/avoidance, mutex vs semaphore at OS level
 - [x] signals-and-process-lifecycle — fork/exec, zombies, SIGTERM vs SIGKILL, graceful shutdown in containers
 - [x] ipc-mechanisms — pipes, sockets, shared memory, message queues

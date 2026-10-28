@@ -899,19 +899,6 @@
    ]
   },
   {
-   "id": "io-models-blocking-nonblocking-epoll",
-   "sec": "computer-science",
-   "sub": "operating-systems",
-   "title": "IO models: blocking, non-blocking, multiplexing and async",
-   "tags": [
-    "operating-systems",
-    "io",
-    "epoll",
-    "linux",
-    "networking"
-   ]
-  },
-  {
    "id": "ipc-mechanisms",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -989,6 +976,20 @@
     "signals",
     "processes",
     "containers",
+    "linux"
+   ]
+  },
+  {
+   "id": "socket-management",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Socket management",
+   "tags": [
+    "operating-systems",
+    "sockets",
+    "tcp",
+    "kernel",
+    "networking",
     "linux"
    ]
   },
@@ -4563,10 +4564,6 @@
   },
   {
    "source": "back-of-envelope-estimation",
-   "target": "io-models-blocking-nonblocking-epoll"
-  },
-  {
-   "source": "back-of-envelope-estimation",
    "target": "latency-numbers"
   },
   {
@@ -4596,6 +4593,10 @@
   {
    "source": "back-of-envelope-estimation",
    "target": "sharding-strategies"
+  },
+  {
+   "source": "back-of-envelope-estimation",
+   "target": "socket-management"
   },
   {
    "source": "back-of-envelope-estimation",
@@ -4748,6 +4749,10 @@
   {
    "source": "backpressure-and-flow-control",
    "target": "rate-limiting"
+  },
+  {
+   "source": "backpressure-and-flow-control",
+   "target": "socket-management"
   },
   {
    "source": "backpressure-and-flow-control",
@@ -9994,54 +9999,6 @@
    "target": "two-pointers-and-sliding-window"
   },
   {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "ipc-mechanisms"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "java-nio"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "latency-numbers"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "operating-system-introduction"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "process-management"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "sockets-and-connection-pooling"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "spring-reactive-webclient-sse"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "storage-management"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "syscalls-and-file-descriptors"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "tcp-handshake-and-connection-states"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "tcp-vs-udp"
-  },
-  {
-   "source": "io-models-blocking-nonblocking-epoll",
-   "target": "virtual-threads"
-  },
-  {
    "source": "ip-addressing-ports-nat",
    "target": "kubernetes-basics"
   },
@@ -10056,6 +10013,10 @@
   {
    "source": "ip-addressing-ports-nat",
    "target": "reverse-proxy-nginx-basics"
+  },
+  {
+   "source": "ip-addressing-ports-nat",
+   "target": "socket-management"
   },
   {
    "source": "ip-addressing-ports-nat",
@@ -10096,6 +10057,10 @@
   {
    "source": "ipc-mechanisms",
    "target": "signals-and-process-lifecycle"
+  },
+  {
+   "source": "ipc-mechanisms",
+   "target": "socket-management"
   },
   {
    "source": "ipc-mechanisms",
@@ -10212,6 +10177,10 @@
   {
    "source": "java-nio",
    "target": "reference-types"
+  },
+  {
+   "source": "java-nio",
+   "target": "socket-management"
   },
   {
    "source": "java-nio",
@@ -10735,6 +10704,10 @@
   },
   {
    "source": "latency-numbers",
+   "target": "socket-management"
+  },
+  {
+   "source": "latency-numbers",
    "target": "sockets-and-connection-pooling"
   },
   {
@@ -11016,6 +10989,10 @@
   {
    "source": "load-balancers-l4-vs-l7",
    "target": "slo-sli-and-alerting"
+  },
+  {
+   "source": "load-balancers-l4-vs-l7",
+   "target": "socket-management"
   },
   {
    "source": "load-balancers-l4-vs-l7",
@@ -11715,6 +11692,10 @@
   },
   {
    "source": "operating-system-introduction",
+   "target": "socket-management"
+  },
+  {
+   "source": "operating-system-introduction",
    "target": "syscalls-and-file-descriptors"
   },
   {
@@ -12143,6 +12124,10 @@
   },
   {
    "source": "process-management",
+   "target": "socket-management"
+  },
+  {
+   "source": "process-management",
    "target": "stack-vs-heap-memory"
   },
   {
@@ -12531,6 +12516,10 @@
   },
   {
    "source": "signals-and-process-lifecycle",
+   "target": "socket-management"
+  },
+  {
+   "source": "signals-and-process-lifecycle",
    "target": "spring-bean-lifecycle"
   },
   {
@@ -12544,6 +12533,34 @@
   {
    "source": "slo-sli-and-alerting",
    "target": "strangler-fig-migration"
+  },
+  {
+   "source": "socket-management",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "socket-management",
+   "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "socket-management",
+   "target": "storage-management"
+  },
+  {
+   "source": "socket-management",
+   "target": "syscalls-and-file-descriptors"
+  },
+  {
+   "source": "socket-management",
+   "target": "tcp-handshake-and-connection-states"
+  },
+  {
+   "source": "socket-management",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "socket-management",
+   "target": "virtual-threads"
   },
   {
    "source": "sockets-and-connection-pooling",

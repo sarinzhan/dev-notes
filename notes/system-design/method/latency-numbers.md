@@ -65,7 +65,7 @@ Interview-grade implications:
 - **Timeouts must sit above the real p99 of the hop**, not above the mean: a 50 ms timeout on a call whose p99 is 60 ms converts 1 % of traffic into retries and a self-inflicted storm.
 
 ### Throughput from latency
-Little's law: `concurrency = throughput × latency`. A pod with 200 request threads and a 100 ms average downstream call handles at most `200 / 0.1 s = 2 000 rps`, whatever its CPU. Lower latency or non-blocking I/O ([[virtual-threads]], [[io-models-blocking-nonblocking-epoll]]) raises the ceiling; so does a bigger pool, up to the database's connection limit ([[hikaricp-pool-sizing]]).
+Little's law: `concurrency = throughput × latency`. A pod with 200 request threads and a 100 ms average downstream call handles at most `200 / 0.1 s = 2 000 rps`, whatever its CPU. Lower latency or non-blocking I/O ([[virtual-threads]], [[socket-management]]) raises the ceiling; so does a bigger pool, up to the database's connection limit ([[hikaricp-pool-sizing]]).
 
 ## Example
 A Java micro-benchmark that makes the ladder visible on your own machine: in-process map vs Redis vs Postgres, each 1 000 sequential point reads. Run it once against a local Docker stack and keep the numbers in mind.

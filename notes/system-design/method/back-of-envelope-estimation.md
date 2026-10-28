@@ -91,6 +91,6 @@ Conclusion for the whiteboard: compute and bandwidth are small; the design is dr
 - Forgetting the peak factor: a design sized for the average falls over at 21:00 every day.
 - Counting storage without indexes, replication and retention: raw rows × days is usually a third of the real disk usage.
 - Confusing registered users with DAU, and requests with user actions (one screen open = 5–10 API calls).
-- Sizing a thread-per-request service by CPU alone: with a 200 ms downstream call, 200 Tomcat threads give ~1 K rps max regardless of cores ([[io-models-blocking-nonblocking-epoll]]).
+- Sizing a thread-per-request service by CPU alone: with a 200 ms downstream call, 200 Tomcat threads give ~1 K rps max regardless of cores ([[socket-management]]).
 - Quoting a number without the conclusion. "600 rps" is useless; "600 rps, so one Postgres primary and no sharding" is the answer.
 - Related: [[latency-numbers]] for the time side of the same estimates; [[requirements-and-constraints]] for where the inputs come from.

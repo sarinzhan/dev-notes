@@ -12,8 +12,7 @@ A TCP connection is opened with SYN, SYN-ACK, ACK (one round trip) and closed wi
 2. Server replies `SYN-ACK`: its own ISN, acknowledges client ISN + 1. The connection sits in the server's **SYN queue** (`SYN_RECV`).
 3. Client sends `ACK`; connection moves to the **accept queue** (`ESTABLISHED`) until the application calls `accept()`.
 - Data can only flow after step 3 (except TCP Fast Open, rarely enabled). Cost: one RTT. TLS adds another ([[tls-handshake-and-certificates]]).
-- If the accept queue is full (`somaxconn`, Tomcat `server.tomcat.accept-count`) the kernel drops the ACK or the SYN; clients see timeouts, not refusals. Watch `ListenOverflows` in `nstat`.
-- **SYN flood**: attacker sends SYNs without ACKs, filling the SYN queue. Linux answers with SYN cookies when the queue is full (`net.ipv4.tcp_syncookies=1`).
+- What the server kernel does with these queues (backlog, accept-queue overflow, SYN floods and SYN cookies) is in [[socket-management]].
 
 ### Closing: four-way handshake
 1. Active closer sends `FIN` → `FIN_WAIT_1`.
