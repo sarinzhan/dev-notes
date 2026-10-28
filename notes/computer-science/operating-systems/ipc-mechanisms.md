@@ -66,4 +66,4 @@ grep -E 'Shmem|Mapped' /proc/meminfo
 - Mounting `docker.sock` into a container for convenience: whoever can write to that socket is root on the host; it is IPC with no authorisation beyond file permissions.
 - Shared memory without a cleanup owner: SysV segments and `/dev/shm` files outlive the processes that created them and quietly consume RAM until a reboot (`ipcrm`, or `shm_unlink`).
 - Named pipes with one reader and many writers above `PIPE_BUF`: interleaved garbage in the output.
-- Related: [[sockets-and-connection-pooling]] for the TCP flavour in depth, [[io-models-blocking-nonblocking-epoll]] for waiting on many of these fds at once.
+- Related: [[sockets-and-connection-pooling]] for the TCP flavour in depth, [[socket-management]] for waiting on many of these fds at once.

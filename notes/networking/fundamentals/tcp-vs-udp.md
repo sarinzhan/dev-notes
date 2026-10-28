@@ -69,4 +69,4 @@ The StatsD case is the canonical "UDP is fine" decision: losing 0.1% of counter 
 - Long-lived idle TCP connections silently die through NAT gateways and firewalls (typically after 5–60 minutes of silence). Enable keep-alive or application pings ([[tcp-handshake-and-connection-states]]).
 - UDP datagrams larger than the path MTU get fragmented at IP level, and one lost fragment loses the whole datagram; keep payloads under ~1400 bytes.
 - `SO_RCVBUF`/`SO_SNDBUF` too small for high-latency links caps throughput at `window / RTT`; Linux autotunes TCP buffers, but UDP receive buffers overflow silently (`UdpInErrors` in `nstat`).
-- Related: [[osi-and-tcp-ip-models]] for where transport sits, [[io-models-blocking-nonblocking-epoll]] for how a server handles thousands of these sockets.
+- Related: [[osi-and-tcp-ip-models]] for where transport sits, [[socket-management]] for how a server handles thousands of these sockets.

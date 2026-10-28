@@ -2503,33 +2503,6 @@
    "title_ru": "Взаимоблокировки и примитивы синхронизации ОС"
   },
   {
-   "id": "io-models-blocking-nonblocking-epoll",
-   "sec": "computer-science",
-   "sub": "operating-systems",
-   "title": "IO models: blocking, non-blocking, multiplexing and async",
-   "tags": [
-    "operating-systems",
-    "io",
-    "epoll",
-    "linux",
-    "networking"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/computer-science/operating-systems/io-models-blocking-nonblocking-epoll.md",
-   "links": [
-    "java-nio",
-    "process-management",
-    "sockets-and-connection-pooling",
-    "spring-reactive-webclient-sse",
-    "syscalls-and-file-descriptors",
-    "tcp-handshake-and-connection-states",
-    "virtual-threads"
-   ],
-   "words": 1124,
-   "ru": "notes-ru/computer-science/operating-systems/io-models-blocking-nonblocking-epoll.md",
-   "title_ru": "Модели ввода-вывода: блокирующий, неблокирующий, мультиплексирование и асинхронный"
-  },
-  {
    "id": "ipc-mechanisms",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -2548,7 +2521,6 @@
     "docker-socket-dind-dood",
     "grpc-and-protobuf",
     "http-fundamentals",
-    "io-models-blocking-nonblocking-epoll",
     "lock-free-and-cas",
     "memory-management",
     "memory-models-and-visibility",
@@ -2556,6 +2528,7 @@
     "process-management",
     "service-communication-sync-vs-async",
     "signals-and-process-lifecycle",
+    "socket-management",
     "sockets-and-connection-pooling",
     "syscalls-and-file-descriptors",
     "tcp-vs-udp"
@@ -2654,13 +2627,13 @@
     "anatomy-of-a-process",
     "docker-containers-and-resources",
     "docker-fundamentals",
-    "io-models-blocking-nonblocking-epoll",
     "kubernetes-basics",
     "linux-architecture-and-kernel",
     "memory-management",
     "operating-system-architecture",
     "process-management",
     "signals-and-process-lifecycle",
+    "socket-management",
     "syscalls-and-file-descriptors",
     "virtual-threads"
    ],
@@ -2696,7 +2669,6 @@
     "docker-containers-and-resources",
     "executors-and-thread-pools",
     "hikaricp-pool-sizing",
-    "io-models-blocking-nonblocking-epoll",
     "ipc-mechanisms",
     "jvm-memory-areas",
     "kubernetes-basics",
@@ -2707,11 +2679,12 @@
     "postgres-performance-checklist",
     "race-conditions-and-critical-sections",
     "signals-and-process-lifecycle",
+    "socket-management",
     "syscalls-and-file-descriptors",
     "threads-basics",
     "virtual-threads"
    ],
-   "words": 3239,
+   "words": 3198,
    "ru": "notes-ru/computer-science/operating-systems/process-management.md",
    "title_ru": "Управление процессами"
   },
@@ -2743,6 +2716,43 @@
    "words": 1142,
    "ru": "notes-ru/computer-science/operating-systems/signals-and-process-lifecycle.md",
    "title_ru": "Сигналы и жизненный цикл процесса"
+  },
+  {
+   "id": "socket-management",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Socket management",
+   "tags": [
+    "operating-systems",
+    "sockets",
+    "tcp",
+    "kernel",
+    "networking",
+    "linux"
+   ],
+   "learned": "2026-10-28",
+   "order": 8,
+   "aliases": [
+    "io-models-blocking-nonblocking-epoll"
+   ],
+   "path": "notes/computer-science/operating-systems/socket-management.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "ip-addressing-ports-nat",
+    "java-nio",
+    "load-balancers-l4-vs-l7",
+    "process-management",
+    "signals-and-process-lifecycle",
+    "sockets-and-connection-pooling",
+    "spring-reactive-webclient-sse",
+    "storage-management",
+    "syscalls-and-file-descriptors",
+    "tcp-handshake-and-connection-states",
+    "virtual-threads"
+   ],
+   "words": 4005,
+   "ru": "notes-ru/computer-science/operating-systems/socket-management.md",
+   "title_ru": "Управление сокетами"
   },
   {
    "id": "stack-vs-heap-memory",
@@ -2794,13 +2804,13 @@
     "docker-fundamentals",
     "docker-volumes-and-registry",
     "file-and-blob-storage",
-    "io-models-blocking-nonblocking-epoll",
     "java-nio",
     "kafka-architecture",
     "latency-numbers",
     "linux-memory-filesystems-io",
     "memory-management",
     "process-management",
+    "socket-management",
     "storage-choices",
     "syscalls-and-file-descriptors",
     "transactions-acid-and-isolation"
@@ -2823,13 +2833,13 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/operating-systems/syscalls-and-file-descriptors.md",
    "links": [
-    "io-models-blocking-nonblocking-epoll",
     "java-io-streams",
     "java-nio",
     "linux-memory-filesystems-io",
     "linux-processes",
     "memory-management",
     "process-management",
+    "socket-management",
     "sockets-and-connection-pooling",
     "synchronization-and-monitors"
    ],
@@ -6382,17 +6392,17 @@
     "circuit-breaker",
     "dns-resolution",
     "hikaricp-pool-sizing",
-    "io-models-blocking-nonblocking-epoll",
     "java-nio",
     "kafka-producer",
     "rest-clients",
+    "socket-management",
     "spring-reactive-webclient-sse",
     "spring-transactional",
     "tcp-handshake-and-connection-states",
     "tcp-vs-udp",
     "virtual-threads"
    ],
-   "words": 983,
+   "words": 880,
    "ru": "notes-ru/networking/fundamentals/sockets-and-connection-pooling.md",
    "title_ru": "Сокеты и пулы соединений"
   },
@@ -6415,11 +6425,12 @@
     "hikaricp-pool-sizing",
     "http-fundamentals",
     "linux-networking",
+    "socket-management",
     "sockets-and-connection-pooling",
     "tcp-vs-udp",
     "tls-handshake-and-certificates"
    ],
-   "words": 1000,
+   "words": 970,
    "ru": "notes-ru/networking/fundamentals/tcp-handshake-and-connection-states.md",
    "title_ru": "Рукопожатие TCP и состояния соединения"
   },
@@ -6441,8 +6452,8 @@
     "dns-resolution",
     "http-1-1-vs-2-vs-3",
     "idempotency",
-    "io-models-blocking-nonblocking-epoll",
     "osi-and-tcp-ip-models",
+    "socket-management",
     "sockets-and-connection-pooling",
     "tcp-handshake-and-connection-states"
    ],
@@ -8274,7 +8285,6 @@
     "design-notification-service",
     "file-and-blob-storage",
     "hikaricp-pool-sizing",
-    "io-models-blocking-nonblocking-epoll",
     "latency-numbers",
     "message-queues-and-streams",
     "outbox-pattern",
@@ -8282,6 +8292,7 @@
     "rate-limiting",
     "requirements-and-constraints",
     "sharding-strategies",
+    "socket-management",
     "storage-choices",
     "virtual-threads"
    ],
@@ -8311,13 +8322,13 @@
     "grafana-dashboards-and-red-use",
     "hikaricp-pool-sizing",
     "http-1-1-vs-2-vs-3",
-    "io-models-blocking-nonblocking-epoll",
     "jpa-n-plus-one",
     "kafka-architecture",
     "leader-follower-replication",
     "multi-region-basics",
     "postgres-indexes",
     "requirements-and-constraints",
+    "socket-management",
     "sockets-and-connection-pooling",
     "tls-handshake-and-certificates",
     "virtual-threads"

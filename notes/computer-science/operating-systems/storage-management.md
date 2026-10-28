@@ -120,7 +120,7 @@ storage-partitions
 | `O_DIRECT` | skips the page cache: DMA straight into the user buffer | databases with their own cache |
 | `O_SYNC` / `O_DSYNC` | every `write()` waits until the data is on disk (slow) | small critical writes; databases' WAL on some setups |
 - **`O_DIRECT` in detail**: a normal `read()` goes disk → DMA → **page cache** → copy → your buffer; with `O_DIRECT` the DMA lands in your buffer. Databases with their own buffer pool use it to avoid **double buffering**: MySQL InnoDB with `innodb_flush_method=O_DIRECT`, Oracle, ScyllaDB. Postgres relies on the page cache instead, which is why its `shared_buffers` is usually only about 25% of RAM.
-- `O_DIRECT` requirements: the buffer address, the file offset and the length must all be aligned to the logical block size (512 B or 4 KiB), or the call fails with `EINVAL`. You also lose the kernel's read-ahead and write-behind, so it only pays off when the application caches and schedules IO better than the kernel ([[io-models-blocking-nonblocking-epoll]]).
+- `O_DIRECT` requirements: the buffer address, the file offset and the length must all be aligned to the logical block size (512 B or 4 KiB), or the call fails with `EINVAL`. You also lose the kernel's read-ahead and write-behind, so it only pays off when the application caches and schedules IO better than the kernel ([[socket-management]]).
 - `O_DIRECT` does not mean durable: data may still sit in the device's write cache. Use `fsync`/`fdatasync` or `O_DSYNC` for durability.
 - In Java: `FileChannel.force(true)` is `fsync` (`force(false)` ≈ `fdatasync`); `StandardOpenOption.APPEND`, `SYNC`, `DSYNC` map to the flags above; `ExtendedOpenOption.DIRECT` gives `O_DIRECT` ([[java-nio]]).
 
@@ -185,4 +185,4 @@ sudo smartctl -a /dev/nvme0  # SSD wear: "Percentage Used", "Data Units Written"
 - Misaligned partitions on a VM image or an old disk: every write touches two physical sectors. Check that partition start sectors are divisible by 8 (or by 2048).
 - Benchmarking a disk with a file smaller than RAM: you measure the page cache. Use `fio` with `--direct=1` or a file several times larger than memory.
 - Deleting a log file a process still writes to frees nothing until the process closes it (`lsof +L1`); see [[linux-memory-filesystems-io]] for `ls` vs `du` vs `df`.
-- Related: [[memory-management]] for the page cache's memory side, DMA and `mmap`, [[process-management]] for blocked threads waiting on IO, [[io-models-blocking-nonblocking-epoll]] for async file IO (`io_uring`), [[file-and-blob-storage]] and [[storage-choices]] for storage at the system-design level.
+- Related: [[memory-management]] for the page cache's memory side, DMA and `mmap`, [[process-management]] for blocked threads waiting on IO, [[socket-management]] for async file IO (`io_uring`), [[file-and-blob-storage]] and [[storage-choices]] for storage at the system-design level.

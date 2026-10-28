@@ -3081,6 +3081,203 @@ ANIMS["storage-read-path"] = el=>{
   }});
 };
 
+// ============ 33. Listening socket, SYN queue, accept queue, accept(), connection queues
+ANIMS["socket-accept-queues"] = el=>{
+  const ST = [
+    { t: ["listen()", "listen()"], syn: [], acc: [], fds: [], en: "The server calls socket(), bind(0.0.0.0:8080) and listen(fd, 4). The kernel creates the listening socket S, and with it two queues: the SYN queue for half-finished handshakes and the accept queue for finished connections. The process gets one file descriptor, fd 3. No connection exists yet.",
+      ru: "Сервер вызывает socket(), bind(0.0.0.0:8080) и listen(fd, 4). Ядро создаёт слушающий сокет S и вместе с ним две очереди: очередь SYN для незавершённых рукопожатий и очередь accept для завершённых соединений. Процесс получает один файловый дескриптор, fd 3. Соединений пока нет." },
+    { t: ["SYN arrives", "Приходит SYN"], syn: [1], acc: [], fds: [], pkt: ["c1", "syn", "SYN"], en: "Client 1 sends a SYN to 10.0.0.1:8080. The kernel looks up which listening socket owns that IP and port, finds S, and stores an entry in S's SYN queue, keyed by the 4-tuple: source IP, source port, destination IP, destination port.",
+      ru: "Клиент 1 отправляет SYN на 10.0.0.1:8080. Ядро ищет, какой слушающий сокет владеет этим IP и портом, находит S и сохраняет запись в очереди SYN сокета S по ключу из четырёх полей: IP и порт источника, IP и порт назначения." },
+    { t: ["SYN-ACK", "SYN-ACK"], syn: [1], acc: [], fds: [], pkt: ["syn", "c1", "SYN-ACK"], en: "The kernel immediately answers with a SYN-ACK and waits for the final ACK. The application is not involved at all: the kernel runs the whole handshake.",
+      ru: "Ядро сразу отвечает SYN-ACK и ждёт последний ACK. Приложение вообще не участвует: всё рукопожатие выполняет ядро." },
+    { t: ["ACK: connection complete", "ACK: соединение готово"], syn: [], acc: [1], fds: [], pkt: ["c1", "acc", "ACK"], en: "The client's ACK matches the SYN entry. The kernel removes it from the SYN queue and puts a complete connection into the accept queue. The connection is established (ESTABLISHED in ss), but the application still does not know about it.",
+      ru: "ACK клиента совпадает с записью SYN. Ядро убирает её из очереди SYN и кладёт готовое соединение в очередь accept. Соединение установлено (ESTABLISHED в ss), но приложение о нём всё ещё не знает." },
+    { t: ["accept()", "accept()"], syn: [], acc: [], fds: [1], conn: true, pkt: ["acc", "proc", "accept()"], en: "The backend calls accept() (every framework does it for you). The kernel takes the connection out of the accept queue, creates a new file descriptor, fd 4, in the calling process's table, and gives the connection its own send queue and receive queue. If the accept queue is empty, accept() blocks.",
+      ru: "Бэкенд вызывает accept() (за вас это делает любой фреймворк). Ядро достаёт соединение из очереди accept, создаёт новый файловый дескриптор fd 4 в таблице вызвавшего процесса и даёт соединению собственные очереди отправки и приёма. Если очередь accept пуста, accept() блокируется." },
+    { t: ["Data: receive and send queues", "Данные: очереди приёма и отправки"], syn: [], acc: [], fds: [1], conn: true, data: true, en: "The client's request lands in connection 1's receive queue; read(fd 4) copies it into the process. The response from write(fd 4) goes into the send queue, and the kernel sends it out through the NIC. The client has the same pair of queues on its side, but no listening socket.",
+      ru: "Запрос клиента попадает в очередь приёма соединения 1; read(fd 4) копирует его в процесс. Ответ из write(fd 4) уходит в очередь отправки, и ядро отправляет его через сетевую карту. У клиента на своей стороне та же пара очередей, но нет слушающего сокета." },
+    { t: ["Slow backend: accept queue full", "Медленный бэкенд: очередь accept полна"], syn: [], acc: [2, 3, 4, 5], fds: [1], conn: true, full: true, pkt: ["c6", "syn", "SYN"], en: "The backend is busy and does not call accept() fast enough. Clients 2–5 finish their handshakes and wait in the accept queue, which now holds backlog = 4 entries. Client 6's handshake cannot complete: the kernel drops it, and the client sees a timeout, not a refusal.",
+      ru: "Бэкенд занят и вызывает accept() недостаточно быстро. Клиенты 2–5 завершают рукопожатие и ждут в очереди accept, которая теперь содержит backlog = 4 записи. Рукопожатие клиента 6 не может завершиться: ядро его отбрасывает, и клиент видит тайм-аут, а не отказ." },
+    { t: ["SYN flood and SYN cookies", "SYN-флуд и SYN cookies"], syn: ["x", "x", "x", "x", "x", "x"], acc: [], fds: [1], conn: true, flood: true, pkt: ["att", "syn", "SYN"], en: "An attacker sends SYNs and never answers the SYN-ACK. Each one takes a SYN queue slot until it times out, and the queue fills up with half-open entries. Linux defends with SYN cookies: when the queue is full, it encodes the connection's state in the SYN-ACK's sequence number and stores nothing, so real clients still get in.",
+      ru: "Атакующий отправляет SYN и никогда не отвечает на SYN-ACK. Каждый такой SYN занимает место в очереди SYN до тайм-аута, и очередь заполняется полуоткрытыми записями. Linux защищается SYN cookies: когда очередь полна, ядро кодирует состояние соединения в порядковом номере SYN-ACK и ничего не хранит, так что настоящие клиенты всё равно подключаются." }
+  ];
+  const CY = i => 40 + i * 44, SX = 230, SW = 46, SY = 96, AY = 176;
+  const P = { c1: [118, CY(0) + 15], c6: [118, CY(5) + 15], att: [118, CY(6) + 15], syn: [SX + 23, SY + 15], acc: [SX + 23, AY + 15], proc: [600, 120] };
+  return steppedAnim(el, { title: LL("Listening socket, SYN queue and accept queue", "Слушающий сокет, очередь SYN и очередь accept"), vb: [760, 360], steps: ST, stepMs: 6200, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1400));
+    // clients
+    for(let i = 0; i < 6; i++){ const id = i + 1, live = s.fds.includes(id), wait = s.acc.includes(id);
+      oR(g, 10, CY(i), 108, 30, live ? "an-pg k2" : wait ? "an-pg k1" : "an-box", 5); oT(g, 64, CY(i) + 20, LL(`client ${id}`, `клиент ${id}`), "an-m an-b"); }
+    if(s.flood){ oR(g, 10, CY(6), 108, 30, "an-leak", 5); oT(g, 64, CY(6) + 20, LL("attacker", "атакующий"), "an-m an-b an-warn"); }
+    if(s.full){ oT(g, 64, CY(6) + 20, LL("client 6: timeout", "клиент 6: тайм-аут"), "an-m an-b an-warn"); }
+    // kernel
+    oR(g, 160, 14, 410, 334, "an-frame", 10); oT(g, 365, 30, LL("kernel", "ядро"), "an-m an-b");
+    oR(g, 176, 40, 378, 34, "an-reg on", 6); oT(g, 365, 62, LL("listening socket S · 0.0.0.0:8080 · LISTEN", "слушающий сокет S · 0.0.0.0:8080 · LISTEN"), "an-t an-b");
+    const row = (y, label, n, items, cls)=>{ oT(g, SX - 8, y + 20, label, "an-m an-b", "end"); for(let i = 0; i < n; i++){ const v = items[i]; oR(g, SX + i * (SW + 4), y, SW, 30, v == null ? "an-box" : v === "x" ? "an-leak" : cls, 4); if(v != null) oT(g, SX + i * (SW + 4) + SW / 2, y + 20, v === "x" ? "?" : "c" + v, "an-m an-b" + (v === "x" ? " an-warn" : "")); } };
+    oT(g, SX, SY - 8, LL("SYN queue: half-open (SYN_RECV)", "очередь SYN: полуоткрытые (SYN_RECV)"), "an-m", "start"); row(SY, "SYN", 6, s.syn, "an-pg k3");
+    oT(g, SX, AY - 8, LL("accept queue: complete · size = backlog 4", "очередь accept: готовые · размер = backlog 4"), "an-m" + (s.full ? " an-b an-warn" : ""), "start"); row(AY, "accept", 4, s.acc, "an-pg k1");
+    if(s.flood) oT(g, 365, 148, LL("full → SYN cookies: answer without storing", "полна → SYN cookies: ответ без хранения"), "an-m an-b an-warn");
+    if(s.conn){
+      oT(g, 176, 238, LL("connection 1 (fd 4)", "соединение 1 (fd 4)"), "an-m an-b", "start");
+      oR(g, 176, 246, 180, 30, "an-pg k2", 5); oT(g, 266, 266, LL("receive queue", "очередь приёма"), "an-m an-b");
+      oR(g, 176, 284, 180, 30, "an-pg k2", 5); oT(g, 266, 304, LL("send queue", "очередь отправки"), "an-m an-b");
+    }
+    // process
+    oR(g, 590, 60, 160, 200, "an-frame", 8); oT(g, 670, 52, LL("process A · PCB", "процесс A · PCB"), "an-m an-b");
+    oT(g, 600, 82, LL("fd table", "таблица fd"), "an-m an-b", "start");
+    const fdr = [["0", "stdin"], ["1", "stdout"], ["2", "stderr"], ["3", LL("socket S (listen)", "сокет S (listen)")]].concat(s.fds.map(id => [String(3 + id), LL(`conn ${id}`, `соед. ${id}`)]));
+    fdr.forEach(([n, l], i)=>{ const hl = (i === 3 && !s.conn) || (i === 4); oR(g, 600, 90 + i * 30, 140, 24, hl ? "an-reg on" : "an-box", 4); oT(g, 610, 107 + i * 30, n, "an-code an-b", "start"); oT(g, 630, 107 + i * 30, l, "an-m", "start"); });
+    if(s.full) oT(g, 670, 280, LL("busy, not calling accept()", "занят, не зовёт accept()"), "an-m an-b an-warn");
+    // packets
+    const fly = (a, b, label)=>{ const [x1, y1] = P[a], [x2, y2] = P[b], x = x1 + (x2 - x1) * k, y = y1 + (y2 - y1) * k; E(g, "line", { x1, y1, x2, y2, class: "an-flowline" }); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); oT(g, x, y - 10, label, "an-m an-b an-sp"); };
+    if(s.pkt) fly(...s.pkt);
+    if(s.data){ const ph = (t % 3000) / 3000, kk = ph < .5 ? ph * 2 : (ph - .5) * 2;
+      const path = ph < .5 ? [[118, 55], [176, 261], [356, 261], [600, 220]] : [[600, 220], [356, 299], [176, 299], [118, 55]];
+      E(g, "polyline", { points: path.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); const [x, y] = polyAt(path, kk); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" });
+      oT(g, 470, ph < .5 ? 256 : 330, ph < .5 ? "read(fd 4)" : "write(fd 4)", "an-code an-b", "middle"); }
+  }});
+};
+
+// ============ 34. Sharing a listening socket: fork vs SO_REUSEPORT (socket sharding)
+ANIMS["socket-sharding"] = el=>{
+  const ST = [
+    { t: ["fork: one socket, two processes", "fork: один сокет, два процесса"], mode: "fork", en: "A process listens on 8080, getting fd 3, then forks. The child gets a copy of the fd table, so both processes have an fd 3 that points to the same socket S, with one SYN queue and one accept queue between them.",
+      ru: "Процесс слушает 8080, получает fd 3 и делает fork. Потомок получает копию таблицы fd, поэтому у обоих процессов есть fd 3, указывающий на один и тот же сокет S с одной очередью SYN и одной очередью accept на двоих." },
+    { t: ["Both call accept()", "Оба вызывают accept()"], mode: "fork", flow: true, en: "Both processes block in accept() on the same accept queue; each new connection goes to one of them. This is how classic pre-fork servers (Apache prefork, older NGINX) scaled accepting. With many waiters, the kernel may wake them all for a single connection (thundering herd); EPOLLEXCLUSIVE limits that.",
+      ru: "Оба процесса блокируются в accept() на одной очереди accept; каждое новое соединение достаётся одному из них. Так масштабировали приём соединений классические pre-fork серверы (Apache prefork, старый NGINX). Когда ждущих много, ядро может разбудить всех ради одного соединения (thundering herd); EPOLLEXCLUSIVE это ограничивает." },
+    { t: ["SO_REUSEPORT", "SO_REUSEPORT"], mode: "reuse", en: "Normally a second listen on an IP and port that is already in use fails with EADDRINUSE. With the socket option SO_REUSEPORT set on every socket, independent processes (or threads) each get their own, distinct socket on the same IP:port pair, each with its own queues. This is socket sharding.",
+      ru: "Обычно повторный listen на уже занятые IP и порт падает с ошибкой EADDRINUSE. Если на каждом сокете установлена опция SO_REUSEPORT, независимые процессы (или потоки) получают каждый свой отдельный сокет на ту же пару IP:порт, каждый со своими очередями. Это шардирование сокетов." },
+    { t: ["The kernel load-balances", "Ядро балансирует нагрузку"], mode: "reuse", flow: true, en: "For each new connection the kernel hashes the 4-tuple and picks one of the sockets, so connections spread across the accept queues and each process accepts only from its own. No shared queue, no lock contention, no thundering herd. NGINX (listen 8080 reuseport), Envoy and HAProxy use this.",
+      ru: "Для каждого нового соединения ядро хеширует четыре поля и выбирает один из сокетов, так что соединения распределяются по очередям accept, и каждый процесс принимает только из своей. Нет общей очереди, нет борьбы за блокировку, нет thundering herd. Так делают NGINX (listen 8080 reuseport), Envoy и HAProxy." },
+    { t: ["Only the same user", "Только тот же пользователь"], mode: "reuse", hijack: true, en: "Could a malicious process join port 80 with SO_REUSEPORT and steal traffic? Linux prevents it: every socket in the group must belong to the same effective user ID as the first one. A process running as another user gets EADDRINUSE.",
+      ru: "Может ли вредоносный процесс присоединиться к порту 80 через SO_REUSEPORT и красть трафик? Linux этого не позволяет: все сокеты группы должны принадлежать тому же эффективному пользователю (UID), что и первый. Процесс другого пользователя получает EADDRINUSE." },
+    { t: ["When a socket goes away", "Когда сокет исчезает"], mode: "reuse", close: true, en: "The hash only knows the sockets that exist right now. If process 2 restarts, the connections already waiting in its accept queue are reset, and the spread of new connections shifts. That is why reloads with reuseport need care: Linux 5.14 can migrate queued connections (net.ipv4.tcp_migrate_req), and eBPF can steer connections explicitly.",
+      ru: "Хеш знает только сокеты, которые существуют прямо сейчас. Если процесс 2 перезапускается, соединения, уже ждущие в его очереди accept, сбрасываются, а распределение новых соединений сдвигается. Поэтому перезагрузки с reuseport требуют аккуратности: Linux 5.14 умеет переносить ждущие соединения (net.ipv4.tcp_migrate_req), а eBPF позволяет явно направлять соединения." }
+  ];
+  const QX = 300, QW = 34;
+  return steppedAnim(el, { title: LL("Sharing a port: fork vs SO_REUSEPORT", "Общий порт: fork и SO_REUSEPORT"), vb: [760, 330], steps: ST, stepMs: 6600, render(g, s, t){
+    oR(g, 10, 140, 90, 40, "an-box", 6); oT(g, 55, 165, LL("clients", "клиенты"), "an-t an-b");
+    oR(g, 130, 20, 400, 300, "an-frame", 10); oT(g, 330, 14, LL("kernel · 0.0.0.0:8080", "ядро · 0.0.0.0:8080"), "an-m an-b");
+    const proc = (y, label, fd, cls, dim)=>{ const grp = E(g, "g", { class: dim ? "an-dim" : "" }); oR(grp, 600, y, 150, 60, cls || "an-box", 8); oT(grp, 675, y + 24, label, "an-t an-b"); oT(grp, 675, y + 44, fd, "an-code"); };
+    const queue = (y, label, n, cls, dead)=>{ oT(g, QX - 8, y + 20, label, "an-m an-b", "end"); for(let i = 0; i < 4; i++) oR(g, QX + i * (QW + 4), y, QW, 30, dead ? "an-leak" : i < n ? cls : "an-box", 4); };
+    const ph = (t % 1600) / 1600, n = Math.floor(t / 1600);
+    if(s.mode === "fork"){
+      oR(g, 150, 44, 360, 32, "an-reg on", 6); oT(g, 330, 65, LL("socket S (one)", "сокет S (один)"), "an-t an-b");
+      queue(110, "SYN", 1, "an-pg k3"); queue(180, "accept", s.flow ? 2 : 1, "an-pg k1");
+      proc(80, LL("process 1", "процесс 1"), "fd 3 → S", n % 2 === 0 && s.flow ? "an-reg on" : "an-box"); proc(200, LL("process 2 (fork)", "процесс 2 (fork)"), "fd 3 → S", n % 2 === 1 && s.flow ? "an-reg on" : "an-box");
+      E(g, "path", { d: "M600 110C560 110,540 60,510 60", class: "an-link2 on" }); E(g, "path", { d: "M600 230C560 230,540 60,510 60", class: "an-link2 on" });
+      if(s.flow){ const to = n % 2 === 0 ? 110 : 230, path = [[100, 160], [QX, 195], [QX + 150, 195], [600, to]]; E(g, "polyline", { points: path.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); const [x, y] = polyAt(path, ph); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); oT(g, 330, 262, LL("one shared accept queue, whoever calls accept() first", "одна общая очередь accept: кто первым вызвал accept()"), "an-m an-b"); }
+    } else {
+      const dead2 = s.close && (t % 6600) > 1500;
+      oR(g, 150, 40, 360, 30, "an-reg on", 6); oT(g, 330, 60, LL("socket S1 · SO_REUSEPORT", "сокет S1 · SO_REUSEPORT"), "an-t an-b");
+      queue(80, "accept 1", s.flow ? 2 : 1, "an-pg k1");
+      oR(g, 150, 160, 360, 30, dead2 ? "an-leak" : "an-reg on", 6); oT(g, 330, 180, dead2 ? LL("socket S2 closed: queued connections reset", "сокет S2 закрыт: ждущие соединения сброшены") : LL("socket S2 · SO_REUSEPORT", "сокет S2 · SO_REUSEPORT"), "an-t an-b" + (dead2 ? " an-warn" : ""));
+      queue(200, "accept 2", s.flow ? 2 : 1, "an-pg k2", dead2);
+      proc(50, LL("process 1", "процесс 1"), "fd 3 → S1", s.flow && n % 2 === 0 ? "an-reg on" : "an-box"); proc(170, LL("process 2", "процесс 2"), dead2 ? LL("restarting…", "перезапуск…") : "fd 3 → S2", s.flow && n % 2 === 1 ? "an-reg on" : "an-box", dead2);
+      E(g, "path", { d: "M600 80C560 80,540 55,510 55", class: "an-link2 on" }); if(!dead2) E(g, "path", { d: "M600 200C560 200,540 175,510 175", class: "an-link2 on" });
+      if(s.flow){ const second = n % 2 === 1, path = [[100, 160], [140, 160], [QX, second ? 215 : 95], [600, second ? 200 : 80]]; E(g, "polyline", { points: path.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); const [x, y] = polyAt(path, ph); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); oT(g, 330, 262, LL("kernel: hash(src IP, src port, dst IP, dst port) → S1 or S2", "ядро: hash(IP и порт источника, IP и порт назначения) → S1 или S2"), "an-m an-b"); }
+      if(s.hijack){ oR(g, 600, 250, 150, 60, "an-leak", 8); oT(g, 675, 274, LL("process 3 · other user", "процесс 3 · другой польз."), "an-m an-b an-warn"); oT(g, 675, 294, "bind → EADDRINUSE", "an-code an-warn"); oT(g, 330, 290, LL("all sockets in the group: same effective UID", "все сокеты группы: один и тот же эффективный UID"), "an-m an-b"); }
+    }
+  }});
+};
+
+// ============ 35. Receive and send buffers, ACK and window, slow reader → flow control
+ANIMS["socket-buffers"] = el=>{
+  const ST = [
+    { t: ["Data arrives", "Приходят данные"], rx: 1, tx: 0, win: 7, pkt: "in", en: "The client sends data on the connection. The kernel (on the server's side) puts the bytes into the connection's receive buffer. The application has not done anything yet.",
+      ru: "Клиент отправляет данные по соединению. Ядро на стороне сервера кладёт байты в буфер приёма соединения. Приложение пока ничего не сделало." },
+    { t: ["ACK and window", "ACK и окно"], rx: 1, tx: 0, win: 7, pkt: "ack", en: "The kernel acknowledges the data, possibly a little later (delayed ACK, up to ~40 ms, to piggyback on a response), and advertises its window: how much free space is left in the receive buffer, here 7 slots.",
+      ru: "Ядро подтверждает данные, возможно, чуть позже (отложенный ACK, до ~40 мс, чтобы отправить его вместе с ответом), и сообщает своё окно — сколько свободного места осталось в буфере приёма, здесь 7 ячеек." },
+    { t: ["read() copies", "read() копирует"], rx: 0, tx: 0, win: 8, pkt: "read", en: "The app calls read(): the kernel copies the bytes from the receive buffer into the process's memory and frees the space. Unless you use zero-copy tricks, every byte is copied once from kernel to user space.",
+      ru: "Приложение вызывает read(): ядро копирует байты из буфера приёма в память процесса и освобождает место. Если не использовать приёмы без копирования, каждый байт один раз копируется из ядра в пространство пользователя." },
+    { t: ["send() copies", "send() копирует"], rx: 0, tx: 2, win: 8, pkt: "send", en: "The app calls send() (or write()) with the response. The kernel copies the bytes into the send buffer and send() returns at once: returning means \"copied to the kernel\", not \"delivered\".",
+      ru: "Приложение вызывает send() (или write()) с ответом. Ядро копирует байты в буфер отправки, и send() сразу возвращается: возврат означает «скопировано в ядро», а не «доставлено»." },
+    { t: ["Kernel sends, ACK frees", "Ядро отправляет, ACK освобождает"], rx: 0, tx: 2, win: 8, pkt: "out", en: "The kernel cuts the data into segments and sends them as far as the client's window allows. Segments stay in the send buffer until the client ACKs them, because they may need to be retransmitted. Small writes can be held back briefly by Nagle's algorithm (TCP_NODELAY disables it).",
+      ru: "Ядро режет данные на сегменты и отправляет их, насколько позволяет окно клиента. Сегменты остаются в буфере отправки, пока клиент их не подтвердит, потому что их может понадобиться отправить повторно. Маленькие записи алгоритм Нейгла может ненадолго задержать (TCP_NODELAY его отключает)." },
+    { t: ["Backend reads too slowly", "Бэкенд читает слишком медленно"], rx: 8, tx: 0, win: 0, pkt: "in", slow: true, en: "If the backend does not read fast enough, the receive queue fills up and the advertised window drops to 0. The client must stop sending: its own send buffer fills and its write() blocks. The client slows down. This is TCP flow control, backpressure at the lowest level.",
+      ru: "Если бэкенд читает недостаточно быстро, очередь приёма заполняется, и объявленное окно падает до 0. Клиент обязан перестать отправлять: его собственный буфер отправки заполняется, и его write() блокируется. Клиент замедляется. Это управление потоком TCP — обратное давление на самом нижнем уровне." }
+  ];
+  const BX = 250, CW = 46, RXY = 70, TXY = 200;
+  return steppedAnim(el, { title: LL("Receive and send buffers", "Буферы приёма и отправки"), vb: [760, 330], steps: ST, stepMs: 6000, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1400));
+    oR(g, 10, 120, 110, 70, s.slow ? "an-leak" : "an-box", 8); oT(g, 65, 150, LL("client", "клиент"), "an-t an-b"); if(s.slow) oT(g, 65, 172, LL("write() blocked", "write() заблокирован"), "an-m an-b an-warn");
+    oR(g, 170, 20, 400, 290, "an-frame", 10); oT(g, 370, 14, LL("server kernel · connection fd 4", "ядро сервера · соединение fd 4"), "an-m an-b");
+    const buf = (y, label, n, cls)=>{ oT(g, BX, y - 8, label, "an-m an-b", "start"); for(let i = 0; i < 8; i++) oR(g, BX + i * CW, y, CW - 4, 34, i < n ? cls : "an-box", 4); };
+    buf(RXY, LL("receive buffer", "буфер приёма"), s.rx, "an-pg k1"); buf(TXY, LL("send buffer", "буфер отправки"), s.tx, "an-pg k0");
+    oT(g, BX, RXY + 56, LL(`window = ${s.win} free`, `окно = ${s.win} свободно`), "an-code" + (s.win === 0 ? " an-warn an-b" : ""), "start");
+    oR(g, 610, 120, 140, 90, "an-frame", 8); oT(g, 680, 112, LL("process", "процесс"), "an-m an-b"); oR(g, 625, 150, 110, 40, s.pkt === "read" || s.pkt === "send" ? "an-reg on" : "an-box", 5); oT(g, 680, 175, LL("user buffer", "буфер польз."), "an-m an-b");
+    const fly = (path, label, n = 1)=>{ E(g, "polyline", { points: path.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); for(let j = 0; j < n; j++){ const kk = k - j * .15; if(kk <= 0) continue; const [x, y] = polyAt(path, kk); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); } const [lx, ly] = path[Math.floor(path.length / 2)]; oT(g, lx, ly - 10, label, "an-m an-b an-sp"); };
+    if(s.pkt === "in") fly([[120, 140], [BX - 20, RXY + 17], [BX, RXY + 17]], LL("data", "данные"), s.slow ? 3 : 1);
+    if(s.pkt === "ack") fly([[BX, RXY + 40], [150, 190], [120, 180]], LL(`ACK, window ${s.win}`, `ACK, окно ${s.win}`));
+    if(s.pkt === "read") fly([[BX + 20, RXY + 34], [520, 140], [625, 165]], LL("read(): copy", "read(): копия"), 3);
+    if(s.pkt === "send") fly([[625, 175], [520, 230], [BX + 60, TXY + 17]], LL("send(): copy", "send(): копия"), 3);
+    if(s.pkt === "out") fly([[BX, TXY + 17], [150, 200], [120, 175]], LL("segments → NIC", "сегменты → NIC"), 2);
+    if(s.slow) oT(g, 590, 290, LL("app busy, not calling read()", "приложение занято, не вызывает read()"), "an-m an-b an-warn", "end");
+  }});
+};
+
+// ============ 36. Blocking reads vs select vs epoll vs io_uring
+ANIMS["io-multiplexing"] = el=>{
+  const DATA = [1, 1, 0, 1, 1, 1, 1, 0, 1, 1];   // which connections have data in their receive buffer
+  const ST = [
+    { t: ["Blocking loop", "Блокирующий цикл"], mode: "block", en: "A single thread loops over 10 connections calling read() on each. con1 and con2 have data and return at once. con3's receive buffer is empty, so read() blocks: the thread's program counter cannot move, and con4–con10 wait although they have data.",
+      ru: "Один поток в цикле вызывает read() на 10 соединениях. У con1 и con2 есть данные, вызовы сразу возвращаются. Буфер приёма con3 пуст, поэтому read() блокируется: счётчик команд потока не может сдвинуться, и con4–con10 ждут, хотя данные у них есть." },
+    { t: ["select(): ask which are ready", "select(): спросить, кто готов"], mode: "select", en: "The ready approach: give the kernel the whole set of fds to watch with select(). It blocks (with a timeout) until any of them is ready, then returns. The program still loops over all of them with FD_ISSET to find the ready ones, and reads only those, without blocking.",
+      ru: "Подход готовности: передать ядру весь набор fd для наблюдения через select(). Он блокируется (с тайм-аутом), пока хоть один не станет готовым, и возвращается. Программа всё равно обходит все fd с FD_ISSET, чтобы найти готовые, и читает только их, не блокируясь." },
+    { t: ["select() costs", "Цена select()"], mode: "select", cost: true, en: "Every call copies the whole fd set into the kernel and back, the kernel checks every fd, and the program scans every fd again: O(n) per call even when one connection is ready. The set is a bitmap of fixed size: fd numbers above 1024 (FD_SETSIZE) are not supported.",
+      ru: "Каждый вызов копирует весь набор fd в ядро и обратно, ядро проверяет каждый fd, а программа снова обходит каждый fd: O(n) на вызов, даже если готово одно соединение. Набор — битовая карта фиксированного размера: номера fd выше 1024 (FD_SETSIZE) не поддерживаются." },
+    { t: ["epoll: interest list once", "epoll: список интересов один раз"], mode: "epoll", reg: true, en: "epoll_create() makes an epoll instance in the kernel; epoll_ctl(ADD) registers the connections in its interest list once. Nothing is copied again on each wait.",
+      ru: "epoll_create() создаёт экземпляр epoll в ядре; epoll_ctl(ADD) один раз регистрирует соединения в его списке интересов. При каждом ожидании ничего заново не копируется." },
+    { t: ["Kernel fills the ready list", "Ядро заполняет список готовых"], mode: "epoll", ready: true, en: "As packets arrive, the kernel itself puts the connection on the instance's ready list: when data lands in con3's and con7's receive buffers, they are added. The process does not have to be running for this.",
+      ru: "Когда приходят пакеты, ядро само добавляет соединение в список готовых этого экземпляра: как только данные попадают в буферы приёма con3 и con7, они добавляются в список. Процессу для этого не нужно выполняться." },
+    { t: ["epoll_wait returns only ready fds", "epoll_wait возвращает только готовые"], mode: "epoll", ready: true, wait: true, en: "epoll_wait() blocks until the ready list is non-empty, then builds the events array from it: [con3, con7]. The loop reads just those two, so the cost follows the number of ready connections, not all of them. This is how NGINX, Node.js, Netty and Java NIO serve 100,000 connections with a few threads.",
+      ru: "epoll_wait() блокируется, пока список готовых пуст, а затем строит из него массив событий: [con3, con7]. Цикл читает только эти два, так что цена зависит от числа готовых соединений, а не от всех. Так NGINX, Node.js, Netty и Java NIO обслуживают 100 000 соединений несколькими потоками." },
+    { t: ["io_uring: completion", "io_uring: завершение"], mode: "uring", en: "The completion approach: the process puts \"jobs\" (read con3 into this buffer) into a submission queue in memory shared with the kernel. The kernel does the work and writes the results into a completion queue; the data is already in the buffer. Many jobs per system call, or none with polling, and it works for files too. Windows IOCP works the same way.",
+      ru: "Подход завершения: процесс кладёт «задания» (прочитать con3 в этот буфер) в очередь отправки в памяти, общей с ядром. Ядро выполняет работу и пишет результаты в очередь завершения; данные уже лежат в буфере. Много заданий на один системный вызов или вообще без вызовов в режиме опроса, и это работает и для файлов. Так же устроен IOCP в Windows." }
+  ];
+  const CX = 620, CY = i => 22 + i * 29;
+  const CODE = {
+    block: ["for (i = 0; i < 10; i++)", "  read(conn[i], buf);   // may block"],
+    select: ["select(nfds, &readfds, …, &timeout);", "for (fd = 0; fd < nfds; fd++)", "  if (FD_ISSET(fd, &readfds))", "    read(fd, buf);"],
+    epoll: ["e = epoll_create1(0);", "epoll_ctl(e, ADD, conn[i]);  // once", "while (1) {", "  n = epoll_wait(e, events, …);", "  for (i = 0; i < n; i++)", "    read(events[i].fd, buf);", "}"],
+    uring: ["sqe = io_uring_get_sqe(&ring);", "io_uring_prep_recv(sqe, con3, buf, …);", "io_uring_submit(&ring);", "io_uring_wait_cqe(&ring, &cqe);", "// cqe->res = bytes already in buf"]
+  };
+  return steppedAnim(el, { title: LL("Waiting for many sockets: blocking, select, epoll, io_uring", "Ожидание многих сокетов: блокировка, select, epoll, io_uring"), vb: [760, 330], steps: ST, stepMs: 6600, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1600)), nb = x => x.replace(/ /g, " ");
+    CODE[s.mode].forEach((l, i)=> oT(g, 14, 30 + i * 20, nb(l), "an-code", "start"));
+    for(let i = 0; i < 10; i++){
+      const has = s.mode === "epoll" || s.mode === "uring" ? (i === 2 || i === 6) : DATA[i];
+      oR(g, CX, CY(i), 130, 24, has ? "an-pg k2" : "an-box", 4); oT(g, CX + 10, CY(i) + 17, "con" + (i + 1), "an-m an-b", "start");
+      if(has) oR(g, CX + 98, CY(i) + 5, 22, 14, "an-pg k0", 2);
+    }
+    if(s.mode === "block"){
+      const cur = Math.min(2, Math.floor(t / 900));
+      for(let i = 0; i <= cur; i++){ const y = CY(i) + 12; E(g, "line", { x1: 430, y1: y, x2: CX - 4, y2: y, class: "an-flowline" }); oT(g, 420, y + 4, i < 2 ? "read ✓" : LL("read ✗ blocked", "read ✗ блок"), "an-m an-b" + (i < 2 ? " an-sp" : " an-warn"), "end"); }
+      if(cur === 2) oT(g, 14, 120, LL("thread asleep in read(con3); con4…con10 have data but wait", "поток спит в read(con3); у con4…con10 есть данные, но они ждут"), "an-m an-b an-warn", "start");
+    }
+    if(s.mode === "select"){
+      oR(g, 400, 120, 140, 60, "an-box", 8); oT(g, 470, 146, LL("kernel", "ядро"), "an-t an-b"); oT(g, 470, 164, LL("checks all 10", "проверяет все 10"), "an-m");
+      E(g, "line", { x1: 330, y1: 140, x2: 400, y2: 140, class: "an-flowline" }); oT(g, 340, 132, LL("fd set ×10", "набор fd ×10"), "an-m an-b", "start");
+      const scan = Math.min(9, Math.floor(t / 400)); oR(g, CX - 6, CY(scan) - 2, 142, 28, "an-link2 on", 5); oT(g, CX - 12, CY(scan) + 17, "FD_ISSET?", "an-m an-b an-sp", "end");
+      if(s.cost){ [LL("copy 10 fds in + out every call", "копировать 10 fd туда и обратно на каждый вызов"), LL("kernel checks all: O(n)", "ядро проверяет все: O(n)"), LL("app scans all: O(n)", "приложение обходит все: O(n)"), LL("max fd 1024 (FD_SETSIZE)", "максимум fd 1024 (FD_SETSIZE)")].forEach((l, i)=> oT(g, 14, 210 + i * 22, "− " + l, "an-m an-b an-warn", "start")); }
+    }
+    if(s.mode === "epoll"){
+      oR(g, 360, 190, 200, 40, "an-reg on", 6); oT(g, 460, 215, LL("epoll e (kernel)", "epoll e (ядро)"), "an-t an-b");
+      oR(g, 360, 250, 200, 60, "an-box", 6); oT(g, 460, 270, LL("ready list", "список готовых"), "an-m an-b");
+      const rl = s.ready ? (k > .5 ? "[con3, con7]" : "[con3]") : "[ ]"; oT(g, 460, 296, rl, "an-code an-b");
+      if(s.reg) for(let i = 0; i < 10; i++) E(g, "line", { x1: 560, y1: 210, x2: CX, y2: CY(i) + 12, class: "an-link2", style: "stroke-opacity:.35" });
+      if(s.ready && !s.wait){ [2, 6].forEach((i, j)=>{ const kk = Math.max(0, Math.min(1, k * 2 - j)); const x = CX + (560 - CX) * kk, y = CY(i) + 12 + (280 - CY(i) - 12) * kk; E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); }); oT(g, 750, 318, LL("incoming packets", "входящие пакеты"), "an-m an-b", "end"); }
+      if(s.wait){ E(g, "line", { x1: 360, y1: 280, x2: 300, y2: 280, class: "an-flowline" }); oT(g, 14, 280, LL("events = [con3, con7] → 2 reads, not 10", "events = [con3, con7] → 2 чтения, а не 10"), "an-m an-b an-sp", "start"); [2, 6].forEach(i => oR(g, CX - 6, CY(i) - 2, 142, 28, "an-link2 on", 5)); }
+    }
+    if(s.mode === "uring"){
+      const ring = (x, label, items)=>{ oT(g, x + 80, 168, label, "an-m an-b"); for(let i = 0; i < 4; i++){ oR(g, x + i * 40, 176, 36, 36, i < items.length ? "an-pg k1" : "an-box", 5); if(items[i]) oT(g, x + i * 40 + 18, 199, items[i], "an-m an-b"); } };
+      oR(g, 14, 150, 560, 80, "an-frame an-dash", 8); oT(g, 300, 246, LL("memory shared by the process and the kernel", "память, общая для процесса и ядра"), "an-m");
+      ring(30, LL("submission queue (jobs)", "очередь отправки (задания)"), k < .5 ? ["c3", "c7"] : []); ring(330, LL("completion queue (results)", "очередь завершения (результаты)"), k >= .5 ? ["c3 ✓", "c7 ✓"] : []);
+      oT(g, 300, 290, k < .5 ? LL("kernel picks up the jobs and does the IO…", "ядро забирает задания и выполняет ввод-вывод…") : LL("…data already in the buffers", "…данные уже в буферах"), "an-m an-b an-sp");
+    }
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }

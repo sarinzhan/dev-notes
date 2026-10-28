@@ -7,17 +7,9 @@ learned: 2026-10-27
 A socket is a file descriptor the kernel ties to a 4-tuple and two buffers; creating one for TCP costs a handshake (plus TLS), slow start and an ephemeral port that is locked for 60 seconds after close. Connection pools exist to pay that cost once and reuse the socket for many requests, and to put a hard cap on how many connections a service opens. Every client library you use (HikariCP, Apache HttpClient, Lettuce, Kafka clients, JDK `HttpClient`) is a pool with slightly different knobs; the failure modes are the same: leaks, stale connections after idle, and pool exhaustion masquerading as slowness.
 
 ## Key points
-### Socket lifecycle
-| Step | Server side | Client side | Kernel state |
-|---|---|---|---|
-| create | `socket()` | `socket()` | fd allocated, no address |
-| name | `bind(0.0.0.0:8080)`, `listen(backlog)` | implicit bind to ephemeral port | `LISTEN` / none |
-| connect | `accept()` returns a new fd per client | `connect()` runs the handshake | `ESTABLISHED` |
-| transfer | `read()`/`write()` on the socket buffers | same | send/receive buffers, window |
-| end | `close()` or `shutdown()` | `close()` | FIN exchange, `TIME_WAIT` on the active closer |
-
-- The listening socket and the per-connection sockets are different fds; a server holding 10k clients has 10k fds. `ulimit -n` (default 1024 on some images) is a real ceiling; Spring Boot in Kubernetes should run with 65536.
-- Each socket has kernel send/receive buffers; a slow reader fills the sender's buffer and `write()` blocks (or returns `EAGAIN` in non-blocking mode). This is backpressure at the lowest level ([[backpressure-and-flow-control]], [[io-models-blocking-nonblocking-epoll]]).
+### Sockets from the client side
+- The socket lifecycle (`socket`, `bind`, `listen`, `accept`), listening vs connection sockets, the SYN and accept queues and file-descriptor limits are in [[socket-management]].
+- Each socket has kernel send/receive buffers; a slow reader fills the sender's buffer and `write()` blocks (or returns `EAGAIN` in non-blocking mode). This is backpressure at the lowest level ([[backpressure-and-flow-control]], [[socket-management]]).
 - In Java: `java.net.Socket` (blocking, one thread per connection, fine with [[virtual-threads]]), `SocketChannel` + `Selector` ([[java-nio]], what Netty and Tomcat NIO use).
 
 ### Why pools exist

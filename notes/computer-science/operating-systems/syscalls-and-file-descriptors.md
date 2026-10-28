@@ -12,7 +12,7 @@ User code cannot touch hardware, other processes or the kernel's data structures
 - CPU privilege rings: user mode (ring 3) cannot execute privileged instructions or access kernel memory; kernel mode (ring 0) can. The boundary is what makes [[process-management|process isolation]] and [[memory-management|virtual memory]] enforceable.
 - A syscall is a controlled entry: put the syscall number and arguments in registers, execute `syscall` (x86-64), the CPU jumps to the kernel entry point, the kernel validates arguments (user pointers are checked, never trusted), does the work, returns a value or `-errno`.
 - Cost: around 100–300 ns for the trap itself after Spectre/Meltdown mitigations, plus whatever the call does. Thousands of tiny `read(fd, buf, 1)` calls are slow for the trap, not the bytes; that is why buffered streams exist ([[java-io-streams]]) and why `vDSO` maps `clock_gettime` into user space so `System.nanoTime()` does not trap at all.
-- Blocking syscalls (`read` on an empty socket, `accept`, `futex` wait) put the thread to sleep; the kernel wakes it when the event arrives. This is what "a thread is blocked" means at the OS level ([[io-models-blocking-nonblocking-epoll]]).
+- Blocking syscalls (`read` on an empty socket, `accept`, `futex` wait) put the thread to sleep; the kernel wakes it when the event arrives. This is what "a thread is blocked" means at the OS level ([[socket-management]]).
 - Libraries wrap syscalls: `fopen` → `openat`, Java `FileInputStream.read` → JNI → `read`. `strace -f -p <pid>` shows the real calls under any abstraction.
 
 ### Common syscall families
@@ -65,4 +65,4 @@ A `futex` count far above `read`/`write` in `strace -c` means lock contention, n
 - fd leaks are slow bombs: the service works for days, then every new socket fails with `EMFILE` and the health check still passes because it uses an existing connection. Alert on `process_open_fds` from the JVM Micrometer binder.
 - Assuming the container inherits the host's `ulimit -n`: Docker and Kubernetes set their own (`--ulimit nofile`, or the runtime default); check inside the pod.
 - `close()` can fail (`EIO` on NFS, `EINTR`) and that is where delayed write errors surface; ignoring its return value loses data silently. Also, closing an fd that another thread is using races: the number may be reused for a new socket immediately.
-- Related: [[io-models-blocking-nonblocking-epoll]] for what happens when the fd is not ready, [[linux-memory-filesystems-io]] for `/proc`, `/sys` and page cache behind file syscalls.
+- Related: [[socket-management]] for what happens when the fd is not ready, [[linux-memory-filesystems-io]] for `/proc`, `/sys` and page cache behind file syscalls.
