@@ -8,6 +8,7 @@ Front matter per note:
     learned: YYYY-MM-DD
     ---
 Wikilinks: [[note-id]] or [[note-id|label]], where note-id is the file name without .md.
+Optional `aliases: [old-id, ...]` keeps links and URLs to merged or renamed notes working.
 Russian translations live in notes-ru/<section>/<subsection>/<id>.md (same path and id as the
 English note). They are optional; a note without one falls back to English in the UI.
 Run: python3 build.py   (no dependencies)
@@ -42,7 +43,7 @@ def parse_front_matter(text):
 
 
 def main():
-    notes, ids = [], set()
+    notes, ids, alias = [], set(), {}
     for path in sorted(NOTES.glob("*/*/*.md")):
         sec, sub = path.parts[-3], path.parts[-2]
         if sec not in SECTIONS or sub not in SECTIONS[sec]["subs"]:
@@ -52,12 +53,17 @@ def main():
         if nid in ids:
             sys.exit(f"duplicate note id: {nid}")
         ids.add(nid)
+        for a in meta.get("aliases", []) or []:
+            if a in alias:
+                sys.exit(f"duplicate alias: {a}")
+            alias[a] = nid
         notes.append({
             "id": nid, "sec": sec, "sub": sub,
             "title": meta.get("title", nid),
             "tags": meta.get("tags", []),
             "learned": meta.get("learned", ""),
             **({"order": int(meta["order"])} if str(meta.get("order", "")).isdigit() else {}),
+            **({"aliases": meta["aliases"]} if meta.get("aliases") else {}),
             "path": str(path.relative_to(ROOT)).replace("\\", "/"),
             "links": sorted({m.group(1) for m in WL.finditer(CODE.sub("", body))}),
             "words": len(body.split()),
@@ -67,6 +73,12 @@ def main():
             ru_meta, _ = parse_front_matter(ru.read_text(encoding="utf-8"))
             notes[-1]["ru"] = str(ru.relative_to(ROOT)).replace("\\", "/")
             notes[-1]["title_ru"] = ru_meta.get("title", notes[-1]["title"])
+
+    clash = sorted(set(alias) & ids)
+    if clash:
+        sys.exit("aliases that are also note ids: " + ", ".join(clash))
+    for n in notes:
+        n["links"] = sorted({alias.get(l, l) for l in n["links"]} - {n["id"]})
 
     orphans = sorted(str(p.relative_to(ROOT)) for p in NOTES_RU.glob("*/*/*.md")
                      if not (NOTES / p.relative_to(NOTES_RU)).exists()) if NOTES_RU.exists() else []

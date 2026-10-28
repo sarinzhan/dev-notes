@@ -39,6 +39,9 @@ One short, realistic, compilable code block (java / sql / yaml / bash). Not toy 
 - Only link to ids that exist or that another converter is creating in this batch (see the id list you were given). If you must mention a topic nobody is writing, write it as plain text.
 - Never link to a note from within itself.
 
+## Merged or renamed notes
+When notes are merged or renamed, list the old ids in the surviving note's front matter (`aliases: [old-id, ...]`, English file only). Wikilinks and `#old-id` URLs then resolve to it, so notes that link to the old id do not have to change.
+
 ## Animations
 A fenced block with the language `anim` and an animation name renders a live, interactive diagram:
 ````
@@ -46,7 +49,7 @@ A fenced block with the language `anim` and an animation name renders a live, in
 kafka-consumer-group
 ```
 ````
-Available: `kafka-partitioning`, `kafka-consumer-group`, `kafka-replication`, `os-layers`, `syscall-walkthrough`, `cpu-memory-hierarchy`, `process-memory-layout`, `virtual-memory-mapping`, `disk-lba-partitions`, `program-to-process`, `cpu-fetch-execute`, `call-stack-frames`, `program-execution`, `heap-leak`, `ram-read-write`, `memory-fragmentation`, `vm-page-tables`, `redis-cow`, `dma-transfer`. Labels inside an animation are bilingual: write them with `LL("English", "Русский")` so the EN/RU switch covers them. New ones are added to the `ANIMS` registry in `index.html` (each is a function that receives the container element and returns `{ stop() }`).
+Available: `kafka-partitioning`, `kafka-consumer-group`, `kafka-replication`, `os-layers`, `syscall-walkthrough`, `cpu-memory-hierarchy`, `process-memory-layout`, `virtual-memory-mapping`, `disk-lba-partitions`, `program-to-process`, `cpu-fetch-execute`, `call-stack-frames`, `program-execution`, `heap-leak`, `ram-read-write`, `memory-fragmentation`, `vm-page-tables`, `redis-cow`, `dma-transfer`, `cpu-components`, `cpu-instruction-cycle`, `cpu-pipeline`, `cpu-parallelism`. Labels inside an animation are bilingual: write them with `LL("English", "Русский")` so the EN/RU switch covers them. New ones are added to the `ANIMS` registry in `index.html` (each is a function that receives the container element and returns `{ stop() }`).
 
 ## Images
 Source images live in the chapter folder under `media/`. Skip screenshots of text and of trivial diagrams; describe the idea in words or code instead. If a diagram is really needed, copy it to `notes/assets/<descriptive-name>.png` and reference it as `![caption](assets/<descriptive-name>.png)`.
