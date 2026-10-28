@@ -3304,11 +3304,11 @@ ANIMS["mode-switch-syscall"] = el=>{
   return steppedAnim(el, { title: LL("A system call: user mode → kernel mode → back", "Системный вызов: режим пользователя → режим ядра → обратно"), vb: [760, 360], steps: ST, stepMs: 6400, render(g, s, t){
     const k = easeIO(Math.min(1, t / 1400)), user = s.mode === "user";
     // address space
-    oT(g, AX + AW / 2, 18, LL("one process's virtual address space", "виртуальное адресное пространство процесса"), "an-m an-b");
+    oT(g, AX + AW / 2, 18, LL("one process's virtual address space", "адресное пространство процесса"), "an-m an-b");
     oR(g, AX, ROWS.kernel[0], AW, ROWS.kernel[1], user ? "an-pg k3 dim" : "an-pg k3", 6);
     oT(g, AX + AW / 2, 54, LL("kernel half", "половина ядра"), "an-t an-b");
     [LL("kernel code, sys_call_table", "код ядра, sys_call_table"), LL("page tables, PCBs", "таблицы страниц, PCB"), LL("socket buffers, page cache", "буферы сокетов, стр. кэш"), LL("kernel stacks", "стеки ядра")].forEach((l, i)=> oT(g, AX + AW / 2, 74 + i * 17, l, "an-m"));
-    if(user) oT(g, AX + AW - 8, 46, LL("🔒 supervisor-only", "🔒 только ядро"), "an-m an-b an-warn", "end");
+    if(user) oT(g, AX + AW / 2, 143, LL("🔒 supervisor-only", "🔒 только ядро"), "an-m an-b an-warn");
     oT(g, AX + 4, 160, "0xffff8000_00000000 ↑", "an-m", "start");
     E(g, "line", { x1: AX, y1: 156, x2: AX + AW, y2: 156, class: "an-link2 an-dash" });
     [["stack", "k0", LL("user stack", "стек пользователя")], ["heap", "k4", LL("heap · buf", "куча · buf")], ["data", "k2", LL("data", "данные")], ["text", "k1", LL("text: app code + libc", "код: приложение + libc")]].forEach(([n, c, l])=>{ const [y, h] = ROWS[n]; oR(g, AX, y, AW, h, "an-pg " + c, 4); oT(g, AX + AW / 2, y + h / 2 + 5, l, "an-t an-b"); });
@@ -3323,14 +3323,14 @@ ANIMS["mode-switch-syscall"] = el=>{
     // pc pointer into memory
     const pcY = s.pc in PCY ? PCY[s.pc] : 70;
     E(g, "line", { x1: 262, y1: 81, x2: AX + AW, y2: pcY, class: "an-flowline" }); E(g, "circle", { cx: AX + AW, cy: pcY, r: 4, class: "an-dot an-flow" });
-    if(s.fault){ const x = 330 + (AX + AW - 330) * k, y = 250 + (90 - 250) * k; E(g, "line", { x1: 330, y1: 250, x2: AX + AW, y2: 90, class: "an-flowline" }); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); oT(g, 300, 270, LL("load [0xffff8880…] → fault → SIGSEGV", "load [0xffff8880…] → fault → SIGSEGV"), "an-m an-b an-warn"); }
+    if(s.fault){ const p = [[AX + AW, 316], [236, 200], [AX + AW, 92]]; E(g, "polyline", { points: p.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); const [x, y] = polyAt(p, k); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); oT(g, 470, 250, LL("load [0xffff8880…] → fault → SIGSEGV", "load [0xffff8880…] → fault → SIGSEGV"), "an-t an-b an-warn", "start"); }
     // kernel stack and table
     oT(g, 470, 22, LL("this thread's kernel stack", "стек ядра этого потока"), "an-m an-b", "start");
     oR(g, 470, 30, 280, 150, s.sp === "kstack" ? "an-frame" : "an-frame an-dim", 8);
     const saved = [LL("user pc (return address)", "pc польз. (адрес возврата)"), "user sp, bp", "rbx, r12–r15 …", "flags"];
     if(s.save || s.restore){ const n = s.restore ? Math.max(0, 4 - Math.floor(k * 5)) : Math.min(4, 1 + Math.floor(k * 4)); saved.slice(0, n).forEach((l, i)=>{ oR(g, 480, 40 + i * 32, 260, 26, "an-pg k0", 4); oT(g, 610, 58 + i * 32, l, "an-m an-b"); }); oT(g, 610, 172, s.restore ? LL("restore: memory reads", "восстановление: чтения из памяти") : LL("save: memory writes", "сохранение: записи в память"), "an-m an-b an-sp"); }
     if(s.table){ oT(g, 470, 204, "sys_call_table", "an-m an-b", "start"); ["0 → sys_read", "1 → sys_write", "2 → sys_open", "3 → sys_close"].forEach((l, i)=>{ oR(g, 470, 212 + i * 26, 180, 22, i === 0 ? "an-reg on" : "an-box", 4); oT(g, 480, 228 + i * 26, l, "an-code", "start"); }); oT(g, 660, 228, LL("✓ fd is ours", "✓ fd наш"), "an-m an-b", "start"); oT(g, 660, 254, LL("✓ buf is user", "✓ buf польз."), "an-m an-b", "start"); }
-    if(s.copy){ const p = [[AX + AW, 120], [300, 290], [AX + AW, 242]]; E(g, "polyline", { points: p.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); for(let j = 0; j < 3; j++){ const kk = k - j * .15; if(kk <= 0) continue; const [x, y] = polyAt(p, kk); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); } oT(g, 470, 240, LL("copy: kernel buffer → user buf", "копия: буфер ядра → buf польз."), "an-m an-b an-sp", "start"); }
+    if(s.copy){ const p = [[AX + AW, 110], [236, 175], [AX + AW, 242]]; E(g, "polyline", { points: p.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); for(let j = 0; j < 3; j++){ const kk = k - j * .15; if(kk <= 0) continue; const [x, y] = polyAt(p, kk); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); } oT(g, 470, 240, LL("copy: kernel buffer → user buf", "копия: буфер ядра → buf польз."), "an-m an-b an-sp", "start"); }
     if(s.restore) oT(g, 470, 240, LL("sysret → ring 3 · time inside = system time", "sysret → ring 3 · время внутри = системное"), "an-m an-b", "start");
   }});
 };
@@ -3366,10 +3366,10 @@ ANIMS["kernel-entries"] = el=>{
       const end = i >= prevUp && idx > 0 ? a + (b - a) * k : b; if(end <= a) return;
       const y = m === "u" ? 40 : 100, cls = m === "u" ? "an-pg k1" : m === "z" ? "an-free" : "an-pg k0";
       oR(g, X0 + a * MS + 1, y + 2, Math.max(2, (end - a) * MS - 2), 30, cls, 4);
-      if(label && end - a > .2){ oT(g, X0 + (a + end) / 2 * MS, y + 54, label, "an-m an-b" + (m === "z" ? " an-warn" : "")); if(m !== "z") E(g, "line", { x1: X0 + a * MS, y1: 74, x2: X0 + a * MS, y2: 100, class: "an-flowline" }); }
+      if(label && end - a > .2){ oT(g, X0 + (a + end) / 2 * MS, m === "z" ? y + 21 : y + 54, label, "an-m an-b" + (m === "z" ? " an-warn" : "")); if(m !== "z") E(g, "line", { x1: X0 + a * MS, y1: 74, x2: X0 + a * MS, y2: 100, class: "an-flowline" }); }
       if(m === "u") us += end - a; else if(m === "k") sy += end - a;
     });
-    if(s.vdso){ oT(g, X0 + 8.4 * MS, 32, "clock_gettime() · vDSO", "an-m an-b an-sp"); E(g, "circle", { cx: X0 + 8.4 * MS, cy: 57, r: 5, class: "an-dot an-flow" }); }
+    if(s.vdso){ oT(g, X0 + 8.4 * MS, 90, "clock_gettime() · vDSO", "an-m an-b an-sp"); E(g, "circle", { cx: X0 + 8.4 * MS, cy: 57, r: 5, class: "an-dot an-flow" }); }
     if(s.acct){ oR(g, X0, 190, W, 44, "an-box", 6); oT(g, X0 + 14, 217, `$ time ./app  →  real 10.0 ms   user ${us.toFixed(1)} ms   sys ${sy.toFixed(1)} ms`, "an-code", "start"); oT(g, X0 + W, 245, LL("sleeping on the disk is neither: real > user + sys", "сон в ожидании диска — ни то, ни другое: real > user + sys"), "an-m", "end"); }
   }});
 };
