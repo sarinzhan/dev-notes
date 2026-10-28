@@ -20,7 +20,7 @@ There are four ways a program can wait for data on a socket. **Blocking**: the t
 - Readiness vs completion: epoll tells you an fd is **ready** (there are bytes to read or buffer space to write); `io_uring` tells you an operation **completed** and the data is already in your buffer.
 
 ### Why thread-per-connection stops scaling
-- Each blocked thread costs a kernel task, a stack (1 MiB reserved), scheduler work and a context switch per wakeup ([[processes-and-threads]], [[cpu-scheduling]]). 10 k idle keep-alive connections = 10 k sleeping threads doing nothing but occupying memory. This is the C10K problem.
+- Each blocked thread costs a kernel task, a stack (1 MiB reserved), scheduler work and a context switch per wakeup ([[process-management]]). 10 k idle keep-alive connections = 10 k sleeping threads doing nothing but occupying memory. This is the C10K problem.
 - With multiplexing, idle connections cost only an fd and a kernel socket buffer; the thread count follows the CPU count, not the connection count.
 - The price is programming style: state per connection must be explicit (a state machine or a reactive pipeline) because there is no thread holding it on its stack. Virtual threads and Go goroutines hide this: the runtime parks the "thread" on a blocking call and uses epoll underneath, so you write blocking code and get multiplexed IO.
 

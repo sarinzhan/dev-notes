@@ -871,18 +871,6 @@
    ]
   },
   {
-   "id": "cpu-scheduling",
-   "sec": "computer-science",
-   "sub": "operating-systems",
-   "title": "CPU scheduling: preemption, priorities and load",
-   "tags": [
-    "operating-systems",
-    "scheduling",
-    "linux",
-    "performance"
-   ]
-  },
-  {
    "id": "cpu",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -978,15 +966,17 @@
    ]
   },
   {
-   "id": "processes-and-threads",
+   "id": "process-management",
    "sec": "computer-science",
    "sub": "operating-systems",
-   "title": "Processes and threads from the OS point of view",
+   "title": "Process management",
    "tags": [
     "operating-systems",
     "processes",
     "threads",
-    "scheduling"
+    "scheduling",
+    "context-switch",
+    "linux"
    ]
   },
   {
@@ -3790,10 +3780,6 @@
   },
   {
    "source": "amdahls-law-and-parallel-speedup",
-   "target": "cpu-scheduling"
-  },
-  {
-   "source": "amdahls-law-and-parallel-speedup",
    "target": "fork-join-framework"
   },
   {
@@ -3819,6 +3805,10 @@
   {
    "source": "amdahls-law-and-parallel-speedup",
    "target": "lock-free-and-cas"
+  },
+  {
+   "source": "amdahls-law-and-parallel-speedup",
+   "target": "process-management"
   },
   {
    "source": "amdahls-law-and-parallel-speedup",
@@ -3878,7 +3868,7 @@
   },
   {
    "source": "anatomy-of-a-process",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "anatomy-of-a-process",
@@ -6266,10 +6256,6 @@
   },
   {
    "source": "cpu",
-   "target": "cpu-scheduling"
-  },
-  {
-   "source": "cpu",
    "target": "docker-containers-and-resources"
   },
   {
@@ -6318,7 +6304,7 @@
   },
   {
    "source": "cpu",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "cpu",
@@ -6327,10 +6313,6 @@
   {
    "source": "cpu",
    "target": "virtual-threads"
-  },
-  {
-   "source": "cpu-caches-and-cache-lines",
-   "target": "cpu-scheduling"
   },
   {
    "source": "cpu-caches-and-cache-lines",
@@ -6386,55 +6368,11 @@
   },
   {
    "source": "cpu-caches-and-cache-lines",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "cpu-caches-and-cache-lines",
    "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "docker-containers-and-resources"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "executors-and-thread-pools"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "greedy-algorithms"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "io-models-blocking-nonblocking-epoll"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "kubernetes-basics"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "linux-processes"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "lock-free-and-cas"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "operating-system-architecture"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "operating-system-introduction"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "processes-and-threads"
-  },
-  {
-   "source": "cpu-scheduling",
-   "target": "virtual-threads"
   },
   {
    "source": "cqrs",
@@ -7099,6 +7037,10 @@
   {
    "source": "deadlocks-and-synchronization-primitives",
    "target": "postgres-locks"
+  },
+  {
+   "source": "deadlocks-and-synchronization-primitives",
+   "target": "process-management"
   },
   {
    "source": "deadlocks-and-synchronization-primitives",
@@ -7886,6 +7828,10 @@
   },
   {
    "source": "docker-containers-and-resources",
+   "target": "process-management"
+  },
+  {
+   "source": "docker-containers-and-resources",
    "target": "signals-and-process-lifecycle"
   },
   {
@@ -8686,7 +8632,7 @@
   },
   {
    "source": "executors-and-thread-pools",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "executors-and-thread-pools",
@@ -9158,6 +9104,10 @@
   },
   {
    "source": "greedy-algorithms",
+   "target": "process-management"
+  },
+  {
+   "source": "greedy-algorithms",
    "target": "rate-limiting"
   },
   {
@@ -9530,7 +9480,7 @@
   },
   {
    "source": "hikaricp-pool-sizing",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "hikaricp-pool-sizing",
@@ -10042,7 +9992,7 @@
   },
   {
    "source": "io-models-blocking-nonblocking-epoll",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "io-models-blocking-nonblocking-epoll",
@@ -10114,7 +10064,7 @@
   },
   {
    "source": "ipc-mechanisms",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "ipc-mechanisms",
@@ -10470,7 +10420,7 @@
   },
   {
    "source": "jvm-memory-areas",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "jvm-memory-areas",
@@ -10714,6 +10664,10 @@
   },
   {
    "source": "kubernetes-basics",
+   "target": "process-management"
+  },
+  {
+   "source": "kubernetes-basics",
    "target": "secrets-management"
   },
   {
@@ -10742,7 +10696,7 @@
   },
   {
    "source": "latency-numbers",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "latency-numbers",
@@ -10978,7 +10932,7 @@
   },
   {
    "source": "linux-processes",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "linux-processes",
@@ -11071,6 +11025,10 @@
   {
    "source": "lock-free-and-cas",
    "target": "mutex-semaphore-monitor"
+  },
+  {
+   "source": "lock-free-and-cas",
+   "target": "process-management"
   },
   {
    "source": "lock-free-and-cas",
@@ -11178,7 +11136,7 @@
   },
   {
    "source": "memory-management",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "memory-management",
@@ -11694,7 +11652,7 @@
   },
   {
    "source": "operating-system-architecture",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "operating-system-architecture",
@@ -11706,7 +11664,7 @@
   },
   {
    "source": "operating-system-introduction",
-   "target": "processes-and-threads"
+   "target": "process-management"
   },
   {
    "source": "operating-system-introduction",
@@ -12046,6 +12004,10 @@
   },
   {
    "source": "postgres-performance-checklist",
+   "target": "process-management"
+  },
+  {
+   "source": "postgres-performance-checklist",
    "target": "query-planning-and-execution"
   },
   {
@@ -12129,23 +12091,27 @@
    "target": "type-systems"
   },
   {
-   "source": "processes-and-threads",
+   "source": "process-management",
    "target": "race-conditions-and-critical-sections"
   },
   {
-   "source": "processes-and-threads",
+   "source": "process-management",
+   "target": "signals-and-process-lifecycle"
+  },
+  {
+   "source": "process-management",
    "target": "stack-vs-heap-memory"
   },
   {
-   "source": "processes-and-threads",
+   "source": "process-management",
    "target": "syscalls-and-file-descriptors"
   },
   {
-   "source": "processes-and-threads",
+   "source": "process-management",
    "target": "threads-basics"
   },
   {
-   "source": "processes-and-threads",
+   "source": "process-management",
    "target": "virtual-threads"
   },
   {

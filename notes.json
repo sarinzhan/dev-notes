@@ -1426,7 +1426,6 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/algorithms/greedy-algorithms.md",
    "links": [
-    "cpu-scheduling",
     "dynamic-programming",
     "heaps-and-priority-queues",
     "http-fundamentals",
@@ -1434,6 +1433,7 @@
     "kafka-consumer",
     "kubernetes-basics",
     "prefix-sums-and-intervals",
+    "process-management",
     "rate-limiting",
     "shortest-paths-dijkstra",
     "sorting-algorithms",
@@ -1895,7 +1895,6 @@
     "backpressure-and-flow-control",
     "completable-future",
     "cpu-caches-and-cache-lines",
-    "cpu-scheduling",
     "fork-join-framework",
     "hikaricp-pool-sizing",
     "horizontal-vs-vertical-scaling",
@@ -1903,6 +1902,7 @@
     "latency-numbers",
     "load-balancing",
     "lock-free-and-cas",
+    "process-management",
     "rate-limiting",
     "slo-sli-and-alerting",
     "syscalls-and-file-descriptors",
@@ -1928,7 +1928,6 @@
    "path": "notes/computer-science/concurrency-theory/lock-free-and-cas.md",
    "links": [
     "cpu-caches-and-cache-lines",
-    "cpu-scheduling",
     "deadlocks-and-synchronization-primitives",
     "distributed-locks-and-fencing",
     "http-caching",
@@ -1938,6 +1937,7 @@
     "locks-and-lock-free",
     "memory-models-and-visibility",
     "mutex-semaphore-monitor",
+    "process-management",
     "race-conditions-and-critical-sections",
     "rate-limiting"
    ],
@@ -2413,7 +2413,7 @@
     "hikaricp-pool-sizing",
     "jvm-memory-areas",
     "memory-management",
-    "processes-and-threads",
+    "process-management",
     "race-conditions-and-critical-sections",
     "signals-and-process-lifecycle",
     "stack-vs-heap-memory",
@@ -2422,32 +2422,6 @@
    "words": 3448,
    "ru": "notes-ru/computer-science/operating-systems/anatomy-of-a-process.md",
    "title_ru": "Процесс"
-  },
-  {
-   "id": "cpu-scheduling",
-   "sec": "computer-science",
-   "sub": "operating-systems",
-   "title": "CPU scheduling: preemption, priorities and load",
-   "tags": [
-    "operating-systems",
-    "scheduling",
-    "linux",
-    "performance"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/computer-science/operating-systems/cpu-scheduling.md",
-   "links": [
-    "cpu-caches-and-cache-lines",
-    "docker-containers-and-resources",
-    "executors-and-thread-pools",
-    "kubernetes-basics",
-    "linux-processes",
-    "processes-and-threads",
-    "virtual-threads"
-   ],
-   "words": 1040,
-   "ru": "notes-ru/computer-science/operating-systems/cpu-scheduling.md",
-   "title_ru": "Планирование CPU: вытеснение, приоритеты и нагрузка"
   },
   {
    "id": "cpu",
@@ -2479,7 +2453,6 @@
     "bit-manipulation",
     "compilation-interpretation-jit",
     "cpu-caches-and-cache-lines",
-    "cpu-scheduling",
     "docker-containers-and-resources",
     "executors-and-thread-pools",
     "garbage-collection",
@@ -2492,7 +2465,7 @@
     "memory-models-and-visibility",
     "numbers-bits-and-floating-point",
     "operating-system-architecture",
-    "processes-and-threads",
+    "process-management",
     "race-conditions-and-critical-sections",
     "virtual-threads"
    ],
@@ -2544,16 +2517,15 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/operating-systems/io-models-blocking-nonblocking-epoll.md",
    "links": [
-    "cpu-scheduling",
     "java-nio",
-    "processes-and-threads",
+    "process-management",
     "sockets-and-connection-pooling",
     "spring-reactive-webclient-sse",
     "syscalls-and-file-descriptors",
     "tcp-handshake-and-connection-states",
     "virtual-threads"
    ],
-   "words": 1125,
+   "words": 1124,
    "ru": "notes-ru/computer-science/operating-systems/io-models-blocking-nonblocking-epoll.md",
    "title_ru": "Модели ввода-вывода: блокирующий, неблокирующий, мультиплексирование и асинхронный"
   },
@@ -2581,7 +2553,7 @@
     "memory-management",
     "memory-models-and-visibility",
     "message-queues-and-streams",
-    "processes-and-threads",
+    "process-management",
     "service-communication-sync-vs-async",
     "signals-and-process-lifecycle",
     "sockets-and-connection-pooling",
@@ -2622,7 +2594,7 @@
     "linux-memory-filesystems-io",
     "linux-processes",
     "postgres-performance-checklist",
-    "processes-and-threads",
+    "process-management",
     "redis-patterns-and-persistence",
     "signals-and-process-lifecycle",
     "stack-vs-heap-memory"
@@ -2650,13 +2622,12 @@
     "anatomy-of-a-process",
     "cpu",
     "cpu-caches-and-cache-lines",
-    "cpu-scheduling",
     "docker-fundamentals",
     "linux-architecture-and-kernel",
     "memory-management",
     "operating-system-introduction",
     "osi-and-tcp-ip-models",
-    "processes-and-threads",
+    "process-management",
     "syscalls-and-file-descriptors",
     "tcp-vs-udp"
    ],
@@ -2681,7 +2652,6 @@
    "path": "notes/computer-science/operating-systems/operating-system-introduction.md",
    "links": [
     "anatomy-of-a-process",
-    "cpu-scheduling",
     "docker-containers-and-resources",
     "docker-fundamentals",
     "io-models-blocking-nonblocking-epoll",
@@ -2689,7 +2659,7 @@
     "linux-architecture-and-kernel",
     "memory-management",
     "operating-system-architecture",
-    "processes-and-threads",
+    "process-management",
     "signals-and-process-lifecycle",
     "syscalls-and-file-descriptors",
     "virtual-threads"
@@ -2699,36 +2669,51 @@
    "title_ru": "Что такое операционная система и зачем она нужна"
   },
   {
-   "id": "processes-and-threads",
+   "id": "process-management",
    "sec": "computer-science",
    "sub": "operating-systems",
-   "title": "Processes and threads from the OS point of view",
+   "title": "Process management",
    "tags": [
     "operating-systems",
     "processes",
     "threads",
-    "scheduling"
+    "scheduling",
+    "context-switch",
+    "linux"
    ],
-   "learned": "2026-10-27",
-   "path": "notes/computer-science/operating-systems/processes-and-threads.md",
+   "learned": "2026-10-28",
+   "order": 6,
+   "aliases": [
+    "processes-and-threads",
+    "cpu-scheduling"
+   ],
+   "path": "notes/computer-science/operating-systems/process-management.md",
    "links": [
+    "anatomy-of-a-process",
+    "cpu",
     "cpu-caches-and-cache-lines",
-    "cpu-scheduling",
+    "deadlocks-and-synchronization-primitives",
+    "docker-containers-and-resources",
     "executors-and-thread-pools",
     "hikaricp-pool-sizing",
+    "io-models-blocking-nonblocking-epoll",
     "ipc-mechanisms",
     "jvm-memory-areas",
+    "kubernetes-basics",
     "latency-numbers",
     "linux-processes",
+    "lock-free-and-cas",
     "memory-management",
+    "postgres-performance-checklist",
     "race-conditions-and-critical-sections",
-    "stack-vs-heap-memory",
+    "signals-and-process-lifecycle",
+    "syscalls-and-file-descriptors",
     "threads-basics",
     "virtual-threads"
    ],
-   "words": 982,
-   "ru": "notes-ru/computer-science/operating-systems/processes-and-threads.md",
-   "title_ru": "Процессы и потоки с точки зрения ОС"
+   "words": 3239,
+   "ru": "notes-ru/computer-science/operating-systems/process-management.md",
+   "title_ru": "Управление процессами"
   },
   {
    "id": "signals-and-process-lifecycle",
@@ -2779,7 +2764,7 @@
     "jvm-memory-areas",
     "lock-free-and-cas",
     "memory-management",
-    "processes-and-threads",
+    "process-management",
     "recursion-and-backtracking",
     "spring-aop",
     "virtual-threads"
@@ -2808,7 +2793,7 @@
     "linux-memory-filesystems-io",
     "linux-processes",
     "memory-management",
-    "processes-and-threads",
+    "process-management",
     "sockets-and-connection-pooling",
     "synchronization-and-monitors"
    ],

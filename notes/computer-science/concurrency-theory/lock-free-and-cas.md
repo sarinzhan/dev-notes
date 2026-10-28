@@ -21,7 +21,7 @@ learned: 2026-10-27
 | Obstruction-free | a thread finishes if it runs alone long enough | some STM designs |
 | Lock-free | some thread always completes in bounded steps; individual threads may starve | CAS retry loops, Treiber stack, Michael-Scott queue, `ConcurrentLinkedQueue` |
 | Wait-free | every thread completes in bounded steps | fetch-and-add counters, `LongAdder` increments, single-producer/single-consumer ring buffers |
-- Lock-free is about **progress under preemption and failure**, not raw speed. A lock-free structure can be slower than a locked one under low contention; its value is that a thread paused by the OS ([[cpu-scheduling]]), a GC safepoint or a page fault cannot stall the rest, and there is no priority inversion or deadlock ([[deadlocks-and-synchronization-primitives]]).
+- Lock-free is about **progress under preemption and failure**, not raw speed. A lock-free structure can be slower than a locked one under low contention; its value is that a thread paused by the OS ([[process-management]]), a GC safepoint or a page fault cannot stall the rest, and there is no priority inversion or deadlock ([[deadlocks-and-synchronization-primitives]]).
 
 ### The CAS loop
 ```c

@@ -40,7 +40,7 @@ A greedy algorithm makes the **locally best choice at every step and never revis
 | when unsure | try greedy, look for a counter-example | fall back to DP |
 
 ### Where greedy shows up in systems
-- Scheduling: shortest-job-first minimises average wait; earliest-deadline-first for real-time; both are greedy ([[cpu-scheduling]]).
+- Scheduling: shortest-job-first minimises average wait; earliest-deadline-first for real-time; both are greedy ([[process-management]]).
 - Kafka's range and round-robin partition assignors, and sticky assignment minimising moves, are greedy heuristics ([[kafka-consumer]]).
 - Bin packing of pods onto nodes in Kubernetes schedulers is greedy with scoring; optimal bin packing is NP-hard ([[kubernetes-basics]]).
 - Huffman trees sit inside DEFLATE (gzip), so every compressed HTTP response is a greedy algorithm at work ([[http-fundamentals]]).

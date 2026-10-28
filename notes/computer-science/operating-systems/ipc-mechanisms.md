@@ -4,7 +4,7 @@ tags: [operating-systems, ipc, sockets, pipes, shared-memory]
 learned: 2026-10-27
 ---
 ## TL;DR
-Processes have separate address spaces, so they talk through the kernel: **pipes** (a byte stream between parent and child or between shell commands), **Unix domain sockets** (bidirectional, same-host, used by Docker, Postgres and most sidecars), **TCP sockets** (the same API across hosts), **shared memory** (the fastest, zero copies, but you bring your own synchronization), **message queues** and **signals** (small notifications). The choice is about coupling, speed and whether the other side may be on another machine. Nearly every backend system you touch is IPC: the JDBC connection, the Kafka client, the OTel exporter, the `docker.sock`. Within one process threads just share memory ([[processes-and-threads]]); between services over the network it becomes [[service-communication-sync-vs-async]].
+Processes have separate address spaces, so they talk through the kernel: **pipes** (a byte stream between parent and child or between shell commands), **Unix domain sockets** (bidirectional, same-host, used by Docker, Postgres and most sidecars), **TCP sockets** (the same API across hosts), **shared memory** (the fastest, zero copies, but you bring your own synchronization), **message queues** and **signals** (small notifications). The choice is about coupling, speed and whether the other side may be on another machine. Nearly every backend system you touch is IPC: the JDBC connection, the Kafka client, the OTel exporter, the `docker.sock`. Within one process threads just share memory ([[process-management]]); between services over the network it becomes [[service-communication-sync-vs-async]].
 
 ## Key points
 

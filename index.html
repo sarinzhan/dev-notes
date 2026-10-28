@@ -2637,6 +2637,177 @@ ANIMS["cpu-parallelism"] = el=>{
   }});
 };
 
+// ============ 24. Process table, PCB, threads, thread table, TCB
+ANIMS["process-thread-tables"] = el=>{
+  const ST = [
+    { t: ["Two processes", "Два процесса"], view: "proc", lvl: 0, en: "Two running programs, PID 100 and PID 200. Each has its own virtual address space with code, data, heap and a stack. The CPU knows nothing about them; the kernel has to keep track of both.",
+      ru: "Две работающие программы, PID 100 и PID 200. У каждой своё виртуальное адресное пространство с кодом, данными, кучей и стеком. CPU о них ничего не знает; следить за обеими должно ядро." },
+    { t: ["Process table", "Таблица процессов"], view: "proc", lvl: 1, en: "In kernel memory, the process table maps each PID to the address of its process control block (PCB), for a quick lookup. User programs cannot read it; tools like ps get the data through /proc.",
+      ru: "В памяти ядра таблица процессов отображает каждый PID на адрес его блока управления процессом (PCB) — для быстрого поиска. Пользовательские программы её не видят; утилиты вроде ps получают данные через /proc." },
+    { t: ["Process control block", "Блок управления процессом"], view: "proc", lvl: 2, en: "The PCB is the kernel's record of one process: PID and state, saved program counter and registers, a pointer to its page table, open file descriptors, priority, CPU and memory accounting, IPC resources. Process 100 is running; 200 is stopped, its registers parked in its PCB.",
+      ru: "PCB — запись ядра об одном процессе: PID и состояние, сохранённые счётчик команд и регистры, указатель на таблицу страниц, открытые файловые дескрипторы, приоритет, учёт CPU и памяти, ресурсы IPC. Процесс 100 выполняется; 200 остановлен, его регистры лежат в PCB." },
+    { t: ["Threads inside a process", "Потоки внутри процесса"], view: "thr", lvl: 0, en: "Process 100 starts two threads. They share its code, heap, data, open files and page table. Each thread gets only its own stack (inside the same address space) and its own program counter and registers. That is why a thread is called a lightweight process.",
+      ru: "Процесс 100 запускает два потока. Они делят его код, кучу, данные, открытые файлы и таблицу страниц. Каждому потоку достаётся только свой стек (в том же адресном пространстве) и свои счётчик команд и регистры. Поэтому поток называют облегчённым процессом." },
+    { t: ["Thread table and TCB", "Таблица потоков и TCB"], view: "thr", lvl: 1, en: "For each thread the kernel keeps a thread control block (TCB): TID, state, saved PC and registers, its stack pointer, priority, CPU time, and a pointer back to the PCB of its process. The thread table maps TID to TCB. Thread 1001 is running, 1002 is waiting.",
+      ru: "Для каждого потока ядро хранит блок управления потоком (TCB): TID, состояние, сохранённые PC и регистры, указатель стека, приоритет, время CPU и ссылку на PCB своего процесса. Таблица потоков отображает TID на TCB. Поток 1001 выполняется, 1002 ждёт." },
+    { t: ["Linux: everything is a task", "Linux: всё — задача"], view: "thr", lvl: 2, en: "Linux has one structure for both, task_struct. A thread is a task created by clone() with the address space (mm), files and signal handlers shared with its parent; a process is a task with its own. The scheduler only ever picks tasks. A JVM with 57 threads is 57 tasks: ls /proc/<pid>/task.",
+      ru: "В Linux для обоих одна структура — task_struct. Поток — это задача, созданная clone() с общими с родителем адресным пространством (mm), файлами и обработчиками сигналов; процесс — задача со своими. Планировщик всегда выбирает задачи. JVM с 57 потоками — это 57 задач: ls /proc/<pid>/task." }
+  ];
+  const AS = (g, x, y, w, h, label, threads, dim)=>{
+    const grp = E(g, "g", { class: dim ? "an-dim" : "" });
+    oT(grp, x + w / 2, y - 8, label, "an-m an-b"); oR(grp, x, y, w, h, "an-frame", 6);
+    const R = (yy, hh, cls, txt) => { oR(grp, x + 6, yy, w - 12, hh, "an-pg " + cls, 4); oT(grp, x + w / 2, yy + hh / 2 + 4, txt, "an-t an-b"); };
+    if(threads){ R(y + 6, 36, "k0", LL("main stack", "стек main")); R(y + 46, 34, "k3", LL("thread 1 stack", "стек потока 1")); R(y + 84, 34, "k3", LL("thread 2 stack", "стек потока 2")); }
+    else R(y + 6, 50, "k0", LL("stack", "стек"));
+    R(y + h - 172, 46, "k4", LL("heap", "куча")); R(y + h - 120, 46, "k2", LL("data", "данные")); R(y + h - 68, 62, "k1", LL("text / code", "text / код"));
+    return { stack: y + 24, s1: y + 63, s2: y + 101, mid: y + h / 2 };
+  };
+  const box = (g, x, y, w, h, title, lines, cls)=>{ oT(g, x, y - 6, title, "an-m an-b", "start"); oR(g, x, y, w, h, cls || "an-box", 6); lines.forEach((l, i)=> oT(g, x + 10, y + 17 + i * 15, l, "an-code", "start")); };
+  const link = (g, x1, y1, x2, y2, on) => E(g, "path", { d: `M${x1} ${y1}C${(x1 + x2) / 2} ${y1},${(x1 + x2) / 2} ${y2},${x2} ${y2}`, class: "an-link2" + (on ? " on" : "") });
+  return steppedAnim(el, { title: LL("Process table, PCB, threads and TCB", "Таблица процессов, PCB, потоки и TCB"), vb: [760, 420], steps: ST, stepMs: 6400, render(g, s){
+    if(s.view === "proc"){
+      const a = AS(g, 14, 40, 150, 360, "PID 100", false), b = AS(g, 186, 40, 150, 360, "PID 200", false);
+      if(s.lvl >= 1){ box(g, 470, 30, 270, 66, LL("process table (kernel)", "таблица процессов (ядро)"), ["PID | PCB", "100 | 0x222222", "200 | 0x333333"], "an-reg on"); }
+      if(s.lvl >= 2){
+        box(g, 470, 130, 270, 128, "PCB 100", [LL("PID 100 · running", "PID 100 · выполняется"), "pc=4012  sp, bp, lr…", LL("page table: 0x555555", "табл. страниц: 0x555555"), "fds: 0 1 2 5(socket)", LL("priority 120 · cpu 3.2 s", "приоритет 120 · cpu 3,2 с"), LL("IPC: shm, semaphores", "IPC: shm, семафоры"), LL("parent PID 1", "родитель PID 1")], "an-box");
+        box(g, 470, 290, 270, 66, "PCB 200", [LL("PID 200 · stopped", "PID 200 · остановлен"), "pc=8008  sp, bp…", LL("page table: 0x444444", "табл. страниц: 0x444444")], "an-box");
+        link(g, 470, 194, 164, a.mid, true); link(g, 470, 322, 336, b.mid, false);
+      }
+    } else {
+      const a = AS(g, 14, 40, 170, 360, LL("PID 100 · one address space", "PID 100 · одно адресное пространство"), true);
+      if(s.lvl >= 1){
+        box(g, 330, 30, 200, 66, LL("thread table (kernel)", "таблица потоков (ядро)"), ["PID | TID  | TCB", "100 | 1001 | 0x2a0", "100 | 1002 | 0x2b0"], "an-reg on");
+        box(g, 560, 30, 186, 100, "TCB 1001", [LL("running", "выполняется"), "pc1, regs", "sp → stack 1", "→ PCB 100"], "an-box");
+        box(g, 560, 160, 186, 100, "TCB 1002", [LL("waiting", "ждёт"), "pc2, regs", "sp → stack 2", "→ PCB 100"], "an-box");
+        box(g, 330, 300, 230, 66, "PCB 100", [LL("shared by both threads:", "общий для обоих потоков:"), LL("page table, fds, heap", "таблица страниц, fds, куча")], "an-box");
+        link(g, 560, 80, 184, a.s1, true); link(g, 560, 210, 184, a.s2, false);
+        E(g, "path", { d: "M746 110C770 200,700 330,560 334", class: "an-link2" }); E(g, "path", { d: "M746 240C766 300,700 340,560 340", class: "an-link2" });
+      }
+      if(s.lvl >= 2){ oR(g, 330, 384, 416, 28, "an-reg on", 6); oT(g, 538, 403, LL("Linux: PCB and TCB are both task_struct; threads share mm", "Linux: PCB и TCB — это task_struct; потоки делят mm"), "an-m an-b"); }
+    }
+  }});
+};
+
+// ============ 25. Context switch between processes: save to PCB, load PCB, ptbr, TLB flush vs ASID, thread switch
+ANIMS["context-switch"] = el=>{
+  const P100 = { pc: 4012, sp: "0xff9998", ptbr: "0x555555" }, P200 = { pc: 8008, sp: "0xff7720", ptbr: "0x444444" };
+  const T100 = ["4000→28000", "8000→40000"], T200 = ["4000→8000", "8000→16000"];
+  const ST = [
+    { t: ["Process 100 runs", "Работает процесс 100"], cpu: P100, run: 100, tlb: T100.map(e => ["", e]), pcb: ["ready·?", "ready"], mode: "user", en: "The CPU does not know what a process is. It only has registers: pc, sp, bp, lr and the page table base register (ptbr). The OS loaded process 100's values there, which is called its context, and the CPU executes instructions. The TLB holds 100's recent address translations.",
+      ru: "CPU не знает, что такое процесс. У него есть только регистры: pc, sp, bp, lr и регистр базы таблицы страниц (ptbr). ОС загрузила туда значения процесса 100 — это и называется его контекстом, — и CPU выполняет инструкции. В TLB лежат недавние трансляции адресов процесса 100." },
+    { t: ["Timer interrupt", "Прерывание таймера"], cpu: P100, run: 100, tlb: T100.map(e => ["", e]), pcb: ["running", "ready"], mode: "kernel", irq: true, en: "Process 100's time slice ends: the timer raises an interrupt, the CPU switches to kernel mode and jumps into the scheduler. The scheduler decides that process 200 runs next.",
+      ru: "Квант процесса 100 заканчивается: таймер поднимает прерывание, CPU переходит в режим ядра и прыгает в планировщик. Планировщик решает, что следующим работает процесс 200." },
+    { t: ["Save context to PCB 100", "Сохранить контекст в PCB 100"], cpu: P100, run: null, tlb: T100.map(e => ["", e]), pcb: ["ready", "ready"], mode: "kernel", save: true, en: "The kernel saves the current registers into PCB 100 (a memory write): pc=4012, sp, bp, lr, ptbr. Process 100 becomes ready: it can run, it just has no CPU.",
+      ru: "Ядро сохраняет текущие регистры в PCB 100 (запись в память): pc=4012, sp, bp, lr, ptbr. Процесс 100 становится готовым: он может работать, просто у него нет CPU." },
+    { t: ["Load context from PCB 200", "Загрузить контекст из PCB 200"], cpu: P200, run: 200, tlb: T100.map(e => ["", e]), pcb: ["ready", "running"], mode: "kernel", load: true, en: "The kernel reads PCB 200 (a memory read) into the registers: pc=8008, sp, and ptbr=0x444444, so the MMU now walks 200's page table. On return to user mode the CPU continues process 200 exactly where it stopped.",
+      ru: "Ядро читает PCB 200 (чтение из памяти) в регистры: pc=8008, sp и ptbr=0x444444, так что MMU теперь обходит таблицу страниц 200. При возврате в режим пользователя CPU продолжает процесс 200 ровно с того места, где он остановился." },
+    { t: ["TLB flush", "Сброс TLB"], cpu: P200, run: 200, tlb: [], pcb: ["ready", "running"], mode: "user", flush: true, en: "The TLB still holds 100's translations, and 4000 means a different physical page for process 200. Without tags they must be flushed. Process 200 then misses the TLB on its first accesses and pays page-table walks: the hidden, larger part of a process switch.",
+      ru: "В TLB остались трансляции процесса 100, а 4000 у процесса 200 означает другую физическую страницу. Без меток их нужно сбросить. Тогда процесс 200 на первых обращениях промахивается мимо TLB и платит обходами таблицы страниц — это скрытая и бо́льшая часть цены переключения процессов." },
+    { t: ["ASID / PCID tags", "Метки ASID / PCID"], cpu: P200, run: 200, tlb: [["100", T100[0]], ["100", T100[1]], ["200", T200[0]], ["200", T200[1]]], pcb: ["ready", "running"], mode: "user", en: "With address space IDs (ASID on ARM, PCID on x86) every TLB entry is tagged with its process. Entries of 100 and 200 live side by side, nothing is flushed, and when 100 runs again its translations may still be warm. ARM gives 8 or 16 bits of ASID, x86 PCID 12 bits.",
+      ru: "С идентификаторами адресного пространства (ASID на ARM, PCID на x86) каждая запись TLB помечена своим процессом. Записи 100 и 200 живут рядом, ничего не сбрасывается, и когда 100 снова запустится, его трансляции могут быть ещё тёплыми. ARM даёт 8 или 16 бит ASID, x86 — 12 бит PCID." },
+    { t: ["Thread switch: cheaper", "Переключение потоков дешевле"], cpu: { pc: 8120, sp: "0xff5100", ptbr: "0x444444" }, run: "200·T2", tlb: T200.map(e => ["", e]), pcb: ["ready", "running"], mode: "user", thread: true, en: "Switching between two threads of the same process saves and loads only pc, sp and registers. ptbr stays the same, so the TLB stays valid and the caches hold the shared heap. That is why threads of one process are faster to switch than processes.",
+      ru: "Переключение между двумя потоками одного процесса сохраняет и загружает только pc, sp и регистры. ptbr не меняется, поэтому TLB остаётся валидным, а в кэшах лежит общая куча. Поэтому потоки одного процесса переключаются быстрее, чем процессы." }
+  ];
+  const AS = (g, x, label, on, pc)=>{
+    const grp = E(g, "g", { class: on ? "" : "an-dim" });
+    oT(grp, x + 60, 22, label, "an-m an-b"); oR(grp, x, 30, 120, 150, "an-frame", 6);
+    [["k0", LL("stack", "стек"), 36], ["k4", LL("heap", "куча"), 80], ["k2", LL("data", "данные"), 112], ["k1", "text", 144]].forEach(([c, t, y])=>{ oR(grp, x + 6, y, 108, y === 144 ? 30 : 26, "an-pg " + c, 3); oT(grp, x + 60, y + 18, t, "an-t an-b"); });
+    if(on) oT(g, x + (x < 300 ? 126 : -6), 163, "◀ pc=" + pc, "an-m an-b an-sp", x < 300 ? "start" : "end");
+  };
+  const PT = (g, x, title, rows, on)=>{ const grp = E(g, "g", { class: on ? "" : "an-dim" }); oT(grp, x, 202, title, "an-m an-b", "start"); rows.forEach((r, i)=>{ oR(grp, x, 208 + i * 20, 120, 18, "an-box", 3); oT(grp, x + 6, 221 + i * 20, r, "an-code", "start"); }); };
+  return steppedAnim(el, { title: LL("Context switch between processes", "Переключение контекста между процессами"), vb: [760, 430], steps: ST, stepMs: 6400, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1600));
+    AS(g, 10, LL("process 100", "процесс 100"), s.run === 100, P100.pc); AS(g, 630, LL("process 200", "процесс 200"), String(s.run).startsWith("200"), s.cpu.pc);
+    PT(g, 10, LL("100: 0x555555", "табл. 100: 0x555555"), ["4000 → 28,000", "8000 → 40,000", "12000 → 44,000"], s.run === 100);
+    PT(g, 630, LL("200: 0x444444", "табл. 200: 0x444444"), ["4000 → 8,000", "8000 → 16,000", "12000 → 20,000"], String(s.run).startsWith("200"));
+    // CPU
+    oR(g, 290, 22, 180, 160, s.irq ? "an-reg on" : "an-frame", 10);
+    oT(g, 380, 40, "CPU · " + (s.mode === "kernel" ? LL("kernel mode", "режим ядра") : LL("user mode", "режим пользователя")), "an-m an-b" + (s.mode === "kernel" ? " an-warn" : ""));
+    [["pc", s.cpu.pc], ["sp", s.cpu.sp], ["ptbr", s.cpu.ptbr]].forEach(([n, v], i)=>{ const ch = (s.load || s.thread) && (n !== "ptbr" || s.load); oR(g, 302, 52 + i * 34, 156, 28, "an-reg" + (ch ? " on" : ""), 5); oT(g, 310, 71 + i * 34, n, "an-m", "start"); oT(g, 450, 71 + i * 34, String(v), "an-code", "end"); });
+    if(s.irq) oT(g, 380, 172, LL("⏰ timer interrupt", "⏰ прерывание таймера"), "an-m an-b an-warn");
+    // TLB
+    oT(g, 296, 202, "TLB", "an-m an-b", "start");
+    oR(g, 290, 208, 180, 92, "an-frame", 6);
+    if(s.flush){ oT(g, 380, 250, LL("flushed: empty", "сброшен: пуст"), "an-t an-b an-warn"); oT(g, 380, 270, LL("→ misses, page walks", "→ промахи, обходы таблиц"), "an-m"); }
+    s.tlb.forEach(([asid, e], i)=>{ oR(g, 298, 214 + i * 21, 164, 18, "an-box", 3); if(asid) { oR(g, 298, 214 + i * 21, 40, 18, "an-pg " + (asid === "100" ? "k0" : "k2"), 3); oT(g, 318, 227 + i * 21, asid, "an-m an-b"); } oT(g, asid ? 346 : 306, 227 + i * 21, e, "an-code", "start"); });
+    // PCBs
+    const pcb = (x, id, st, P, on)=>{ oT(g, x, 330, "PCB " + id, "an-m an-b", "start"); oR(g, x, 336, 230, 74, on ? "an-reg on" : "an-box", 6);
+      oT(g, x + 10, 354, `${id}, ${LL(st === "running" ? "running" : "ready", st === "running" ? "выполняется" : "готов")}`, "an-code", "start");
+      oT(g, x + 10, 372, `pc=${P.pc}  sp=${P.sp}`, "an-code", "start"); oT(g, x + 10, 390, LL("page table: ", "табл. страниц: ") + P.ptbr, "an-code", "start"); };
+    pcb(150, 100, s.pcb[0] === "ready·?" ? "running" : s.pcb[0], P100, s.save); pcb(390, 200, s.pcb[1], P200, s.load);
+    if(s.save) for(let j = 0; j < 3; j++){ const kk = k - j * .12; if(kk <= 0) continue; const [x, y] = polyAt([[380, 182], [380, 310], [265, 336]], kk); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); }
+    if(s.load) for(let j = 0; j < 3; j++){ const kk = k - j * .12; if(kk <= 0) continue; const [x, y] = polyAt([[505, 336], [500, 310], [440, 182]], kk); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); }
+    if(s.save) oT(g, 150, 424, LL("memory write", "запись в память"), "an-m an-b", "start");
+    if(s.load) oT(g, 390, 424, LL("memory read", "чтение из памяти"), "an-m an-b", "start");
+    if(s.thread) oT(g, 380, 314, LL("ptbr unchanged → TLB kept", "ptbr тот же → TLB сохранён"), "an-m an-b an-sp");
+  }});
+};
+
+// ============ 26. Scheduling: cooperative vs preemptive, time slices, CPU-bound vs IO-bound
+ANIMS["cpu-scheduling-timeline"] = el=>{
+  const ST = [
+    { t: ["Cooperative", "Кооперативная"], lanes: [["A", [[0, 8, "k3", "A"]]], ["B", [[0, 8, "wait"]]], ["C", [[0, 8, "wait"]]]], en: "Cooperative multitasking: a program keeps the CPU until it gives it up. Process A runs a long loop and never yields, so B and C starve and the whole system freezes. That is how Windows 3.1 and classic Mac OS behaved.",
+      ru: "Кооперативная многозадачность: программа держит CPU, пока сама его не отдаст. Процесс A крутит долгий цикл и не уступает, поэтому B и C голодают, и вся система замирает. Так вели себя Windows 3.1 и классическая Mac OS." },
+    { t: ["Preemptive, time slices", "Вытесняющая, кванты"], lanes: [["A", [[0, 1, "k3", "A"], [3, 4, "k3", "A"], [6, 7, "k3", "A"]]], ["B", [[1, 2, "k0", "B"], [4, 5, "k0", "B"], [7, 8, "k0", "B"]]], ["C", [[2, 3, "k2", "C"], [5, 6, "k2", "C"]]]], ticks: true, en: "Preemptive multitasking: the timer interrupts every few milliseconds, and when a time slice ends the kernel switches the process out, however long it wants to run. A, B and C take turns, nobody starves. Every modern OS works this way.",
+      ru: "Вытесняющая многозадачность: таймер прерывает каждые несколько миллисекунд, и когда квант заканчивается, ядро снимает процесс с CPU, сколько бы он ни хотел работать. A, B и C работают по очереди, никто не голодает. Так работает любая современная ОС." },
+    { t: ["CPU-bound vs IO-bound", "Вычисления против ввода-вывода"], lanes: [["A cpu", [[0, 1.6, "k3", "A"], [2, 3.6, "k3", "A"], [4, 5.6, "k3", "A"], [6, 7.6, "k3", "A"]]], ["B io", [[1.6, 2, "k0", "B"], [2, 3.6, "io"], [3.6, 4, "k0", "B"], [4, 5.6, "io"], [5.6, 6, "k0", "B"], [6, 7.6, "io"]]]], en: "A is CPU-bound (encryption, compression, sorting, query planning): it uses every slice it gets. B is IO-bound (database queries, network, files): it runs briefly, then blocks waiting for IO. A fair scheduler (Linux CFS/EEVDF) gives B the CPU right away when it wakes, because B has used little CPU, so its latency stays low.",
+      ru: "A загружает CPU (шифрование, сжатие, сортировка, планирование запросов): он использует каждый полученный квант. B ждёт ввода-вывода (запросы к базе, сеть, файлы): работает недолго и блокируется на IO. Справедливый планировщик (Linux CFS/EEVDF) отдаёт B процессор сразу при пробуждении, потому что B мало использовал CPU, и его задержка остаётся низкой." },
+    { t: ["Slice length: a trade-off", "Длина кванта: компромисс"], lanes: [["short", (()=>{ const o = []; for(let q = 0; q < 16; q++){ o.push([q * .5, q * .5 + .38, q % 2 ? "k0" : "k3", q % 2 ? "B" : "A"]); o.push([q * .5 + .38, q * .5 + .5, "k4", ""]); } return o; })()], ["long", [[0, 4, "k3", "A"], [4, 8, "k0", "B"]]]], en: "Short slices give good latency but many context switches, each with saved registers and cold caches (pink). Long slices give throughput but B waits 4 seconds here. Linux targets a few milliseconds and shrinks the slice as more tasks become runnable.",
+      ru: "Короткие кванты дают хорошую задержку, но много переключений контекста, каждое с сохранением регистров и холодными кэшами (розовое). Длинные кванты дают пропускную способность, но B здесь ждёт 4 секунды. Linux целится в несколько миллисекунд и уменьшает квант, когда готовых задач становится больше." }
+  ];
+  const X0 = 110, W = 610, SEC = W / 8;
+  return steppedAnim(el, { title: LL("Scheduling: who gets the CPU and for how long", "Планирование: кто получает CPU и надолго ли"), vb: [760, 180], steps: ST, stepMs: 6600, render(g, s, t){
+    const k = Math.min(1, t / 4500), now = k * 8;
+    for(let sec = 0; sec <= 8; sec++){ oT(g, X0 + sec * SEC, 22, String(sec), "an-m"); if(s.ticks) E(g, "line", { x1: X0 + sec * SEC, y1: 28, x2: X0 + sec * SEC, y2: 34 + s.lanes.length * 46, class: "an-link2 an-dash" }); }
+    oT(g, X0 + W, 12, LL("time →", "время →"), "an-m", "end");
+    s.lanes.forEach(([name, segs], r)=>{
+      const y = 32 + r * 46; oT(g, X0 - 10, y + 22, name, "an-t an-b", "end"); oR(g, X0, y, W, 34, "an-frame", 5);
+      for(const [a, b, cls, txt] of segs){ const to = Math.min(b, now); if(to - a <= .02) continue; const x1 = X0 + a * SEC, x2 = X0 + to * SEC;
+        if(cls === "wait"){ oR(g, x1 + 1, y + 2, x2 - x1 - 2, 30, "an-leak", 4); if(x2 - x1 > 120) oT(g, (x1 + x2) / 2, y + 22, LL("ready, starving", "готов, голодает"), "an-m an-b an-warn"); continue; }
+        if(cls === "io"){ oR(g, x1 + 1, y + 2, x2 - x1 - 2, 30, "an-free", 4); if(x2 - x1 > 60) oT(g, (x1 + x2) / 2, y + 22, LL("blocked on IO", "ждёт IO"), "an-m"); continue; }
+        oR(g, x1 + 1, y + 2, Math.max(1, x2 - x1 - 2), 30, "an-pg " + cls, 4); if(txt && x2 - x1 > 24) oT(g, (x1 + x2) / 2, y + 22, txt, "an-t an-b"); }
+    });
+    E(g, "line", { x1: X0 + now * SEC, y1: 28, x2: X0 + now * SEC, y2: 34 + s.lanes.length * 46, class: "an-flowline" });
+  }});
+};
+
+// ============ 27. Race condition: two threads a++ on shared a
+ANIMS["race-condition"] = el=>{
+  const OPS = [["ldr r0, [a]", "load"], ["add r0, r0, #1", "add"], ["str r0, [a]", "store"]];
+  // events: [thread, op] in order; state per step derived
+  const ST = [
+    { t: ["Shared a = 1", "Общая a = 1"], ev: 0, lock: false, en: "Two threads (or two processes on shared memory) both run a++ on the same variable a = 1. The expected result is 3. a++ is not one instruction: it is load into a register, add, store back.",
+      ru: "Два потока (или два процесса на общей памяти) выполняют a++ над одной переменной a = 1. Ожидаемый результат — 3. a++ — это не одна инструкция: загрузка в регистр, сложение, запись обратно." },
+    { t: ["T1 loads a", "T1 читает a"], ev: 1, lock: false, en: "T1 loads a into its register: r0 = 1.", ru: "T1 загружает a в свой регистр: r0 = 1." },
+    { t: ["T2 loads a too", "T2 тоже читает a"], ev: 2, lock: false, en: "Before T1 stores, T2 runs (on another core, or after a context switch) and also loads a: its r0 = 1. Each thread has its own registers, saved in its TCB.",
+      ru: "Прежде чем T1 записал результат, работает T2 (на другом ядре или после переключения контекста) и тоже читает a: его r0 = 1. У каждого потока свои регистры, сохраняемые в его TCB." },
+    { t: ["Both add", "Оба складывают"], ev: 4, lock: false, en: "Both add 1 to their own copy: r0 = 2 in T1 and r0 = 2 in T2.", ru: "Оба прибавляют 1 к своей копии: r0 = 2 у T1 и r0 = 2 у T2." },
+    { t: ["Lost update", "Потерянное обновление"], ev: 6, lock: false, en: "T1 stores 2, then T2 stores 2. Two increments ran, a = 2 instead of 3: one update is lost. It happens rarely and only under load, which makes it hard to reproduce. This is a race condition.",
+      ru: "T1 записывает 2, затем T2 записывает 2. Прошло два инкремента, а a = 2 вместо 3: одно обновление потеряно. Это случается редко и только под нагрузкой, поэтому трудно воспроизводится. Это состояние гонки (race condition)." },
+    { t: ["Fix: lock or atomic", "Решение: блокировка или атомарность"], ev: 6, lock: true, en: "Make load-add-store indivisible. A mutex (synchronized, ReentrantLock) lets T2 wait until T1 has stored, so T2 reads 2 and writes 3. An atomic instruction (lock xadd, CAS, AtomicInteger.incrementAndGet) does the whole read-modify-write in one step.",
+      ru: "Нужно сделать загрузку-сложение-запись неделимыми. Мьютекс (synchronized, ReentrantLock) заставляет T2 ждать, пока T1 не запишет результат, поэтому T2 читает 2 и пишет 3. Атомарная инструкция (lock xadd, CAS, AtomicInteger.incrementAndGet) выполняет всё чтение-изменение-запись за один шаг." }
+  ];
+  const RACE = [[1, 0], [2, 0], [1, 1], [2, 1], [1, 2], [2, 2]], LOCKED = [[1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]];
+  const sim = (seq, n)=>{ let a = 1; const r = { 1: null, 2: null }, done = { 1: -1, 2: -1 }; for(let i = 0; i < n; i++){ const [th, op] = seq[i]; if(op === 0) r[th] = a; if(op === 1) r[th] += 1; if(op === 2) a = r[th]; done[th] = op; } return { a, r, done }; };
+  return steppedAnim(el, { title: LL("Race condition: two threads, one a++", "Гонка: два потока, один a++"), vb: [760, 330], steps: ST, stepMs: 5400, render(g, s, t){
+    const seq = s.lock ? LOCKED : RACE, n = s.lock ? Math.min(6, Math.floor(t / 700)) : s.ev, st = sim(seq, n), k = easeIO(Math.min(1, (t % 700) / 500));
+    oR(g, 320, 20, 120, 50, s.lock ? "an-reg on" : "an-reg" + (n === 6 && !s.lock ? " on" : ""), 8); oT(g, 380, 38, LL("shared memory", "общая память"), "an-m"); oT(g, 380, 62, `a = ${st.a}`, "an-big" + (n === 6 && !s.lock ? " an-warn" : ""));
+    if(n === 6) oT(g, 450, 50, s.lock ? LL("correct: 3", "верно: 3") : LL("expected 3 → lost update", "ожидали 3 → потеряно обновление"), "an-m an-b" + (s.lock ? "" : " an-warn"), "start");
+    for(const th of [1, 2]){
+      const x = th === 1 ? 40 : 460, w = 260;
+      oT(g, x + w / 2, 116, (th === 1 ? "T1" : "T2") + " · a++", "an-t an-b");
+      oR(g, x, 124, w, 130, "an-frame", 8);
+      OPS.forEach(([c], i)=>{ const done = st.done[th] >= i; oR(g, x + 10, 134 + i * 30, w - 20, 24, done ? "an-pg " + (th === 1 ? "k1" : "k0") : "an-box", 4); oT(g, x + 20, 151 + i * 30, c.replace(/ /g, " "), "an-code", "start"); if(done) oT(g, x + w - 18, 151 + i * 30, "✓", "an-t an-b", "end"); });
+      oR(g, x + 10, 226, w - 20, 22, "an-reg", 4); oT(g, x + 20, 241, `r0 = ${st.r[th] == null ? "–" : st.r[th]}`, "an-code", "start");
+      if(s.lock){ const holds = (th === 1 && n >= 1 && n < 3) || (th === 2 && n >= 4 && n < 6), waits = th === 2 && n >= 1 && n < 4; if(holds || waits) oT(g, x + w - 18, 241, holds ? LL("🔒 holds lock", "🔒 держит блокировку") : LL("waits for lock", "ждёт блокировку"), "an-m an-b" + (waits ? " an-warn" : ""), "end"); }
+    }
+    if(n > 0){ const [th, op] = seq[n - 1]; if(op !== 1 && t % 700 < 600){ const tx = th === 1 ? 170 : 590, a = [380, 70], b = [tx, 124]; const [p0, p1] = op === 0 ? [a, b] : [b, a]; E(g, "line", { x1: p0[0], y1: p0[1], x2: p1[0], y2: p1[1], class: "an-flowline" }); E(g, "circle", { cx: p0[0] + (p1[0] - p0[0]) * k, cy: p0[1] + (p1[1] - p0[1]) * k, r: 6, class: "an-dot an-flow" }); } }
+    // order log
+    oT(g, 40, 278, LL("order:", "порядок:"), "an-m an-b", "start");
+    seq.slice(0, n).forEach(([th, op], i)=>{ oR(g, 100 + i * 106, 266, 100, 20, "an-pg " + (th === 1 ? "k1" : "k0"), 3); oT(g, 150 + i * 106, 280, `T${th} ${OPS[op][1]}`, "an-m an-b"); });
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
