@@ -259,6 +259,7 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
 .an-reg{fill:var(--panel);stroke:var(--line);stroke-width:1.2} .an-reg.on{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.8}
 .an-big{font:600 20px var(--f-mono);fill:var(--fg);pointer-events:none;text-anchor:middle}
 .an-slot{fill-opacity:.2;stroke:var(--line)} .an-slot.dead{fill-opacity:.05;stroke-dasharray:3 3}
+.an-leak{fill:var(--warn);fill-opacity:.16;stroke:var(--warn);stroke-width:1.5;stroke-dasharray:4 3}
 .an-slot.an-hlslot{stroke:var(--accent);stroke-width:2;fill-opacity:.35} .an-mid{font:600 15px var(--f-mono);fill:var(--fg);pointer-events:none;text-anchor:middle}
 .an-deadt{fill:var(--muted);text-decoration:line-through}
 .an-bp{fill:var(--k3)} .an-sp{fill:var(--accent)}
@@ -1983,6 +1984,115 @@ ANIMS["program-execution"] = el=>{
       const t = k, bx = (1 - t) ** 3 * x + 3 * (1 - t) ** 2 * t * (x - 26) + 3 * (1 - t) * t * t * (x - 26) + t ** 3 * x, by = (1 - t) ** 3 * y1 + 3 * (1 - t) ** 2 * t * y1 + 3 * (1 - t) * t * t * y2 + t ** 3 * y2;
       E(g, "circle", { cx: bx, cy: by, r: 5, class: "an-dot an-flow" });
     }
+  }
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); steps.set(S.i, S.t / STEP_MS); render(); });
+  go(0); sh.kick();
+  return sh;
+};
+
+// ============ 14. The heap: malloc, a pointer on the stack, a leak when the function returns, free
+ANIMS["heap-leak"] = el=>{
+  const CODE = ["char *c;              // global: data section", "void f() {", "  int *a = malloc(9000);", "  c = malloc(100);", "}                     // no free(a)",
+                "int main() {", "  f();", "  use(c);", "  free(c);", "  while (1) f();", "}"];
+  // blocks: id -> {y offset from heap base, h, label, state}; frames on the stack; pointers
+  const ST = [
+    { line: 5, f: false, a: null, c: "NULL", A: null, C: null, t: ["Start", "Старт"],
+      en: "The process starts in main. The heap is empty. The global pointer c lives in the data section and starts as NULL. The stack holds main's frame.",
+      ru: "Процесс стартует в main. Куча пуста. Глобальный указатель c живёт в секции данных и изначально равен NULL. В стеке лежит фрейм main." },
+    { line: 1, f: true, a: "?", c: "NULL", A: null, C: null, t: ["f() is called", "Вызов f()"],
+      en: "f() gets a frame on the stack. Its local a is only a pointer, 8 bytes. The 9000 bytes it will point to go to the heap: they are big, and the frame disappears when f returns.",
+      ru: "f() получает фрейм в стеке. Её локальная a — всего лишь указатель, 8 байт. 9000 байт, на которые она будет указывать, пойдут в кучу: они большие, а фрейм исчезнет, когда f вернётся." },
+    { line: 2, f: true, a: "0x1000010", c: "NULL", A: "live", C: null, grow: "A", t: ["a = malloc(9000)", "a = malloc(9000)"],
+      en: "malloc asks the allocator for 9000 bytes. It finds free space in the heap (asking the kernel for more pages with brk or mmap if needed) and returns the address. Only that address is stored on the stack.",
+      ru: "malloc просит у аллокатора 9000 байт. Тот находит свободное место в куче (при необходимости запрашивая у ядра страницы через brk или mmap) и возвращает адрес. В стек записывается только этот адрес." },
+    { line: 3, f: true, a: "0x1000010", c: "0x1002340", A: "live", C: "live", grow: "C", t: ["c = malloc(100)", "c = malloc(100)"],
+      en: "A second block, placed above the first: the heap grows from low addresses to high. Its address goes into the global c, so any function can reach this block. The heap is not tied to the function that allocated it.",
+      ru: "Второй блок ложится над первым: куча растёт от младших адресов к старшим. Его адрес записывается в глобальную c, поэтому до блока может добраться любая функция. Куча не привязана к функции, которая выделила память." },
+    { line: 4, f: "dead", a: "0x1000010", c: "0x1002340", A: "leak", C: "live", t: ["f returns: leak", "f вернулась: утечка"],
+      en: "f returns without free(a). Its frame is popped and the pointer a disappears with it. The 9000 bytes stay allocated, but no one holds their address any more, so nothing can ever free them. That is a memory leak.",
+      ru: "f возвращается без free(a). Её фрейм снимается, и указатель a исчезает вместе с ним. 9000 байт остаются выделенными, но их адреса больше ни у кого нет, и освободить их уже нельзя. Это утечка памяти." },
+    { line: 7, f: false, a: null, c: "0x1002340", A: "leak", C: "live", hlc: true, t: ["use(c)", "use(c)"],
+      en: "Back in main, the block from f is still valid, because c points to it. Heap memory lives until it is freed, not until a function returns. That is its whole purpose.",
+      ru: "Снова в main, блок из f по-прежнему действителен, потому что на него указывает c. Память кучи живёт, пока её не освободят, а не пока функция не вернётся. В этом и весь её смысл." },
+    { line: 8, f: false, a: null, c: "0x1002340", dangling: true, A: "leak", C: "free", t: ["free(c)", "free(c)"],
+      en: "free gives the block back to the allocator, and the next malloc can reuse the hole. But c still holds the old address: a dangling pointer. Reading through it now is a use-after-free bug. Set it to NULL after free.",
+      ru: "free возвращает блок аллокатору, и следующий malloc сможет занять эту дыру. Но в c остался старый адрес — висячий указатель. Чтение через него теперь — ошибка use-after-free. После free присваивайте NULL." },
+    { line: 9, f: true, a: "…", c: "0x1002340", dangling: true, A: "leak", C: "free", loop: true, t: ["while (1) f()", "while (1) f()"],
+      en: "Every call to f leaks another 9000 bytes. The 100-byte hole is too small for them, so each new block goes higher: the heap grows up toward the stack. Resident memory keeps rising until malloc fails or the OOM killer ends the process. Long-running servers die this way.",
+      ru: "Каждый вызов f теряет ещё 9000 байт. Дыра в 100 байт для них мала, поэтому каждый новый блок ложится выше: куча растёт вверх, к стеку. Резидентная память растёт, пока malloc не вернёт ошибку или OOM killer не завершит процесс. Так умирают долгоживущие серверы." }
+  ];
+  const STEP_MS = 5600, MOVE_MS = 900, S = { i: 0, t: 0 };
+  const sh = animShell(el, { title: LL("The heap: malloc, free and a memory leak", "Куча: malloc, free и утечка памяти"), vb: [760, 440], buttons: [
+    { id: "prev", label: LL("← Back", "← Назад"), on(){ go(S.i - 1); } },
+    { id: "next", label: LL("Next →", "Дальше →"), on(){ go(S.i + 1); } }
+  ]});
+  const steps = sh.steps(ST.map(s => ({ title: LL(...s.t), text: LL(s.en, s.ru) })), i=>go(i));
+  function go(i){ S.i = (i + ST.length) % ST.length; S.t = 0; sh.say(LL(ST[S.i].en, ST[S.i].ru), 1); }
+  const MX = 420, MW = 230, HB = 324, HTOP0 = 214;   // heap base (bottom) and the drawn heap top
+  const AH = 46, CH = 18, LH = 10;
+  const ptr = (g, y1, y2, off, cls) => {
+    const x = MX + MW;
+    E(g, "path", { d: `M${x - 6} ${y1}C${x + off} ${y1},${x + off} ${y2},${x - 6} ${y2}`, class: "an-link2 " + cls });
+    E(g, "circle", { cx: x - 6, cy: y2, r: 4, class: "an-dot an-flow" });
+  };
+  function render(){
+    const g = sh.svg; g.textContent = ""; const s = ST[S.i], k = easeIO(Math.min(1, S.t / MOVE_MS));
+    // ---- C code
+    oT(g, 14, 26, LL("C program", "программа на C"), "an-m an-b", "start");
+    CODE.forEach((c, i)=>{
+      const y = 46 + i * 21;
+      if(i === s.line) oR(g, 8, y - 14, 330, 20, "an-rowhl", 4);
+      oT(g, 16, y, c.replace(/ +/g, m => " ".repeat(m.length)), "an-code" + (i === s.line ? "" : " c"), "start");
+    });
+    // ---- stats
+    const n = s.loop ? 1 + Math.min(9, Math.floor(S.t / 420)) : 0;
+    const leaked = (s.A === "leak" ? 9000 : 0) + n * 9000, live = s.C === "live" ? 100 : 0;
+    const B = x => LL(x.toLocaleString("en-US") + " B", x.toLocaleString("ru-RU") + " Б");
+    oR(g, 8, 290, 330, 80, "an-box", 8);
+    oT(g, 20, 312, LL("heap in use", "занято в куче") + ": " + B(leaked + live + (s.A === "live" ? 9000 : 0)), "an-t", "start");
+    oT(g, 20, 334, LL("reachable", "достижимо") + ": " + B(live + (s.A === "live" ? 9000 : 0)), "an-t", "start");
+    oT(g, 20, 356, LL("leaked", "утекло") + ": " + B(leaked) + (n ? LL(` (f called ${n + 1}×)`, ` (f вызвана ${n + 1}×)`) : ""), "an-t" + (leaked ? " an-b an-warn" : ""), "start");
+    // ---- memory column
+    oR(g, MX - 6, 14, MW + 12, 418, "an-frame", 10);
+    oT(g, MX - 12, 30, "0x7ffc…", "an-m", "end");
+    oT(g, MX + 8, 32, LL("Stack ↓", "Стек ↓"), "an-t an-b", "start");
+    oR(g, MX, 40, MW, 34, "an-slot k0", 6); oT(g, MX + 10, 61, LL("main's frame", "фрейм main"), "an-t", "start");
+    if(s.f){
+      const dead = s.f === "dead";
+      oR(g, MX, 78, MW, 40, "an-slot k3" + (dead ? " dead" : ""), 6);
+      oT(g, MX + 10, 94, LL("f's frame", "фрейм f") + (dead ? LL(" (popped)", " (снят)") : ""), dead ? "an-m an-deadt" : "an-m", "start");
+      oT(g, MX + 10, 111, `int *a = ${s.a}`, dead ? "an-code c an-deadt" : "an-code", "start");
+    }
+    // heap blocks
+    const loopH = n * LH, top = Math.min(HTOP0, HB - AH - CH - 6 - loopH - 26);
+    oT(g, MX + MW / 2, (130 + top) / 2 + 4, LL("free (unmapped)", "свободно (не отображено)"), "an-m");
+    oR(g, MX, top, MW, HB - top + 4, "an-free", 6);
+    oT(g, MX + 8, top + 16, LL("Heap ↑", "Куча ↑"), "an-t an-b", "start");
+    const yA = HB - AH, yC = yA - 4 - CH;
+    if(s.A){
+      const h = s.grow === "A" ? AH * k : AH;
+      oR(g, MX + 6, HB - h, MW - 12, h, s.A === "leak" ? "an-leak" : "an-slot k1", 5);
+      if(h > 30){ oT(g, MX + 14, yA + 18, LL("9000 B block", "блок 9000 Б") + (s.A === "leak" ? LL(" (leaked)", " (утёк)") : ""), "an-t" + (s.A === "leak" ? " an-warn an-b" : ""), "start");
+        oT(g, MX + 14, yA + 36, "0x1000010", "an-m", "start"); }
+    }
+    if(s.C){
+      const h = s.grow === "C" ? CH * k : CH;
+      oR(g, MX + 6, yC + CH - h, MW - 12, h, s.C === "free" ? "an-free" : "an-slot k2", 4);
+      if(h > 12) oT(g, MX + 14, yC + 13, (s.C === "free" ? LL("100 B hole (free)", "дыра 100 Б (свободна)") : LL("100 B block", "блок 100 Б")) + "  0x1002340", "an-m", "start");
+    }
+    for(let j = 0; j < n; j++) oR(g, MX + 6, yC - 4 - (j + 1) * LH + 1, MW - 12, LH - 2, "an-leak", 2);
+    oT(g, MX - 12, HB + 4, "0x1000000", "an-m", "end");
+    // data + text
+    oR(g, MX, 338, MW, 40, "an-slot k2", 6);
+    oT(g, MX + 10, 353, LL("Data (static)", "Данные (static)"), "an-m", "start");
+    oT(g, MX + 10, 371, `char *c = ${s.c}`, "an-code" + (s.dangling ? " an-warn" : ""), "start");
+    oR(g, MX, 384, MW, 40, "an-box", 6); oT(g, MX + MW / 2, 409, LL("Text / code", "Text / код"), "an-t");
+    oT(g, MX - 12, 424, "0x400000", "an-m", "end");
+    // ---- pointers
+    if(s.A === "live" && s.f === true && (s.grow !== "A" || k > .9)) ptr(g, 107, yA + 20, 60, "on");
+    if(s.C && (s.grow !== "C" || k > .9)) ptr(g, 367, yC + 9, 90, s.C === "free" ? "an-dash" : s.hlc ? "on" : "");
+    if(s.dangling) oT(g, MX + MW + 6, 352, LL("dangling!", "висячий!"), "an-m an-b an-warn", "start");
+    if(s.A === "leak") oT(g, MX + MW + 6, yA + 26, LL("no pointer", "нет указателя"), "an-m an-b an-warn", "start");
   }
   sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); steps.set(S.i, S.t / STEP_MS); render(); });
   go(0); sh.kick();
