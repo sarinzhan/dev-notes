@@ -2532,6 +2532,7 @@
    "path": "notes/computer-science/operating-systems/anatomy-of-a-process.md",
    "links": [
     "compilation-interpretation-jit",
+    "cpu-caches-and-cache-lines",
     "cpu-components-and-architecture",
     "docker-containers-and-resources",
     "garbage-collection",
@@ -2546,7 +2547,7 @@
     "virtual-memory-and-paging",
     "virtual-threads"
    ],
-   "words": 2851,
+   "words": 3448,
    "ru": "notes-ru/computer-science/operating-systems/anatomy-of-a-process.md",
    "title_ru": "Процесс"
   },

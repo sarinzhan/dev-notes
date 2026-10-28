@@ -3879,6 +3879,10 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "cpu-caches-and-cache-lines"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "cpu-components-and-architecture"
   },
   {

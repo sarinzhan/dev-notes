@@ -149,9 +149,39 @@ program-execution
 - The split between data (initialised) and BSS (zero) exists so the executable file does not store megabytes of zeros.
 
 ### Heap
-- The heap holds objects whose lifetime is not tied to a call: a request object that outlives the method that created it, a cache, a connection pool. Allocation goes through an allocator that finds free space; release is explicit (`free`) or automatic (garbage collection).
-- The process asks the kernel for heap pages in bulk (`brk`, `mmap`) and then hands out small pieces itself. That is why the JVM's "used heap" and the kernel's "resident memory" of the process are different numbers: the JVM may hold pages it is not currently using ([[jvm-memory-areas]], [[garbage-collection]]).
+The heap is the region for memory whose size or lifetime is not known in advance: it is allocated while the program runs and stays until someone releases it.
+
+| Property | What it means |
+|---|---|
+| Data that outlives a call | A request object returned from the method that built it, a cache, a connection pool. Not only "large" data: a 16-byte `malloc` is on the heap too; what decides is lifetime and run-time size |
+| Lives until freed | Released explicitly (`free` in C, `delete` in C++) or, in Java, by the garbage collector once nothing references it. Returning from a function frees nothing on the heap |
+| Reachable from any function, through a pointer | The block itself has no name. Code reaches it through an address held on the stack, in the data section or in another heap block. Lose every copy of the address and the block is lost |
+| Grows from low addresses to high | Toward the stack, which grows down. The allocator gets pages from the kernel in bulk (`brk`, `mmap`) and hands out small pieces itself |
+| API | C: `malloc` / `free`. C++: `new` / `delete`. Java: `new`, freed by the GC |
+
+- Because the process asks for pages in bulk, the JVM's "used heap" and the kernel's "resident memory" of the process are different numbers: the JVM may hold pages it is not currently using ([[jvm-memory-areas]], [[garbage-collection]]).
 - Heap memory is shared by all threads of the process. Two threads can hold references to the same object, which is both the point (shared state) and the danger (needs synchronisation).
+
+```anim
+heap-leak
+```
+
+### Memory leaks
+- In C a leak is a block that is still allocated but whose address no one holds any more. The classic case is in the animation: the only pointer was a local variable, and the function returned without `free`. Nothing can release that memory until the process exits.
+- A leak in a short command-line program is harmless, because the kernel takes back all memory when the process ends. In a server that runs for weeks, a few kilobytes per request add up to an out-of-memory kill.
+- The opposite mistakes are just as bad: using a block after `free` (*use-after-free*, through a *dangling pointer*) and calling `free` twice (*double free*). Both corrupt the allocator's bookkeeping and are a classic source of security holes.
+- Java cannot leak this way: the GC frees every object that is unreachable. A Java leak is an object that is still **reachable** but no longer needed: a `static Map` used as a cache with no eviction, listeners that are registered and never removed, a `ThreadLocal` left set in a pooled thread, a growing queue no one drains.
+- The symptom of a Java leak: after each full GC, the old generation stays a little higher, until `OutOfMemoryError: Java heap space`. Diagnose with a heap dump (`-XX:+HeapDumpOnOutOfMemoryError`, then the dominator tree in Eclipse MAT) to see which object keeps the rest alive.
+
+### Stack vs heap: performance
+| | Stack | Heap |
+|---|---|---|
+| Allocate and free | Move `sp`: one instruction, and everything is freed automatically on return | The allocator searches its free lists, may take a lock, sometimes makes a system call; memory must be freed by hand or by the GC |
+| Locality | Frames are contiguous and recently used, so they sit in the L1 cache | After many allocations and frees, related blocks end up scattered ("heap is random"), so walking them causes cache misses ([[cpu-caches-and-cache-lines]]) |
+| Size | Small and fixed per thread: 8 MB for the main thread on Linux (`ulimit -s`), 512 KB to 1 MB for a Java thread (`-Xss`). Overflow means `StackOverflowError` | Limited by RAM, the address space, and in Java by `-Xmx` |
+| Fragmentation | None: the stack is always one contiguous block | Holes between live blocks, like the freed 100 bytes in the animation, that may be too small to reuse |
+
+- In Java, allocation is almost as cheap as on the stack: each thread bumps a pointer inside its own buffer in the young generation (a TLAB). The cost moves to garbage collection, which is why "allocate less" is still a performance rule ([[garbage-collection]]).
 
 ## Example
 From source to three running processes, and where each piece of a program lands:
