@@ -3208,7 +3208,7 @@ ANIMS["socket-buffers"] = el=>{
     oR(g, 610, 120, 140, 90, "an-frame", 8); oT(g, 680, 112, LL("process", "процесс"), "an-m an-b"); oR(g, 625, 150, 110, 40, s.pkt === "read" || s.pkt === "send" ? "an-reg on" : "an-box", 5); oT(g, 680, 175, LL("user buffer", "буфер польз."), "an-m an-b");
     const fly = (path, label, n = 1)=>{ E(g, "polyline", { points: path.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); for(let j = 0; j < n; j++){ const kk = k - j * .15; if(kk <= 0) continue; const [x, y] = polyAt(path, kk); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); } const [lx, ly] = path[Math.floor(path.length / 2)]; oT(g, lx, ly - 10, label, "an-m an-b an-sp"); };
     if(s.pkt === "in") fly([[120, 140], [BX - 20, RXY + 17], [BX, RXY + 17]], LL("data", "данные"), s.slow ? 3 : 1);
-    if(s.pkt === "ack") fly([[BX, RXY + 40], [150, 190], [120, 180]], LL(`ACK, window ${s.win}`, `ACK, окно ${s.win}`));
+    if(s.pkt === "ack") fly([[BX, RXY + 40], [175, 225], [100, 190]], LL(`ACK, window ${s.win}`, `ACK, окно ${s.win}`));
     if(s.pkt === "read") fly([[BX + 20, RXY + 34], [520, 140], [625, 165]], LL("read(): copy", "read(): копия"), 3);
     if(s.pkt === "send") fly([[625, 175], [520, 230], [BX + 60, TXY + 17]], LL("send(): copy", "send(): копия"), 3);
     if(s.pkt === "out") fly([[BX, TXY + 17], [150, 200], [120, 175]], LL("segments → NIC", "сегменты → NIC"), 2);
