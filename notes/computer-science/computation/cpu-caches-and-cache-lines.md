@@ -17,7 +17,7 @@ Main memory is ~100× slower than the core, so each core keeps small, fast copie
 | DRAM | GBs | ~70–100 ns (200–300 cycles) | everything |
 
 - A load first checks L1, then L2, L3, then memory; each miss costs the latency of the next level. The CPU also *prefetches* lines ahead of a sequential access pattern, which is why linear scans run near memory bandwidth while random access runs at DRAM latency ([[latency-numbers]]).
-- The **TLB** caches virtual-to-physical address translations; a TLB miss adds a page-table walk. Huge pages (`-XX:+UseTransparentHugePages`) reduce TLB misses for large heaps ([[virtual-memory-and-paging]]).
+- The **TLB** caches virtual-to-physical address translations; a TLB miss adds a page-table walk. Huge pages (`-XX:+UseTransparentHugePages`) reduce TLB misses for large heaps ([[memory-management]]).
 
 ### Cache lines and locality
 - Memory is fetched in 64-byte lines. Reading one `int` pulls in its 15 neighbours for free; iterating `int[]` touches a new line every 16 elements, iterating a `LinkedList<Integer>` touches at least one new line per element (node object) plus another for the boxed `Integer`.

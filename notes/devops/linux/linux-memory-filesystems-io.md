@@ -4,17 +4,11 @@ tags: [linux, virtual-memory, filesystems, page-cache, disk]
 learned: 2026-10-22
 ---
 ## TL;DR
-Every process sees its own **virtual address space** mapped to physical RAM in 4 KiB pages; the kernel uses the rest of RAM as **page cache** for files, which is why `free` shows almost nothing free on a healthy server. Filesystems (ext4, XFS, btrfs) store data on block devices, pseudo-filesystems (`/proc`, `/sys`) expose kernel state, and the IO scheduler orders disk requests. The classic "disk is full but files are gone" puzzle is answered by knowing what `ls`, `du` and `df` actually measure.
+Every process sees its own **virtual address space** mapped to physical RAM in 4 KiB pages; the kernel uses the rest of RAM as **page cache** for files, which is why `free` shows almost nothing free on a healthy server (the mechanism is in [[memory-management]]). Filesystems (ext4, XFS, btrfs) store data on block devices, pseudo-filesystems (`/proc`, `/sys`) expose kernel state, and the IO scheduler orders disk requests. The classic "disk is full but files are gone" puzzle is answered by knowing what `ls`, `du` and `df` actually measure.
 
 ## Key points
-### Virtual memory and paging
-- Each process gets a private virtual address space (47 bits usable on x86-64). The MMU translates virtual pages to physical frames through page tables; the TLB caches translations.
-- Pages are 4 KiB by default; huge pages (2 MiB) reduce TLB misses for big heaps (`-XX:+UseTransparentHugePages` for the JVM).
-- Memory is allocated lazily: `mmap`/`malloc` reserve address space, a physical page is attached on first touch (page fault). That is why a JVM with `-Xmx4g` shows 4 GiB virtual (`VSZ`) and much less resident (`RSS`) until the heap is actually used ([[jvm-memory-areas]]).
-- **Copy-on-write** after `fork()`: parent and child share pages until one writes ([[linux-processes]]).
-- **Swap**: when RAM is short the kernel evicts anonymous pages to swap space on disk. For a latency-sensitive JVM swapping is a disaster (GC pauses touch the whole heap); servers running databases or JVMs usually run with `vm.swappiness=1` or no swap and rely on the OOM killer plus proper limits.
-- **OOM killer**: when memory is really exhausted the kernel kills the process with the highest `oom_score` (usually the biggest one). Inside a cgroup with `memory.max`, the same happens per container: exit code 137 ([[docker-containers-and-resources]]).
-- **Page cache**: file contents read or written stay in RAM as cache; `free -h` shows them under `buff/cache` and they count as *available*. Writes go to the cache first (dirty pages) and are flushed by the kernel; `fsync()` forces it, which is what Postgres does at commit and Kafka deliberately does not ([[kafka-architecture]]).
+### Memory
+- Virtual memory, page tables, page faults, the page cache, swap, the OOM killer and copy-on-write are explained in [[memory-management]]. This note keeps the Linux commands: `free -h` (look at `available`), `/proc/<pid>/status` and `/proc/<pid>/maps` for one process, `vm.swappiness` and `vm.overcommit_memory` in `/etc/sysctl.d/`.
 
 ### Filesystems
 | FS | Traits | Typical use |
@@ -62,9 +56,8 @@ cat /proc/$(pgrep -f app.jar)/status | grep -E 'VmRSS|VmSwap|Threads'
 ```
 
 ## Pitfalls
-- Reading `free` column "free" and concluding memory is exhausted; look at `available`.
 - Deleting a log file that a running process writes to frees nothing; truncate it or use `copytruncate` in logrotate.
 - Docker volumes and image layers live under `/var/lib/docker`; `docker system prune` is often the real fix for a full disk ([[docker-volumes-and-registry]]).
-- Default `vm.max_map_count` (65530) is too low for Elasticsearch and some JVM workloads; set it in `/etc/sysctl.d/`.
+- Memory pitfalls (`free` vs `available`, swap on JVM hosts, `vm.max_map_count`, THP) are in [[memory-management]].
 - A JVM heap larger than the cgroup memory limit is killed, not swapped, inside a container; set `-XX:MaxRAMPercentage` instead of `-Xmx` ([[garbage-collection]]).
 - Related: [[linux-architecture-and-kernel]], [[linux-commands]], [[java-nio]].

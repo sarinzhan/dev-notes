@@ -260,6 +260,7 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
 .an-big{font:600 20px var(--f-mono);fill:var(--fg);pointer-events:none;text-anchor:middle}
 .an-slot{fill-opacity:.2;stroke:var(--line)} .an-slot.dead{fill-opacity:.05;stroke-dasharray:3 3}
 .an-leak{fill:var(--warn);fill-opacity:.16;stroke:var(--warn);stroke-width:1.5;stroke-dasharray:4 3}
+.an-pg{fill-opacity:.55;stroke:var(--panel);stroke-width:1.5} .an-pg.dim{fill-opacity:.12;stroke-dasharray:3 3;stroke:var(--line)}
 .an-slot.an-hlslot{stroke:var(--accent);stroke-width:2;fill-opacity:.35} .an-mid{font:600 15px var(--f-mono);fill:var(--fg);pointer-events:none;text-anchor:middle}
 .an-deadt{fill:var(--muted);text-decoration:line-through}
 .an-bp{fill:var(--k3)} .an-sp{fill:var(--accent)}
@@ -2097,6 +2098,355 @@ ANIMS["heap-leak"] = el=>{
   sh.onFrame(dt=>{ S.t += dt; if(S.t > STEP_MS) go(S.i + 1); steps.set(S.i, S.t / STEP_MS); render(); });
   go(0); sh.kick();
   return sh;
+};
+
+// ============ memory-management helpers
+function polyAt(pts, k){
+  const segs = pts.slice(1).map((q, j) => Math.hypot(q[0] - pts[j][0], q[1] - pts[j][1])), tot = segs.reduce((a, b) => a + b, 0);
+  let d = Math.max(0, Math.min(1, k)) * tot, j = 0; while(j < segs.length - 1 && d > segs[j]){ d -= segs[j]; j++; }
+  const f = segs[j] ? d / segs[j] : 1, a = pts[j], b = pts[j + 1] || a;
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+}
+function steppedAnim(el, { title, vb, steps: ST, stepMs = 5200, render }){
+  const S = { i: 0, t: 0 };
+  const sh = animShell(el, { title, vb, buttons: [
+    { id: "prev", label: LL("← Back", "← Назад"), on(){ go(S.i - 1); } },
+    { id: "next", label: LL("Next →", "Дальше →"), on(){ go(S.i + 1); } }
+  ]});
+  const bar = sh.steps(ST.map(s => ({ title: LL(...s.t), text: LL(s.en, s.ru) })), i=>go(i));
+  function go(i){ S.i = (i + ST.length) % ST.length; S.t = 0; sh.say(LL(ST[S.i].en, ST[S.i].ru), 1); }
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > stepMs) go(S.i + 1); bar.set(S.i, S.t / stepMs); sh.svg.textContent = ""; render(sh.svg, ST[S.i], S.t, S.i); });
+  go(0); sh.kick();
+  return sh;
+}
+
+// ============ 15. How the CPU reads and writes RAM: TLB, caches, memory controller, DRAM row buffer, cache line, write-back, alignment
+ANIMS["ram-read-write"] = el=>{
+  const ST = [
+    { t: ["Load: translate", "Загрузка: трансляция"], ins: "ldr r0, [0x7ffd1044]", at: "tlb", lat: 1, en: "The core executes a load. The address in the instruction is virtual, so the MMU first translates it with the TLB: 0x7ffd1044 is physical 0x31044. A TLB hit costs about a cycle.", ru: "Ядро выполняет загрузку. Адрес в инструкции виртуальный, поэтому MMU сначала транслирует его через TLB: 0x7ffd1044 — это физический 0x31044. Попадание в TLB стоит около такта." },
+    { t: ["L1 miss", "Промах L1"], ins: "ldr r0, [0x7ffd1044]", at: "l1", miss: ["l1"], lat: 1, en: "L1 is checked for the cache line that contains 0x31044, which is the 64-byte line 0x31040–0x3107F. It is not there: a miss.", ru: "L1 ищет кэш-линию, в которой лежит 0x31044, — это 64-байтная линия 0x31040–0x3107F. Её там нет: промах." },
+    { t: ["L2 and L3 miss", "Промахи L2 и L3"], ins: "ldr r0, [0x7ffd1044]", at: "l3", miss: ["l1", "l2", "l3"], lat: 40, en: "L2 (about 4 ns) and the shared L3 (about 12–40 ns) miss too. Now the request leaves the CPU core for the memory controller.", ru: "L2 (около 4 нс) и общий L3 (около 12–40 нс) тоже промахиваются. Запрос уходит из ядра в контроллер памяти." },
+    { t: ["Activate the row", "Открытие строки"], ins: "ldr r0, [0x7ffd1044]", at: "row", miss: ["l1", "l2", "l3"], row: true, lat: 70, en: "DRAM is a grid of capacitors in banks, rows and columns. The memory controller sends ACTIVATE: the whole row (about 8 KB) that holds the address is copied into the bank's row buffer. Reading a capacitor drains it, so the row is written back later.", ru: "DRAM — это сетка конденсаторов, разбитая на банки, строки и столбцы. Контроллер памяти посылает ACTIVATE: вся строка (около 8 КБ), где лежит адрес, копируется в буфер строки банка. Чтение разряжает конденсатор, поэтому строка позже записывается обратно." },
+    { t: ["Burst: 64 bytes", "Пакет: 64 байта"], ins: "ldr r0, [0x7ffd1044]", at: "burst", miss: ["l1", "l2", "l3"], row: true, lat: 90, en: "READ selects the columns: the 64-byte line is sent over the memory bus in a burst of 8 transfers of 8 bytes. The CPU never reads a single byte from RAM; it always reads a whole cache line.", ru: "READ выбирает столбцы: 64-байтная линия идёт по шине памяти пакетом из 8 передач по 8 байт. CPU никогда не читает из RAM один байт; он всегда читает целую кэш-линию." },
+    { t: ["Fill and return", "Заполнение и ответ"], ins: "ldr r0, [0x7ffd1044]", at: "fill", fill: ["l1", "l2", "l3"], row: true, r0: "42", lat: 100, en: "The line is stored in L3, L2 and L1, and the 4 bytes at 0x31044 go into r0. About 100 ns in total: roughly 300 cycles in which this instruction waited.", ru: "Линия сохраняется в L3, L2 и L1, а 4 байта по адресу 0x31044 попадают в r0. Всего около 100 нс — примерно 300 тактов, которые эта инструкция ждала." },
+    { t: ["Next load: L1 hit", "Следующая загрузка: попадание в L1"], ins: "ldr r1, [0x7ffd1048]", at: "hit", fill: ["l1", "l2", "l3"], r0: "42", r1: "7", lat: 1, en: "The next variable, 0x31048, is in the same line, so it is an L1 hit in about 1 ns. That is spatial locality: arrays and fields that sit next to each other are almost free after the first access.", ru: "Следующая переменная, 0x31048, в той же линии, поэтому это попадание в L1 примерно за 1 нс. Это пространственная локальность: соседние элементы массива и поля почти бесплатны после первого обращения." },
+    { t: ["Store: write-back", "Запись: write-back"], ins: "str r1, [0x7ffd1050]", at: "store", fill: ["l1", "l2", "l3"], dirty: true, r0: "42", r1: "7", lat: 1, en: "A store goes into the L1 line only, and the line is marked dirty. RAM still holds the old value. Other cores still see the new one, because cache coherence (MESI) moves the line between caches.", ru: "Запись попадает только в линию L1, и линия помечается как грязная (dirty). В RAM пока старое значение. Другие ядра всё равно увидят новое: когерентность кэшей (MESI) передаёт линию между кэшами." },
+    { t: ["Eviction writes back", "Вытеснение и запись"], ins: "…", at: "evict", fill: ["l2", "l3"], r0: "42", r1: "7", lat: 0, en: "Later the line is evicted to make room. Because it is dirty, the whole 64 bytes are written back to DRAM in one burst. Writes are batched per line, not per variable.", ru: "Позже линия вытесняется, чтобы освободить место. Раз она грязная, все 64 байта записываются в DRAM одним пакетом. Записи группируются по линиям, а не по переменным." },
+    { t: ["Alignment", "Выравнивание"], ins: "ldr x2, [0x7ffd107c]", at: "align", fill: ["l2", "l3"], align: true, r0: "42", r1: "7", lat: 200, en: "An 8-byte value at 0x3107C crosses the boundary at 0x31080, so it spans two lines: two fetches, and the read cannot be atomic. Compilers align each type to its size (4-byte int at an address divisible by 4, 8-byte long at one divisible by 8), so a value never straddles a line.", ru: "8-байтное значение по адресу 0x3107C пересекает границу 0x31080 и занимает две линии: две выборки, и чтение не может быть атомарным. Компиляторы выравнивают каждый тип по его размеру (4-байтный int — по адресу, кратному 4, 8-байтный long — кратному 8), поэтому значение никогда не пересекает линию." }
+  ];
+  const BOX = { core: [12, 96, 136, 150], l1: [176, 120, 82, 102], l2: [276, 120, 82, 102], l3: [376, 120, 82, 102], mc: [478, 120, 82, 102], dram: [584, 60, 166, 186] };
+  const cx = b => BOX[b][0] + BOX[b][2] / 2, cy = b => BOX[b][1] + BOX[b][3] / 2;
+  return steppedAnim(el, { title: LL("How the CPU reads and writes RAM", "Как CPU читает и пишет в RAM"), vb: [760, 336], steps: ST, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1400));
+    // core
+    const [x, y, w, h] = BOX.core;
+    oR(g, x, y, w, h, "an-frame", 10); oT(g, x + w / 2, y - 8, LL("CPU core", "ядро CPU"), "an-m an-b");
+    oT(g, x + 8, y + 18, s.ins, "an-code", "start");
+    [["r0", s.r0], ["r1", s.r1]].forEach(([n, v], i)=>{ oR(g, x + 8 + i * 62, y + 30, 56, 40, "an-reg" + ((s.at === "fill" && n === "r0") || (s.at === "hit" && n === "r1") ? " on" : ""), 6); oT(g, x + 14 + i * 62, y + 42, n, "an-m", "start"); oT(g, x + 36 + i * 62, y + 63, v || "", "an-mid"); });
+    oR(g, x + 8, y + 82, w - 16, 54, "an-reg" + (s.at === "tlb" ? " on" : ""), 6);
+    oT(g, x + 14, y + 96, "MMU · TLB", "an-m", "start");
+    oT(g, x + w / 2, y + 113, "0x7ffd1… →", "an-m"); oT(g, x + w / 2, y + 128, "0x31…", "an-m");
+    // caches
+    const lat = { l1: "~1 ns", l2: "~4 ns", l3: "~12–40 ns" };
+    for(const c of ["l1", "l2", "l3"]){
+      const [bx, by, bw, bh] = BOX[c], miss = (s.miss || []).includes(c), fill = (s.fill || []).includes(c);
+      oR(g, bx, by, bw, bh, (s.at === c || (s.at === "hit" && c === "l1") ? "an-reg on" : "an-box"), 8);
+      oT(g, bx + bw / 2, by - 8, c.toUpperCase(), "an-m an-b"); oT(g, bx + bw / 2, by + bh + 14, lat[c], "an-m");
+      if(fill){ oR(g, bx + 8, by + 22, bw - 16, 36, "an-slot k1" + (c === "l1" && s.dirty ? " an-hlslot" : ""), 4); oT(g, bx + bw / 2, by + 38, "0x31040", "an-m"); oT(g, bx + bw / 2, by + 52, c === "l1" && s.dirty ? LL("dirty", "грязная") : "64 B", "an-m" + (c === "l1" && s.dirty ? " an-b an-warn" : "")); }
+      else if(miss) oT(g, bx + bw / 2, by + 46, LL("miss", "промах"), "an-t an-b an-warn");
+    }
+    // memory controller + DRAM
+    { const [bx, by, bw, bh] = BOX.mc; oR(g, bx, by, bw, bh, "an-box", 8); oT(g, bx + bw / 2, by + 38, LL("memory", "контроллер"), "an-m"); oT(g, bx + bw / 2, by + 52, LL("controller", "памяти"), "an-m"); }
+    { const [bx, by, bw, bh] = BOX.dram; oR(g, bx, by, bw, bh, "an-frame", 10); oT(g, bx + bw / 2, by - 8, "DRAM (DIMM)", "an-m an-b");
+      for(let b = 0; b < 2; b++){ const X = bx + 10 + b * 78; oR(g, X, by + 14, 70, 112, "an-box", 4); oT(g, X + 35, by + 28, LL(`bank ${b}`, `банк ${b}`), "an-m");
+        for(let r = 0; r < 7; r++) oR(g, X + 6, by + 36 + r * 12, 58, 9, b === 1 && r === 3 && s.row ? "an-slot k1 an-hlslot" : "an-free", 2); }
+      oR(g, bx + 78, by + 134, 84, 20, s.row ? "an-slot k1" : "an-free", 3); oT(g, bx + 120, by + 148, LL("row buffer", "буфер строки"), "an-m");
+      oT(g, bx + 10, by + 162, LL("rows ≈ 8 KB", "строка ≈ 8 КБ"), "an-m", "start"); oT(g, bx + 10, by + 176, LL("refresh every 64 ms", "регенерация раз в 64 мс"), "an-m", "start"); }
+    // buses
+    const busY = 208; for(const [x1, x2] of [[148, 176], [258, 276], [358, 376], [458, 478], [560, 584]]) E(g, "line", { x1, y1: busY, x2, y2: busY, class: "an-flowline" });
+    // moving data
+    const P = { core: [148, busY], l1: [217, busY], l2: [317, busY], l3: [417, busY], mc: [519, busY], dram: [672, 226] };
+    let path = null, back = false, n = 1;
+    if(s.at === "l1") path = [P.core, P.l1]; if(s.at === "l3") path = [P.l1, P.l2, P.l3, P.mc];
+    if(s.at === "row") path = [P.mc, [672, busY], [672, 120]];
+    if(s.at === "burst"){ path = [[672, 196], [672, busY], P.mc]; n = 8; }
+    if(s.at === "fill"){ path = [P.mc, P.l3, P.l2, P.l1, P.core]; }
+    if(s.at === "hit"){ path = [P.l1, P.core]; }
+    if(s.at === "store"){ path = [P.core, P.l1]; }
+    if(s.at === "evict"){ path = [P.l1, P.l2, P.l3, P.mc, [672, busY], [672, 196]]; }
+    if(s.at === "align"){ path = [P.mc, P.l3, P.l2, P.l1, P.core]; n = 2; }
+    if(path) for(let j = 0; j < n; j++){ const kk = k - j * (n === 8 ? .07 : .25); if(kk <= 0) continue; const [px, py] = polyAt(path, kk); E(g, "circle", { cx: px, cy: py, r: n === 8 ? 4 : 6, class: "an-dot an-flow" }); }
+    // the cache line, bytes
+    const LX = 176, LY = 268, BW = 7.4;
+    oT(g, LX - 6, LY + 12, LL("line 0x31040:", "линия 0x31040:"), "an-m", "end");
+    for(let b = 0; b < 16; b++){
+      const a = 0x31040 + b * 4, on = (s.at !== "tlb" && s.at !== "l1" && s.at !== "l3" && s.at !== "row") && ((a === 0x31044 && ["fill", "burst"].includes(s.at)) || (a === 0x31048 && s.at === "hit") || (a === 0x31050 && (s.at === "store" || s.at === "evict")) || (s.align && a >= 0x3107c));
+      oR(g, LX + b * 4 * BW, LY, 4 * BW - 2, 18, on ? "an-slot k0 an-hlslot" : "an-slot", 2);
+    }
+    oT(g, LX, LY + 34, "0x31040", "an-m", "start"); oT(g, LX + 64 * BW, LY + 34, "0x31080", "an-m", "end");
+    if(s.align){ oR(g, LX + 64 * BW + 4, LY, 4 * BW - 2, 18, "an-slot k0 an-hlslot", 2); oT(g, LX + 64 * BW + 4 + 2 * BW, LY - 6, LL("next line", "след. линия"), "an-m an-warn"); }
+    oT(g, 750, 326, LL(`this access ≈ ${s.lat} ns`, `это обращение ≈ ${s.lat} нс`), "an-m an-b", "end");
+  }});
+};
+
+// ============ 16. External vs internal fragmentation; why paging solves external
+ANIMS["memory-fragmentation"] = el=>{
+  const C = { A: "k0", B: "k2", C: "k1", D: "k3", E: "k4" };
+  const ST = [
+    { t: ["Contiguous allocation", "Непрерывное выделение"], blocks: [["A", 0, 12], ["B", 12, 8], ["C", 20, 12], ["D", 32, 4]],
+      en: "Without virtual memory, each process must sit in one contiguous range of physical memory. A, B, C and D are loaded one after another; 4 KB is left free at the end.",
+      ru: "Без виртуальной памяти каждый процесс должен занимать один непрерывный диапазон физической памяти. A, B, C и D загружены друг за другом; в конце осталось 4 КБ." },
+    { t: ["B exits", "B завершается"], blocks: [["A", 0, 12], ["C", 20, 12], ["D", 32, 4]], hole: [12, 8],
+      en: "B exits and leaves an 8 KB hole between A and C. Free memory is now 12 KB in total, in two pieces.",
+      ru: "B завершается и оставляет дыру в 8 КБ между A и C. Свободно теперь 12 КБ, но двумя кусками." },
+    { t: ["External fragmentation", "Внешняя фрагментация"], blocks: [["A", 0, 12], ["C", 20, 12], ["D", 32, 4]], want: 12,
+      en: "E needs 12 KB. In total exactly 12 KB is free, but the largest contiguous hole is 8 KB, so E cannot load. That is external fragmentation: enough free memory, just not in one piece.",
+      ru: "E нужно 12 КБ. Свободно ровно 12 КБ, но самая большая непрерывная дыра — 8 КБ, поэтому E не загрузить. Это внешняя фрагментация: свободной памяти хватает, но не одним куском." },
+    { t: ["Compaction", "Уплотнение"], blocks: [["A", 0, 12], ["C", 12, 12, 20], ["D", 24, 4, 32], ["E", 28, 12, null, 1]],
+      en: "One fix is compaction: move C and D down so the holes merge. But moving a process means copying all its memory while it is paused, and every absolute address inside it becomes wrong.",
+      ru: "Одно решение — уплотнение: сдвинуть C и D вниз, чтобы дыры слились. Но перенос процесса — это копирование всей его памяти, пока он стоит, и все абсолютные адреса внутри него становятся неверными." },
+    { t: ["Paging", "Страничная организация"], blocks: [["A", 0, 12], ["C", 20, 12], ["D", 32, 4]], pages: [12, 16, 36],
+      en: "Virtual memory solves it differently. Memory is cut into 4 KB pages, and E's three pages go into any free frames: 12, 16 and 36 KB. E still sees one contiguous range from 0 to 12 KB, and the page table hides where the pieces really are.",
+      ru: "Виртуальная память решает это иначе. Память нарезана на страницы по 4 КБ, и три страницы E ложатся в любые свободные кадры: 12, 16 и 36 КБ. E по-прежнему видит один непрерывный диапазон от 0 до 12 КБ, а таблица страниц скрывает, где куски лежат на самом деле." },
+    { t: ["Internal fragmentation", "Внутренняя фрагментация"], blocks: [["A", 0, 12], ["C", 20, 12], ["D", 32, 4]], pages: [12, 16, 36], used: 9,
+      en: "The price is internal fragmentation. E really needs 9 KB, but memory is handed out in whole pages, so it gets 12 KB, and 3 KB of its last page is wasted inside the allocation. On average half a page per region: small and predictable, unlike external fragmentation.",
+      ru: "Цена — внутренняя фрагментация. На самом деле E нужно 9 КБ, но память выдаётся целыми страницами, поэтому E получает 12 КБ, и 3 КБ её последней страницы пропадают внутри выделения. В среднем полстраницы на область: мало и предсказуемо, в отличие от внешней фрагментации." }
+  ];
+  const X0 = 40, W = 680, KB = W / 40, PY = 210, VY = 92;
+  return steppedAnim(el, { title: LL("External vs internal fragmentation", "Внешняя и внутренняя фрагментация"), vb: [760, 330], steps: ST, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1500));
+    oT(g, X0, PY - 12, LL("Physical memory (40 KB)", "Физическая память (40 КБ)"), "an-m an-b", "start");
+    oR(g, X0, PY, W, 48, "an-frame", 4);
+    for(let kb = 0; kb <= 40; kb += 4){ E(g, "line", { x1: X0 + kb * KB, y1: PY + 48, x2: X0 + kb * KB, y2: PY + 54, class: "an-link2" }); oT(g, X0 + kb * KB, PY + 68, String(kb), "an-m"); }
+    oT(g, X0 + W, PY + 84, "KB", "an-m", "end");
+    for(const [n, at, size, from, appear] of s.blocks){
+      const a = from == null ? at : from + (at - from) * k;
+      if(appear && k < .98) continue;
+      oR(g, X0 + a * KB + 1, PY + 2, size * KB - 2, 44, "an-pg " + C[n], 4); oT(g, X0 + (a + size / 2) * KB, PY + 29, n, "an-t an-b");
+    }
+    if(s.hole){ const [a, size] = s.hole; oT(g, X0 + (a + size / 2) * KB, PY + 29, LL("hole 8 KB", "дыра 8 КБ"), "an-m an-b"); }
+    if(s.want){
+      oR(g, X0 + 12 * KB, VY, 12 * KB, 44, "an-leak", 4); oT(g, X0 + 18 * KB, VY + 27, LL("E needs 12 KB contiguous", "E нужно 12 КБ подряд"), "an-t an-b an-warn");
+      oT(g, X0 + 16 * KB, PY + 100, LL("free: 8 KB + 4 KB = 12 KB, largest hole 8 KB", "свободно: 8 КБ + 4 КБ = 12 КБ, наибольшая дыра 8 КБ"), "an-m an-b an-warn");
+    }
+    if(s.pages){
+      oT(g, X0, VY - 12, LL("E's virtual address space", "виртуальное адресное пространство E"), "an-m an-b", "start");
+      s.pages.forEach((p, i)=>{
+        const vx = X0 + i * 4 * KB, kk = Math.max(0, Math.min(1, k * 3 - i));
+        oR(g, vx + 1, VY, 4 * KB - 2, 44, "an-pg " + C.E, 4); oT(g, vx + 2 * KB, VY + 27, `E.P${i + 1}`, "an-t an-b");
+        const tx = X0 + p * KB;
+        E(g, "path", { d: `M${vx + 2 * KB} ${VY + 44}C${vx + 2 * KB} ${VY + 80},${tx + 2 * KB} ${PY - 40},${tx + 2 * KB} ${PY}`, class: "an-link2 on" });
+        if(kk > 0){ oR(g, tx + 1, PY + 2, 4 * KB - 2, 44, "an-pg " + C.E, 4); oT(g, tx + 2 * KB, PY + 29, `E.P${i + 1}`, "an-t an-b"); }
+        if(s.used && i === 2){
+          const ux = (9 - 8) * KB;
+          for(const X of [vx, tx]) { oR(g, X + ux, (X === vx ? VY : PY + 2), 4 * KB - ux - 1, 44, "an-leak", 3); }
+          oT(g, vx + ux + (4 * KB - ux) / 2, VY + 62, LL("3 KB wasted", "3 КБ впустую"), "an-m an-b an-warn");
+        }
+      });
+      oT(g, X0 + 12 * KB + 8, VY + 27, LL("0 – 12 KB, contiguous", "0 – 12 КБ, непрерывно"), "an-m", "start");
+    }
+  }});
+};
+
+// ============ 17. Page tables: translation, isolation, unmapped address, sharing, swap (numbers from the course slides; page = 4,000 for round numbers)
+ANIMS["vm-page-tables"] = el=>{
+  const PC = { A: "k0", B: "k2", C: "k1" };
+  const BASE = { A: { 4000: 28000, 8000: 40000, 12000: 44000, 16000: 48000 }, B: { 8000: 12000, 12000: 32000, 16000: 36000 }, C: { 4000: 4000, 8000: 8000, 12000: 16000, 16000: 20000, 20000: 24000 } };
+  const ST = [
+    { t: ["Three address spaces", "Три адресных пространства"], cur: null, en: "Each process has its own virtual address space and sees its pages as one contiguous range. In physical memory the same pages are scattered: A.P1 sits at 28,000, between C's and B's pages. Pages are 4,000 bytes here to keep the numbers round; real pages are 4,096.",
+      ru: "У каждого процесса своё виртуальное адресное пространство, и свои страницы он видит одним непрерывным диапазоном. В физической памяти те же страницы разбросаны: A.P1 лежит на 28 000, между страницами C и B. Страницы здесь по 4 000 байт для круглых чисел; настоящие — по 4 096." },
+    { t: ["A runs: PTBR", "Работает A: PTBR"], cur: "A", en: "A is running. The kernel has loaded the address of A's page table into a CPU register: the page table base register (CR3 on x86, TTBR on ARM). The table itself is stored in RAM, and each process has its own.",
+      ru: "Работает A. Ядро загрузило адрес таблицы страниц A в регистр CPU — регистр базы таблицы страниц (CR3 на x86, TTBR на ARM). Сама таблица хранится в RAM, и у каждого процесса она своя." },
+    { t: ["A loads [8,100]", "A читает [8 100]"], cur: "A", va: 8100, en: "A executes a load from virtual address 8,100. The MMU splits it into a page (8,000) and an offset inside the page (100). It checks the TLB first; on a miss it walks A's page table in RAM.",
+      ru: "A выполняет чтение по виртуальному адресу 8 100. MMU делит его на страницу (8 000) и смещение внутри страницы (100). Сначала проверяется TLB; при промахе MMU обходит таблицу страниц A в RAM." },
+    { t: ["→ physical 40,100", "→ физический 40 100"], cur: "A", va: 8100, pa: true, en: "A's table says page 8,000 is in frame 40,000. Physical address = 40,000 + 100 = 40,100, which is inside A.P2. The program never sees this number.",
+      ru: "Таблица A говорит: страница 8 000 лежит в кадре 40 000. Физический адрес = 40 000 + 100 = 40 100, внутри A.P2. Программа этого числа никогда не видит." },
+    { t: ["Switch to C, same address", "Переключение на C, тот же адрес"], cur: "C", va: 8100, pa: true, en: "Context switch: the kernel loads C's table into the PTBR. C loads the same virtual address, 8,100, and gets physical 8,100 inside C.P2. The same address in two processes means two different bytes.",
+      ru: "Переключение контекста: ядро загружает в PTBR таблицу C. C читает тот же виртуальный адрес 8 100 и получает физический 8 100 внутри C.P2. Один и тот же адрес в двух процессах — это два разных байта." },
+    { t: ["Isolation: unmapped address", "Изоляция: неотображённый адрес"], cur: "C", va: 40100, fault: true, en: "C tries virtual 40,100, A's physical address. C's table has no entry for page 40,000, so the MMU raises a page fault, and the kernel sends SIGSEGV. A process cannot even name another process's memory. Most of each address space is simply not mapped.",
+      ru: "C пробует виртуальный 40 100 — физический адрес A. В таблице C нет записи для страницы 40 000, MMU вызывает page fault, и ядро посылает SIGSEGV. Процесс не может даже назвать память другого процесса. Большая часть каждого адресного пространства просто не отображена." },
+    { t: ["Shared page", "Общая страница"], cur: "B", share: true, en: "A.P2 and B.P1 hold the same code: the same program or a shared library such as libc. The kernel loads it once and points both tables at frame 40,000, so frame 12,000 is freed. This is how 5 copies of a program, or 100 processes using libc, cost one copy of RAM.",
+      ru: "В A.P2 и B.P1 один и тот же код: та же программа или общая библиотека вроде libc. Ядро загружает его один раз и направляет обе таблицы на кадр 40 000, так что кадр 12 000 освобождается. Так 5 копий программы или 100 процессов с libc стоят одну копию в RAM." },
+    { t: ["Swap out", "Вытеснение в swap"], cur: "C", share: true, swap: true, en: "C's pages P3–P5 have not been used for a while and RAM is short. The kernel writes them to swap on the SSD, frees frames 16,000–24,000, and marks the entries not present. C's virtual address space does not change.",
+      ru: "Страницы C P3–P5 давно не использовались, а RAM не хватает. Ядро записывает их в swap на SSD, освобождает кадры 16 000–24 000 и помечает записи как отсутствующие. Виртуальное адресное пространство C не меняется." },
+    { t: ["Major page fault", "Major page fault"], cur: "C", share: true, swap: true, back: true, va: 16050, en: "C touches 16,050 in P4. The entry is not present: page fault. The kernel reads the page back from disk into a free frame (12,000), updates C's table and restarts the instruction. It works, but it takes milliseconds instead of 100 ns.",
+      ru: "C обращается к 16 050 в P4. Записи нет в памяти: page fault. Ядро читает страницу с диска в свободный кадр (12 000), обновляет таблицу C и перезапускает инструкцию. Это работает, но занимает миллисекунды вместо 100 нс." }
+  ];
+  const PX = 470, PW = 170, FY = f => 438 - (f / 4000 + 1) * 30;   // physical column
+  const VX = { A: 56, B: 142, C: 228 }, VW = 76, VYp = v => 236 - (v / 4000 + 1) * 30;
+  function state(s){
+    const t = JSON.parse(JSON.stringify(BASE));
+    if(s.share) t.B[8000] = 40000;
+    if(s.swap){ for(const v of [12000, 16000, 20000]) t.C[v] = "disk"; }
+    if(s.back) t.C[16000] = 12000;
+    return t;
+  }
+  return steppedAnim(el, { title: LL("Page tables: translation, isolation, sharing, swap", "Таблицы страниц: трансляция, изоляция, общие страницы, swap"), vb: [760, 450], steps: ST, stepMs: 6200, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1300)), tb = state(s);
+    // virtual columns
+    for(const p of ["A", "B", "C"]){
+      const x = VX[p], dim = s.cur && s.cur !== p;
+      const grp = E(g, "g", { class: dim ? "an-dim" : "" });
+      oT(grp, x + VW / 2, 16, LL(`${p} virtual`, `${p} (вирт.)`), "an-m an-b");
+      oR(grp, x, 24, VW, 216, "an-frame", 5);
+      for(const v of Object.keys(BASE[p]).map(Number)){
+        const onDisk = tb[p][v] === "disk";
+        oR(grp, x + 4, VYp(v) + 2, VW - 8, 26, "an-pg " + PC[p] + (onDisk ? " dim" : ""), 3);
+        oT(grp, x + VW / 2, VYp(v) + 19, `P${v / 4000 - (p === "B" ? 1 : 0)}` + (onDisk ? " ⤓" : ""), "an-t an-b");
+      }
+      if(p === "A") for(const v of [0, 8000, 16000, 24000]) oT(g, x - 4, VYp(v) + 30 + 4, v.toLocaleString(LL("en-US", "ru-RU")), "an-m", "end");
+    }
+    oT(g, 56, 256, LL("B's P1 starts at 8,000", "у B P1 начинается с 8 000"), "an-m", "start");
+    // page table of the current process
+    if(s.cur){
+      const p = s.cur, rows = Object.entries(tb[p]);
+      oT(g, 14, 282, LL(`${p}'s page table`, `таблица страниц ${p}`), "an-m an-b", "start");
+      oR(g, 14, 290, 130, 22, "an-reg on", 5); oT(g, 79, 305, `PTBR → ${p}`, "an-code");
+      oT(g, 22, 330, "VMA", "an-m an-b", "start"); oT(g, 84, 330, "PA", "an-m an-b", "start");
+      rows.forEach(([v, f], i)=>{
+        const y = 348 + i * 19, va = s.va != null ? Math.floor(s.va / 4000) * 4000 : null, hl = va === +v && !s.fault;
+        if(hl) oR(g, 14, y - 13, 136, 18, "an-rowhl", 3);
+        oT(g, 22, y, (+v).toLocaleString(LL("en-US", "ru-RU")), "an-code", "start");
+        oT(g, 84, y, f === "disk" ? LL("on disk", "на диске") : f.toLocaleString(LL("en-US", "ru-RU")), "an-code" + (f === "disk" ? " c" : ""), "start");
+      });
+    }
+    // CPU translation box
+    if(s.va != null){
+      const pg = Math.floor(s.va / 4000) * 4000, off = s.va - pg, f = tb[s.cur][pg];
+      oR(g, 158, 290, 212, 118, "an-box", 8);
+      oT(g, 168, 310, `${s.cur}: load [${s.va.toLocaleString(LL("en-US", "ru-RU"))}]`, "an-code", "start");
+      oT(g, 168, 330, LL(`page ${pg.toLocaleString(LL("en-US", "ru-RU"))} + offset ${off}`, `страница ${pg.toLocaleString(LL("en-US", "ru-RU"))} + смещение ${off}`), "an-m", "start");
+      if(s.fault){ oT(g, 168, 356, LL("no entry → page fault", "нет записи → page fault"), "an-t an-b an-warn", "start"); oT(g, 168, 378, "→ SIGSEGV", "an-t an-b an-warn", "start"); }
+      else if(s.back){ oT(g, 168, 356, LL("not present → page fault", "нет в памяти → page fault"), "an-t an-b an-warn", "start"); if(k > .6) oT(g, 168, 378, LL("read from swap → 12,050", "чтение из swap → 12 050"), "an-t an-b", "start"); }
+      else if(s.pa && typeof f === "number") oT(g, 168, 360, `→ ${f.toLocaleString(LL("en-US", "ru-RU"))} + ${off} = ${(f + off).toLocaleString(LL("en-US", "ru-RU"))}`, "an-t an-b", "start");
+    }
+    // physical memory
+    oT(g, PX + PW / 2, 16, LL("Physical memory", "Физическая память"), "an-m an-b");
+    oR(g, PX, 24, PW, 420, "an-frame", 5);
+    const owner = new Map();
+    for(const p of ["A", "B", "C"]) for(const [v, f] of Object.entries(tb[p])) if(typeof f === "number"){ if(!owner.has(f)) owner.set(f, []); owner.get(f).push(`${p}.P${v / 4000 - (p === "B" ? 1 : 0)}`); }
+    for(let f = 0; f <= 48000; f += 4000){
+      oT(g, PX - 4, FY(f) + 30 + 4, f.toLocaleString(LL("en-US", "ru-RU")), "an-m", "end");
+      const o = owner.get(f); if(!o) continue;
+      const p = o[0][0], dim = s.cur && !o.some(n => n[0] === s.cur);
+      oR(g, PX + 6, FY(f) + 2, PW - 12, 26, "an-pg " + (o.length > 1 ? "k4" : PC[p]) + (dim ? " dim" : ""), 3);
+      oT(g, PX + PW / 2, FY(f) + 19, o.join(", "), "an-t an-b");
+    }
+    // mapping lines for the current process
+    if(s.cur) for(const [v, f] of Object.entries(tb[s.cur])){
+      if(typeof f !== "number") continue;
+      const y1 = VYp(+v) + 15, y2 = FY(f) + 15, x1 = VX[s.cur] + VW, hl = s.va != null && Math.floor(s.va / 4000) * 4000 === +v;
+      E(g, "path", { d: `M${x1} ${y1}C${x1 + 110} ${y1},${PX - 110} ${y2},${PX} ${y2}`, class: "an-link2" + (hl ? " on" : "") });
+      if(hl && s.pa){ const [px, py] = polyAt([[x1, y1], [PX, y2]], k); E(g, "circle", { cx: px, cy: py, r: 5, class: "an-dot an-flow" }); }
+    }
+    if(s.share && s.cur === "B"){ const y1 = VYp(8000) + 15; E(g, "path", { d: `M${VX.A + VW} ${VYp(8000) + 15}C${VX.A + VW + 300} ${y1},${PX - 110} ${FY(40000) + 15},${PX} ${FY(40000) + 15}`, class: "an-link2 on" }); }
+    // SSD
+    if(s.swap){
+      oR(g, 664, 160, 88, 120, "an-box", 8); oT(g, 708, 178, "SSD · swap", "an-m an-b");
+      ["P3", "P4", "P5"].forEach((n, i)=>{ if(s.back && n === "P4") return; oR(g, 674, 188 + i * 28, 68, 22, "an-pg k1", 3); oT(g, 708, 203 + i * 28, "C." + n, "an-t an-b"); });
+      if(!s.back) E(g, "path", { d: `M${PX + PW} ${FY(20000) + 15}C${PX + PW + 20} ${FY(20000)},640 220,664 220`, class: "an-link2 an-dash" });
+      else { const [px, py] = polyAt([[674, 230], [PX + PW, FY(12000) + 15]], k); E(g, "circle", { cx: px, cy: py, r: 6, class: "an-dot an-flow" }); }
+    }
+  }});
+};
+
+// ============ 18. Redis BGSAVE: fork + copy-on-write
+ANIMS["redis-cow"] = el=>{
+  const ST = [
+    { t: ["Redis in memory", "Redis в памяти"], forked: false, copies: [], rdb: 0, en: "Redis keeps the whole dataset in its process memory, here in 5 pages. Saving it to disk while clients keep writing is the problem: a snapshot must not mix old and new values.",
+      ru: "Redis хранит весь набор данных в памяти своего процесса, здесь — в 5 страницах. Задача — сохранить его на диск, пока клиенты продолжают писать: снимок не должен смешивать старые и новые значения." },
+    { t: ["BGSAVE: fork()", "BGSAVE: fork()"], forked: true, copies: [], rdb: 0, en: "BGSAVE calls fork(). The child gets a copy of the parent's page table, not of the data: both point to the same 5 frames, now marked read-only. Copying the page table still takes time on a big dataset (latest_fork_usec), and Redis is blocked during it.",
+      ru: "BGSAVE вызывает fork(). Потомок получает копию таблицы страниц родителя, а не данных: оба указывают на те же 5 кадров, теперь помеченных только для чтения. Копирование таблицы страниц на большом наборе данных всё же занимает время (latest_fork_usec), и Redis на это время блокируется." },
+    { t: ["Child writes the snapshot", "Потомок пишет снимок"], forked: true, copies: [], rdb: 2, en: "The child walks the pages and writes them to dump.rdb. It sees memory exactly as it was at the moment of fork(). The parent keeps serving clients at the same time.",
+      ru: "Потомок обходит страницы и пишет их в dump.rdb. Он видит память ровно такой, какой она была в момент fork(). Родитель в это время продолжает обслуживать клиентов." },
+    { t: ["SET → page copied", "SET → копия страницы"], forked: true, copies: [1], rdb: 3, set: 1, en: "A client sends SET user:2. The parent writes to P2, but the page is read-only: page fault. The kernel copies the frame to a new one, points only the parent's table at the copy, and lets the write go there. The child still sees the old P2.",
+      ru: "Клиент отправляет SET user:2. Родитель пишет в P2, но страница только для чтения: page fault. Ядро копирует кадр в новый, перенаправляет на копию только таблицу родителя, и запись идёт туда. Потомок по-прежнему видит старую P2." },
+    { t: ["More writes, more copies", "Больше записей — больше копий"], forked: true, copies: [1, 3], rdb: 4, set: 3, en: "Each page written for the first time during the save costs one copy. Pages nobody writes to stay shared. Memory overhead = pages modified while BGSAVE runs; Redis logs it as \"memory used by copy-on-write\".",
+      ru: "Каждая страница, в которую впервые пишут во время сохранения, стоит одну копию. Страницы, в которые никто не пишет, остаются общими. Перерасход памяти = страницы, изменённые за время BGSAVE; Redis пишет это в лог как «memory used by copy-on-write»." },
+    { t: ["Snapshot done", "Снимок готов"], forked: false, copies: [1, 3], done: true, rdb: 5, en: "The child finishes dump.rdb, a consistent snapshot as of the fork, and exits. The old versions of P2 and P4 are freed, and the parent keeps its copies.",
+      ru: "Потомок дописывает dump.rdb — согласованный снимок на момент fork() — и завершается. Старые версии P2 и P4 освобождаются, у родителя остаются его копии." },
+    { t: ["Worst case", "Худший случай"], forked: true, copies: [0, 1, 2, 3, 4], rdb: 3, worst: true, en: "With a write-heavy load, almost every page is copied during the save, so memory can approach 2× the dataset. With transparent huge pages one small write copies 2 MB instead of 4 KB, which is why Redis asks to disable THP. Keep RAM headroom, and set vm.overcommit_memory = 1 so that fork() is not refused.",
+      ru: "При интенсивной записи за время сохранения копируется почти каждая страница, и память может приблизиться к 2× от набора данных. С прозрачными huge pages одна маленькая запись копирует 2 МБ вместо 4 КБ — поэтому Redis просит отключить THP. Оставляйте запас RAM и ставьте vm.overcommit_memory = 1, чтобы fork() не отказал." }
+  ];
+  const FX = 300, FW = 150, FYf = i => 60 + i * 44, NEWY = i => 60 + (5 + i) * 44 - 220;
+  return steppedAnim(el, { title: LL("Redis BGSAVE: fork and copy-on-write", "Redis BGSAVE: fork и copy-on-write"), vb: [760, 300], steps: ST, stepMs: 5800, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1300));
+    const tableAt = (x, label, child)=>{
+      oT(g, x + 60, 30, label, "an-m an-b");
+      oR(g, x, 40, 120, 226, "an-frame", 8);
+      for(let i = 0; i < 5; i++){ oR(g, x + 10, FYf(i) + 2, 100, 32, "an-reg" + (!child && s.set === i ? " on" : ""), 5); oT(g, x + 60, FYf(i) + 23, `P${i + 1}`, "an-t an-b"); }
+    };
+    tableAt(40, LL("redis (parent)", "redis (родитель)"), false);
+    if(s.forked) tableAt(560, LL("BGSAVE child", "потомок BGSAVE"), true);
+    oT(g, FX + FW / 2, 30, LL("physical frames", "физические кадры"), "an-m an-b");
+    for(let i = 0; i < 5; i++){
+      const copied = s.copies.includes(i), shared = s.forked && !copied;
+      oR(g, FX, FYf(i) + 2, FW, 32, "an-pg k1" + (s.done && copied ? " dim" : ""), 4);
+      oT(g, FX + FW / 2, FYf(i) + 23, (s.done && copied ? LL("freed", "освобождён") : `F${i + 1}`) + (shared ? LL(" · shared, RO", " · общий, RO") : ""), "an-t an-b");
+      // parent mapping
+      const pTo = copied ? null : FYf(i) + 18;
+      if(pTo) E(g, "line", { x1: 150, y1: FYf(i) + 18, x2: FX, y2: pTo, class: "an-link2" + (s.forked ? " an-dash" : "") });
+      if(s.forked && !s.done) E(g, "line", { x1: FX + FW, y1: FYf(i) + 18, x2: 570, y2: FYf(i) + 18, class: "an-link2 an-dash" });
+    }
+    // copies
+    s.copies.forEach(i=>{
+      const kk = s.set === i ? k : 1, w = 112;
+      oR(g, 176, FYf(i) + 2, w * kk, 32, "an-pg k0", 4);
+      if(kk > .8){ oT(g, 176 + w / 2, FYf(i) + 23, LL(`F${i + 1}′ copy`, `F${i + 1}′ копия`), "an-t an-b"); E(g, "line", { x1: 150, y1: FYf(i) + 18, x2: 176, y2: FYf(i) + 18, class: "an-link2 on" }); }
+    });
+    if(s.copies.length) oT(g, 750, 292, LL(`copy-on-write: ${s.copies.length * 4} KB`, `copy-on-write: ${s.copies.length * 4} КБ`) + (s.worst ? LL(" ≈ 2× memory", " ≈ 2× памяти") : ""), "an-m an-b" + (s.worst ? " an-warn" : ""), "end");
+    // client SET
+    if(s.set != null && !s.done){ oT(g, 12, FYf(s.set) + 22, "SET", "an-code", "start"); }
+    // dump.rdb
+    oR(g, 690, 120, 62, 80, "an-box", 6); oT(g, 721, 140, "dump", "an-m an-b"); oT(g, 721, 154, ".rdb", "an-m an-b");
+    const fill = Math.min(5, s.rdb - 1 + (s.forked ? k : 1));
+    if(s.rdb) oR(g, 698, 192 - 34 * Math.max(0, fill) / 5, 46, 34 * Math.max(0, fill) / 5, "an-pg k2", 2);
+    if(s.forked && s.rdb && !s.done) E(g, "line", { x1: 680, y1: 150, x2: 690, y2: 150, class: "an-flowline" });
+  }});
+};
+
+// ============ 19. Reading from a device: through the CPU vs DMA
+ANIMS["dma-transfer"] = el=>{
+  const ST = [
+    { t: ["Through the CPU", "Через CPU"], mode: "pio", en: "Without DMA, data from a network card or disk must pass through the CPU: it reads a word from the device's register and stores it in RAM, again and again. Keyboard → CPU → RAM, network → CPU → RAM.",
+      ru: "Без DMA данные от сетевой карты или диска должны пройти через CPU: он читает слово из регистра устройства и записывает его в RAM, снова и снова. Клавиатура → CPU → RAM, сеть → CPU → RAM." },
+    { t: ["CPU is busy copying", "CPU занят копированием"], mode: "pio", busy: true, en: "For 1 MB that is 131,072 eight-byte moves. While it copies, this core runs nothing else. Fine for a keypress, too slow for a 10 Gbit/s network card or an NVMe disk.",
+      ru: "Для 1 МБ это 131 072 переноса по 8 байт. Пока ядро копирует, оно больше ничего не выполняет. Для нажатия клавиши — нормально, для сетевой карты на 10 Гбит/с или NVMe-диска — слишком медленно." },
+    { t: ["CPU programs the DMA", "CPU настраивает DMA"], mode: "setup", en: "With DMA, the driver writes a small descriptor to the DMA engine: source device, destination physical address in RAM, length. Modern NICs and NVMe drives have their own DMA engine (bus mastering) and read the descriptors from a ring buffer in RAM.",
+      ru: "С DMA драйвер записывает в DMA-движок небольшой дескриптор: устройство-источник, физический адрес назначения в RAM, длину. У современных сетевых карт и NVMe-дисков свой DMA-движок (bus mastering), и они читают дескрипторы из кольцевого буфера в RAM." },
+    { t: ["Direct transfer", "Прямая передача"], mode: "dma", en: "The device writes the data straight into RAM. The CPU is free and runs other threads. The only CPU cost was the setup, which is why DMA does not pay off for a few bytes from a keyboard or mouse.",
+      ru: "Устройство пишет данные прямо в RAM. CPU свободен и выполняет другие потоки. Единственная работа CPU — настройка, поэтому DMA не окупается для пары байт от клавиатуры или мыши." },
+    { t: ["Interrupt: done", "Прерывание: готово"], mode: "irq", en: "When the transfer is complete, the device raises an interrupt. The kernel's handler marks the buffer ready and wakes the thread blocked in read() or epoll_wait().",
+      ru: "Когда передача закончена, устройство поднимает прерывание. Обработчик ядра помечает буфер готовым и будит поток, заблокированный в read() или epoll_wait()." },
+    { t: ["Physical addresses, IOMMU", "Физические адреса, IOMMU"], mode: "iommu", en: "The device does not know virtual memory: it writes to physical addresses. So the buffer must be pinned, meaning it cannot be swapped out or moved during the transfer. An IOMMU translates device addresses and restricts which RAM each device may touch, which also blocks DMA attacks from a malicious device.",
+      ru: "Устройство не знает о виртуальной памяти: оно пишет по физическим адресам. Поэтому буфер закрепляется (pinned): его нельзя вытеснить в swap или переместить во время передачи. IOMMU транслирует адреса устройств и ограничивает, какую RAM может трогать каждое устройство, — это ещё и защита от DMA-атак со стороны вредоносного устройства." }
+  ];
+  const RAM = [20, 120, 150, 110], CPU = [310, 30, 140, 90], DMA = [300, 160, 160, 44], DEV = [600, 120, 140, 110];
+  return steppedAnim(el, { title: LL("Reading from a device: through the CPU vs DMA", "Чтение с устройства: через CPU и через DMA"), vb: [760, 330], steps: ST, render(g, s, t){
+    const box = ([x, y, w, h], label, cls, top) => { oR(g, x, y, w, h, cls || "an-box", 8); oT(g, x + w / 2, top ? y + 17 : y + h / 2 + 5, label, "an-t an-b"); };
+    box(RAM, "RAM"); box(CPU, "CPU", s.mode === "pio" || s.mode === "setup" || s.mode === "irq" ? "an-reg on" : "an-box");
+    box(DEV, LL("NIC / NVMe", "NIC / NVMe"));
+    if(s.mode !== "pio") box(DMA, s.mode === "iommu" ? "IOMMU" : LL("DMA engine", "DMA-движок"), s.mode === "setup" ? "an-reg on" : "an-box", true);
+    const ramP = [RAM[0] + RAM[2], RAM[1] + 55], devP = [DEV[0], DEV[1] + 55], cpuP = [CPU[0] + CPU[2] / 2, CPU[1] + CPU[3]];
+    const dots = (pts, n, speed)=>{ for(let j = 0; j < n; j++){ const kk = ((t / speed) + j / n) % 1; const [x, y] = polyAt(pts, kk); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-flow" }); } };
+    if(s.mode === "pio"){
+      const pts = [devP, [cpuP[0] + 30, cpuP[1]], [cpuP[0] - 30, cpuP[1]], ramP];
+      E(g, "polyline", { points: pts.map(p => p.join(",")).join(" "), class: "an-flowline", fill: "none" }); dots(pts, 3, 1800);
+    }
+    if(s.mode === "setup"){ const pts = [cpuP, [DMA[0] + DMA[2] / 2, DMA[1]]]; E(g, "polyline", { points: pts.map(p => p.join(",")).join(" "), class: "an-flowline", fill: "none" }); dots(pts, 1, 1200);
+      oT(g, 380, 226, LL("src: NIC  dst: 0x3a000  len: 1 MB", "откуда: NIC  куда: 0x3a000  длина: 1 МБ"), "an-code"); }
+    if(s.mode === "dma" || s.mode === "iommu"){ const pts = [devP, [DMA[0] + DMA[2], DMA[1] + 34], [DMA[0], DMA[1] + 34], ramP]; E(g, "polyline", { points: pts.map(p => p.join(",")).join(" "), class: "an-flowline", fill: "none" }); dots(pts, 6, 1400); }
+    if(s.mode === "irq"){ const pts = [[DEV[0] + 20, DEV[1]], [CPU[0] + CPU[2], CPU[1] + 45]]; E(g, "polyline", { points: pts.map(p => p.join(",")).join(" "), class: "an-flowline", fill: "none" }); dots(pts, 1, 1000); oT(g, 560, 70, LL("interrupt", "прерывание"), "an-m an-b an-warn"); }
+    if(s.mode === "iommu"){ oT(g, 380, 228, LL("device address → physical, allowed ranges only", "адрес устройства → физический, только разрешённые диапазоны"), "an-m", "middle");
+      oR(g, RAM[0] + 20, RAM[1] + 70, 110, 26, "an-slot k0 an-hlslot", 4); oT(g, RAM[0] + 75, RAM[1] + 88, LL("pinned buffer", "закреплённый буфер"), "an-m an-b"); }
+    // CPU timeline
+    const TY = 268; oT(g, 20, TY - 8, LL("CPU core time", "время ядра CPU"), "an-m an-b", "start");
+    oR(g, 20, TY, 720, 26, "an-frame", 4);
+    const busy = s.mode === "pio" ? 1 : s.mode === "setup" ? .08 : s.mode === "irq" ? .06 : 0;
+    const prog = Math.min(1, t / 4000);
+    if(s.mode === "pio"){ oR(g, 20, TY, 720 * prog, 26, "an-pg k0", 4); oT(g, 30, TY + 18, LL("copying device → RAM", "копирование устройство → RAM"), "an-t an-b", "start"); }
+    else { const b = 720 * busy; if(b) { oR(g, 20, TY, b, 26, "an-pg k0", 4); } oR(g, 20 + b, TY, (720 - b) * prog, 26, "an-pg k2", 4); oT(g, 30 + b, TY + 18, LL("free: running other threads", "свободно: выполняет другие потоки"), "an-t an-b", "start"); }
+  }});
 };
 
 // ---- boot

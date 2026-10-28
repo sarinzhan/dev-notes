@@ -1780,8 +1780,8 @@
     "linked-lists",
     "lock-free-and-cas",
     "lru-cache-design",
-    "memory-models-and-visibility",
-    "virtual-memory-and-paging"
+    "memory-management",
+    "memory-models-and-visibility"
    ],
    "words": 1032,
    "ru": "notes-ru/computer-science/computation/cpu-caches-and-cache-lines.md",
@@ -2406,9 +2406,9 @@
     "hashmap-internals",
     "linked-lists",
     "lock-free-and-cas",
+    "memory-management",
     "redis-patterns-and-persistence",
-    "spring-cache-abstraction",
-    "virtual-memory-and-paging"
+    "spring-cache-abstraction"
    ],
    "words": 1074,
    "ru": "notes-ru/computer-science/data-structures/lru-cache-design.md",
@@ -2540,11 +2540,11 @@
     "how-cpu-executes-code",
     "instruction-lifecycle-and-pipelining",
     "jvm-memory-areas",
+    "memory-management",
     "processes-and-threads",
     "race-conditions-and-critical-sections",
     "signals-and-process-lifecycle",
     "stack-vs-heap-memory",
-    "virtual-memory-and-paging",
     "virtual-threads"
    ],
    "words": 3448,
@@ -2655,9 +2655,9 @@
     "http-fundamentals",
     "io-models-blocking-nonblocking-epoll",
     "lock-free-and-cas",
+    "memory-management",
     "memory-models-and-visibility",
     "message-queues-and-streams",
-    "postgres-performance-checklist",
     "processes-and-threads",
     "service-communication-sync-vs-async",
     "signals-and-process-lifecycle",
@@ -2665,9 +2665,48 @@
     "syscalls-and-file-descriptors",
     "tcp-vs-udp"
    ],
-   "words": 1047,
+   "words": 1023,
    "ru": "notes-ru/computer-science/operating-systems/ipc-mechanisms.md",
    "title_ru": "Механизмы межпроцессного взаимодействия"
+  },
+  {
+   "id": "memory-management",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Memory management (RAM)",
+   "tags": [
+    "operating-systems",
+    "memory",
+    "ram",
+    "virtual-memory",
+    "paging",
+    "dma",
+    "linux"
+   ],
+   "learned": "2026-10-28",
+   "order": 4,
+   "path": "notes/computer-science/operating-systems/memory-management.md",
+   "links": [
+    "anatomy-of-a-process",
+    "cpu-caches-and-cache-lines",
+    "docker-containers-and-resources",
+    "garbage-collection",
+    "io-models-blocking-nonblocking-epoll",
+    "ipc-mechanisms",
+    "java-nio",
+    "jvm-memory-areas",
+    "kafka-architecture",
+    "linux-memory-filesystems-io",
+    "linux-processes",
+    "postgres-performance-checklist",
+    "processes-and-threads",
+    "redis-patterns-and-persistence",
+    "signals-and-process-lifecycle",
+    "stack-vs-heap-memory"
+   ],
+   "words": 3732,
+   "ru": "notes-ru/computer-science/operating-systems/memory-management.md",
+   "title_ru": "Управление памятью (RAM)"
   },
   {
    "id": "operating-system-architecture",
@@ -2692,14 +2731,14 @@
     "docker-fundamentals",
     "instruction-lifecycle-and-pipelining",
     "linux-architecture-and-kernel",
+    "memory-management",
     "operating-system-introduction",
     "osi-and-tcp-ip-models",
     "processes-and-threads",
     "syscalls-and-file-descriptors",
-    "tcp-vs-udp",
-    "virtual-memory-and-paging"
+    "tcp-vs-udp"
    ],
-   "words": 2601,
+   "words": 2494,
    "ru": "notes-ru/computer-science/operating-systems/operating-system-architecture.md",
    "title_ru": "Обзор архитектуры системы"
   },
@@ -2726,11 +2765,11 @@
     "io-models-blocking-nonblocking-epoll",
     "kubernetes-basics",
     "linux-architecture-and-kernel",
+    "memory-management",
     "operating-system-architecture",
     "processes-and-threads",
     "signals-and-process-lifecycle",
     "syscalls-and-file-descriptors",
-    "virtual-memory-and-paging",
     "virtual-threads"
    ],
    "words": 938,
@@ -2759,10 +2798,10 @@
     "jvm-memory-areas",
     "latency-numbers",
     "linux-processes",
+    "memory-management",
     "race-conditions-and-critical-sections",
     "stack-vs-heap-memory",
     "threads-basics",
-    "virtual-memory-and-paging",
     "virtual-threads"
    ],
    "words": 982,
@@ -2788,11 +2827,11 @@
     "dockerfile-and-images",
     "kubernetes-basics",
     "linux-processes",
+    "memory-management",
     "outbox-pattern",
     "spring-bean-lifecycle",
     "spring-kafka-consumer",
-    "threads-basics",
-    "virtual-memory-and-paging"
+    "threads-basics"
    ],
    "words": 1142,
    "ru": "notes-ru/computer-science/operating-systems/signals-and-process-lifecycle.md",
@@ -2817,10 +2856,10 @@
     "jpa-entities-and-relationships",
     "jvm-memory-areas",
     "lock-free-and-cas",
+    "memory-management",
     "processes-and-threads",
     "recursion-and-backtracking",
     "spring-aop",
-    "virtual-memory-and-paging",
     "virtual-threads"
    ],
    "words": 970,
@@ -2846,41 +2885,14 @@
     "java-nio",
     "linux-memory-filesystems-io",
     "linux-processes",
+    "memory-management",
     "processes-and-threads",
     "sockets-and-connection-pooling",
-    "synchronization-and-monitors",
-    "virtual-memory-and-paging"
+    "synchronization-and-monitors"
    ],
    "words": 1017,
    "ru": "notes-ru/computer-science/operating-systems/syscalls-and-file-descriptors.md",
    "title_ru": "Системные вызовы и файловые дескрипторы"
-  },
-  {
-   "id": "virtual-memory-and-paging",
-   "sec": "computer-science",
-   "sub": "operating-systems",
-   "title": "Virtual memory and paging",
-   "tags": [
-    "operating-systems",
-    "memory",
-    "paging",
-    "linux"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/computer-science/operating-systems/virtual-memory-and-paging.md",
-   "links": [
-    "cpu-caches-and-cache-lines",
-    "docker-containers-and-resources",
-    "java-nio",
-    "jvm-memory-areas",
-    "kafka-architecture",
-    "linux-memory-filesystems-io",
-    "linux-processes",
-    "stack-vs-heap-memory"
-   ],
-   "words": 1033,
-   "ru": "notes-ru/computer-science/operating-systems/virtual-memory-and-paging.md",
-   "title_ru": "Виртуальная память и страничная организация"
   },
   {
    "id": "error-handling-strategies",
@@ -3617,6 +3629,7 @@
     "idempotency",
     "kafka-architecture",
     "leader-follower-replication",
+    "memory-management",
     "message-queues-and-streams",
     "postgres-locks",
     "rate-limiting",
@@ -3624,7 +3637,7 @@
     "spring-cache-abstraction",
     "websockets-sse-and-long-polling"
    ],
-   "words": 1019,
+   "words": 1020,
    "ru": "notes-ru/databases/nosql/redis-patterns-and-persistence.md",
    "title_ru": "Паттерны Redis и персистентность: кэш, блокировки, rate limit, stream"
   },
@@ -4220,18 +4233,15 @@
    "learned": "2026-10-22",
    "path": "notes/devops/linux/linux-memory-filesystems-io.md",
    "links": [
-    "docker-containers-and-resources",
     "docker-fundamentals",
     "docker-volumes-and-registry",
     "garbage-collection",
     "java-nio",
-    "jvm-memory-areas",
-    "kafka-architecture",
     "linux-architecture-and-kernel",
     "linux-commands",
-    "linux-processes"
+    "memory-management"
    ],
-   "words": 1007,
+   "words": 790,
    "ru": "notes-ru/devops/linux/linux-memory-filesystems-io.md",
    "title_ru": "Память, файловые системы и ввод-вывод в Linux"
   },

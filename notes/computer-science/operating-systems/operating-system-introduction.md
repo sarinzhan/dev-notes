@@ -28,7 +28,7 @@ An operating system is the program that sits between the hardware and every othe
 ### What the OS gives a running program
 - A **process** ([[processes-and-threads]], [[anatomy-of-a-process]]): a private address space, one or more threads of execution, a table of open files, an identity (user, group, PID).
 - **Time on the CPU** ([[cpu-scheduling]]): the illusion that your 200 threads run at once on 8 cores.
-- **Memory on demand** ([[virtual-memory-and-paging]]): the JVM asks for 4 GB of heap and gets it page by page, when first touched.
+- **Memory on demand** ([[memory-management]]): the JVM asks for 4 GB of heap and gets it page by page, when first touched.
 - **I/O that looks uniform** ([[io-models-blocking-nonblocking-epoll]]): a file, a pipe, a socket and a terminal are all read with the same call.
 - **Signals and lifecycle** ([[signals-and-process-lifecycle]]): how the OS tells a process to stop, and how `SIGTERM` becomes a graceful shutdown.
 

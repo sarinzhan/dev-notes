@@ -36,7 +36,7 @@ Redis is used for five recurring jobs in a backend: cache in front of the databa
 | Mode | What is written | Loss on crash | Cost |
 |---|---|---|---|
 | None | nothing | everything | fastest; pure cache |
-| RDB | point-in-time snapshot every N seconds/changes (`save 60 1000`), fork + copy-on-write | minutes | fork memory spike on large datasets |
+| RDB | point-in-time snapshot every N seconds/changes (`save 60 1000`), fork + copy-on-write ([[memory-management]]) | minutes | fork memory spike on large datasets |
 | AOF `appendfsync everysec` | every write command appended, fsync once per second; rewritten periodically | ≤ 1 s | small; the recommended durable mode |
 | AOF `appendfsync always` | fsync per write | none | slow |
 | RDB + AOF (Redis 7 multi-part AOF) | both; AOF used on restart | ≤ 1 s | default for "I need my data back" |
