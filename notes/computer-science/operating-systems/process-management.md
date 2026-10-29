@@ -51,6 +51,34 @@ process-thread-tables
 - Both kinds of server have to share one listening port between their workers: by inheriting the listening socket through `fork`, or with `SO_REUSEPORT` sockets. How that works is in [[socket-management]].
 - **Fork** creates the new process: the child must have its own virtual memory, but copy-on-write means pages are shared until one side writes. Redis uses exactly this for asynchronous durability (`BGSAVE`). The details and animation are in [[memory-management]]; the lifecycle (`exec`, `wait`, zombies) is in [[signals-and-process-lifecycle]].
 
+- **Postgres and the process model.** Every connection is a forked backend, so the default `max_connections` is 100 and thousands of connections are a bad idea: thousands of processes, page tables and TLB flushes. Applications put a pool in front (HikariCP in the app, PgBouncer between apps and the database) and share a few connections between many users. Besides backends, Postgres runs auxiliary processes: checkpointer, background writer, WAL writer, autovacuum launcher and workers, logger, archiver, and parallel query workers.
+- In 2023 the Postgres developers started a long discussion about moving to threads. One argument from it: on big machines with many connections, switching between processes costs more than switching threads of one process, and much of that time goes to TLB misses, which the process model cannot avoid. The counter-arguments are the work involved (global variables everywhere in the code) and losing crash isolation. It is still open.
+- **Pipelining on a database connection**: Postgres's pipeline mode (libpq, Postgres 14+; the JDBC driver batches the same way) lets a client send several queries without waiting. The results come back **in the order the queries were sent**, so the client matches them by position; there are no query IDs (the lecture suggests there are). A slow first query delays the others, the same head-of-line blocking as HTTP/1.1 pipelining ([[cpu]]).
+- **Threads trade isolation for speed.** All threads of a process share the heap, so a buggy or compromised thread can read or overwrite any other thread's data; nothing in the kernel separates them. What makes injected code hard to run is not threads but the memory permissions: the heap and stacks are not executable, the code is not writable ([[anatomy-of-a-process]]).
+
+### Seeing fork and copy-on-write: `smaps`
+The lecture's demo: a C program `malloc`s 10 MB, writes it with `memset` (until then the pages have no frames, so RSS stays small), forks, and both processes loop forever.
+
+```bash
+top -p 999,1000                      # RES ~10 MB for both: looks like 20 MB in total
+grep -A 20 heap /proc/999/smaps      # one mapping of the process, in detail
+#   Rss:            10244 kB
+#   Pss:             5122 kB          <- proportional: shared pages divided by the number of sharers
+#   Shared_Clean:       0 kB
+#   Shared_Dirty:   10240 kB          <- written before fork, now mapped by parent and child
+#   Private_Clean:      0 kB
+#   Private_Dirty:      4 kB          <- pages only this process maps
+cat /proc/999/smaps_rollup           # the same totals for the whole process
+```
+
+- **Dirty** means the page has been written; **clean** means it still matches its source (a file, or never touched). **Shared** pages are mapped by more than one process; **private** ones by only this one.
+- In the second version the child writes one byte every 1,000 bytes (every 4,096 would touch each page exactly once). With every refresh the child's `Private_Dirty` grows and `Shared_Dirty` shrinks: each written page was copied for the child, and the parent's original became private to the parent.
+- **RSS double-counts shared pages**; summing RSS over 20 forked workers can claim several times the real RAM. **Pss** gives each process its share, so the sum of Pss is the true total. `smem` shows it per process.
+
+```anim
+fork-cow-smaps
+```
+
 ### Shared memory
 - Processes and threads can share memory. Threads share the whole address space automatically. Separate processes share by mapping the same physical pages: `mmap(MAP_SHARED)` or `shm_open`. The **virtual** addresses can differ between the processes; the **physical** pages are the same.
 - The classic example is a database's **shared buffers**: every Postgres backend process attaches to the same `shared_buffers` segment, so a page read by one connection is in memory for all of them ([[postgres-performance-checklist]]).
@@ -60,11 +88,15 @@ process-thread-tables
 - A **context switch** saves the current context into the current process's PCB (a memory write) and loads the next process's PCB into the registers (a memory read): pc, bp, sp, lr, ptbr and more. The switched-out process becomes **ready**; the new one **running**.
 - When it happens: the time slice ends (timer interrupt), the thread blocks (IO, lock, `sleep`), a higher-priority thread wakes, or the thread exits.
 
+- The page table base register must hold a **physical** address: if it were virtual, translating it would need the page table it points to. The PCB's copy of the PC is stale while the process runs; the live PC is only in the CPU and is written back at the switch.
+
 ### TLB flush and ASID
 - The **TLB** caches virtual-to-physical translations. Processes cannot share these mappings: virtual address 4000 means one physical page for process 100 and another for 200. So a switch to a different process has to **flush** the TLB, and the new process then misses on its first memory accesses and pays page-table walks. That is slow, and usually costs more than saving the registers.
 - **Threads of the same process are faster to switch**: same memory, same page table, the TLB stays valid. This holds only as long as both threads belong to the same process.
 - **ASID** (address space ID on ARM) and **PCID** (process-context ID on x86) tag each TLB entry with the process it belongs to, so entries of several processes live side by side and a switch does not need a flush. The tags are small (8 or 16 bits on ARM, 12 on x86), so the kernel recycles them and flushes only when it runs out.
 - Spectre/Meltdown mitigations (page-table isolation) made the user↔kernel switch itself more expensive; PCID is what keeps it tolerable.
+
+- The lecture doubts that ASIDs are practical with so few bits and so many processes. The kernel handles it with generations: it hands out tags until they run out, then flushes the whole TLB once, starts a new generation and reassigns tags as processes run. Stale entries of a process that has not run for a while are simply evicted by newer ones. Linux uses PCID on x86 since 4.14 and ASIDs on ARM64.
 
 ```anim
 context-switch
@@ -109,6 +141,10 @@ cpu-scheduling-timeline
 - **IO-bound** work mostly waits: database queries, network reads and writes, file reads and writes. It runs briefly and blocks. A fair scheduler rewards it with quick wakeups, because it has used little CPU.
 - Consequence for sizing: CPU-bound thread pools ≈ number of cores (more threads only add switches); IO-bound pools can be much larger, or use virtual threads or non-blocking IO ([[executors-and-thread-pools]], [[socket-management]]).
 
+- **Concurrency vs parallelism**: concurrent tasks are in progress at the same time and take turns, like two threads on one core or two hardware threads under hyper-threading; parallel tasks literally run at the same instant on different cores. Concurrency hides waiting, parallelism adds compute.
+- Every TLS connection costs CPU on both ends, so "just open another connection" is never free. Even shrinking TLS has a CPU price: certificate compression (RFC 8879) saves several KB per handshake, but the client must decompress, and a malicious server could send a decompression bomb, so it is applied carefully.
+- libuv (Node.js) does file IO on a pool of 4 threads by default (`UV_THREADPOOL_SIZE`), because regular file reads block; `io_uring` can make them asynchronous without threads.
+
 ### Linux specifics you can observe
 - Scheduling classes: `SCHED_OTHER` (normal, CFS/EEVDF), `SCHED_BATCH`, `SCHED_IDLE`, and real-time `SCHED_FIFO`/`SCHED_RR` (fixed priorities 1–99, preempt everything normal; used by audio and some trading systems, dangerous because a spinning RT thread can lock a core).
 - `nice` from -20 to 19 maps to a weight: each step is about 1.25× CPU share; nice 0 gets roughly 10× nice 10. It changes the share only under contention; on an idle box a nice 19 process runs at full speed.
@@ -138,6 +174,10 @@ cpu-scheduling-timeline
 - With concurrency come challenges: **two threads touching the same variable** (thread safety), or **two processes writing to the same shared memory**.
 - `a++` is three steps: load `a` into a register, add 1, store it back. If two threads interleave (T1 loads 1, T2 loads 1, both add, both store 2), one increment is lost: a **race condition**. Each thread kept its own copy in its own registers, saved in its TCB across switches.
 - Fixes: make the read-modify-write indivisible with a mutex (`synchronized`, `ReentrantLock`, a process-shared mutex in shared memory) or an atomic instruction (`lock xadd`, compare-and-swap, `AtomicInteger`) ([[race-conditions-and-critical-sections]], [[lock-free-and-cas]]). Locks bring their own problems: contention and deadlock ([[deadlocks-and-synchronization-primitives]]).
+
+- **A mutex has an owner**: only the thread that locked it may unlock it. If that thread dies while holding it, the mutex can stay locked forever and everyone waiting deadlocks. POSIX *robust* mutexes report `EOWNERDEAD` to the next locker instead. In Java, `synchronized` is released automatically even when an exception is thrown; a `ReentrantLock` is released only by `unlock()`, which is why it always goes in `finally`.
+- A **semaphore** is just a counter with `wait` (decrement, block at zero) and `signal` (increment); it has no owner, so any thread can signal it. Initialised to 1 it behaves like a mutex without the ownership checks ([[deadlocks-and-synchronization-primitives]]).
+- Databases release row locks when the transaction ends, and never take a new lock after releasing one: that is **two-phase locking** (a growing phase, then a shrinking phase at commit or rollback). The lecture calls it two-phase commit, which is a different protocol for committing across several databases.
 
 ```anim
 race-condition
@@ -176,6 +216,7 @@ nice -n 15 java -jar reindex.jar
 A thread dump line like `"kafka-producer-network-thread" ... nid=0x3039` points at kernel task 12345: the same thread seen by the OS and by the JVM. `nr_throttled` growing while the node's `%usr` is far below 100% is the signature of a CPU limit set too tightly for a bursty JVM.
 
 ## Pitfalls
+- Adding up RSS of forked workers (Postgres backends, gunicorn or nginx workers) to size memory: shared pages are counted once per process. Use Pss from `smaps_rollup` or `smem`.
 - Assuming threads are free: each platform thread reserves `-Xss` (1 MiB default) of virtual memory and a kernel structure; a thread-per-request design dies at a few thousand concurrent requests. Use a bounded pool ([[executors-and-thread-pools]]) or virtual threads.
 - Forgetting that a process switch costs a TLB flush (or ASID churn): a design that bounces each request through several local processes (sidecars, local proxies) pays it on every hop.
 - Measuring only CPU usage: a service with 20% CPU and a huge `cs` rate is bottlenecked on lock or IO waits, not compute. Check `pidstat -w` before adding cores.
