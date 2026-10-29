@@ -2465,6 +2465,7 @@
     "garbage-collection",
     "horizontal-vs-vertical-scaling",
     "java-memory-model",
+    "kernel-vs-user-mode",
     "latency-numbers",
     "linked-lists",
     "lock-free-and-cas",
@@ -2472,11 +2473,12 @@
     "memory-models-and-visibility",
     "numbers-bits-and-floating-point",
     "operating-system-architecture",
+    "operating-system-introduction",
     "process-management",
     "race-conditions-and-critical-sections",
     "virtual-threads"
    ],
-   "words": 3993,
+   "words": 5398,
    "ru": "notes-ru/computer-science/operating-systems/cpu.md",
    "title_ru": "CPU"
   },

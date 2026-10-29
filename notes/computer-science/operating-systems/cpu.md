@@ -27,6 +27,16 @@ A CPU core is a few parts wired around a clock: a **control unit** that fetches 
 cpu-components
 ```
 
+### Why separate units, and how the ALU adds
+- The core is split into units (fetch, decode, ALU, load/store) so that they can all work at once on different instructions: that is what makes pipelining possible. One unit doing everything would sit mostly idle.
+- The **control unit** does not compute; it moves values around. For `sub sp, sp, #12` it reads the stack pointer from the register file (say 100), hands the ALU two plain numbers, 100 and 12, and writes the result, 88, back into `sp`. The ALU never sees register names; it only gets inputs and produces an output.
+- The **ALU** is logic gates. Addition is built from adders: a *half adder* gives `sum = a XOR b`, `carry = a AND b`; a *full adder* also takes the carry from the previous bit: `sum = a XOR b XOR cin`, `cout = (a AND b) OR (cin AND (a XOR b))`. Chaining them gives a multi-bit adder; real ALUs compute all the carries in parallel (carry-lookahead) so a 64-bit add finishes in one cycle.
+- The same "add" is a different thing at every level: `a + b` in Java, an `add` in assembly, a few bytes of machine code, control signals into the ALU, and finally gates. Each level translates for the one below.
+
+```anim
+alu-adder
+```
+
 ### Registers
 - **Small, ultrafast storage inside the core**: 32 or 64 bits each, read in under a cycle. Everything the ALU computes on must be in a register first.
 - **PC** (program counter, `RIP` on x86-64): address of the next instruction. Changed by jumps, calls, returns and interrupts.
@@ -37,6 +47,8 @@ cpu-components
 - **Control and system registers**: page-table base (CR3 / TTBR), privilege mode, interrupt masks; writable only in kernel mode.
 - Inside, a core has far more **physical** registers (~200) than the ISA names; *register renaming* maps the names onto them so independent instructions that reuse `rax` do not wait for each other.
 
+- **Using the full register width pays.** `memchr()` (find a byte in a block of memory) used to compare one byte at a time. A 2022 patch to the Linux kernel's version loads a whole 8-byte word into a 64-bit register and checks all 8 bytes at once with a few bit tricks, which was reported about 4× faster. The function had sat unchanged for years: code compiled for a 64-bit CPU runs, but it is only faster if it actually uses the 64 bits.
+- The same gap shows up everywhere: hardware ships a feature, and nothing gets faster until the software above uses it (a new GPU on an old chipset, NVMe zoned namespaces the file system does not understand, SIMD a library never calls).
 ### Caches: L1, L2, L3
 | Level | Where | Size (typical) | Latency |
 |---|---|---|---|
@@ -46,10 +58,16 @@ cpu-components
 | RAM | through the memory controller | GBs | 50–100 ns |
 - Data moves between levels in 64-byte **cache lines**. A hardware **coherence protocol** keeps all copies of a line consistent across cores; that traffic is what makes contended locks and false sharing slow. The full story of lines, locality and false sharing is in [[cpu-caches-and-cache-lines]], and how the line comes from RAM is in [[memory-management]].
 
+- **What a write costs other cores.** Core 1 and core 2 both have variable `a` cached. Core 1 writes it: its copy becomes *modified*, and the coherence protocol (MESI: modified, exclusive, shared, invalid) sends an invalidation so core 2's copy becomes *invalid*. Core 2's next read misses and fetches the line again, from L3 or from core 1, ~15–40 ns instead of 1. Whole 64-byte lines are invalidated, not single variables, so unrelated data next to a hot counter suffers too. CPython's reference counts on `None`, `True` and `False` caused exactly this traffic ([[operating-system-introduction]]).
+- **Why L1 is split into L1i and L1d.** Instructions do not change while a program runs, data does. Separate caches let instruction fetch and data access happen in the same cycle, and a stream of data writes cannot evict or invalidate the hot code.
+- **See your caches**: `lscpu | grep -i cache` (Linux), `sysctl -a | grep cache` (macOS), `nproc` for logical CPUs, `uname -m` for the architecture. Vendor tables often list totals: "L1d 4 × 32 KB" means 32 KB per core on 4 cores. Code whose working set fits in L1 or L2 runs at a different speed from code that does not.
+
 ### Cores, sockets and NUMA
 - **Multi-core**: each core has its own front end, ALUs, registers, L1 and L2; cores share L3 and the memory controller. Threads on different cores run truly in parallel; the OS scheduler decides which thread runs where ([[process-management]]).
 - **Multi-socket servers**: two or more chips, each with its own RAM (DIMM1 next to socket 1, DIMM2 next to socket 2), joined by an interconnect (Intel UPI, AMD Infinity Fabric). The hardware presents all RAM as one shared address space, so any core can read any address, but RAM attached to the other socket is slower (often 1.5–2×). This is **NUMA**, non-uniform memory access; the course slide calls the link a distributed shared memory (DSM).
 - Consequence: a big JVM heap that spans both sockets sees uneven latency. `numactl --hardware` shows the layout; `-XX:+UseNUMA` makes the parallel and G1 collectors allocate a thread's young objects in its local node; databases are often pinned to one socket.
+
+- The lecture calls the link between sockets "distributed shared memory"; in practice it is the CPU vendor's interconnect (Intel UPI, AMD Infinity Fabric). Apple's M-series puts the memory in the same package as all cores, so every core is about equally close to all of it and the NUMA question mostly disappears.
 
 ### ISA: RISC vs CISC
 | | RISC (ARM64, RISC-V) | CISC (x86-64, Intel / AMD) |
@@ -63,6 +81,8 @@ cpu-components
 - The **ISA** (instruction set architecture) is the contract a program can rely on: instructions, registers, memory model. The **microarchitecture** is one implementation of it: how many decoders, how deep the pipeline, how big the caches. Two chips with the same ISA run the same binary at different speeds.
 - Memory ordering is part of the ISA: x86 is strongly ordered (loads and stores mostly appear in program order), ARM is weakly ordered. The same Java code with a missing `volatile` can work on x86 and break on ARM ([[memory-models-and-visibility]], [[java-memory-model]]).
 - For a backend developer: a `linux/amd64` Docker image does not run natively on an ARM machine; build multi-arch images. The JVM has a JIT back end for each ISA, so Java bytecode runs on both.
+
+- The lecture's example, `a = a + b` with both in memory: on x86 it is presented as one instruction adding two memory locations, but x86 does not allow two memory operands either; it is `mov eax, [b]` then `add [a], eax`, two instructions, the second of which loads, adds and stores. On ARM it is four: `ldr`, `ldr`, `add`, `str`. CISC makes the code shorter, not the work smaller: the memory accesses are the same, just hidden inside an instruction. The same trade-off as an ORM hiding SQL: simpler to write, the cost is still there.
 
 ### Clock speed and instructions per cycle
 - Clock speed is cycles per second: 3 GHz = 3 billion cycles, 0.33 ns each.
@@ -110,6 +130,8 @@ One instruction takes 15–20 cycles from fetch to retire, yet the core retires 
 cpu-pipeline
 ```
 
+- **The same idea in HTTP.** HTTP/1.1 pipelining let a client send several requests on one connection without waiting, so the server could work on the next while sending the previous response. It failed in practice: responses must come back in order (one slow request blocks the rest, head-of-line blocking) and many proxies handled it badly. HTTP/2 replaced it with independent multiplexed streams. A CPU pipeline works because the core controls every stage and can always retire in order.
+
 ### Out-of-order and speculative execution
 - The scheduler issues whichever µops have their inputs ready, not the oldest. A load that misses the cache does not stop later independent arithmetic; the core keeps going until the reorder buffer fills with instructions waiting behind the miss.
 - Everything executes on a guess (the predicted branch path) and becomes real only at retire. If the guess was wrong, the results are discarded and nothing is visible: the architectural state only moves at retirement.
@@ -139,6 +161,9 @@ cpu-pipeline
 ```anim
 cpu-parallelism
 ```
+
+- **Some teams turn hyper-threading off.** The two hardware threads share L1, L2 and often the TLB, so a noisy neighbour on the sibling thread makes latency unpredictable: the lecturer's colleagues disabled it for steadier production timings. It is also a security boundary problem: attacks such as L1TF and MDS (2018–2019) leak data between sibling threads, so OpenBSD disabled SMT by default and cloud providers never put two customers on the same core. When the two threads run the same program they share code in L1i and it tends to help; when they run unrelated programs they fight over the caches.
+- **SIMD** gives the ALU vectors instead of single values: one instruction adds 4, 8 or 16 numbers. Image and audio processing, compression, JSON parsing (simdjson), and even B+ tree searches use it to compare many keys at once. ARM's version is NEON, x86's SSE/AVX. In Java the JIT vectorises simple loops over arrays automatically, and the Vector API (`jdk.incubator.vector`) lets you write SIMD code explicitly.
 
 ### A Java loop, cycle by cycle
 Sum the prices of items whose quantity is positive: 10,000 `Item` objects allocated in order (so they sit next to each other on the heap), about 95% with `qty > 0`:
@@ -202,6 +227,33 @@ The chain `i1 → i2 → i3 → i4` is the critical path; everything else runs i
 - **Container CPU limits** are enforced by the scheduler in time slices, not by taking cores away: a limit of `1` on a 16-core node still lets a thread run on any core, but only for 100 ms in every 100 ms window ([[docker-containers-and-resources]]).
 - *Why is `i++` not atomic?* It is load → add → store, three steps; another core can interleave between them ([[race-conditions-and-critical-sections]]). `lock xadd` or `CAS` does it in one atomic instruction ([[lock-free-and-cas]]).
 
+### CPU-bound or IO-bound? Reading `top`
+A workload is **CPU-bound** when it needs more instructions than the cores can run, and **IO-bound** when it mostly waits for disk or network. The first line of `top` tells them apart:
+
+```text
+%Cpu(s):  8.0 us,  4.0 sy,  0.0 ni, 38.0 id, 50.0 wa,  0.0 hi,  0.0 si,  0.0 st
+```
+
+| Field | Meaning | High value means |
+|---|---|---|
+| `us` | user: your processes' own code | CPU-bound application work |
+| `sy` | system: kernel code on behalf of processes (system calls, page faults) | too many small system calls, lock contention, page faults ([[kernel-vs-user-mode]]) |
+| `ni` | user time of processes with a positive *nice* value (lower priority) | background jobs you deprioritised |
+| `id` | idle | spare capacity, or a service waiting on the network |
+| `wa` | iowait: idle while **disk** IO is outstanding | the disk is the bottleneck |
+| `hi` / `si` | hardware / software interrupts | heavy network traffic (softirq) |
+| `st` | steal: time the hypervisor gave your vCPU to another VM | a noisy neighbour or an oversubscribed host |
+
+- The percentages are of **all cores**: on 4 cores, one busy core is 25%. A single process's `%CPU` column counts per core and can exceed 100% (`htop` and some tools show 400% for 4 full cores).
+- **iowait is idle time, not busy time**: the core is free and the kernel can run another thread on it. It counts only block-device IO (including network file systems), not sockets: a service waiting for a slow HTTP downstream shows plain `id`.
+- The lecture's demo on a 4-core Raspberry Pi: one CPU loop → 25% `us`; four copies → ~100% `us`; a Postgres `INSERT … SELECT … FROM generate_series(…)` on slow eMMC → 40–80% `wa` with little `us`.
+- **100% CPU does not prove starvation.** It only says the cores were busy. Whether threads waited for a core shows in the run queue (`vmstat 1`, column `r` above the core count) and in **pressure stall information**: `/proc/pressure/cpu` gives the share of time some task was runnable but not running (the lecture calls it "performance stall information"). In containers, also check `nr_throttled` in the cgroup's `cpu.stat` ([[docker-containers-and-resources]]).
+- This decides thread pool sizes: CPU-bound pools near the number of cores, IO-bound pools larger, or virtual threads ([[executors-and-thread-pools]], [[virtual-threads]]).
+
+```anim
+cpu-vs-io-bound
+```
+
 ## Example
 What the CPU sees when Java adds two fields (`this.total += item.price`), after the JIT, on x86-64:
 
@@ -250,6 +302,8 @@ Item[] scattered after GC, random qty          ~60 ns     one miss + one flush p
 `perf stat -e cycles,instructions,branch-misses,cache-misses -p <pid>` shows which case you are in: IPC near 3 for the first, near 1 for the second, well under 0.5 for the third.
 
 ## Pitfalls
+- Reading high `wa` as "the CPU is busy": it is idle time waiting for the disk. Adding cores does nothing; faster storage, fewer `fsync`s or batching does.
+- Reading 100% CPU as "we need more cores" without checking the run queue or `/proc/pressure/cpu`: busy is not the same as starved.
 - Clock speed is not performance. A 2.5 GHz server core with a wide back end and large caches beats a 4 GHz laptop core on database workloads.
 - Fewer instructions is not faster. A loop with 20 independent instructions can beat one with 10 that form a dependency chain; one cache miss or mispredicted branch outweighs dozens of ALU operations.
 - "vCPU" means hardware thread, not core. Two threads of one core share its ALUs; size CPU-bound pools around physical cores ([[executors-and-thread-pools]]).

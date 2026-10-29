@@ -3682,6 +3682,70 @@ ANIMS["malloc-many-vs-one"] = el=>{
   }});
 };
 
+// ============ 44. How the ALU adds: half adder, full adders, ripple carry (6 + 7)
+ANIMS["alu-adder"] = el=>{
+  const A = [0, 1, 1, 0], B = [0, 1, 1, 1]; // most significant first: 0110 = 6, 0111 = 7
+  const SUM = [1, 1, 0, 1];
+  const ST = [
+    { t: ["The inputs", "Входы"], col: -1, en: "The ALU adds two numbers in binary: 6 = 0110 and 7 = 0111. It has no idea what \"add\" means; it is a circuit of logic gates, and the control unit has already decoded the instruction and fed it the two values from registers.",
+      ru: "ALU складывает два числа в двоичном виде: 6 = 0110 и 7 = 0111. Что такое «сложить», он не знает: это схема из логических вентилей, а блок управления уже декодировал инструкцию и подал ему два значения из регистров." },
+    { t: ["Bit 0: half adder", "Бит 0: полусумматор"], col: 3, en: "The lowest bit has no carry coming in, so a half adder is enough: sum = a XOR b = 0 XOR 1 = 1, carry = a AND b = 0.",
+      ru: "У младшего бита нет входящего переноса, поэтому хватает полусумматора: сумма = a XOR b = 0 XOR 1 = 1, перенос = a AND b = 0." },
+    { t: ["Bit 1: full adder", "Бит 1: полный сумматор"], col: 2, en: "Every other bit uses a full adder, with three inputs: a, b and the carry in. sum = a XOR b XOR cin = 1 XOR 1 XOR 0 = 0; carry out = (a AND b) OR (cin AND (a XOR b)) = 1.",
+      ru: "Остальные биты используют полный сумматор с тремя входами: a, b и входящим переносом. сумма = a XOR b XOR cin = 1 XOR 1 XOR 0 = 0; выходной перенос = (a AND b) OR (cin AND (a XOR b)) = 1." },
+    { t: ["Bit 2: carry ripples", "Бит 2: перенос бежит"], col: 1, en: "1 + 1 + carry 1 = 3 = binary 11: sum 1, carry 1. Each column waits for the carry from the one before it, which is why this design is called a ripple-carry adder.",
+      ru: "1 + 1 + перенос 1 = 3 = двоичное 11: сумма 1, перенос 1. Каждый столбец ждёт переноса от предыдущего, поэтому такая схема называется сумматором с последовательным переносом." },
+    { t: ["Bit 3", "Бит 3"], col: 0, en: "0 + 0 + carry 1 = 1, carry 0. Done: 1101 = 13.",
+      ru: "0 + 0 + перенос 1 = 1, перенос 0. Готово: 1101 = 13." },
+    { t: ["One cycle for 64 bits", "Один такт на 64 бита"], col: 4, en: "Waiting for a carry to ripple through 64 columns would be slow, so real ALUs use carry-lookahead logic that computes all carries in parallel. A 64-bit add takes one cycle; the expensive part of real code is fetching the operands, not adding them.",
+      ru: "Ждать, пока перенос пробежит 64 столбца, было бы медленно, поэтому настоящие ALU используют ускоренный перенос (carry-lookahead), вычисляющий все переносы параллельно. 64-битное сложение занимает один такт; дорого в реальном коде не сложить, а получить операнды." }
+  ];
+  // carries: cin[col] for col 3..0 (lsb=3): col3 0, col2 0, col1 1, col0 1 ; couts: col3 0, col2 1, col1 1, col0 0
+  const cin = [1, 1, 0, 0], cout = [0, 1, 1, 0];
+  return steppedAnim(el, { title: LL("How the ALU adds", "Как ALU складывает"), vb: [760, 320], steps: ST, stepMs: 6500, render(g, s, t){
+    const X = c => 150 + c * 120, cur = s.col, done = c => s.col === 4 || (cur >= 0 && c >= cur);
+    oT(g, 60, 70, "a = 6", "an-code", "start"); oT(g, 60, 110, "b = 7", "an-code", "start"); oT(g, 60, 250, LL("sum", "сумма"), "an-code", "start"); oT(g, 60, 40, LL("carry in", "перенос"), "an-m", "start");
+    for(let c = 0; c < 4; c++){
+      const x = X(c), on = c === cur;
+      oR(g, x - 20, 52, 40, 30, "an-box", 4); oT(g, x, 73, String(A[c]), "an-mid");
+      oR(g, x - 20, 92, 40, 30, "an-box", 4); oT(g, x, 113, String(B[c]), "an-mid");
+      oR(g, x - 44, 140, 88, 60, on ? "an-reg on" : "an-frame", 8); oT(g, x, 166, c === 3 ? LL("half adder", "полусумматор") : LL("full adder", "полный сумм."), "an-m an-b"); oT(g, x, 184, on ? `cin=${cin[c]}` : "", "an-m");
+      oR(g, x - 20, 230, 40, 30, done(c) ? "an-pg k1" : "an-box", 4); oT(g, x, 251, done(c) ? String(SUM[c]) : "", "an-mid");
+      if(done(c) && c > 0 && cout[c]){ E(g, "path", { d: `M${x - 44} 160 C ${x - 70} 120, ${x - 76} 60, ${X(c - 1) + 30} 40`, class: "an-link2 on", fill: "none" }); oT(g, X(c - 1) + 30, 32, "1", "an-b an-code"); }
+    }
+    oT(g, 680, 251, s.col === 4 || s.col === 0 ? "= 13" : "", "an-mid");
+    if(cur >= 0 && cur < 4){ const c = cur; oT(g, 380, 300, c === 3 ? "sum = a ⊕ b    carry = a ∧ b" : "sum = a ⊕ b ⊕ cin    cout = (a ∧ b) ∨ (cin ∧ (a ⊕ b))", "an-code"); }
+    if(cur === 4) oT(g, 380, 300, LL("real ALUs: carry-lookahead, 64 bits in 1 cycle", "настоящие ALU: ускоренный перенос, 64 бита за 1 такт"), "an-m an-b an-sp");
+  }});
+};
+
+// ============ 45. CPU-bound vs IO-bound in top: us, sy, wa, id across four cores
+ANIMS["cpu-vs-io-bound"] = el=>{
+  const ST = [
+    { t: ["Idle", "Простой"], c: [["id"], ["id"], ["id"], ["id"]], top: "0.1 us, 0.2 sy, 0.0 ni, 99.7 id, 0.0 wa", en: "A quiet Raspberry Pi with 4 cores: 99.7% idle. top's CPU line is a percentage of all cores together, so one fully busy core shows as 25%.",
+      ru: "Спокойный Raspberry Pi с 4 ядрами: 99,7% простоя. Строка CPU в top — это процент от всех ядер вместе, поэтому одно полностью занятое ядро видно как 25%." },
+    { t: ["One CPU-bound loop", "Один цикл на CPU"], c: [["us"], ["id"], ["id"], ["id"]], top: "25.0 us, 0.1 sy, 0.0 ni, 74.9 id, 0.0 wa", en: "A C program that only adds numbers in a loop: one core at 100% user time, 25% of the machine. The process itself shows 100% in its own %CPU column (htop would show the total as up to 400%).",
+      ru: "Программа на C, которая только складывает числа в цикле: одно ядро на 100% пользовательского времени, 25% машины. У самого процесса в колонке %CPU — 100% (htop показал бы сумму до 400%)." },
+    { t: ["Four copies", "Четыре копии"], c: [["us"], ["us"], ["us"], ["us"]], top: "99.8 us, 0.2 sy, 0.0 ni, 0.0 id, 0.0 wa", en: "Four copies use all four cores: 99.8% user, no idle. A fifth would not run faster, only share. But 100% alone does not prove that threads are starving; for that look at the run queue or pressure stall information (/proc/pressure/cpu).",
+      ru: "Четыре копии занимают все четыре ядра: 99,8% user, простоя нет. Пятая не ускорит работу, а будет делить время. Но 100% само по себе не доказывает, что потоки голодают; для этого смотрите очередь готовых потоков или pressure stall information (/proc/pressure/cpu)." },
+    { t: ["Postgres bulk insert", "Массовая вставка в Postgres"], c: [["us", "wa"], ["wa"], ["sy", "id"], ["id"]], top: "8.0 us, 4.0 sy, 0.0 ni, 38.0 id, 50.0 wa", en: "INSERT … SELECT FROM generate_series on slow eMMC storage: the CPU is mostly waiting for the disk. wa (iowait) is idle time with disk IO outstanding; the core is free to run something else. High wa means the disk is the bottleneck.",
+      ru: "INSERT … SELECT FROM generate_series на медленном eMMC-накопителе: CPU в основном ждёт диск. wa (iowait) — это время простоя при незавершённом дисковом вводе-выводе; ядро свободно выполнять что-то другое. Высокий wa значит, что узкое место — диск." },
+    { t: ["Waiting on the network", "Ожидание сети"], c: [["id"], ["id"], ["id"], ["us", "id"]], top: "3.0 us, 1.0 sy, 0.0 ni, 96.0 id, 0.0 wa", en: "A service waiting for HTTP responses or a database across the network shows plain idle, not iowait: only block-device IO counts as wa. A slow downstream call looks like an idle CPU and a low request rate.",
+      ru: "Сервис, ждущий HTTP-ответов или базу данных по сети, показывает обычный простой, а не iowait: в wa учитывается только ввод-вывод блочных устройств. Медленный вызов внешнего сервиса выглядит как простаивающий CPU и низкий поток запросов." }
+  ];
+  const COL = { us: "k1", sy: "k3", wa: "k2", id: "" };
+  return steppedAnim(el, { title: LL("CPU-bound or IO-bound? Reading top", "Упор в CPU или в ввод-вывод? Читаем top"), vb: [760, 300], steps: ST, stepMs: 6500, render(g, s, t){
+    oT(g, 14, 26, "%Cpu(s): " + s.top, "an-code", "start");
+    const W = 600, X0 = 120, slots = 30, off = Math.floor(t / 220);
+    for(let c = 0; c < 4; c++){
+      const y = 50 + c * 46; oT(g, 100, y + 22, LL(`core ${c}`, `ядро ${c}`), "an-m an-b", "end");
+      const pat = s.c[c];
+      for(let i = 0; i < slots; i++){ const kind = pat[(i + off + c * 3) % pat.length]; oR(g, X0 + i * (W / slots), y, W / slots - 2, 32, kind === "id" ? "an-box" : "an-pg " + COL[kind], 3); }
+    }
+    [["us", LL("user", "user")], ["sy", LL("system", "system")], ["wa", LL("iowait", "iowait")], ["id", LL("idle", "idle")]].forEach(([k, lab], i)=>{ const x = 150 + i * 140; oR(g, x, 252, 20, 16, k === "id" ? "an-box" : "an-pg " + COL[k], 3); oT(g, x + 28, 265, lab, "an-m an-b", "start"); });
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
