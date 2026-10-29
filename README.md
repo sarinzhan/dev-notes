@@ -13,6 +13,7 @@ notes/<section>/<subsection>/<id>.md   one note per topic, front matter + markdo
 notes/assets/           images referenced from notes as assets/<name>.png
 build.py                scans notes/ and writes notes.json + graph.json (run before commit, or let the Action do it)
 STYLE.md                how a note is written
+CHANGELOG.md            what was added or changed, by date, one line per change
 ```
 
 ## Adding a note

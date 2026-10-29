@@ -70,3 +70,5 @@ The site has an EN/RU switch. Each topic exists once; the Russian text is an alt
 - Terms: use the established Russian term and add the English one in parentheses on first use when developers commonly say it in English (`пул потоков (thread pool)`). Product names and words Russian-speaking developers use as-is (Kafka, consumer group, offset, rebalance, commit, deploy, pod) stay in Latin script.
 - Tone: neutral, impersonal sentences. Where the English addresses the reader directly, use «ты».
 
+## Changelog
+- Every change to the vault (new note, expanded note, moved/merged content, new animations, site changes) gets one short line at the top of `CHANGELOG.md`, under today's date heading (create it if missing): bold summary, a few words of detail, and the PR link `[#N](https://github.com/sarinzhan/dev-notes/pull/N)`. Newest first.
