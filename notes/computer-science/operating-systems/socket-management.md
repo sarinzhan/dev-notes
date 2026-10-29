@@ -18,7 +18,7 @@ A **socket** is a kernel data structure (a `struct sock` in Linux) that the proc
   - a **connection socket**: one end of an established connection, identified by the 4-tuple (source IP, source port, destination IP, destination port). A client only ever has connection sockets.
 
 ### Listening on an IP and a port
-- A machine has several IP addresses: one per network interface (NIC), plus any number of virtual interfaces, plus the **loopback** `127.0.0.1` (IPv4) and `::1` (IPv6) that points back to the machine itself ([[ip-addressing-ports-nat]]).
+- A machine has several IP addresses: one per network interface (NIC), plus any number of virtual interfaces, plus the **loopback** `127.0.0.1` (IPv4) and `::1` (IPv6) that points back to the machine itself ([[ip-addressing-and-nat]]).
 - You listen on a specific **IP + port**. Binding to `127.0.0.1:8080` accepts only local connections, which is what development servers should do.
 - `0.0.0.0` (IPv4) or `::` (IPv6) means **all interfaces**. Many frameworks default to it because the IP may change and it is easier. It is dangerous: deploy that "local" tool to a server where one interface has a public address, and it is on the internet. Mass breaches of MongoDB and Elasticsearch came exactly from this: databases listening on all interfaces, found by attackers who scan the entire IPv4 space for their ports. Bind to the interface you mean; in Spring Boot that is `server.address`.
 

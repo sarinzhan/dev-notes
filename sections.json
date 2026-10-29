@@ -99,17 +99,25 @@
   "name": "Networking",
   "subs": {
    "fundamentals": "Fundamentals",
+   "ip-layer": "IP layer",
+   "transport": "Transport: TCP & UDP",
+   "performance": "Performance",
+   "protocols": "DNS & TLS",
    "http": "HTTP",
-   "security": "TLS & auth",
-   "dns-and-routing": "DNS, proxies & load balancing",
+   "proxies-and-load-balancing": "Proxies & load balancing",
+   "security": "Security & auth",
    "tools": "Tools"
   },
   "name_ru": "Сети",
   "subs_ru": {
    "fundamentals": "Основы",
+   "ip-layer": "Уровень IP",
+   "transport": "Транспорт: TCP и UDP",
+   "performance": "Производительность",
+   "protocols": "DNS и TLS",
    "http": "HTTP",
-   "security": "TLS и аутентификация",
-   "dns-and-routing": "DNS, прокси и балансировка",
+   "proxies-and-load-balancing": "Прокси и балансировка",
+   "security": "Безопасность и аутентификация",
    "tools": "Инструменты"
   }
  },

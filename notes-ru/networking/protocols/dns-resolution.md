@@ -35,7 +35,7 @@ DNS превращает имя в адреса через цепочку кеш
 ### DNS в Kubernetes
 - CoreDNS обслуживает зону кластера. Имена: `<svc>.<ns>.svc.cluster.local` → ClusterIP; **headless**-сервис (`clusterIP: None`) возвращает IP подов напрямую — это то, что нужно для балансировки на стороне клиента (gRPC `round_robin`, Kafka, Cassandra) ([[grpc-and-protobuf]]). Для StatefulSet существуют имена `<pod-name>.<svc>`.
 - `/etc/resolv.conf` пода: `nameserver 10.96.0.10`, `search esim.svc.cluster.local svc.cluster.local cluster.local`, `options ndots:5`. Имя, в котором меньше 5 точек (в `api.beeline.kg` их 2), сначала пробуется с каждым суффиксом поиска: 3–4 round trip с NXDOMAIN перед настоящим запросом. Используй завершающую точку (`api.beeline.kg.`) или задай `dnsConfig.options ndots:2` для сервисов, которые обращаются ко многим внешним хостам.
-- IP сервиса стабилен, пока поды за ним меняются; переключение при отказе (failover) на основе DNS внутри кластера — это проблема kube-proxy/Endpoints, а не TTL ([[kubernetes-basics]], [[ip-addressing-ports-nat]]).
+- IP сервиса стабилен, пока поды за ним меняются; переключение при отказе (failover) на основе DNS внутри кластера — это проблема kube-proxy/Endpoints, а не TTL ([[kubernetes-basics]], [[ip-addressing-and-nat]]).
 - Перегрузка CoreDNS (conntrack, потери UDP) выглядит как случайные 5-секундные зависания: это таймаут резолвера. `NodeLocal DNSCache` решает проблему кешем на каждом узле.
 
 ### DNS как инструмент балансировки и failover

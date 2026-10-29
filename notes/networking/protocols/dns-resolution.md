@@ -35,7 +35,7 @@ DNS turns a name into addresses through a chain of caches: the application's own
 ### DNS in Kubernetes
 - CoreDNS serves the cluster zone. Names: `<svc>.<ns>.svc.cluster.local` → ClusterIP; a **headless** service (`clusterIP: None`) returns the pod IPs directly, which is what client-side load balancing (gRPC `round_robin`, Kafka, Cassandra) needs ([[grpc-and-protobuf]]). `<pod-name>.<svc>` names exist for StatefulSets.
 - Pod `/etc/resolv.conf`: `nameserver 10.96.0.10`, `search esim.svc.cluster.local svc.cluster.local cluster.local`, `options ndots:5`. A name with fewer than 5 dots (`api.beeline.kg` has 2) is first tried with every search suffix: 3–4 NXDOMAIN round trips before the real query. Use a trailing dot (`api.beeline.kg.`) or set `dnsConfig.options ndots:2` for services that call many external hosts.
-- Service IP is stable while pods change behind it; DNS-based failover inside the cluster is a kube-proxy/Endpoints problem, not a TTL one ([[kubernetes-basics]], [[ip-addressing-ports-nat]]).
+- Service IP is stable while pods change behind it; DNS-based failover inside the cluster is a kube-proxy/Endpoints problem, not a TTL one ([[kubernetes-basics]], [[ip-addressing-and-nat]]).
 - CoreDNS overload (conntrack, UDP drops) looks like random 5-second stalls: the resolver timeout. `NodeLocal DNSCache` fixes it with a per-node cache.
 
 ### DNS as a load-balancing and failover tool

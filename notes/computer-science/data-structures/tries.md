@@ -32,7 +32,7 @@ A trie stores strings as paths from the root, one character per edge, so all key
 
 ### Where tries appear in systems
 - **Autocomplete / typeahead**: walk to the prefix node, then DFS or keep the top-k suggestions precomputed per node (a heap per node, [[heaps-and-priority-queues]]). At scale the trie is sharded by first letters and served from memory ([[design-news-feed]] style fan-out does not apply; this is read-mostly).
-- **Longest-prefix matching**: IP routing tables (binary trie over address bits, [[ip-addressing-ports-nat]]), telecom number plans (which operator/tariff owns `+99655…`), URL routers that match `/api/v1/sims/{id}`.
+- **Longest-prefix matching**: IP routing tables (binary trie over address bits, [[ip-addressing-and-nat]]), telecom number plans (which operator/tariff owns `+99655…`), URL routers that match `/api/v1/sims/{id}`.
 - **Full-text search building blocks**: a dictionary of terms with prefix queries; inverted indexes use an FST (finite state transducer), a compressed trie, in Lucene/Elasticsearch ([[elasticsearch-basics]]).
 - **Compressed in-memory indexes**: adaptive radix trees in databases, `btree_gin`-like prefix operators in Postgres rely on B-trees instead ([[postgres-indexes]]); a trie is purely in-memory in practice.
 - **String algorithms**: Aho-Corasick (trie + failure links) finds many patterns in one pass; suffix tries/trees answer substring queries ([[string-algorithms]]).

@@ -2,6 +2,7 @@
 title: IP addressing, ports and NAT
 tags: [networking, ip, nat, docker, kubernetes]
 learned: 2026-10-27
+aliases: [ip-addressing-ports-nat]
 ---
 ## TL;DR
 An IPv4 address plus a CIDR mask says which hosts are on the same subnet and which need a router. Private ranges (10/8, 172.16/12, 192.168/16) never appear on the public internet; NAT rewrites them to a public address on the way out and remembers the mapping to route replies back. Ports (0–65535) multiplex many sockets on one address. Containers add one more layer of all this: every Docker network and every Kubernetes pod network is a private subnet with NAT (or a CNI route) in front, and "the port is open in the container but not reachable" is almost always a binding or publishing mistake, not a firewall.

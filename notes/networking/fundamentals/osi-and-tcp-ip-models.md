@@ -24,7 +24,7 @@ The OSI model is a seven-layer teaching vocabulary; the TCP/IP model is the four
 
 ### Which layer am I debugging?
 - **L2**: wrong VLAN, ARP cache stale after a server moved, MTU mismatch. Symptoms: host unreachable on the same subnet, large packets vanish.
-- **L3**: no route, wrong gateway, firewall dropping ICMP, NAT problems ([[ip-addressing-ports-nat]]). Symptoms: `ping` fails, `traceroute` stops.
+- **L3**: no route, wrong gateway, firewall dropping ICMP, NAT problems ([[ip-addressing-and-nat]]). Symptoms: `ping` fails, `traceroute` stops.
 - **L4**: port closed, SYN dropped by a firewall, connection reset, exhausted ephemeral ports ([[tcp-handshake-and-connection-states]]). Symptoms: "connection refused" vs "timeout".
 - **L5–6**: TLS handshake failure, certificate not trusted, wrong SNI ([[tls-handshake-and-certificates]]).
 - **L7**: 4xx/5xx, wrong `Host` header, CORS, slow upstream ([[http-fundamentals]]).

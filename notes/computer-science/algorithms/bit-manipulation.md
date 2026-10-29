@@ -46,7 +46,7 @@ Bit tricks treat an `int` or `long` as an array of 32 or 64 booleans. The operat
 - `EnumSet` is a bitmask over enum ordinals: O(1) membership, 1 bit per constant, and it beats `HashSet<Enum>` in every benchmark ([[enums]]).
 - `java.util.BitSet` for compact membership of integer ids (which of 10 million subscriber ids have been migrated: 1.25 MB instead of a `HashSet<Long>` at 50+ MB).
 - EMV and smart-card protocols encode data in TLV with bit-level flags (AIP, TVR, CVM results); decoding them is masks and shifts over `byte[]` with `& 0xFF` everywhere ([[emv-card-processing]]).
-- CIDR matching `ip & mask == network & mask` ([[ip-addressing-ports-nat]]), Bloom filters ([[bloom-filters-and-probabilistic]]), hash spreading in `HashMap` (`h ^ (h >>> 16)`, [[hashmap-internals]]).
+- CIDR matching `ip & mask == network & mask` ([[ip-addressing-and-nat]]), Bloom filters ([[bloom-filters-and-probabilistic]]), hash spreading in `HashMap` (`h ^ (h >>> 16)`, [[hashmap-internals]]).
 
 ## Example
 ```java

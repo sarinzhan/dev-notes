@@ -100,17 +100,25 @@
    "name": "Networking",
    "subs": {
     "fundamentals": "Fundamentals",
+    "ip-layer": "IP layer",
+    "transport": "Transport: TCP & UDP",
+    "performance": "Performance",
+    "protocols": "DNS & TLS",
     "http": "HTTP",
-    "security": "TLS & auth",
-    "dns-and-routing": "DNS, proxies & load balancing",
+    "proxies-and-load-balancing": "Proxies & load balancing",
+    "security": "Security & auth",
     "tools": "Tools"
    },
    "name_ru": "Сети",
    "subs_ru": {
     "fundamentals": "Основы",
+    "ip-layer": "Уровень IP",
+    "transport": "Транспорт: TCP и UDP",
+    "performance": "Производительность",
+    "protocols": "DNS и TLS",
     "http": "HTTP",
-    "security": "TLS и аутентификация",
-    "dns-and-routing": "DNS, прокси и балансировка",
+    "proxies-and-load-balancing": "Прокси и балансировка",
+    "security": "Безопасность и аутентификация",
     "tools": "Инструменты"
    }
   },
@@ -1344,7 +1352,7 @@
     "hash-tables",
     "hashmap-internals",
     "interview-problem-patterns",
-    "ip-addressing-ports-nat",
+    "ip-addressing-and-nat",
     "numbers-bits-and-floating-point"
    ],
    "words": 1001,
@@ -2381,7 +2389,7 @@
     "elasticsearch-basics",
     "hash-tables",
     "heaps-and-priority-queues",
-    "ip-addressing-ports-nat",
+    "ip-addressing-and-nat",
     "postgres-indexes",
     "string-algorithms",
     "text-encodings-and-unicode"
@@ -2813,7 +2821,7 @@
    "path": "notes/computer-science/operating-systems/socket-management.md",
    "links": [
     "backpressure-and-flow-control",
-    "ip-addressing-ports-nat",
+    "ip-addressing-and-nat",
     "java-nio",
     "load-balancers-l4-vs-l7",
     "process-management",
@@ -6302,129 +6310,6 @@
    "title_ru": "Основы RabbitMQ — модель AMQP, exchange, очереди, ack"
   },
   {
-   "id": "dns-resolution",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "DNS resolution",
-   "tags": [
-    "networking",
-    "dns",
-    "kubernetes",
-    "java",
-    "caching"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/networking/dns-and-routing/dns-resolution.md",
-   "links": [
-    "grpc-and-protobuf",
-    "http-1-1-vs-2-vs-3",
-    "ip-addressing-ports-nat",
-    "kubernetes-basics",
-    "linux-networking",
-    "load-balancers-l4-vs-l7",
-    "multi-region-basics",
-    "network-debugging-toolkit",
-    "sockets-and-connection-pooling",
-    "tcp-vs-udp"
-   ],
-   "words": 1035,
-   "ru": "notes-ru/networking/dns-and-routing/dns-resolution.md",
-   "title_ru": "Разрешение имён в DNS"
-  },
-  {
-   "id": "load-balancers-l4-vs-l7",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "Load balancers, L4 vs L7",
-   "tags": [
-    "networking",
-    "load-balancing",
-    "l4",
-    "l7",
-    "health-checks"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/networking/dns-and-routing/load-balancers-l4-vs-l7.md",
-   "links": [
-    "api-gateway-and-service-discovery",
-    "consistent-hashing",
-    "cookies-sessions-and-cors",
-    "dns-resolution",
-    "failure-modes-and-timeouts",
-    "grpc-and-protobuf",
-    "horizontal-vs-vertical-scaling",
-    "idempotency",
-    "kubernetes-basics",
-    "load-balancing",
-    "reverse-proxy-nginx-basics",
-    "tcp-handshake-and-connection-states",
-    "websockets-sse-and-long-polling"
-   ],
-   "words": 1111,
-   "ru": "notes-ru/networking/dns-and-routing/load-balancers-l4-vs-l7.md",
-   "title_ru": "Балансировщики нагрузки, L4 и L7"
-  },
-  {
-   "id": "reverse-proxy-nginx-basics",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "Reverse proxy basics with nginx",
-   "tags": [
-    "networking",
-    "nginx",
-    "reverse-proxy",
-    "tls-termination",
-    "timeouts"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/networking/dns-and-routing/reverse-proxy-nginx-basics.md",
-   "links": [
-    "api-gateway-and-service-discovery",
-    "cdn",
-    "distributed-tracing",
-    "dns-resolution",
-    "idempotency",
-    "load-balancers-l4-vs-l7",
-    "mtls-and-service-to-service-auth",
-    "observability-three-pillars",
-    "rate-limiting",
-    "tcp-handshake-and-connection-states",
-    "tls-handshake-and-certificates",
-    "websockets-sse-and-long-polling"
-   ],
-   "words": 1123,
-   "ru": "notes-ru/networking/dns-and-routing/reverse-proxy-nginx-basics.md",
-   "title_ru": "Основы обратного прокси на nginx"
-  },
-  {
-   "id": "ip-addressing-ports-nat",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "IP addressing, ports and NAT",
-   "tags": [
-    "networking",
-    "ip",
-    "nat",
-    "docker",
-    "kubernetes"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/networking/fundamentals/ip-addressing-ports-nat.md",
-   "links": [
-    "dns-resolution",
-    "docker-fundamentals",
-    "kubernetes-basics",
-    "linux-networking",
-    "osi-and-tcp-ip-models",
-    "reverse-proxy-nginx-basics",
-    "sockets-and-connection-pooling",
-    "tcp-handshake-and-connection-states"
-   ],
-   "words": 983,
-   "ru": "notes-ru/networking/fundamentals/ip-addressing-ports-nat.md",
-   "title_ru": "IP-адресация, порты и NAT"
-  },
-  {
    "id": "osi-and-tcp-ip-models",
    "sec": "networking",
    "sub": "fundamentals",
@@ -6441,7 +6326,7 @@
     "cdn",
     "http-1-1-vs-2-vs-3",
     "http-fundamentals",
-    "ip-addressing-ports-nat",
+    "ip-addressing-and-nat",
     "linux-networking",
     "load-balancers-l4-vs-l7",
     "mtls-and-service-to-service-auth",
@@ -6454,93 +6339,6 @@
    "words": 915,
    "ru": "notes-ru/networking/fundamentals/osi-and-tcp-ip-models.md",
    "title_ru": "Модели OSI и TCP/IP на реальных примерах"
-  },
-  {
-   "id": "sockets-and-connection-pooling",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "Sockets and connection pooling",
-   "tags": [
-    "networking",
-    "sockets",
-    "connection-pool",
-    "java"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/networking/fundamentals/sockets-and-connection-pooling.md",
-   "links": [
-    "backpressure-and-flow-control",
-    "circuit-breaker",
-    "dns-resolution",
-    "hikaricp-pool-sizing",
-    "java-nio",
-    "kafka-producer",
-    "rest-clients",
-    "socket-management",
-    "spring-reactive-webclient-sse",
-    "spring-transactional",
-    "tcp-handshake-and-connection-states",
-    "tcp-vs-udp",
-    "virtual-threads"
-   ],
-   "words": 880,
-   "ru": "notes-ru/networking/fundamentals/sockets-and-connection-pooling.md",
-   "title_ru": "Сокеты и пулы соединений"
-  },
-  {
-   "id": "tcp-handshake-and-connection-states",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "TCP handshake and connection states",
-   "tags": [
-    "networking",
-    "tcp",
-    "time-wait",
-    "keep-alive"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/networking/fundamentals/tcp-handshake-and-connection-states.md",
-   "links": [
-    "docker-fundamentals",
-    "failure-modes-and-timeouts",
-    "hikaricp-pool-sizing",
-    "http-fundamentals",
-    "linux-networking",
-    "socket-management",
-    "sockets-and-connection-pooling",
-    "tcp-vs-udp",
-    "tls-handshake-and-certificates"
-   ],
-   "words": 970,
-   "ru": "notes-ru/networking/fundamentals/tcp-handshake-and-connection-states.md",
-   "title_ru": "Рукопожатие TCP и состояния соединения"
-  },
-  {
-   "id": "tcp-vs-udp",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "TCP vs UDP",
-   "tags": [
-    "networking",
-    "tcp",
-    "udp",
-    "transport"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/networking/fundamentals/tcp-vs-udp.md",
-   "links": [
-    "delivery-guarantees",
-    "dns-resolution",
-    "http-1-1-vs-2-vs-3",
-    "idempotency",
-    "osi-and-tcp-ip-models",
-    "socket-management",
-    "sockets-and-connection-pooling",
-    "tcp-handshake-and-connection-states"
-   ],
-   "words": 948,
-   "ru": "notes-ru/networking/fundamentals/tcp-vs-udp.md",
-   "title_ru": "TCP и UDP"
   },
   {
    "id": "cookies-sessions-and-cors",
@@ -6716,6 +6514,156 @@
    "title_ru": "WebSocket, SSE и long polling"
   },
   {
+   "id": "ip-addressing-and-nat",
+   "sec": "networking",
+   "sub": "ip-layer",
+   "title": "IP addressing, ports and NAT",
+   "tags": [
+    "networking",
+    "ip",
+    "nat",
+    "docker",
+    "kubernetes"
+   ],
+   "learned": "2026-10-27",
+   "aliases": [
+    "ip-addressing-ports-nat"
+   ],
+   "path": "notes/networking/ip-layer/ip-addressing-and-nat.md",
+   "links": [
+    "dns-resolution",
+    "docker-fundamentals",
+    "kubernetes-basics",
+    "linux-networking",
+    "osi-and-tcp-ip-models",
+    "reverse-proxy-nginx-basics",
+    "sockets-and-connection-pooling",
+    "tcp-handshake-and-connection-states"
+   ],
+   "words": 983,
+   "ru": "notes-ru/networking/ip-layer/ip-addressing-and-nat.md",
+   "title_ru": "IP-адресация, порты и NAT"
+  },
+  {
+   "id": "dns-resolution",
+   "sec": "networking",
+   "sub": "protocols",
+   "title": "DNS resolution",
+   "tags": [
+    "networking",
+    "dns",
+    "kubernetes",
+    "java",
+    "caching"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/protocols/dns-resolution.md",
+   "links": [
+    "grpc-and-protobuf",
+    "http-1-1-vs-2-vs-3",
+    "ip-addressing-and-nat",
+    "kubernetes-basics",
+    "linux-networking",
+    "load-balancers-l4-vs-l7",
+    "multi-region-basics",
+    "network-debugging-toolkit",
+    "sockets-and-connection-pooling",
+    "tcp-vs-udp"
+   ],
+   "words": 1035,
+   "ru": "notes-ru/networking/protocols/dns-resolution.md",
+   "title_ru": "Разрешение имён в DNS"
+  },
+  {
+   "id": "tls-handshake-and-certificates",
+   "sec": "networking",
+   "sub": "protocols",
+   "title": "TLS handshake and certificates",
+   "tags": [
+    "networking",
+    "tls",
+    "certificates",
+    "pki",
+    "java"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/protocols/tls-handshake-and-certificates.md",
+   "links": [
+    "mtls-and-service-to-service-auth",
+    "network-debugging-toolkit",
+    "spring-boot-properties-and-profiles",
+    "symmetric-and-asymmetric-crypto"
+   ],
+   "words": 1278,
+   "ru": "notes-ru/networking/protocols/tls-handshake-and-certificates.md",
+   "title_ru": "Рукопожатие TLS и сертификаты"
+  },
+  {
+   "id": "load-balancers-l4-vs-l7",
+   "sec": "networking",
+   "sub": "proxies-and-load-balancing",
+   "title": "Load balancers, L4 vs L7",
+   "tags": [
+    "networking",
+    "load-balancing",
+    "l4",
+    "l7",
+    "health-checks"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/proxies-and-load-balancing/load-balancers-l4-vs-l7.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "consistent-hashing",
+    "cookies-sessions-and-cors",
+    "dns-resolution",
+    "failure-modes-and-timeouts",
+    "grpc-and-protobuf",
+    "horizontal-vs-vertical-scaling",
+    "idempotency",
+    "kubernetes-basics",
+    "load-balancing",
+    "reverse-proxy-nginx-basics",
+    "tcp-handshake-and-connection-states",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 1111,
+   "ru": "notes-ru/networking/proxies-and-load-balancing/load-balancers-l4-vs-l7.md",
+   "title_ru": "Балансировщики нагрузки, L4 и L7"
+  },
+  {
+   "id": "reverse-proxy-nginx-basics",
+   "sec": "networking",
+   "sub": "proxies-and-load-balancing",
+   "title": "Reverse proxy basics with nginx",
+   "tags": [
+    "networking",
+    "nginx",
+    "reverse-proxy",
+    "tls-termination",
+    "timeouts"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/proxies-and-load-balancing/reverse-proxy-nginx-basics.md",
+   "links": [
+    "api-gateway-and-service-discovery",
+    "cdn",
+    "distributed-tracing",
+    "dns-resolution",
+    "idempotency",
+    "load-balancers-l4-vs-l7",
+    "mtls-and-service-to-service-auth",
+    "observability-three-pillars",
+    "rate-limiting",
+    "tcp-handshake-and-connection-states",
+    "tls-handshake-and-certificates",
+    "websockets-sse-and-long-polling"
+   ],
+   "words": 1123,
+   "ru": "notes-ru/networking/proxies-and-load-balancing/reverse-proxy-nginx-basics.md",
+   "title_ru": "Основы обратного прокси на nginx"
+  },
+  {
    "id": "api-security-checklist",
    "sec": "networking",
    "sub": "security",
@@ -6806,30 +6754,6 @@
    "title_ru": "mTLS и аутентификация между сервисами"
   },
   {
-   "id": "tls-handshake-and-certificates",
-   "sec": "networking",
-   "sub": "security",
-   "title": "TLS handshake and certificates",
-   "tags": [
-    "networking",
-    "tls",
-    "certificates",
-    "pki",
-    "java"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/networking/security/tls-handshake-and-certificates.md",
-   "links": [
-    "mtls-and-service-to-service-auth",
-    "network-debugging-toolkit",
-    "spring-boot-properties-and-profiles",
-    "symmetric-and-asymmetric-crypto"
-   ],
-   "words": 1278,
-   "ru": "notes-ru/networking/security/tls-handshake-and-certificates.md",
-   "title_ru": "Рукопожатие TLS и сертификаты"
-  },
-  {
    "id": "network-debugging-toolkit",
    "sec": "networking",
    "sub": "tools",
@@ -6859,6 +6783,93 @@
    "words": 988,
    "ru": "notes-ru/networking/tools/network-debugging-toolkit.md",
    "title_ru": "Набор инструментов для сетевой отладки"
+  },
+  {
+   "id": "sockets-and-connection-pooling",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "Sockets and connection pooling",
+   "tags": [
+    "networking",
+    "sockets",
+    "connection-pool",
+    "java"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/transport/sockets-and-connection-pooling.md",
+   "links": [
+    "backpressure-and-flow-control",
+    "circuit-breaker",
+    "dns-resolution",
+    "hikaricp-pool-sizing",
+    "java-nio",
+    "kafka-producer",
+    "rest-clients",
+    "socket-management",
+    "spring-reactive-webclient-sse",
+    "spring-transactional",
+    "tcp-handshake-and-connection-states",
+    "tcp-vs-udp",
+    "virtual-threads"
+   ],
+   "words": 880,
+   "ru": "notes-ru/networking/transport/sockets-and-connection-pooling.md",
+   "title_ru": "Сокеты и пулы соединений"
+  },
+  {
+   "id": "tcp-handshake-and-connection-states",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP handshake and connection states",
+   "tags": [
+    "networking",
+    "tcp",
+    "time-wait",
+    "keep-alive"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/transport/tcp-handshake-and-connection-states.md",
+   "links": [
+    "docker-fundamentals",
+    "failure-modes-and-timeouts",
+    "hikaricp-pool-sizing",
+    "http-fundamentals",
+    "linux-networking",
+    "socket-management",
+    "sockets-and-connection-pooling",
+    "tcp-vs-udp",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 970,
+   "ru": "notes-ru/networking/transport/tcp-handshake-and-connection-states.md",
+   "title_ru": "Рукопожатие TCP и состояния соединения"
+  },
+  {
+   "id": "tcp-vs-udp",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP vs UDP",
+   "tags": [
+    "networking",
+    "tcp",
+    "udp",
+    "transport"
+   ],
+   "learned": "2026-10-27",
+   "path": "notes/networking/transport/tcp-vs-udp.md",
+   "links": [
+    "delivery-guarantees",
+    "dns-resolution",
+    "http-1-1-vs-2-vs-3",
+    "idempotency",
+    "osi-and-tcp-ip-models",
+    "socket-management",
+    "sockets-and-connection-pooling",
+    "tcp-handshake-and-connection-states"
+   ],
+   "words": 948,
+   "ru": "notes-ru/networking/transport/tcp-vs-udp.md",
+   "title_ru": "TCP и UDP"
   },
   {
    "id": "emv-card-processing",

@@ -2582,58 +2582,6 @@
    ]
   },
   {
-   "id": "dns-resolution",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "DNS resolution",
-   "tags": [
-    "networking",
-    "dns",
-    "kubernetes",
-    "java",
-    "caching"
-   ]
-  },
-  {
-   "id": "load-balancers-l4-vs-l7",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "Load balancers, L4 vs L7",
-   "tags": [
-    "networking",
-    "load-balancing",
-    "l4",
-    "l7",
-    "health-checks"
-   ]
-  },
-  {
-   "id": "reverse-proxy-nginx-basics",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "Reverse proxy basics with nginx",
-   "tags": [
-    "networking",
-    "nginx",
-    "reverse-proxy",
-    "tls-termination",
-    "timeouts"
-   ]
-  },
-  {
-   "id": "ip-addressing-ports-nat",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "IP addressing, ports and NAT",
-   "tags": [
-    "networking",
-    "ip",
-    "nat",
-    "docker",
-    "kubernetes"
-   ]
-  },
-  {
    "id": "osi-and-tcp-ip-models",
    "sec": "networking",
    "sub": "fundamentals",
@@ -2643,42 +2591,6 @@
     "osi",
     "tcp-ip",
     "fundamentals"
-   ]
-  },
-  {
-   "id": "sockets-and-connection-pooling",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "Sockets and connection pooling",
-   "tags": [
-    "networking",
-    "sockets",
-    "connection-pool",
-    "java"
-   ]
-  },
-  {
-   "id": "tcp-handshake-and-connection-states",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "TCP handshake and connection states",
-   "tags": [
-    "networking",
-    "tcp",
-    "time-wait",
-    "keep-alive"
-   ]
-  },
-  {
-   "id": "tcp-vs-udp",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "TCP vs UDP",
-   "tags": [
-    "networking",
-    "tcp",
-    "udp",
-    "transport"
    ]
   },
   {
@@ -2758,6 +2670,71 @@
    ]
   },
   {
+   "id": "ip-addressing-and-nat",
+   "sec": "networking",
+   "sub": "ip-layer",
+   "title": "IP addressing, ports and NAT",
+   "tags": [
+    "networking",
+    "ip",
+    "nat",
+    "docker",
+    "kubernetes"
+   ]
+  },
+  {
+   "id": "dns-resolution",
+   "sec": "networking",
+   "sub": "protocols",
+   "title": "DNS resolution",
+   "tags": [
+    "networking",
+    "dns",
+    "kubernetes",
+    "java",
+    "caching"
+   ]
+  },
+  {
+   "id": "tls-handshake-and-certificates",
+   "sec": "networking",
+   "sub": "protocols",
+   "title": "TLS handshake and certificates",
+   "tags": [
+    "networking",
+    "tls",
+    "certificates",
+    "pki",
+    "java"
+   ]
+  },
+  {
+   "id": "load-balancers-l4-vs-l7",
+   "sec": "networking",
+   "sub": "proxies-and-load-balancing",
+   "title": "Load balancers, L4 vs L7",
+   "tags": [
+    "networking",
+    "load-balancing",
+    "l4",
+    "l7",
+    "health-checks"
+   ]
+  },
+  {
+   "id": "reverse-proxy-nginx-basics",
+   "sec": "networking",
+   "sub": "proxies-and-load-balancing",
+   "title": "Reverse proxy basics with nginx",
+   "tags": [
+    "networking",
+    "nginx",
+    "reverse-proxy",
+    "tls-termination",
+    "timeouts"
+   ]
+  },
+  {
    "id": "api-security-checklist",
    "sec": "networking",
    "sub": "security",
@@ -2797,19 +2774,6 @@
    ]
   },
   {
-   "id": "tls-handshake-and-certificates",
-   "sec": "networking",
-   "sub": "security",
-   "title": "TLS handshake and certificates",
-   "tags": [
-    "networking",
-    "tls",
-    "certificates",
-    "pki",
-    "java"
-   ]
-  },
-  {
    "id": "network-debugging-toolkit",
    "sec": "networking",
    "sub": "tools",
@@ -2820,6 +2784,42 @@
     "curl",
     "tcpdump",
     "dns"
+   ]
+  },
+  {
+   "id": "sockets-and-connection-pooling",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "Sockets and connection pooling",
+   "tags": [
+    "networking",
+    "sockets",
+    "connection-pool",
+    "java"
+   ]
+  },
+  {
+   "id": "tcp-handshake-and-connection-states",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP handshake and connection states",
+   "tags": [
+    "networking",
+    "tcp",
+    "time-wait",
+    "keep-alive"
+   ]
+  },
+  {
+   "id": "tcp-vs-udp",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP vs UDP",
+   "tags": [
+    "networking",
+    "tcp",
+    "udp",
+    "transport"
    ]
   },
   {
@@ -5114,7 +5114,7 @@
   },
   {
    "source": "bit-manipulation",
-   "target": "ip-addressing-ports-nat"
+   "target": "ip-addressing-and-nat"
   },
   {
    "source": "bit-manipulation",
@@ -7834,7 +7834,7 @@
   },
   {
    "source": "dns-resolution",
-   "target": "ip-addressing-ports-nat"
+   "target": "ip-addressing-and-nat"
   },
   {
    "source": "dns-resolution",
@@ -7986,7 +7986,7 @@
   },
   {
    "source": "docker-fundamentals",
-   "target": "ip-addressing-ports-nat"
+   "target": "ip-addressing-and-nat"
   },
   {
    "source": "docker-fundamentals",
@@ -10105,35 +10105,35 @@
    "target": "two-pointers-and-sliding-window"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "kubernetes-basics"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "linux-networking"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "osi-and-tcp-ip-models"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "reverse-proxy-nginx-basics"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "socket-management"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "sockets-and-connection-pooling"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "tcp-handshake-and-connection-states"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "tries"
   },
   {
