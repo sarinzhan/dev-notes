@@ -14,16 +14,7 @@ Docker packages an application with all its dependencies into a lightweight **co
 - Drawbacks: shared kernel (weaker isolation than a VM, Linux-only containers on Linux kernels; Docker Desktop runs a hidden Linux VM on macOS/Windows), image sprawl and disk usage, networking and storage add complexity, root daemon as attack surface ([[docker-socket-dind-dood]]), stateful workloads need care ([[docker-volumes-and-registry]]).
 
 ### Containers vs virtual machines
-| | Container | Virtual machine |
-|---|---|---|
-| Kernel | Shares the host kernel; runs in the host's process space | Own guest kernel on top of a hypervisor |
-| Isolation | Namespaces (what a process sees) + cgroups (what it may use) ([[linux-architecture-and-kernel]]) | Hardware-level, enforced by the hypervisor (KVM, VMware, Hyper-V) |
-| Start time | Milliseconds (it is just `clone()` + `exec`) | Seconds to minutes (BIOS, kernel, init) |
-| Size | Megabytes (app + libs) | Gigabytes (full OS) |
-| Overhead | Near zero; native syscalls | CPU virtualisation extensions plus memory for each guest OS |
-| Security boundary | Weaker; kernel exploit escapes to host | Stronger |
-| Portability | Any host with a compatible kernel | Any host with the hypervisor |
-- A hypervisor is software that lets several VMs run in parallel on the same hardware and divides CPU, memory and IO between them. Type 1 runs on bare metal (KVM, ESXi), type 2 on a host OS (VirtualBox).
+- Short version: a VM boots its own kernel on a hypervisor; a container is a group of host processes isolated by namespaces and limited by cgroups. Hypervisor types, how hardware virtualization works, every namespace, cgroup controllers, OverlayFS and the security trade-offs are in [[virtualization-and-containers]].
 - `ps` on the host shows the container's processes as ordinary processes; `docker top <c>` maps them.
 
 ### Image vs container

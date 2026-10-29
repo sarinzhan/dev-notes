@@ -32,9 +32,7 @@ learned: 2026-10-22
 - **Драйверы устройств / модули ядра**: загружаются по требованию; `lsmod` перечисляет, `modprobe <mod>` загружает с зависимостями, `insmod` загружает один `.ko`, `rmmod` выгружает.
 - **sysfs (`/sys`) и procfs (`/proc`)**: псевдофайловые системы в памяти, которые представляют объекты ядра в виде файлов. `cat /proc/<pid>/status`, `/proc/meminfo`, `/sys/class/net/eth0/`; запись в `/proc/sys/...` (или `sysctl -w`) настраивает ядро на лету.
 - **Планировщик**: CFS (Completely Fair Scheduler) с 2.6.23 даёт каждой готовой к выполнению задаче справедливую долю времени CPU, взвешенную по значению nice; в ядре 6.6 (2023) заменён на **EEVDF** с тем же интерфейсом. См. [[linux-processes]].
-- **Пространства имён (namespaces)**: изолируют то, что процесс *видит*. PID (своё дерево процессов), NET (свои интерфейсы, таблица маршрутизации, порты), MNT (своя таблица монтирования), IPC (своя разделяемая память и семафоры), UTS (своё имя хоста), USER (отображение uid, root внутри = непривилегированный снаружи), плюс cgroup и time. Основа контейнеров.
-- **cgroups** (control groups): ограничивают и учитывают то, что процесс *использует*: доли и квоты CPU, память, блочный IO, pids. cgroups v2 (единая иерархия, по умолчанию с systemd 248 / Ubuntu 22.04). Основа `docker run --memory` и requests/limits в Kubernetes.
-- Контейнер = процесс, запущенный через `clone()` в новых пространствах имён, помещённый в cgroup, с другой корневой файловой системой (`pivot_root`) и урезанным набором capabilities.
+- **Пространства имён** (что процесс видит) и **cgroups** (что ему можно использовать) — возможности ядра, из которых сделаны контейнеры; обе, с примерами, — в [[virtualization-and-containers]].
 
 ## Пример
 ```bash
@@ -43,11 +41,6 @@ sudo strace -f -tt -e trace=network,connect,openat -p "$(pgrep -f app.jar)" 2>&1
 # 12:03:11.118 connect(27, {sa_family=AF_INET, sin_port=htons(5432), ...}, 16) = -1 EINPROGRESS
 # 12:03:41.120 ... ETIMEDOUT   -> недоступен хост БД, а не JVM
 
-# Пространства имён главного процесса работающего контейнера
-PID=$(docker inspect -f '{{.State.Pid}}' esim-api)
-sudo ls -l /proc/$PID/ns/            # pid, net, mnt, ipc, uts, user, cgroup
-sudo nsenter -t $PID -n ss -ltnp      # запустить ss внутри NET namespace контейнера
-cat /sys/fs/cgroup/system.slice/docker-*.scope/memory.max   # лимит памяти cgroup v2
 ```
 
 ## Подводные камни

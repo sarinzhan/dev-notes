@@ -3848,6 +3848,99 @@ ANIMS["sendfile-zero-copy"] = el=>{
   }});
 };
 
+// ============ 49. Multi-boot vs VMs vs containers: what is shared and what is duplicated
+ANIMS["virt-stacks"] = el=>{
+  const ST = [
+    { t: ["Multi-boot", "Несколько ОС"], m: "boot", en: "One machine, several operating systems on separate partitions; the boot loader asks which one to start. Only one runs at a time; the others are just files. Complete isolation, no sharing at all.",
+      ru: "Одна машина, несколько ОС на разных разделах; загрузчик спрашивает, какую запустить. Работает только одна; остальные — просто файлы. Полная изоляция, никакого разделения." },
+    { t: ["Virtual machines", "Виртуальные машины"], m: "vm", en: "A hypervisor gives each VM its own slice of CPU and memory and fake hardware. Each VM boots a full OS with its own kernel. Strong isolation, but every kernel, every set of OS tools and every page cache is duplicated.",
+      ru: "Гипервизор даёт каждой ВМ свою долю CPU и памяти и поддельное железо. Каждая ВМ загружает полную ОС со своим ядром. Сильная изоляция, но каждое ядро, каждый набор инструментов ОС и каждый страничный кэш дублируются." },
+    { t: ["Containers", "Контейнеры"], m: "ct", en: "Containers are ordinary processes on one shared kernel. The kernel shows each one only its own files, processes and network (namespaces) and limits what it can use (cgroups). Only the user-space tools differ, and identical image layers are shared too.",
+      ru: "Контейнеры — обычные процессы на одном общем ядре. Ядро показывает каждому только его файлы, процессы и сеть (пространства имён) и ограничивает то, что он может использовать (cgroups). Различаются лишь инструменты пространства пользователя, а одинаковые слои образов тоже общие." },
+    { t: ["Containers in VMs", "Контейнеры в ВМ"], m: "both", en: "In the cloud you usually get both: your Kubernetes node is a VM (strong isolation between customers), and your pods are containers inside it (cheap isolation between your own services). Docker Desktop on macOS and Windows works the same way: a hidden Linux VM runs the containers.",
+      ru: "В облаке обычно есть и то и другое: узел Kubernetes — это ВМ (сильная изоляция между клиентами), а поды — контейнеры внутри неё (дешёвая изоляция между вашими сервисами). Docker Desktop в macOS и Windows работает так же: контейнеры запускает скрытая Linux-ВМ." }
+  ];
+  const layer = (g, x, y, w, h, cls, lab)=>{ oR(g, x, y, w, h, cls, 4); oT(g, x + w / 2, y + h / 2 + 4, lab, "an-m an-b"); };
+  return steppedAnim(el, { title: LL("Multi-boot, VMs and containers", "Несколько ОС, ВМ и контейнеры"), vb: [760, 320], steps: ST, stepMs: 7000, render(g, s, t){
+    const m = s.m, X = 120, W = 520;
+    layer(g, X, 270, W, 36, "an-pg k3", LL("hardware", "железо"));
+    if(m === "boot"){
+      const act = Math.floor(t / 2300) % 3;
+      for(let i = 0; i < 3; i++){ const x = X + i * (W / 3); layer(g, x + 4, 130, W / 3 - 8, 130, i === act ? "an-reg on" : "an-box", i === act ? LL(`OS ${i + 1}: running`, `ОС ${i + 1}: работает`) : LL(`OS ${i + 1}: files on disk`, `ОС ${i + 1}: файлы на диске`)); }
+      oT(g, 380, 110, LL("boot loader: which one?", "загрузчик: какую запустить?"), "an-m an-b an-sp");
+      return;
+    }
+    if(m === "vm" || m === "both"){
+      layer(g, X, 230, W, 36, "an-pg k1", LL("host kernel", "ядро хоста"));
+      layer(g, X, 190, W, 36, "an-reg on", LL("hypervisor (KVM, ESXi, Hyper-V)", "гипервизор (KVM, ESXi, Hyper-V)"));
+      for(let i = 0; i < 3; i++){ const x = X + i * (W / 3) + 4, w = W / 3 - 8;
+        layer(g, x, 150, w, 36, "an-pg k1", LL("guest kernel", "гостевое ядро"));
+        if(m === "vm"){ layer(g, x, 110, w, 36, "an-pg k0", LL("OS tools", "инструменты ОС")); layer(g, x, 70, w, 36, "an-box", LL(`app ${i + 1}`, `прил. ${i + 1}`)); }
+        else { oR(g, x, 40, w, 106, "an-frame", 6); oT(g, x + w / 2, 56, LL(`VM ${i + 1}: node`, `ВМ ${i + 1}: узел`), "an-m an-b"); for(let j = 0; j < 2; j++) layer(g, x + 6 + j * (w / 2 - 3), 66, w / 2 - 9, 74, "an-pg k2", LL("pod", "под")); }
+      }
+      if(m === "vm") oT(g, 380, 50, LL("× 3 kernels, × 3 OS installs", "× 3 ядра, × 3 установки ОС"), "an-m an-b an-warn");
+      return;
+    }
+    layer(g, X, 230, W, 36, "an-reg on", LL("one shared kernel: namespaces + cgroups", "одно общее ядро: namespaces + cgroups"));
+    layer(g, X, 190, W, 36, "an-pg k0", LL("container runtime (containerd, runc)", "среда контейнеров (containerd, runc)"));
+    for(let i = 0; i < 3; i++){ const x = X + i * (W / 3) + 4, w = W / 3 - 8;
+      layer(g, x, 130, w, 54, "an-pg k1 dim", [LL("ubuntu tools", "инструменты ubuntu"), LL("alpine tools", "инструменты alpine"), LL("ubuntu tools", "инструменты ubuntu")][i]);
+      layer(g, x, 80, w, 46, "an-pg k2", [LL("Node 18", "Node 18"), LL("JDK 21 app", "приложение JDK 21"), LL("Node 20", "Node 20")][i]); }
+    oT(g, 380, 60, LL("ubuntu layers stored once, used by containers 1 and 3", "слои ubuntu хранятся один раз, их используют контейнеры 1 и 3"), "an-m an-b an-sp");
+  }});
+};
+
+// ============ 50. What a container process sees: PID, mount and network namespaces, OverlayFS, cgroup limits
+ANIMS["container-isolation"] = el=>{
+  const ST = [
+    { t: ["PID namespace", "PID namespace"], m: "pid", en: "Inside the container, your JVM is PID 1 and ps shows only its processes, because /proc is mounted for the container's PID namespace. The host kernel knows the same process as PID 31877 and schedules it like any other.",
+      ru: "Внутри контейнера ваша JVM — PID 1, и ps показывает только его процессы, потому что /proc смонтирован для PID namespace контейнера. Ядро хоста знает тот же процесс как PID 31877 и планирует его как любой другой." },
+    { t: ["Mount namespace", "Mount namespace"], m: "mnt", en: "The container's / is a directory on the host (for Docker, /var/lib/docker/overlay2/<id>/merged), made the root with pivot_root in a new mount namespace. It cannot go above it or see the host's other mounts.",
+      ru: "Корень / контейнера — это каталог на хосте (у Docker /var/lib/docker/overlay2/<id>/merged), сделанный корнем через pivot_root в новом mount namespace. Подняться выше или увидеть другие точки монтирования хоста контейнер не может." },
+    { t: ["OverlayFS layers", "Слои OverlayFS"], m: "ovl", en: "That root is an overlay: the image's read-only layers (shared by every container from the image) plus one thin writable layer. The first write to an image file copies it up into the writable layer; a delete leaves a whiteout marker.",
+      ru: "Этот корень — наложение (overlay): слои образа только для чтения (общие для всех контейнеров из этого образа) плюс один тонкий записываемый слой. Первая запись в файл образа копирует его наверх, в записываемый слой; удаление оставляет метку whiteout." },
+    { t: ["Network namespace", "Network namespace"], m: "net", en: "The container gets its own interfaces, routing table and ports: a veth pair connects its eth0 to the docker0 bridge on the host, and NAT gives it the internet. With --network host it shares the host's stack instead.",
+      ru: "Контейнер получает свои интерфейсы, таблицу маршрутизации и порты: пара veth соединяет его eth0 с мостом docker0 на хосте, а NAT даёт выход в интернет. С --network host он вместо этого использует сетевой стек хоста." },
+    { t: ["cgroups", "cgroups"], m: "cg", en: "Namespaces limit what the container sees; cgroups limit what it uses. cpu.max 100000/100000 = one CPU per 100 ms window, then throttling; memory.max 1 GiB, then the OOM killer inside the cgroup; pids.max caps fork bombs.",
+      ru: "Namespaces ограничивают то, что контейнер видит; cgroups — то, что он использует. cpu.max 100000/100000 = один CPU на окно в 100 мс, дальше троттлинг; memory.max 1 GiB, дальше OOM killer внутри cgroup; pids.max ограничивает fork-бомбы." }
+  ];
+  return steppedAnim(el, { title: LL("What a container process sees", "Что видит процесс в контейнере"), vb: [760, 330], steps: ST, stepMs: 7000, render(g, s, t){
+    const m = s.m, L = E(g, "g", {});
+    oR(g, 10, 30, 330, 290, "an-frame", 10); oT(g, 175, 22, LL("inside the container", "внутри контейнера"), "an-m an-b");
+    oR(g, 380, 30, 370, 290, "an-frame", 10); oT(g, 565, 22, LL("on the host", "на хосте"), "an-m an-b");
+    if(m === "pid"){
+      [["1", "java -jar app.jar"], ["27", "sh healthcheck"]].forEach(([p, c], i)=>{ oR(g, 30, 60 + i * 40, 290, 32, i === 0 ? "an-reg on" : "an-box", 5); oT(g, 40, 81 + i * 40, `PID ${p}   ${c}`, "an-code", "start"); });
+      [["1", "systemd"], ["912", "dockerd"], ["31877", "java -jar app.jar"], ["31950", "sh healthcheck"], ["40211", "postgres"]].forEach(([p, c], i)=>{ const on = c.startsWith("java"); oR(g, 400, 60 + i * 40, 330, 32, on ? "an-reg on" : "an-box", 5); oT(g, 410, 81 + i * 40, `PID ${p}   ${c}`, "an-code", "start"); });
+      E(L, "line", { x1: 320, y1: 76, x2: 400, y2: 156, class: "an-link2 on" });
+      oT(g, 175, 300, LL("ps aux: 2 processes", "ps aux: 2 процесса"), "an-m an-b"); return;
+    }
+    if(m === "mnt" || m === "ovl"){
+      ["/", "├ app/app.jar", "├ etc/", "├ usr/lib/jvm/", "└ tmp/"].forEach((l, i)=>oT(g, 30, 70 + i * 22, l, "an-code", "start"));
+      oT(g, 395, 60, "/var/lib/docker/overlay2/9f3c…/", "an-code", "start");
+      if(m === "mnt"){ oR(g, 395, 80, 340, 40, "an-reg on", 6); oT(g, 565, 105, "merged/   ← container's /", "an-code"); oT(g, 565, 160, LL("host /, /home, /var/lib/postgresql…", "/ хоста, /home, /var/lib/postgresql…"), "an-m"); oT(g, 565, 180, LL("invisible from inside", "не видны изнутри"), "an-m an-b an-warn");
+        E(L, "line", { x1: 60, y1: 66, x2: 395, y2: 100, class: "an-link2 on" }); return; }
+      const lay = [["upperdir (writable, this container)", "k2", "upperdir (запись, этот контейнер)"], ["layer 3: COPY app.jar", "k1", "слой 3: COPY app.jar"], ["layer 2: JRE", "k1", "слой 2: JRE"], ["layer 1: ubuntu base", "k1", "слой 1: база ubuntu"]];
+      lay.forEach(([en, c, ru], i)=>{ oR(g, 395, 80 + i * 46, 340, 40, "an-pg " + c, 5); oT(g, 565, 105 + i * 46, LL(en, ru), "an-m an-b"); });
+      oT(g, 565, 280, LL("lower layers: read-only, shared by all containers", "нижние слои: только чтение, общие для всех"), "an-m an-b an-sp");
+      const k = Math.min(1, t / 3000); const y = 222 - k * 138; E(g, "circle", { cx: 700, cy: y, r: 6, class: "an-dot an-flow" }); oT(g, 30, 220, LL("echo x >> /etc/hosts", "echo x >> /etc/hosts"), "an-code", "start"); oT(g, 30, 240, LL("→ copy-up into upperdir", "→ copy-up в upperdir"), "an-m an-b an-warn", "start"); return;
+    }
+    if(m === "net"){
+      oR(g, 30, 60, 290, 40, "an-reg on", 5); oT(g, 175, 85, "eth0 172.17.0.2", "an-code");
+      oR(g, 30, 110, 290, 40, "an-box", 5); oT(g, 175, 135, "lo 127.0.0.1", "an-code");
+      oT(g, 175, 190, LL("listen :8080 here does not", "listen :8080 здесь не"), "an-m"); oT(g, 175, 206, LL("clash with the host's :8080", "конфликтует с :8080 хоста"), "an-m");
+      oR(g, 400, 60, 150, 40, "an-reg on", 5); oT(g, 475, 85, "veth3a1b", "an-code");
+      oR(g, 400, 130, 330, 40, "an-pg k0", 5); oT(g, 565, 155, LL("bridge docker0 172.17.0.1", "мост docker0 172.17.0.1"), "an-code");
+      oR(g, 400, 200, 330, 40, "an-pg k1", 5); oT(g, 565, 225, LL("eth0 (host) + NAT, -p 80:8080", "eth0 (хост) + NAT, -p 80:8080"), "an-code");
+      E(L, "line", { x1: 320, y1: 80, x2: 400, y2: 80, class: "an-link2 on" }); E(L, "line", { x1: 475, y1: 100, x2: 475, y2: 130, class: "an-link2 on" }); E(L, "line", { x1: 565, y1: 170, x2: 565, y2: 200, class: "an-link2 on" });
+      return;
+    }
+    const bars = [["CPU", 0.92, "cpu.max 100000 100000", "k1"], ["memory", 0.71, "memory.max 1G", "k2"], ["pids", 0.08, "pids.max 512", "k0"]];
+    bars.forEach(([lab, v, f, c], i)=>{ const y = 70 + i * 80; oT(g, 30, y - 6, lab, "an-m an-b", "start"); oR(g, 30, y, 290, 30, "an-box", 4); const w = 290 * Math.min(1, v * (0.6 + 0.4 * Math.abs(Math.sin(t / 900 + i)))); oR(g, 30, y, w, 30, "an-pg " + c, 4);
+      oT(g, 410, y + 20, `/sys/fs/cgroup/…/${f}`, "an-code", "start"); });
+    oT(g, 565, 290, LL("over CPU quota → throttled; over memory → OOM-killed", "сверх квоты CPU → троттлинг; сверх памяти → OOM kill"), "an-m an-b an-warn");
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }

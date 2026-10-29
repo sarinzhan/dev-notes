@@ -1035,6 +1035,20 @@
    ]
   },
   {
+   "id": "virtualization-and-containers",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Virtualization and containers",
+   "tags": [
+    "operating-systems",
+    "virtualization",
+    "containers",
+    "namespaces",
+    "cgroups",
+    "docker"
+   ]
+  },
+  {
    "id": "error-handling-strategies",
    "sec": "computer-science",
    "sub": "programming",
@@ -3945,6 +3959,10 @@
    "target": "virtual-threads"
   },
   {
+   "source": "anatomy-of-a-process",
+   "target": "virtualization-and-containers"
+  },
+  {
    "source": "annotations",
    "target": "functional-interfaces"
   },
@@ -6377,6 +6395,10 @@
    "target": "virtual-threads"
   },
   {
+   "source": "cpu",
+   "target": "virtualization-and-containers"
+  },
+  {
    "source": "cpu-caches-and-cache-lines",
    "target": "distributed-cache-coherence"
   },
@@ -7897,6 +7919,10 @@
    "target": "signals-and-process-lifecycle"
   },
   {
+   "source": "docker-containers-and-resources",
+   "target": "virtualization-and-containers"
+  },
+  {
    "source": "docker-fundamentals",
    "target": "docker-socket-dind-dood"
   },
@@ -7967,6 +7993,10 @@
   {
    "source": "docker-fundamentals",
    "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "docker-fundamentals",
+   "target": "virtualization-and-containers"
   },
   {
    "source": "docker-socket-dind-dood",
@@ -8103,6 +8133,10 @@
   {
    "source": "dockerfile-and-images",
    "target": "spring-boot-starters-and-autoconfiguration"
+  },
+  {
+   "source": "dockerfile-and-images",
+   "target": "virtualization-and-containers"
   },
   {
    "source": "domain-events-and-integration-events",
@@ -10465,6 +10499,10 @@
    "target": "virtual-threads"
   },
   {
+   "source": "jvm-memory-areas",
+   "target": "virtualization-and-containers"
+  },
+  {
    "source": "jwt-authentication",
    "target": "owasp-top-10-for-backend"
   },
@@ -10741,6 +10779,10 @@
    "target": "system-design-basics"
   },
   {
+   "source": "kubernetes-basics",
+   "target": "virtualization-and-containers"
+  },
+  {
    "source": "latency-numbers",
    "target": "leader-follower-replication"
   },
@@ -10941,6 +10983,10 @@
    "target": "operating-system-introduction"
   },
   {
+   "source": "linux-architecture-and-kernel",
+   "target": "virtualization-and-containers"
+  },
+  {
    "source": "linux-basics",
    "target": "linux-commands"
   },
@@ -10995,6 +11041,10 @@
   {
    "source": "linux-networking",
    "target": "tcp-handshake-and-connection-states"
+  },
+  {
+   "source": "linux-networking",
+   "target": "virtualization-and-containers"
   },
   {
    "source": "linux-processes",
@@ -11219,6 +11269,10 @@
   {
    "source": "memory-management",
    "target": "storage-management"
+  },
+  {
+   "source": "memory-management",
+   "target": "virtualization-and-containers"
   },
   {
    "source": "memory-models-and-visibility",
@@ -12201,6 +12255,10 @@
    "target": "virtual-threads"
   },
   {
+   "source": "process-management",
+   "target": "virtualization-and-containers"
+  },
+  {
    "source": "programming-paradigms",
    "target": "query-planning-and-execution"
   },
@@ -12579,6 +12637,10 @@
   {
    "source": "signals-and-process-lifecycle",
    "target": "threads-basics"
+  },
+  {
+   "source": "signals-and-process-lifecycle",
+   "target": "virtualization-and-containers"
   },
   {
    "source": "slo-sli-and-alerting",
