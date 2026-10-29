@@ -3822,6 +3822,32 @@ ANIMS["page-cache-writeback"] = el=>{
   }});
 };
 
+// ============ 48. Serving a file: read()+write() copies vs sendfile() zero-copy, and why TLS breaks it
+ANIMS["sendfile-zero-copy"] = el=>{
+  const B = { disk: [20, 230, 120, 50, ["disk", "диск"]], pc: [200, 150, 150, 50, ["page cache", "страничный кэш"]], user: [300, 40, 160, 50, ["app buffer", "буфер приложения"]], sock: [410, 150, 150, 50, ["socket send buffer", "буфер отправки сокета"]], nic: [620, 230, 120, 50, ["NIC", "сетевая карта"]] };
+  const C = b => [B[b][0] + B[b][2] / 2, B[b][1] + B[b][3] / 2];
+  const ST = [
+    { t: ["read() + write()", "read() + write()"], path: ["disk", "pc", "user", "sock", "nic"], hops: [["DMA", "DMA"], ["CPU copy", "копия CPU"], ["CPU copy", "копия CPU"], ["DMA", "DMA"]], sc: 2, cp: 2, en: "Serving index.html the naive way: read() brings the file from disk into the page cache (DMA) and copies it into the app's buffer; write() copies it back into the kernel, into the socket's send buffer; the NIC sends it (DMA). Two system calls and two CPU copies, and the bytes were never changed.",
+      ru: "Наивная отдача index.html: read() переносит файл с диска в страничный кэш (DMA) и копирует его в буфер приложения; write() копирует его обратно в ядро, в буфер отправки сокета; сетевая карта отправляет (DMA). Два системных вызова и две копии процессором, хотя байты ни разу не менялись." },
+    { t: ["sendfile()", "sendfile()"], path: ["disk", "pc", "sock", "nic"], hops: [["DMA", "DMA"], ["kernel copy", "копия в ядре"], ["DMA", "DMA"]], sc: 1, cp: 1, en: "sendfile(socket_fd, file_fd, …) tells the kernel to move the file to the socket itself. The data never enters user space: one system call, and at most one copy inside the kernel. Java's FileChannel.transferTo() is this call; Kafka uses it to serve consumers straight from the page cache.",
+      ru: "sendfile(socket_fd, file_fd, …) велит ядру самому переместить файл в сокет. Данные не попадают в пространство пользователя: один системный вызов и максимум одна копия внутри ядра. FileChannel.transferTo() в Java — это этот вызов; Kafka с его помощью отдаёт данные потребителям прямо из страничного кэша." },
+    { t: ["True zero-copy", "Настоящий zero-copy"], path: ["disk", "pc", "nic"], hops: [["DMA", "DMA"], ["DMA (scatter-gather)", "DMA (scatter-gather)"]], sc: 1, cp: 0, en: "With a NIC that supports scatter-gather DMA, the kernel only hands the NIC pointers to the page-cache pages: the CPU copies nothing. This is what Bun advertised for serving static files.",
+      ru: "С сетевой картой, поддерживающей scatter-gather DMA, ядро лишь передаёт карте указатели на страницы страничного кэша: процессор ничего не копирует. Именно это рекламировал Bun для отдачи статических файлов." },
+    { t: ["TLS or gzip: back to user space", "TLS или gzip: снова в пространство пользователя"], path: ["disk", "pc", "user", "sock", "nic"], hops: [["DMA", "DMA"], ["CPU copy", "копия CPU"], ["encrypt + copy", "шифрование + копия"], ["DMA", "DMA"]], sc: 2, cp: 2, tls: true, en: "HTTPS needs the bytes encrypted with a session key that lives in the app (OpenSSL), and compression is done by the app too, so the data must come up to user space anyway. Kernel TLS (kTLS, Linux 4.13+) moves the encryption into the kernel so sendfile works with HTTPS again; compression still cannot.",
+      ru: "HTTPS требует шифровать байты сеансовым ключом, который живёт в приложении (OpenSSL), а сжатие тоже делает приложение, так что данные всё равно должны подняться в пространство пользователя. Kernel TLS (kTLS, Linux 4.13+) переносит шифрование в ядро, и sendfile снова работает с HTTPS; со сжатием — по-прежнему нет." }
+  ];
+  return steppedAnim(el, { title: LL("Serving a file: copies and sendfile", "Отдача файла: копии и sendfile"), vb: [760, 320], steps: ST, stepMs: 7000, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 3000)), L = E(g, "g", {});
+    E(L, "line", { x1: 10, y1: 120, x2: 750, y2: 120, class: "an-link2 an-dash" });
+    oT(g, 14, 112, LL("user space", "пространство пользователя"), "an-m an-b", "start"); oT(g, 14, 138, LL("kernel", "ядро"), "an-m an-b", "start"); oT(g, 14, 222, LL("hardware", "железо"), "an-m an-b", "start");
+    for(const b in B){ const [x, y, w, h, lab] = B[b]; const on = s.path.includes(b); oR(g, x, y, w, h, on ? (b === "user" && s.tls ? "an-leak" : "an-reg on") : "an-box", 6); oT(g, x + w / 2, y + h / 2 + 4, LL(...lab), "an-m an-b"); }
+    const P = s.path.map(C);
+    for(let i = 0; i < P.length - 1; i++){ E(L, "line", { x1: P[i][0], y1: P[i][1], x2: P[i + 1][0], y2: P[i + 1][1], class: "an-link2 on" }); const mx = (P[i][0] + P[i + 1][0]) / 2, my = (P[i][1] + P[i + 1][1]) / 2; oT(g, mx + 6, my - 10, LL(...s.hops[i]), "an-m an-b an-sp", "start"); }
+    const [x, y] = polyAt(P, k); E(g, "circle", { cx: x, cy: y, r: 7, class: "an-dot an-flow" });
+    oT(g, 750, 30, LL(`system calls: ${s.sc}`, `системных вызовов: ${s.sc}`), "an-code", "end"); oT(g, 750, 48, LL(`CPU copies: ${s.cp}`, `копий процессором: ${s.cp}`), "an-code", "end");
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }

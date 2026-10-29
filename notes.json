@@ -2795,7 +2795,7 @@
     "tcp-handshake-and-connection-states",
     "virtual-threads"
    ],
-   "words": 4005,
+   "words": 4952,
    "ru": "notes-ru/computer-science/operating-systems/socket-management.md",
    "title_ru": "Управление сокетами"
   },
