@@ -871,6 +871,20 @@
    ]
   },
   {
+   "id": "compilers-and-linkers",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Compilers and linkers",
+   "tags": [
+    "operating-systems",
+    "compilers",
+    "linkers",
+    "elf",
+    "jit",
+    "runtimes"
+   ]
+  },
+  {
    "id": "cpu",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -3872,6 +3886,10 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "compilers-and-linkers"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "cpu"
   },
   {
@@ -5832,6 +5850,10 @@
   },
   {
    "source": "compilation-interpretation-jit",
+   "target": "compilers-and-linkers"
+  },
+  {
+   "source": "compilation-interpretation-jit",
    "target": "cpu"
   },
   {
@@ -5853,6 +5875,22 @@
   {
    "source": "compilation-interpretation-jit",
    "target": "type-systems"
+  },
+  {
+   "source": "compilers-and-linkers",
+   "target": "cpu"
+  },
+  {
+   "source": "compilers-and-linkers",
+   "target": "garbage-collection"
+  },
+  {
+   "source": "compilers-and-linkers",
+   "target": "memory-management"
+  },
+  {
+   "source": "compilers-and-linkers",
+   "target": "virtualization-and-containers"
   },
   {
    "source": "completable-future",

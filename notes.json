@@ -1743,6 +1743,7 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/computation/compilation-interpretation-jit.md",
    "links": [
+    "compilers-and-linkers",
     "cpu",
     "garbage-collection",
     "immutable-objects",
@@ -1750,7 +1751,7 @@
     "jvm-memory-areas",
     "type-systems"
    ],
-   "words": 1110,
+   "words": 1125,
    "ru": "notes-ru/computer-science/computation/compilation-interpretation-jit.md",
    "title_ru": "Компиляция, интерпретация и JIT"
   },
@@ -2409,6 +2410,7 @@
    "path": "notes/computer-science/operating-systems/anatomy-of-a-process.md",
    "links": [
     "compilation-interpretation-jit",
+    "compilers-and-linkers",
     "cpu",
     "cpu-caches-and-cache-lines",
     "docker-containers-and-resources",
@@ -2426,9 +2428,37 @@
     "spring-aop",
     "virtual-threads"
    ],
-   "words": 6880,
+   "words": 6577,
    "ru": "notes-ru/computer-science/operating-systems/anatomy-of-a-process.md",
    "title_ru": "Процесс"
+  },
+  {
+   "id": "compilers-and-linkers",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Compilers and linkers",
+   "tags": [
+    "operating-systems",
+    "compilers",
+    "linkers",
+    "elf",
+    "jit",
+    "runtimes"
+   ],
+   "learned": "2026-10-29",
+   "order": 11,
+   "path": "notes/computer-science/operating-systems/compilers-and-linkers.md",
+   "links": [
+    "anatomy-of-a-process",
+    "compilation-interpretation-jit",
+    "cpu",
+    "garbage-collection",
+    "memory-management",
+    "virtualization-and-containers"
+   ],
+   "words": 4544,
+   "ru": "notes-ru/computer-science/operating-systems/compilers-and-linkers.md",
+   "title_ru": "Компиляторы и линкеры"
   },
   {
    "id": "cpu",

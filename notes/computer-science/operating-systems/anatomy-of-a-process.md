@@ -33,25 +33,7 @@ The same bytes are described twice. **Sections** are the linker's fine-grained v
 
 ### Compiling and linking
 - **Compiling** translates each source file into an **object file** (`.o`): machine code for one CPU, with holes where it calls functions defined elsewhere (`printf`, `SSL_connect`). **Linking** fills those holes and produces one executable.
-- Most code you run is in libraries (libc for `printf` and `malloc`, OpenSSL for TLS, libcurl for HTTP), themselves compiled for the same CPU. The linker can bring them in two ways:
-
-| | Static linking | Dynamic linking |
-|---|---|---|
-| What goes in the file | Your code plus a copy of every library function used | Your code plus a list of needed shared libraries and versions (`NEEDED: libc.so.6`) |
-| File size | Large | Small |
-| At start | Nothing to find: map and run | The dynamic loader finds each `.so` on disk and maps it into the process |
-| Updates | Rebuild to get a library fix | Update the library once (an OpenSSL security fix) and every program gets it |
-| RAM | Each program carries its own copy | One copy of libc's code in RAM, shared by all processes |
-| Fails when | Never for missing libraries | A library is missing or too old: `error while loading shared libraries` (Windows: "DLL not found") |
-| Examples | Go binaries, Rust with musl, GraalVM native images; `FROM scratch` Docker images | Almost everything on a normal Linux system; `.dll` on Windows, `.dylib` on macOS |
-
-- That "DLL not found" is the old story of copying one `.exe` from a friend's machine to a floppy disk: the program came, its libraries did not. Docker images solve the same problem today by shipping the program together with its libraries.
-- Java has the same choice one level up: a Spring Boot **fat jar** carries all its dependency jars inside (static-like), while a thin jar plus a classpath expects them to be present (dynamic-like).
-- Linking is a hard problem in itself (finding symbols across thousands of object files, versions, duplicates), and for big C++ projects it can take minutes; newer linkers like **mold** and **lld** are many times faster than the classic GNU `ld`.
-
-```anim
-linking-static-dynamic
-```
+- How the compiler and linker work, static vs dynamic linking, sonames and linkers like mold are in [[compilers-and-linkers]].
 
 ### Who starts a program
 - `execve()` asks the **kernel** to read the ELF header, create a new address space and map the segments. If the program is dynamically linked, its header names an **interpreter**, `/lib64/ld-linux-x86-64.so.2`; the kernel maps that too and starts there. The loader maps the shared libraries (`ldd ./app` lists them) and fixes up the calls.
@@ -168,7 +150,7 @@ Real cores overlap these stages for many instructions at once ([[cpu]]), but eac
 - **A quiz from the lecture**: `mov r0,#1; mov r1,#3; add r3,r0,r1` has one `add`, but the PC was also advanced three times. The lecture counts those as additions too; in hardware the PC is advanced by its own small incrementer, not the ALU, so they do not compete with your arithmetic.
 - **Instruction size is not word size.** ARM64 instructions are 4 bytes even though registers are 64-bit; x86-64 instructions are 1–15 bytes. In the lecture's gdb demo the PC moved by 8 after `next` because that C line compiled to two instructions, not because a 64-bit CPU uses 8-byte instructions.
 - **One core runs one thread at a time.** With **hyper-threading** (SMT), one physical core shows up as two logical CPUs: each has its own registers and PC, but they share the execution units and the L1/L2 caches. When one thread waits for memory the other can run, so it helps some workloads and hurts others.
-- **The text segment is read-only** (and the stack and heap are not executable), so a bug cannot overwrite code and injected data cannot run. JIT compilers such as the JVM's need to *generate* code at runtime, so they write it into a separate mapping, the **code cache** (`-XX:ReservedCodeCacheSize`), switching its pages between writable and executable.
+- **The text segment is read-only** (and the stack and heap are not executable), so a bug cannot overwrite code and injected data cannot run. JIT compilers such as the JVM's need to *generate* code at runtime, so they write it into a separate mapping, the **code cache** (`-XX:ReservedCodeCacheSize`); how they get around this protection is in [[compilers-and-linkers]].
 - **See it yourself** (any Linux box; on ARM the registers are `x0`…, on x86-64 `rax`…):
 
 ```bash
@@ -392,4 +374,4 @@ A default 1 MiB stack gives roughly 10–20 thousand simple Java frames; the exa
 - A container OOM-killed while the Java heap is well under `-Xmx`: the culprit is native memory (direct buffers from Netty or the Kafka client, metaspace, thread stacks, malloc arenas), which the Java heap numbers do not show.
 - In C, returning the address of a local, or `alloca`/variable-length arrays with a user-controlled size: both corrupt the stack, which Java prevents by design.
 - "Missing library" errors after copying a binary to another machine (`error while loading shared libraries`): ship it in a container, link it statically, or install the matching library version.
-- Related: [[jvm-memory-areas]] for how the JVM divides its part of this layout, [[process-management]] for threads, the PCB and context switches, [[memory-management]] for pages and virtual memory, [[compilation-interpretation-jit]] for how bytecode becomes machine code.
+- Related: [[jvm-memory-areas]] for how the JVM divides its part of this layout, [[process-management]] for threads, the PCB and context switches, [[memory-management]] for pages and virtual memory, [[compilation-interpretation-jit]] for how bytecode becomes machine code, [[compilers-and-linkers]] for how the executable is built.

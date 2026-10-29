@@ -73,4 +73,4 @@ Typical output: round 0 takes tens of milliseconds while `checksum` moves throug
 - A full code cache (`CodeCache is full. Compiler has been disabled`) silently degrades a long-running JVM to interpreted speed; monitor `jvm_memory_used_bytes{area="nonheap"}` and raise `ReservedCodeCacheSize` if needed.
 - Megamorphic call sites in generic framework code (one `handle(Event)` dispatching to 20 handlers) cannot be inlined; a `switch` on a sealed type or per-type listeners keeps sites monomorphic.
 - native-image surprises: a library using reflection or `ServiceLoader` works on the JVM and fails at runtime in the native binary unless reachability metadata is supplied. Test the native build in CI, not only the JVM one.
-- Related: [[jvm-memory-areas]] for where the code cache and metaspace live, [[garbage-collection]] for the other runtime component that competes with the JIT for CPU.
+- Related: [[jvm-memory-areas]] for where the code cache and metaspace live, [[garbage-collection]] for the other runtime component that competes with the JIT for CPU, [[compilers-and-linkers]] for the OS side: object files, linking, and how a JIT makes memory executable.
