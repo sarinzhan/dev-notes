@@ -3790,6 +3790,38 @@ ANIMS["fork-cow-smaps"] = el=>{
   }});
 };
 
+// ============ 47. Page cache write-back: buffered writes, background flush, fsync, crash window
+ANIMS["page-cache-writeback"] = el=>{
+  const ST = [
+    { t: ["write() returns fast", "write() возвращается быстро"], m: "write", en: "The app calls write() again and again (Ctrl+S seven hundred times). Each call only copies bytes into pages of the page cache and marks them dirty; it returns in microseconds. The disk has not been touched.",
+      ru: "Приложение раз за разом вызывает write() (Ctrl+S семьсот раз). Каждый вызов лишь копирует байты в страницы страничного кэша и помечает их грязными; он возвращается за микросекунды. Диск не тронут." },
+    { t: ["Repeated writes merge", "Повторные записи сливаются"], m: "merge", en: "Writing the same block again just overwrites the same cached page. Seven hundred saves become one disk write later: the cache protects the disk from applications that write too often.",
+      ru: "Повторная запись того же блока просто перезаписывает ту же страницу в кэше. Семьсот сохранений превращаются потом в одну запись на диск: кэш защищает диск от приложений, которые пишут слишком часто." },
+    { t: ["Background flush", "Фоновый сброс"], m: "flush", en: "Kernel flusher threads write dirty pages to disk when they are older than ~30 s (vm.dirty_expire_centisecs) or when too much memory is dirty (vm.dirty_background_ratio). The app never waits for it.",
+      ru: "Потоки сброса ядра пишут грязные страницы на диск, когда те старше ~30 с (vm.dirty_expire_centisecs) или когда грязной памяти слишком много (vm.dirty_background_ratio). Приложение этого не ждёт." },
+    { t: ["Crash before flush", "Сбой до сброса"], m: "crash", en: "If the power fails while pages are still dirty, those writes are lost even though write() succeeded. For most files that is acceptable; for a database commit it is not.",
+      ru: "Если питание пропадёт, пока страницы ещё грязные, эти записи потеряются, хотя write() завершился успешно. Для большинства файлов это приемлемо; для коммита базы данных — нет." },
+    { t: ["fsync(fd)", "fsync(fd)"], m: "fsync", en: "fsync(fd) writes every dirty page of that file, then tells the drive to flush its own write cache, and only then returns: milliseconds instead of microseconds. Databases call it on every commit for the WAL. Calling it too often is how Firefox 3 froze whole desktops in 2008.",
+      ru: "fsync(fd) записывает все грязные страницы этого файла, затем велит накопителю сбросить его собственный кэш записи и только после этого возвращается: миллисекунды вместо микросекунд. Базы данных вызывают его на каждый коммит для WAL. Слишком частые вызовы — то, из-за чего Firefox 3 в 2008 году замораживал целые рабочие столы." }
+  ];
+  return steppedAnim(el, { title: LL("Page cache write-back and fsync", "Отложенная запись страничного кэша и fsync"), vb: [760, 320], steps: ST, stepMs: 6500, render(g, s, t){
+    const m = s.m, k = easeIO(Math.min(1, t / 2400)), L = E(g, "g", {});
+    oR(g, 20, 40, 150, 70, m === "write" || m === "merge" || m === "fsync" ? "an-reg on" : "an-box", 8); oT(g, 95, 70, LL("app", "приложение"), "an-t an-b"); oT(g, 95, 92, m === "fsync" ? "fsync(fd)" : "write(fd, …)", "an-code");
+    oR(g, 240, 20, 300, 130, "an-frame", 10); oT(g, 390, 14, LL("page cache (RAM, kernel)", "страничный кэш (RAM, ядро)"), "an-m an-b");
+    const dirty = { write: [1, 1, 1, 0, 0], merge: [1, 1, 1, 0, 0], flush: [0, 0, 1, 0, 0], crash: [1, 1, 0, 0, 0], fsync: [0, 0, 0, 0, 0] }[m];
+    for(let i = 0; i < 5; i++){ const x = 256 + i * 56; oR(g, x, 50, 48, 70, m === "crash" && dirty[i] ? "an-leak" : dirty[i] ? "an-pg k2" : "an-pg k1", 5); oT(g, x + 24, 90, `b${i}`, "an-m an-b"); oT(g, x + 24, 108, dirty[i] ? LL("dirty", "грязн.") : LL("clean", "чист."), "an-m"); }
+    oR(g, 240, 230, 300, 70, "an-frame", 10); oT(g, 390, 222, LL("disk (with its own write cache)", "диск (со своим кэшем записи)"), "an-m an-b");
+    for(let i = 0; i < 5; i++){ const x = 256 + i * 56; const onDisk = m === "flush" ? i < 2 : m === "fsync"; oR(g, x, 248, 48, 36, onDisk ? "an-pg k1" : "an-box", 4); oT(g, x + 24, 271, `b${i}`, "an-m"); }
+    const fly = (P)=>{ E(L, "polyline", { points: P.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" }); const [x, y] = polyAt(P, k); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); };
+    if(m === "write") fly([[170, 75], [256 + (Math.floor(t / 700) % 3) * 56 + 24, 85]]);
+    if(m === "merge"){ fly([[170, 75], [256 + 24, 85]]); oT(g, 556, 70, LL("×700 → same page", "×700 → та же страница"), "an-m an-b an-sp", "start"); }
+    if(m === "flush"){ fly([[312, 120], [312, 248]]); oT(g, 556, 180, LL("flusher thread,", "поток сброса,"), "an-m an-b", "start"); oT(g, 556, 196, LL("after ~30 s", "через ~30 с"), "an-m an-b", "start"); }
+    if(m === "crash"){ oT(g, 556, 70, LL("power lost:", "питание пропало:"), "an-m an-b an-warn", "start"); oT(g, 556, 86, LL("b0, b1 never reached disk", "b0, b1 не дошли до диска"), "an-m an-b an-warn", "start"); }
+    if(m === "fsync"){ fly([[170, 100], [256 + 112, 120], [368, 248]]); oT(g, 556, 180, LL("waits for: pages written", "ждёт: страницы записаны"), "an-m an-b", "start"); oT(g, 556, 196, LL("+ drive cache flushed", "+ кэш диска сброшен"), "an-m an-b", "start"); oT(g, 95, 140, LL("blocked ~ms", "заблокировано ~мс"), "an-m an-b an-warn"); }
+    if(m === "write" || m === "merge") oT(g, 95, 140, LL("returns in µs", "возврат за мкс"), "an-m an-b");
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }

@@ -45,6 +45,10 @@ storage-hdd-lba
 storage-ssd-ftl
 ```
 
+- **Do not defragment an SSD.** On an HDD, defragmenting moved a file's sectors next to each other so the head did not jump around, and it really helped. On an SSD any LBA is as fast as any other, so defragmenting gains nothing and spends program/erase cycles rewriting the whole drive. Early SSD owners wore out drives this way; Windows now runs TRIM instead of a defrag when it "optimises" an SSD.
+- **HDDs are not dead.** For huge, mostly sequential, write-once data, cost per terabyte wins: Dropbox stores most of its data on shingled (SMR) hard drives, writing in large sequential chunks that suit them. SMR drives overlap tracks like roof shingles, so like SSDs they cannot rewrite in place and keep an LBA mapping table.
+- **SSDs report sizes that are not their real write unit.** A drive typically reports 512-byte logical and 4 KiB physical sectors, while its NAND pages are 16 KiB. The OS aligns to what it is told; the drive absorbs the rest with read-modify-write inside the FTL.
+
 ### Blocks everywhere: PBA, LBA, file-system block, page
 | Term | Who sees it | Typical size |
 |---|---|---|
@@ -101,6 +105,9 @@ storage-fat-clusters
 storage-partitions
 ```
 
+- `fdisk` offers partition numbers 1–4 because an **MBR** partition table has exactly four primary slots (more need an extended partition); GPT has 128. `lsblk` columns: `MAJ:MIN` is the kernel's device number (driver and minor index), `RM` is 1 for removable drives.
+- `mkfs.ntfs` without `-Q` (quick) writes zeros over the whole partition first, which is why it took so long in the demo. Desktops mount USB drives automatically through udev and udisks; on a server, use `/etc/fstab` entries or systemd automount units.
+
 ### The page cache
 - File-system blocks read from disk are cached in RAM: each block number maps to a virtual-memory page (an FS block is usually ≤ one 4 KiB page), and each block maps to LBAs.
 - **Cached read**: the user wants block 3, the OS checks the page cache, block 3 is there, its content is copied to the user buffer. No disk access.
@@ -108,6 +115,12 @@ storage-partitions
 - **Write**: the OS writes into the page cache (buffered), creating or updating an entry, and marks it **dirty**. **Later** the kernel's flusher threads write dirty pages to disk (after `vm.dirty_expire_centisecs`, 30 s by default, or when dirty memory exceeds `vm.dirty_background_ratio`), or immediately when `fsync()` is called.
 - Upsides: much faster reads, and the cache is shared, so two apps reading the same file share one copy. `free -h` shows it as `buff/cache`, and it counts as *available* memory because clean pages can be dropped at any time.
 - Downside: it can cause data loss and corruption. A write goes to the cache, then the OS crashes or the power fails, and the data the app believed it wrote is gone. Durability needs `fsync` (or `fdatasync`), and even then the drive's own write cache must honour the flush.
+
+- **Too many fsyncs hurt everyone.** In 2008 a kernel developer noticed Firefox 3 freezing whenever he compiled a kernel; `strace` showed several `fsync` calls for every page visited (SQLite saving history and bookmarks). On ext3 in its default mode an `fsync` of one file had to flush the whole file system journal, including the compiler's writes, so the browser waited seconds. Firefox batched its writes, and file systems improved. The general lesson, the same one behind the 2024 XZ backdoor being caught because `ssh` logins got 0.5 s slower: measure, and an unexplained slowdown is worth chasing.
+
+```anim
+page-cache-writeback
+```
 
 ### File modes: flags to open()
 - A file must be opened before it can be used: `open()` returns a file descriptor ([[syscalls-and-file-descriptors]]), and the flags choose the mode.
@@ -124,6 +137,16 @@ storage-partitions
 - `O_DIRECT` does not mean durable: data may still sit in the device's write cache. Use `fsync`/`fdatasync` or `O_DSYNC` for durability.
 - In Java: `FileChannel.force(true)` is `fsync` (`force(false)` ≈ `fdatasync`); `StandardOpenOption.APPEND`, `SYNC`, `DSYNC` map to the flags above; `ExtendedOpenOption.DIRECT` gives `O_DIRECT` ([[java-nio]]).
 
+- Databases let you pick how they reach the disk:
+
+| Setting | Values | Meaning |
+|---|---|---|
+| Postgres `wal_sync_method` | `fdatasync` (Linux default), `fsync`, `open_datasync`, `open_sync`, `fsync_writethrough` | how a commit makes the WAL durable: a sync call after writing, or opening the WAL with `O_DSYNC`/`O_SYNC` so every write is durable |
+| Postgres `fsync` | `on` / `off` | `off` skips all syncs: fast, and a crash can corrupt the cluster. Only for throwaway data |
+| MySQL `innodb_flush_method` | `fsync`, `O_DSYNC`, `O_DIRECT`, `O_DIRECT_NO_FSYNC` | how InnoDB writes data and log files; `O_DIRECT` (the default on Linux since 8.0.14 when supported) avoids double caching data in the page cache |
+
+- `fdatasync` flushes the data and only the metadata needed to read it back (the file size), not timestamps, so it saves a write compared with `fsync`.
+
 ### A read, layer by layer
 The course example: read the entire file `test.dat`, 5,000 bytes, with logical sector, physical sector, page and file-system block all 4,096 bytes, so 1 block = 1 LBA. The file needs two blocks: one full block and one with the remaining 904 bytes.
 1. The app issues `read()`. The OS reads the file-system metadata, finds the start block and follows it until the end of the file: blocks 6 and 3 (it still needs the LBAs).
@@ -136,6 +159,8 @@ So many layers: a POSIX `read()` becomes file-system blocks, then pages, then LB
 ```anim
 storage-read-path
 ```
+
+- One NVMe or SCSI read command takes **one starting LBA and a count**. Blocks scattered across the disk need one command each, which is why file systems try hard to allocate a file's blocks contiguously (extents) and why sequential files read faster even on SSDs.
 
 ### IO scheduling
 - Block-layer schedulers reorder and merge requests: **mq-deadline** (bounded latency, a good default for SSD/NVMe), **BFQ** (fair per-process bandwidth, desktops, slow disks), **kyber** (low latency for fast devices), **none** (NVMe does its own queueing). CFQ was the old single-queue scheduler, removed in kernel 5.0.
