@@ -16,7 +16,7 @@ When a call between services fails, debug bottom-up, one layer at a time: **name
 | Where on the path does it stop? | `mtr -rwc 50 host`, `traceroute -T -p 443 host` | Loss that starts at one hop and continues to the end; loss on a single middle hop only is usually ICMP rate limiting, not a real problem |
 | Does TLS work and which certificate is served? | `openssl s_client -connect host:443 -servername host` | Wrong issuer (a corporate proxy re-signing traffic), expired chain, missing intermediate, SNI mismatch ([[tls-handshake-and-certificates]]) |
 | What does the server actually return, and where is the time spent? | `curl -v`, `curl -w` with timing variables | 502/504 from a proxy rather than the app, `time_connect` small but `time_starttransfer` large (slow backend) |
-| What is on the wire? | `tcpdump -i any -nn 'host X and port 443' -w cap.pcap` + Wireshark | SYN without SYN-ACK, RST right after connect, retransmissions |
+| What is on the wire? | `tcpdump -i any -nn 'host X and port 443' -w cap.pcap` + Wireshark | SYN without SYN-ACK, RST right after connect, retransmissions ([[tcpdump]]) |
 | What connections does this host hold? | `ss -tanp`, `ss -s`, `ss -ltnp` | Thousands of `TIME_WAIT` (no keep-alive or pooling), many `CLOSE_WAIT` (app never closes sockets), nothing in `LISTEN` on the expected port ([[tcp-handshake-and-connection-states]]) |
 
 ### Reading `curl` timings

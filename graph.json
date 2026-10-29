@@ -1518,6 +1518,19 @@
    ]
   },
   {
+   "id": "docker-networking",
+   "sec": "devops",
+   "sub": "docker",
+   "title": "Docker networking",
+   "tags": [
+    "docker",
+    "networking",
+    "bridge",
+    "iptables",
+    "compose"
+   ]
+  },
+  {
    "id": "docker-socket-dind-dood",
    "sec": "devops",
    "sub": "docker",
@@ -2582,55 +2595,16 @@
    ]
   },
   {
-   "id": "dns-resolution",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "DNS resolution",
-   "tags": [
-    "networking",
-    "dns",
-    "kubernetes",
-    "java",
-    "caching"
-   ]
-  },
-  {
-   "id": "load-balancers-l4-vs-l7",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "Load balancers, L4 vs L7",
-   "tags": [
-    "networking",
-    "load-balancing",
-    "l4",
-    "l7",
-    "health-checks"
-   ]
-  },
-  {
-   "id": "reverse-proxy-nginx-basics",
-   "sec": "networking",
-   "sub": "dns-and-routing",
-   "title": "Reverse proxy basics with nginx",
-   "tags": [
-    "networking",
-    "nginx",
-    "reverse-proxy",
-    "tls-termination",
-    "timeouts"
-   ]
-  },
-  {
-   "id": "ip-addressing-ports-nat",
+   "id": "host-to-host-communication",
    "sec": "networking",
    "sub": "fundamentals",
-   "title": "IP addressing, ports and NAT",
+   "title": "Host-to-host communication: MAC, IP, ports, switches and routers",
    "tags": [
     "networking",
-    "ip",
-    "nat",
-    "docker",
-    "kubernetes"
+    "fundamentals",
+    "mac",
+    "routing",
+    "client-server"
    ]
   },
   {
@@ -2643,42 +2617,6 @@
     "osi",
     "tcp-ip",
     "fundamentals"
-   ]
-  },
-  {
-   "id": "sockets-and-connection-pooling",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "Sockets and connection pooling",
-   "tags": [
-    "networking",
-    "sockets",
-    "connection-pool",
-    "java"
-   ]
-  },
-  {
-   "id": "tcp-handshake-and-connection-states",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "TCP handshake and connection states",
-   "tags": [
-    "networking",
-    "tcp",
-    "time-wait",
-    "keep-alive"
-   ]
-  },
-  {
-   "id": "tcp-vs-udp",
-   "sec": "networking",
-   "sub": "fundamentals",
-   "title": "TCP vs UDP",
-   "tags": [
-    "networking",
-    "tcp",
-    "udp",
-    "transport"
    ]
   },
   {
@@ -2758,6 +2696,187 @@
    ]
   },
   {
+   "id": "arp",
+   "sec": "networking",
+   "sub": "ip-layer",
+   "title": "ARP: resolving IP addresses to MAC addresses",
+   "tags": [
+    "networking",
+    "arp",
+    "ethernet",
+    "security"
+   ]
+  },
+  {
+   "id": "icmp-ping-traceroute",
+   "sec": "networking",
+   "sub": "ip-layer",
+   "title": "ICMP, ping and traceroute",
+   "tags": [
+    "networking",
+    "icmp",
+    "ping",
+    "traceroute",
+    "debugging"
+   ]
+  },
+  {
+   "id": "ip-addressing-and-nat",
+   "sec": "networking",
+   "sub": "ip-layer",
+   "title": "IP addressing and NAT",
+   "tags": [
+    "networking",
+    "ip",
+    "nat",
+    "docker",
+    "kubernetes"
+   ]
+  },
+  {
+   "id": "ip-packet-structure",
+   "sec": "networking",
+   "sub": "ip-layer",
+   "title": "IP packet structure and fragmentation",
+   "tags": [
+    "networking",
+    "ip",
+    "ipv4",
+    "ipv6",
+    "fragmentation"
+   ]
+  },
+  {
+   "id": "network-routing",
+   "sec": "networking",
+   "sub": "ip-layer",
+   "title": "Network routing: tables, longest-prefix match and the default gateway",
+   "tags": [
+    "networking",
+    "routing",
+    "ip",
+    "nat",
+    "linux"
+   ]
+  },
+  {
+   "id": "connection-establishment-cost",
+   "sec": "networking",
+   "sub": "performance",
+   "title": "Connection establishment cost",
+   "tags": [
+    "networking",
+    "tcp",
+    "tls",
+    "latency",
+    "performance"
+   ]
+  },
+  {
+   "id": "head-of-line-blocking",
+   "sec": "networking",
+   "sub": "performance",
+   "title": "Head-of-line blocking",
+   "tags": [
+    "networking",
+    "tcp",
+    "http2",
+    "quic",
+    "performance"
+   ]
+  },
+  {
+   "id": "mss-mtu-pmtud",
+   "sec": "networking",
+   "sub": "performance",
+   "title": "MSS, MTU and Path MTU discovery",
+   "tags": [
+    "networking",
+    "tcp",
+    "mtu",
+    "ip",
+    "performance"
+   ]
+  },
+  {
+   "id": "nagle-and-delayed-ack",
+   "sec": "networking",
+   "sub": "performance",
+   "title": "Nagle's algorithm and delayed ACK",
+   "tags": [
+    "networking",
+    "tcp",
+    "latency",
+    "sockets",
+    "performance"
+   ]
+  },
+  {
+   "id": "dns-resolution",
+   "sec": "networking",
+   "sub": "protocols",
+   "title": "DNS resolution",
+   "tags": [
+    "networking",
+    "dns",
+    "kubernetes",
+    "java",
+    "caching"
+   ]
+  },
+  {
+   "id": "tls-handshake-and-certificates",
+   "sec": "networking",
+   "sub": "protocols",
+   "title": "TLS handshake and certificates",
+   "tags": [
+    "networking",
+    "tls",
+    "certificates",
+    "pki",
+    "java"
+   ]
+  },
+  {
+   "id": "tls-key-exchange",
+   "sec": "networking",
+   "sub": "protocols",
+   "title": "TLS key exchange, versions and certificate files",
+   "tags": [
+    "networking",
+    "tls",
+    "cryptography",
+    "openssl",
+    "java"
+   ]
+  },
+  {
+   "id": "load-balancers-l4-vs-l7",
+   "sec": "networking",
+   "sub": "proxies-and-load-balancing",
+   "title": "Load balancers, L4 vs L7",
+   "tags": [
+    "networking",
+    "load-balancing",
+    "l4",
+    "l7",
+    "health-checks"
+   ]
+  },
+  {
+   "id": "reverse-proxy-nginx-basics",
+   "sec": "networking",
+   "sub": "proxies-and-load-balancing",
+   "title": "Reverse proxy basics with nginx",
+   "tags": [
+    "networking",
+    "nginx",
+    "reverse-proxy",
+    "tls-termination",
+    "timeouts"
+   ]
+  },
+  {
    "id": "api-security-checklist",
    "sec": "networking",
    "sub": "security",
@@ -2797,16 +2916,16 @@
    ]
   },
   {
-   "id": "tls-handshake-and-certificates",
+   "id": "network-access-to-databases",
    "sec": "networking",
    "sub": "security",
-   "title": "TLS handshake and certificates",
+   "title": "Network access control to database servers",
    "tags": [
     "networking",
-    "tls",
-    "certificates",
-    "pki",
-    "java"
+    "security",
+    "postgres",
+    "firewall",
+    "pg-hba"
    ]
   },
   {
@@ -2820,6 +2939,116 @@
     "curl",
     "tcpdump",
     "dns"
+   ]
+  },
+  {
+   "id": "tcpdump",
+   "sec": "networking",
+   "sub": "tools",
+   "title": "Capturing traffic with tcpdump",
+   "tags": [
+    "networking",
+    "tcpdump",
+    "troubleshooting",
+    "pcap",
+    "bpf"
+   ]
+  },
+  {
+   "id": "building-tcp-udp-servers",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "Building TCP and UDP servers",
+   "tags": [
+    "networking",
+    "sockets",
+    "tcp",
+    "udp",
+    "java"
+   ]
+  },
+  {
+   "id": "sockets-and-connection-pooling",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "Sockets and connection pooling",
+   "tags": [
+    "networking",
+    "sockets",
+    "connection-pool",
+    "java"
+   ]
+  },
+  {
+   "id": "tcp-congestion-control",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP congestion control, slow start and congestion avoidance",
+   "tags": [
+    "networking",
+    "tcp",
+    "transport",
+    "congestion-control"
+   ]
+  },
+  {
+   "id": "tcp-flow-control",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP flow control and the receive window",
+   "tags": [
+    "networking",
+    "tcp",
+    "transport",
+    "flow-control"
+   ]
+  },
+  {
+   "id": "tcp-handshake-and-connection-states",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP handshake and connection states",
+   "tags": [
+    "networking",
+    "tcp",
+    "time-wait",
+    "keep-alive"
+   ]
+  },
+  {
+   "id": "tcp-segment-structure",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP segment structure",
+   "tags": [
+    "networking",
+    "tcp",
+    "transport",
+    "packets"
+   ]
+  },
+  {
+   "id": "tcp-vs-udp",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "TCP vs UDP",
+   "tags": [
+    "networking",
+    "tcp",
+    "udp",
+    "transport"
+   ]
+  },
+  {
+   "id": "udp-in-depth",
+   "sec": "networking",
+   "sub": "transport",
+   "title": "UDP in depth",
+   "tags": [
+    "networking",
+    "udp",
+    "transport",
+    "ddos"
    ]
   },
   {
@@ -4302,6 +4531,10 @@
   },
   {
    "source": "api-security-checklist",
+   "target": "network-access-to-databases"
+  },
+  {
+   "source": "api-security-checklist",
    "target": "owasp-top-10-for-backend"
   },
   {
@@ -4391,6 +4624,42 @@
   {
    "source": "architecture-resources",
    "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "arp",
+   "target": "docker-networking"
+  },
+  {
+   "source": "arp",
+   "target": "host-to-host-communication"
+  },
+  {
+   "source": "arp",
+   "target": "icmp-ping-traceroute"
+  },
+  {
+   "source": "arp",
+   "target": "ip-addressing-and-nat"
+  },
+  {
+   "source": "arp",
+   "target": "mtls-and-service-to-service-auth"
+  },
+  {
+   "source": "arp",
+   "target": "network-debugging-toolkit"
+  },
+  {
+   "source": "arp",
+   "target": "network-routing"
+  },
+  {
+   "source": "arp",
+   "target": "tcpdump"
+  },
+  {
+   "source": "arp",
+   "target": "tls-handshake-and-certificates"
   },
   {
    "source": "arrays-and-dynamic-arrays",
@@ -4846,6 +5115,10 @@
   },
   {
    "source": "backpressure-and-flow-control",
+   "target": "tcp-flow-control"
+  },
+  {
+   "source": "backpressure-and-flow-control",
    "target": "tcp-vs-udp"
   },
   {
@@ -5114,7 +5387,7 @@
   },
   {
    "source": "bit-manipulation",
-   "target": "ip-addressing-ports-nat"
+   "target": "ip-addressing-and-nat"
   },
   {
    "source": "bit-manipulation",
@@ -5243,6 +5516,58 @@
   {
    "source": "bounded-contexts-and-context-mapping",
    "target": "value-objects-and-entities"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "docker-networking"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "failure-modes-and-timeouts"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "java-nio"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "socket-management"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "spring-mvc-request-lifecycle"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "spring-reactive-webclient-sse"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "syscalls-and-file-descriptors"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "tcp-flow-control"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "udp-in-depth"
+  },
+  {
+   "source": "building-tcp-udp-servers",
+   "target": "virtual-threads"
   },
   {
    "source": "caching",
@@ -6023,6 +6348,78 @@
   {
    "source": "concurrent-collections",
    "target": "trees-and-bst"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "dns-resolution"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "head-of-line-blocking"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "http-1-1-vs-2-vs-3"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "kafka-producer"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "latency-numbers"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "load-balancers-l4-vs-l7"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "nagle-and-delayed-ack"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "network-access-to-databases"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "rest-clients"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "reverse-proxy-nginx-basics"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "tcp-congestion-control"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "tcp-handshake-and-connection-states"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "tls-handshake-and-certificates"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "tls-key-exchange"
+  },
+  {
+   "source": "connection-establishment-cost",
+   "target": "udp-in-depth"
   },
   {
    "source": "consistency-models",
@@ -7826,6 +8223,10 @@
   },
   {
    "source": "dns-resolution",
+   "target": "docker-networking"
+  },
+  {
+   "source": "dns-resolution",
    "target": "grpc-and-protobuf"
   },
   {
@@ -7834,7 +8235,7 @@
   },
   {
    "source": "dns-resolution",
-   "target": "ip-addressing-ports-nat"
+   "target": "ip-addressing-and-nat"
   },
   {
    "source": "dns-resolution",
@@ -7851,6 +8252,10 @@
   {
    "source": "dns-resolution",
    "target": "load-balancing"
+  },
+  {
+   "source": "dns-resolution",
+   "target": "mss-mtu-pmtud"
   },
   {
    "source": "dns-resolution",
@@ -7871,6 +8276,18 @@
   {
    "source": "dns-resolution",
    "target": "tcp-vs-udp"
+  },
+  {
+   "source": "dns-resolution",
+   "target": "tcpdump"
+  },
+  {
+   "source": "dns-resolution",
+   "target": "tls-handshake-and-certificates"
+  },
+  {
+   "source": "dns-resolution",
+   "target": "udp-in-depth"
   },
   {
    "source": "docker-containers-and-resources",
@@ -7962,6 +8379,10 @@
   },
   {
    "source": "docker-fundamentals",
+   "target": "docker-networking"
+  },
+  {
+   "source": "docker-fundamentals",
    "target": "docker-socket-dind-dood"
   },
   {
@@ -7986,7 +8407,7 @@
   },
   {
    "source": "docker-fundamentals",
-   "target": "ip-addressing-ports-nat"
+   "target": "ip-addressing-and-nat"
   },
   {
    "source": "docker-fundamentals",
@@ -8022,10 +8443,6 @@
   },
   {
    "source": "docker-fundamentals",
-   "target": "tcp-handshake-and-connection-states"
-  },
-  {
-   "source": "docker-fundamentals",
    "target": "testcontainers"
   },
   {
@@ -8034,6 +8451,70 @@
   },
   {
    "source": "docker-fundamentals",
+   "target": "virtualization-and-containers"
+  },
+  {
+   "source": "docker-networking",
+   "target": "docker-swarm"
+  },
+  {
+   "source": "docker-networking",
+   "target": "dockerfile-and-images"
+  },
+  {
+   "source": "docker-networking",
+   "target": "host-to-host-communication"
+  },
+  {
+   "source": "docker-networking",
+   "target": "icmp-ping-traceroute"
+  },
+  {
+   "source": "docker-networking",
+   "target": "ip-addressing-and-nat"
+  },
+  {
+   "source": "docker-networking",
+   "target": "ip-packet-structure"
+  },
+  {
+   "source": "docker-networking",
+   "target": "linux-networking"
+  },
+  {
+   "source": "docker-networking",
+   "target": "mss-mtu-pmtud"
+  },
+  {
+   "source": "docker-networking",
+   "target": "network-access-to-databases"
+  },
+  {
+   "source": "docker-networking",
+   "target": "network-routing"
+  },
+  {
+   "source": "docker-networking",
+   "target": "tcp-congestion-control"
+  },
+  {
+   "source": "docker-networking",
+   "target": "tcp-handshake-and-connection-states"
+  },
+  {
+   "source": "docker-networking",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "docker-networking",
+   "target": "tcpdump"
+  },
+  {
+   "source": "docker-networking",
+   "target": "udp-in-depth"
+  },
+  {
+   "source": "docker-networking",
    "target": "virtualization-and-containers"
   },
   {
@@ -8830,6 +9311,10 @@
   },
   {
    "source": "failure-modes-and-timeouts",
+   "target": "host-to-host-communication"
+  },
+  {
+   "source": "failure-modes-and-timeouts",
    "target": "idempotency"
   },
   {
@@ -8899,6 +9384,10 @@
   {
    "source": "failure-modes-and-timeouts",
    "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "failure-modes-and-timeouts",
+   "target": "tcp-flow-control"
   },
   {
    "source": "failure-modes-and-timeouts",
@@ -9266,6 +9755,10 @@
   },
   {
    "source": "grpc-and-protobuf",
+   "target": "head-of-line-blocking"
+  },
+  {
+   "source": "grpc-and-protobuf",
    "target": "http-1-1-vs-2-vs-3"
   },
   {
@@ -9385,6 +9878,10 @@
    "target": "symmetric-and-asymmetric-crypto"
   },
   {
+   "source": "hashing-vs-encryption",
+   "target": "tls-key-exchange"
+  },
+  {
    "source": "hashmap-internals",
    "target": "interview-problem-patterns"
   },
@@ -9407,6 +9904,42 @@
   {
    "source": "hashmap-internals",
    "target": "strings-and-string-pool"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "http-1-1-vs-2-vs-3"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "nagle-and-delayed-ack"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "spring-kafka-consumer"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "tcp-congestion-control"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "tcpdump"
+  },
+  {
+   "source": "head-of-line-blocking",
+   "target": "udp-in-depth"
   },
   {
    "source": "heaps-and-priority-queues",
@@ -9554,6 +10087,10 @@
   },
   {
    "source": "hikaricp-pool-sizing",
+   "target": "ip-addressing-and-nat"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
    "target": "java-ee-and-jakarta"
   },
   {
@@ -9587,6 +10124,10 @@
   {
    "source": "hikaricp-pool-sizing",
    "target": "multi-tenancy-strategies"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "network-access-to-databases"
   },
   {
    "source": "hikaricp-pool-sizing",
@@ -9631,6 +10172,10 @@
   {
    "source": "hikaricp-pool-sizing",
    "target": "spring-transactional"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
+   "target": "tcp-congestion-control"
   },
   {
    "source": "hikaricp-pool-sizing",
@@ -9701,6 +10246,42 @@
    "target": "virtual-threads"
   },
   {
+   "source": "host-to-host-communication",
+   "target": "icmp-ping-traceroute"
+  },
+  {
+   "source": "host-to-host-communication",
+   "target": "ip-addressing-and-nat"
+  },
+  {
+   "source": "host-to-host-communication",
+   "target": "ip-packet-structure"
+  },
+  {
+   "source": "host-to-host-communication",
+   "target": "network-routing"
+  },
+  {
+   "source": "host-to-host-communication",
+   "target": "osi-and-tcp-ip-models"
+  },
+  {
+   "source": "host-to-host-communication",
+   "target": "reverse-proxy-nginx-basics"
+  },
+  {
+   "source": "host-to-host-communication",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "host-to-host-communication",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "host-to-host-communication",
+   "target": "tcpdump"
+  },
+  {
    "source": "http-1-1-vs-2-vs-3",
    "target": "http-fundamentals"
   },
@@ -9735,6 +10316,10 @@
   {
    "source": "http-1-1-vs-2-vs-3",
    "target": "tls-handshake-and-certificates"
+  },
+  {
+   "source": "http-1-1-vs-2-vs-3",
+   "target": "udp-in-depth"
   },
   {
    "source": "http-1-1-vs-2-vs-3",
@@ -9795,6 +10380,30 @@
   {
    "source": "http-fundamentals",
    "target": "tls-handshake-and-certificates"
+  },
+  {
+   "source": "icmp-ping-traceroute",
+   "target": "ip-packet-structure"
+  },
+  {
+   "source": "icmp-ping-traceroute",
+   "target": "mss-mtu-pmtud"
+  },
+  {
+   "source": "icmp-ping-traceroute",
+   "target": "network-debugging-toolkit"
+  },
+  {
+   "source": "icmp-ping-traceroute",
+   "target": "network-routing"
+  },
+  {
+   "source": "icmp-ping-traceroute",
+   "target": "tcpdump"
+  },
+  {
+   "source": "icmp-ping-traceroute",
+   "target": "udp-in-depth"
   },
   {
    "source": "idempotency",
@@ -9943,6 +10552,10 @@
   {
    "source": "idempotency",
    "target": "time-money-and-ids"
+  },
+  {
+   "source": "idempotency",
+   "target": "tls-key-exchange"
   },
   {
    "source": "idempotency",
@@ -10105,36 +10718,72 @@
    "target": "two-pointers-and-sliding-window"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
+   "target": "ip-packet-structure"
+  },
+  {
+   "source": "ip-addressing-and-nat",
    "target": "kubernetes-basics"
   },
   {
-   "source": "ip-addressing-ports-nat",
-   "target": "linux-networking"
+   "source": "ip-addressing-and-nat",
+   "target": "load-balancers-l4-vs-l7"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
+   "target": "network-access-to-databases"
+  },
+  {
+   "source": "ip-addressing-and-nat",
+   "target": "network-routing"
+  },
+  {
+   "source": "ip-addressing-and-nat",
    "target": "osi-and-tcp-ip-models"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "reverse-proxy-nginx-basics"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "socket-management"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "sockets-and-connection-pooling"
   },
   {
-   "source": "ip-addressing-ports-nat",
-   "target": "tcp-handshake-and-connection-states"
+   "source": "ip-addressing-and-nat",
+   "target": "tcp-vs-udp"
   },
   {
-   "source": "ip-addressing-ports-nat",
+   "source": "ip-addressing-and-nat",
    "target": "tries"
+  },
+  {
+   "source": "ip-packet-structure",
+   "target": "mss-mtu-pmtud"
+  },
+  {
+   "source": "ip-packet-structure",
+   "target": "network-routing"
+  },
+  {
+   "source": "ip-packet-structure",
+   "target": "osi-and-tcp-ip-models"
+  },
+  {
+   "source": "ip-packet-structure",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "ip-packet-structure",
+   "target": "tcpdump"
+  },
+  {
+   "source": "ip-packet-structure",
+   "target": "udp-in-depth"
   },
   {
    "source": "ipc-mechanisms",
@@ -10786,6 +11435,10 @@
   },
   {
    "source": "kubernetes-basics",
+   "target": "mss-mtu-pmtud"
+  },
+  {
+   "source": "kubernetes-basics",
    "target": "network-debugging-toolkit"
   },
   {
@@ -10851,6 +11504,10 @@
   {
    "source": "latency-numbers",
    "target": "storage-management"
+  },
+  {
+   "source": "latency-numbers",
+   "target": "tcp-flow-control"
   },
   {
    "source": "latency-numbers",
@@ -11066,6 +11723,10 @@
   },
   {
    "source": "linux-networking",
+   "target": "network-routing"
+  },
+  {
+   "source": "linux-networking",
    "target": "osi-and-tcp-ip-models"
   },
   {
@@ -11079,6 +11740,10 @@
   {
    "source": "linux-networking",
    "target": "tcp-handshake-and-connection-states"
+  },
+  {
+   "source": "linux-networking",
+   "target": "tcpdump"
   },
   {
    "source": "linux-networking",
@@ -11119,6 +11784,10 @@
   {
    "source": "load-balancers-l4-vs-l7",
    "target": "mtls-and-service-to-service-auth"
+  },
+  {
+   "source": "load-balancers-l4-vs-l7",
+   "target": "network-access-to-databases"
   },
   {
    "source": "load-balancers-l4-vs-l7",
@@ -11505,6 +12174,50 @@
    "target": "transactions-acid-and-isolation"
   },
   {
+   "source": "mss-mtu-pmtud",
+   "target": "nagle-and-delayed-ack"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "network-debugging-toolkit"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "osi-and-tcp-ip-models"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "tcp-congestion-control"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "tcp-flow-control"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "tcp-handshake-and-connection-states"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "tcpdump"
+  },
+  {
+   "source": "mss-mtu-pmtud",
+   "target": "udp-in-depth"
+  },
+  {
+   "source": "mtls-and-service-to-service-auth",
+   "target": "network-access-to-databases"
+  },
+  {
    "source": "mtls-and-service-to-service-auth",
    "target": "osi-and-tcp-ip-models"
   },
@@ -11527,6 +12240,10 @@
   {
    "source": "mtls-and-service-to-service-auth",
    "target": "tls-handshake-and-certificates"
+  },
+  {
+   "source": "mtls-and-service-to-service-auth",
+   "target": "tls-key-exchange"
   },
   {
    "source": "multi-leader-and-leaderless",
@@ -11625,8 +12342,72 @@
    "target": "synchronizers"
   },
   {
+   "source": "nagle-and-delayed-ack",
+   "target": "osi-and-tcp-ip-models"
+  },
+  {
+   "source": "nagle-and-delayed-ack",
+   "target": "socket-management"
+  },
+  {
+   "source": "nagle-and-delayed-ack",
+   "target": "tcp-congestion-control"
+  },
+  {
+   "source": "nagle-and-delayed-ack",
+   "target": "tcp-flow-control"
+  },
+  {
+   "source": "nagle-and-delayed-ack",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "nagle-and-delayed-ack",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "nagle-and-delayed-ack",
+   "target": "tcpdump"
+  },
+  {
    "source": "nested-and-anonymous-classes",
    "target": "structural-patterns"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "network-debugging-toolkit"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "network-routing"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "owasp-top-10-for-backend"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "postgres-replication-and-failover"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "schema-migrations-flyway-liquibase"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "secrets-management"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "tcp-flow-control"
+  },
+  {
+   "source": "network-access-to-databases",
+   "target": "tls-handshake-and-certificates"
   },
   {
    "source": "network-debugging-toolkit",
@@ -11642,7 +12423,15 @@
   },
   {
    "source": "network-debugging-toolkit",
+   "target": "tcp-congestion-control"
+  },
+  {
+   "source": "network-debugging-toolkit",
    "target": "tcp-handshake-and-connection-states"
+  },
+  {
+   "source": "network-debugging-toolkit",
+   "target": "tcpdump"
   },
   {
    "source": "network-debugging-toolkit",
@@ -11862,11 +12651,23 @@
   },
   {
    "source": "osi-and-tcp-ip-models",
+   "target": "socket-management"
+  },
+  {
+   "source": "osi-and-tcp-ip-models",
    "target": "tcp-handshake-and-connection-states"
   },
   {
    "source": "osi-and-tcp-ip-models",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "osi-and-tcp-ip-models",
    "target": "tcp-vs-udp"
+  },
+  {
+   "source": "osi-and-tcp-ip-models",
+   "target": "tcpdump"
   },
   {
    "source": "osi-and-tcp-ip-models",
@@ -11891,6 +12692,10 @@
   {
    "source": "otel-metric-types",
    "target": "two-pointers-and-sliding-window"
+  },
+  {
+   "source": "otel-metric-types",
+   "target": "udp-in-depth"
   },
   {
    "source": "outbox-pattern",
@@ -12234,6 +13039,10 @@
   },
   {
    "source": "postgres-vacuum-and-bloat",
+   "target": "tcp-flow-control"
+  },
+  {
+   "source": "postgres-vacuum-and-bloat",
    "target": "time-money-and-ids"
   },
   {
@@ -12558,6 +13367,10 @@
   },
   {
    "source": "reverse-proxy-nginx-basics",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "reverse-proxy-nginx-basics",
    "target": "strangler-fig-migration"
   },
   {
@@ -12645,6 +13458,10 @@
    "target": "testcontainers"
   },
   {
+   "source": "secrets-management",
+   "target": "tls-key-exchange"
+  },
+  {
    "source": "service-communication-sync-vs-async",
    "target": "temporal-concepts"
   },
@@ -12702,11 +13519,23 @@
   },
   {
    "source": "socket-management",
+   "target": "tcp-flow-control"
+  },
+  {
+   "source": "socket-management",
    "target": "tcp-handshake-and-connection-states"
   },
   {
    "source": "socket-management",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "socket-management",
    "target": "tcp-vs-udp"
+  },
+  {
+   "source": "socket-management",
+   "target": "udp-in-depth"
   },
   {
    "source": "socket-management",
@@ -12723,6 +13552,14 @@
   {
    "source": "sockets-and-connection-pooling",
    "target": "syscalls-and-file-descriptors"
+  },
+  {
+   "source": "sockets-and-connection-pooling",
+   "target": "tcp-congestion-control"
+  },
+  {
+   "source": "sockets-and-connection-pooling",
+   "target": "tcp-flow-control"
   },
   {
    "source": "sockets-and-connection-pooling",
@@ -13069,6 +13906,10 @@
    "target": "tls-handshake-and-certificates"
   },
   {
+   "source": "symmetric-and-asymmetric-crypto",
+   "target": "tls-key-exchange"
+  },
+  {
    "source": "synchronization-and-monitors",
    "target": "syscalls-and-file-descriptors"
   },
@@ -13085,8 +13926,48 @@
    "target": "transactions-acid-and-isolation"
   },
   {
+   "source": "tcp-congestion-control",
+   "target": "tcp-flow-control"
+  },
+  {
+   "source": "tcp-congestion-control",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "tcp-congestion-control",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "tcp-congestion-control",
+   "target": "tcpdump"
+  },
+  {
+   "source": "tcp-congestion-control",
+   "target": "udp-in-depth"
+  },
+  {
+   "source": "tcp-flow-control",
+   "target": "tcp-segment-structure"
+  },
+  {
+   "source": "tcp-flow-control",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "tcp-flow-control",
+   "target": "tcpdump"
+  },
+  {
+   "source": "tcp-handshake-and-connection-states",
+   "target": "tcp-segment-structure"
+  },
+  {
    "source": "tcp-handshake-and-connection-states",
    "target": "tcp-vs-udp"
+  },
+  {
+   "source": "tcp-handshake-and-connection-states",
+   "target": "tcpdump"
   },
   {
    "source": "tcp-handshake-and-connection-states",
@@ -13095,6 +13976,30 @@
   {
    "source": "tcp-handshake-and-connection-states",
    "target": "websockets-sse-and-long-polling"
+  },
+  {
+   "source": "tcp-segment-structure",
+   "target": "tcp-vs-udp"
+  },
+  {
+   "source": "tcp-segment-structure",
+   "target": "tcpdump"
+  },
+  {
+   "source": "tcp-segment-structure",
+   "target": "udp-in-depth"
+  },
+  {
+   "source": "tcp-vs-udp",
+   "target": "udp-in-depth"
+  },
+  {
+   "source": "tcpdump",
+   "target": "tls-handshake-and-certificates"
+  },
+  {
+   "source": "tcpdump",
+   "target": "udp-in-depth"
   },
   {
    "source": "temporal-concepts",
@@ -13143,6 +14048,10 @@
   {
    "source": "time-money-and-ids",
    "target": "value-objects-and-entities"
+  },
+  {
+   "source": "tls-handshake-and-certificates",
+   "target": "tls-key-exchange"
   },
   {
    "source": "trees-and-bst",

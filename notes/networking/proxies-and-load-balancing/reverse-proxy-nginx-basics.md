@@ -4,12 +4,22 @@ tags: [networking, nginx, reverse-proxy, tls-termination, timeouts]
 learned: 2026-10-27
 ---
 ## TL;DR
-A reverse proxy sits in front of your services, accepts client connections, and opens its own connections to upstreams. That one hop gives you TLS termination, a single public port for many services, path-based routing, buffering that shields a slow client from a Tomcat thread, compression, static files and a place for rate limits and access logs. nginx is the one you will configure by hand most often; the same concepts (upstreams, timeouts, forwarded headers, buffering) exist in Envoy, Traefik, Caddy and HAProxy. Every "502 Bad Gateway" or "504 Gateway Timeout" you have seen was this layer talking to you.
+A reverse proxy sits in front of your services, accepts client connections, and opens its own, separate connections to upstreams. That hop gives you TLS termination, one public port for many services, path routing, caching, canaries, buffering that shields Tomcat threads from slow clients, and a place for rate limits and access logs. nginx is the one you will configure by hand most often; Envoy, Traefik, Caddy and HAProxy share the same concepts. Every "502 Bad Gateway" or "504 Gateway Timeout" you have seen came from this layer.
 
 ## Key points
 ### Forward vs reverse proxy
-- **Forward proxy**: on the client side, hides or controls clients (corporate egress proxy, `HTTP_PROXY` env, TLS inspection boxes, see [[tls-handshake-and-certificates]]).
-- **Reverse proxy**: on the server side, hides and fronts servers. Load balancer, API gateway and ingress controller are reverse proxies with extra features ([[load-balancers-l4-vs-l7]], [[api-gateway-and-service-discovery]]).
+| | Forward proxy | Reverse proxy |
+|---|---|---|
+| Sits | next to clients, configured by them (`HTTP_PROXY`, browser, JVM `-Dhttps.proxyHost`) | next to servers; clients think it *is* the server |
+| Hides | the clients (the target sees the proxy's IP) | the servers (topology, number of instances) |
+| Use cases | egress allow-lists, logging outbound calls, shared caching (Squid, Maven mirror), anonymity, TLS inspection ([[tls-handshake-and-certificates]]) | load balancing, TLS termination, caching (`proxy_cache`), canary by weight or header, microservice ingress (routing by path), API gateway (auth, rate limits), central access logs |
+
+- Load balancer, API gateway and ingress controller are reverse proxies with extra features ([[load-balancers-l4-vs-l7]], [[api-gateway-and-service-discovery]]).
+- **Transparent proxy**: clients are not configured at all; the network redirects their traffic to the proxy (iptables `REDIRECT`/`TPROXY`, policy routing). Corporate web filters and service-mesh sidecars (Envoy in Istio intercepts every pod connection this way) work like this. Without TLS interception it sees only IPs, ports and the SNI of HTTPS traffic.
+
+### Two TCP connections, not one
+- A proxy terminates the client's connection and opens its own to the upstream: two handshakes, two TLS sessions, two sets of buffers, timeouts and keepalive settings. Client HTTP/2 can become upstream HTTP/1.1. An L4 balancer in NAT mode, by contrast, rewrites packets of a single connection.
+- Consequences: the upstream sees the proxy's IP (hence `X-Forwarded-For`); a client disconnect does not cancel the upstream request; each upstream connection uses an ephemeral port on the proxy, so without keepalive a busy proxy runs out of ports to one `IP:port` (about 28 000 by default) and piles up `TIME_WAIT` ([[connection-establishment-cost]], [[sockets-and-connection-pooling]]).
 
 ### nginx building blocks
 | Directive | What it does | Typical value |
@@ -21,7 +31,6 @@ A reverse proxy sits in front of your services, accepts client connections, and 
 | `proxy_http_version 1.1;` + `Connection ""` | required for upstream keepalive and WebSocket | default is 1.0 |
 | `proxy_connect_timeout` | TCP connect to upstream | 2–5 s |
 | `proxy_read_timeout` | wait between two reads from upstream (not total) | 30–60 s; hours for SSE/WebSocket |
-| `proxy_send_timeout` | wait between two writes to upstream | 30 s |
 | `client_max_body_size` | request body limit; `413` beyond | `10m` for uploads |
 | `proxy_buffering on` | read the whole upstream response, then send to the client at its pace | on for APIs, off for streams |
 | `proxy_next_upstream error timeout http_502` | retry on another backend | add `non_idempotent` only if you really mean it |
@@ -30,12 +39,11 @@ A reverse proxy sits in front of your services, accepts client connections, and 
 ### Buffering: why it exists and when to turn it off
 - With buffering on, nginx takes the full response from Tomcat quickly and feeds a slow mobile client over seconds; the Tomcat thread is freed immediately. Without it, the servlet thread is tied to the client's bandwidth. Default on, keep it for normal APIs.
 - Turn it off (`proxy_buffering off` or `X-Accel-Buffering: no` header from the app) for SSE, chunked streaming responses, LLM token streams ([[websockets-sse-and-long-polling]]). Request bodies similarly: `proxy_request_buffering off` for large uploads you want to stream to the app.
-- Big responses that exceed `proxy_buffers` spill to disk (`proxy_temp_path`); the warning `an upstream response is buffered to a temporary file` in the error log means the buffers are too small or the response too large.
 
 ### TLS termination
 - nginx holds the certificate and private key (`ssl_certificate`, `ssl_certificate_key`), speaks HTTPS and HTTP/2 to the client, and usually plain HTTP to the upstream on a private network. The app must then build URLs with `X-Forwarded-Proto` (Spring: `server.forward-headers-strategy`).
 - Re-encrypting to the upstream (`proxy_pass https://...`, `proxy_ssl_verify on`) when the network is not trusted; passthrough at L4 (`stream {}` block with `ssl_preread` for SNI routing) when the backend must see the client certificate ([[mtls-and-service-to-service-auth]]).
-- OCSP stapling, session tickets, `ssl_protocols TLSv1.2 TLSv1.3`, and `Strict-Transport-Security` belong here, not in every service.
+- OCSP stapling, `ssl_protocols TLSv1.2 TLSv1.3` and HSTS belong here, not in every service.
 
 ### Status codes it generates
 - `502 Bad Gateway`: upstream refused, reset, or sent an invalid response (common on deploys when nginx reuses a keepalive connection the app closed; set `keepalive_timeout` on Tomcat ≥ nginx's `keepalive_time`).
@@ -44,8 +52,7 @@ A reverse proxy sits in front of your services, accepts client connections, and 
 - `413`, `429`, `503` from `limit_req`/`limit_conn`.
 
 ### Observability
-- Access log in JSON with `$request_time` (client-facing total) and `$upstream_response_time` (what the app took): the difference is buffering and slow clients. Add `$request_id` and forward it as `X-Request-ID` so app logs and traces correlate ([[distributed-tracing]], [[observability-three-pillars]]).
-- `stub_status` or the nginx Prometheus exporter for active connections, and `nginx -t` before every reload.
+- JSON access log with `$request_time` (client-facing total) and `$upstream_response_time` (the app's share); the difference is buffering and slow clients. Forward `$request_id` as `X-Request-ID` to correlate app logs and traces ([[distributed-tracing]], [[observability-three-pillars]]).
 
 ## Example
 A production-shaped `server` block for a Spring Boot API: TLS, HTTP/2, upstream keepalive, forwarded headers, a streaming location with buffering off, rate limit on the auth endpoint, and JSON access logs.

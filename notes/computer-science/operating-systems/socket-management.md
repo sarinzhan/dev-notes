@@ -18,7 +18,7 @@ A **socket** is a kernel data structure (a `struct sock` in Linux) that the proc
   - a **connection socket**: one end of an established connection, identified by the 4-tuple (source IP, source port, destination IP, destination port). A client only ever has connection sockets.
 
 ### Listening on an IP and a port
-- A machine has several IP addresses: one per network interface (NIC), plus any number of virtual interfaces, plus the **loopback** `127.0.0.1` (IPv4) and `::1` (IPv6) that points back to the machine itself ([[ip-addressing-ports-nat]]).
+- A machine has several IP addresses: one per network interface (NIC), plus any number of virtual interfaces, plus the **loopback** `127.0.0.1` (IPv4) and `::1` (IPv6) that points back to the machine itself ([[ip-addressing-and-nat]]).
 - You listen on a specific **IP + port**. Binding to `127.0.0.1:8080` accepts only local connections, which is what development servers should do.
 - `0.0.0.0` (IPv4) or `::` (IPv6) means **all interfaces**. Many frameworks default to it because the IP may change and it is easier. It is dangerous: deploy that "local" tool to a server where one interface has a public address, and it is on the internet. Mass breaches of MongoDB and Elasticsearch came exactly from this: databases listening on all interfaces, found by attackers who scan the entire IPv4 space for their ports. Bind to the interface you mean; in Spring Boot that is `server.address`.
 
@@ -93,9 +93,7 @@ sendfile-zero-copy
 ```
 
 ### Nagle's algorithm and delayed ACK
-- **Nagle's algorithm** holds back a small write while earlier data is still unacknowledged, to avoid sending many tiny packets, each carrying 40 bytes of IP and TCP headers. **Delayed ACK** on the other side holds back the acknowledgement for up to ~40 ms, hoping to send it with a response. Together they can stall a request–response exchange: the sender waits for an ACK, the receiver waits to send one.
-- Daniel Stenberg traced unexplained delays in curl to exactly this during the TLS handshake, where small messages sat in the send buffer waiting; curl has set `TCP_NODELAY` (Nagle off) by default since 2016. Most latency-sensitive software does the same: Netty, gRPC, many database drivers. In Java: `socket.setTcpNoDelay(true)`, or `ChannelOption.TCP_NODELAY` in Netty.
-- The trade-off: Nagle saves bandwidth on chatty protocols, `TCP_NODELAY` saves latency. With `TCP_NODELAY`, batch your own writes (one `write()` per response, not per header line).
+- Nagle holds back small writes until earlier data is ACKed, and the peer's delayed ACK holds back that ACK; together they cause ~40 ms stalls on write-write-read exchanges, which is why latency-sensitive software sets `TCP_NODELAY`. Details, timeline and the related socket options: [[nagle-and-delayed-ack]].
 
 ### Problems with reading and sending
 - **The backend does not read fast enough**: the receive queue fills, the advertised window shrinks to zero, and the client has to stop: its send buffer fills and its `write()` blocks. The client slows down. This is TCP flow control: backpressure all the way to the sender ([[backpressure-and-flow-control]]).

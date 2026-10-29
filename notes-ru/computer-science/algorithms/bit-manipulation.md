@@ -46,7 +46,7 @@ learned: 2026-10-27
 - `EnumSet` — это битовая маска по порядковым номерам enum: проверка принадлежности за O(1), 1 бит на константу, и он обходит `HashSet<Enum>` в любом бенчмарке ([[enums]]).
 - `java.util.BitSet` для компактной принадлежности целочисленных id (какие из 10 миллионов id абонентов уже мигрированы: 1,25 МБ вместо `HashSet<Long>` на 50+ МБ).
 - Протоколы EMV и смарт-карт кодируют данные в TLV с флагами на уровне битов (AIP, TVR, результаты CVM); их разбор — это маски и сдвиги по `byte[]` с `& 0xFF` повсюду ([[emv-card-processing]]).
-- Проверка CIDR `ip & mask == network & mask` ([[ip-addressing-ports-nat]]), фильтры Блума ([[bloom-filters-and-probabilistic]]), перемешивание хеша в `HashMap` (`h ^ (h >>> 16)`, [[hashmap-internals]]).
+- Проверка CIDR `ip & mask == network & mask` ([[ip-addressing-and-nat]]), фильтры Блума ([[bloom-filters-and-probabilistic]]), перемешивание хеша в `HashMap` (`h ^ (h >>> 16)`, [[hashmap-internals]]).
 
 ## Пример
 ```java
