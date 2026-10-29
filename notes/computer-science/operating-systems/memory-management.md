@@ -23,11 +23,36 @@ RAM is the volatile working memory of the machine: the CPU reads and writes it i
 | HBM | GPUs, AI accelerators | stacked DRAM dies with a very wide bus: huge bandwidth |
 | ECC (RDIMM) | servers | extra bits detect and correct single-bit errors; "registered" buffers allow more modules per channel |
 
+### Inside DRAM: refresh, rows and DDR
+- **Refresh.** A capacitor leaks its charge in milliseconds, so every row must be read and rewritten at least every 64 ms. The **memory controller** does this in hardware by sending REFRESH commands (a few rows every 7.8 µs); the OS is not involved, and in sleep mode the DRAM refreshes itself. A bank that is refreshing cannot serve reads, so an unlucky access waits longer: one reason the same code shows slightly different timings from run to run.
+- **The row buffer is a cache in front of the capacitors.** Reading a row drains it into the bank's **sense amplifiers**; reads and writes then go to the sense amplifiers, and the row is written back when it is closed. One set of sense amplifiers per bank is why a bank has only one open row: opening another means writing the first one back (precharge) and draining the new one (activate).
+- Typical sizes, which vary by chip: tens of thousands of rows per bank, about a thousand columns per row, and a row of about 8 KiB across the chips of a rank. An access to the already-open row (**row hit**) is much cheaper than one that must close it first (**row conflict**). Sequential data stays in one open row; scattered data keeps reopening rows.
+- **Physical addresses are decoded into DRAM coordinates.** The memory controller splits a physical address into channel, rank, bank, row and column bits (modern controllers hash some of them). Two virtual addresses next to each other can land in different banks, which can be good (parallel access) or bad (row conflicts). Researchers reverse-engineered these mappings for **Rowhammer** attacks: rapidly activating one row can flip bits in its neighbours, so memory vendors added countermeasures and servers use ECC.
+- **From asynchronous DRAM to DDR5.** Early DRAM was asynchronous: not tied to the bus clock, so the CPU and the memory kept missing each other's clock edges. **SDRAM** runs on the bus clock. **DDR** (double data rate) transfers on both the rising and the falling edge. Each generation also widened the **prefetch**: how many bits each data line delivers per access:
+
+| Generation | Prefetch per data line | One burst | Typical speed |
+|---|---|---|---|
+| DDR | 2n | | 200–400 MT/s |
+| DDR2 | 4n | | 400–1066 MT/s |
+| DDR3 | 8n | 64 lines × 8 bits = 64 B | 800–2133 MT/s |
+| DDR4 | 8n, plus bank groups | 64 lines × 8 bits = 64 B | 1600–3200 MT/s |
+| DDR5 | 16n, two independent 32-bit subchannels per module | 32 lines × 16 bits = 64 B per subchannel | 4800–8400 MT/s |
+
+- Every generation keeps one burst equal to **one 64-byte cache line**, because that is what the CPU asks for. DDR5 doubled the prefetch, which on a 64-bit bus would have given 128 bytes, more than the CPU wants, so it split the bus into two 32-bit subchannels instead.
+- A quiz from the lecture: is one cache-line read faster on DDR5 than on DDR4? No: the latency in nanoseconds is about the same (~14 ns for the DRAM itself, ~100 ns end to end). DDR5 wins when many cores read at once: two subchannels and twice as many banks serve more requests in parallel, where on DDR4 a request to a busy bank or bus has to wait.
+- Every layer is a black box to the one above: the frontend calls the backend, the backend calls the database, the database calls the OS, the OS drives the CPU, the CPU asks the DRAM. How far down you look decides how much you can explain.
+
+```anim
+ddr-burst
+```
+
 ### How the CPU reads and writes RAM
 - A load or store instruction carries a **virtual** address. The **MMU** translates it to a physical address (using the TLB), then the caches are checked: L1 (~1 ns), L2 (~4 ns), L3 (~12–40 ns).
 - On a miss everywhere, the **memory controller** (on the CPU die) asks the DIMM: *activate* the row into the row buffer, then *read* the columns. The data comes back as a **64-byte burst**: one whole cache line, never a single byte. The line is placed in the caches and the requested bytes go into a register. Total: about 100 ns, or roughly 300 cycles of waiting.
 - A **store** goes into the L1 line and marks it **dirty** (write-back cache). RAM is updated only when the line is evicted. Other cores still see the new value, because the cache coherence protocol (MESI) moves the line between caches.
 - Consequence for code: memory is fast when access is **sequential** (whole lines are used, the hardware prefetcher runs ahead) and slow when it jumps around (one line fetched per value). An array of primitives beats a linked list of objects for the same reason.
+
+- The same applies to **code**. A 64-byte line holds 16 four-byte instructions: the first fetch costs ~100 ns and the next 15 hit the L1 instruction cache at ~1 ns each (the lecture counts 64 instructions per line; it is 16). Code that calls a function in a different part of the binary on every few instructions keeps paying ~100 ns per jump, several times slower for the same work.
 
 ```anim
 ram-read-write
@@ -45,6 +70,10 @@ struct b { int i; char c; char d; };   // 4 + 1 + 1 + 2 pad          =  8 bytes
 
 - The JVM does the same: fields are laid out to keep them aligned, and every object starts at an 8-byte boundary. That alignment is what makes **compressed oops** work: a 32-bit reference counts in 8-byte units, so it can address a 32 GB heap. Above `-Xmx32g` references become 64-bit and the same data takes more memory ([[jvm-memory-areas]]).
 - `O_DIRECT` and DMA buffers must be aligned to the block size (512 B or 4 KiB); see below.
+
+- The lecture's example, a struct of `char c; double d; short s; int i;`: `c` at 0, padding to 8, `d` at 8–15, `s` at 16–17, padding to 20, `i` at 20–23: **24 bytes**. Reordered as `double, int, short, char` it packs into 15 bytes plus 1 of tail padding: **16 bytes**. Rule of thumb: order fields from largest to smallest. The **compiler** chooses this layout, not the OS (the lecture says the OS).
+- The lecture admits it does not know *why* alignment is required. The reason is the hardware: memory and caches move aligned words and lines, so an aligned value is always inside one of them and needs one access; an unaligned one may straddle two, needing two accesses and losing atomicity, and some CPUs refuse it outright.
+- Packing related, hot fields together matters more than saving bytes: see the Linux 6.8 networking change in [[anatomy-of-a-process]], which gained up to ~40% TCP throughput just from field order.
 
 ### Limits of physical memory without virtual memory
 If processes used physical addresses directly:
@@ -85,6 +114,10 @@ virtual-memory-mapping
 vm-page-tables
 ```
 
+- **What a page-table entry holds.** Not a full address but a **frame number** (the physical address divided by 4096), which is shorter, plus flag bits: *present* (in RAM or not), *writable*, *user* (accessible from user mode), *no-execute*, *accessed* and *dirty*. The CPU sets *accessed* and *dirty* itself on every use, so tracking which pages are idle costs the kernel almost nothing: it just reads and clears those bits.
+- **Threads share one page table**: switching between threads of the same process keeps the TLB, switching between processes does not (unless PCID/ASID tags are used). One reason threads are cheaper than processes ([[process-management]]).
+- **Match the database page to the OS page**: Postgres uses 8 KiB pages and InnoDB 16 KiB, while the OS and most disks write 4 KiB at a time. A crash in the middle can leave a **torn page**, half old and half new, which is why Postgres writes full pages to the WAL after each checkpoint (`full_page_writes`) and InnoDB has its doublewrite buffer.
+
 ### Page faults
 | Kind | Cause | Cost |
 |---|---|---|
@@ -105,6 +138,8 @@ vm-page-tables
   - **NGINX** and proxies: worker processes share cache metadata, rate-limit counters and upstream state in shared memory zones.
   - Java: `FileChannel.map` on a file in `/dev/shm` gives a `MappedByteBuffer` shared across processes (Chronicle Queue, Aeron).
   - **fork** with copy-on-write, below.
+
+- **Postgres** creates its `shared_buffers` as one shared memory region in the postmaster; every backend process it forks inherits the mapping, so all connections read and write the same cached pages. **Nginx** forks its worker processes from a master the same way. Threads get all of this for free, since they share the whole address space and only have their own stacks.
 
 ### Copy-on-write and fork
 - `fork()` gives the child a **copy of the parent's page table**, not of its memory. Every writable page is marked read-only in both tables, and both point to the same frames.
@@ -128,6 +163,7 @@ redis-cow
 ```
 
 ### Swap, reclaim and the OOM killer
+- When a page is swapped out, its page-table entry is marked *not present* and stores where the page went: the swap device and slot (the lecture says an inode; it is a swap entry). The next access faults, and the kernel reads the page back from that slot.
 - When RAM runs short, the kernel reclaims in this order: clean page cache (just drop it), dirty page cache (write back, then drop), then anonymous pages (heap, stacks) written to **swap** on disk. `vm.swappiness` biases between the last two. A swapped page keeps its virtual address; its table entry is marked not present, and the next touch is a major page fault.
 - Swapping a JVM is catastrophic because a GC cycle touches the whole heap: a 4 GiB heap half on disk turns a 50 ms pause into minutes. Production JVM and database hosts run with little or no swap (`vm.swappiness=1`) and rely on correct sizing.
 - The **OOM killer** runs when reclaim cannot free a page. It picks the task with the highest `oom_score` (roughly RSS, adjusted by `oom_score_adj`) and sends `SIGKILL`. In a container with `memory.max` the same happens inside the cgroup, and the pod shows exit code 137 / `OOMKilled` ([[docker-containers-and-resources]]).
@@ -135,9 +171,47 @@ redis-cow
 - **Page cache**: file contents read or written stay in RAM as cache; `free -h` shows them under `buff/cache`, and they count as *available*. Writes go to the cache first (dirty pages) and are flushed later or on `fsync()`; how reads, writes and flushing work is in [[storage-management]].
 - **Overcommit**: the kernel hands out more virtual memory than there is RAM, betting that not all of it will be touched (`vm.overcommit_memory`).
 
+### Reading memory in `top` and `free`
+```text
+MiB Mem :    921.9 total,    592.1 free,    109.4 used,    220.4 buff/cache
+MiB Swap:    100.0 total,    100.0 free,      0.0 used.    752.6 avail Mem
+
+  PID USER   VIRT    RES    SHR  %MEM  COMMAND
+ 1043 pi    33408   8120   6544   0.9  python3
+```
+- **used**: memory held by processes and the kernel that cannot simply be dropped. **buff/cache**: the page cache and kernel caches, which the kernel drops when applications need the RAM. **avail Mem**: how much can still be given to programs *without swapping*; this is the number to watch, not *free*.
+- **Swap**: the disk area that idle pages are written to. On a box with an in-memory database (SAP HANA, Redis) running out of RAM, more swap only postpones the failure, and slowly.
+- Per process: **VIRT** is all the virtual memory it has mapped, including reservations it never touched. **RES** is what is actually in RAM now. **SHR** is the part of RES that can be shared with other processes, such as library code and shared memory; it is *included* in RES, not added to it (the lecture was unsure). All three are in KiB by default, not bytes.
+- A process that reserves memory and never touches it costs only VIRT: pages get physical frames on first access (see page faults above).
+
 ### Memory-mapped files
 - `mmap()` maps a file into the address space: reads become page faults served from the page cache, writes become dirty pages flushed later. Kafka index files and Lucene use it; Java exposes it as `MappedByteBuffer` ([[java-nio]]).
 - Zero-copy `sendfile()` moves page-cache pages straight to a socket without copying them into user space, which is Kafka's consumer fetch path ([[kafka-architecture]]).
+
+### One allocation vs a million
+The lecture's demo: a mock 44-byte network packet (`struct` of `char` arrays for source and destination IP, ports and length), one million of them.
+
+```c
+/* alloc1.c: one malloc per packet */                /* alloc2.c: one malloc for all */
+struct packet **p = malloc(N * sizeof(*p));           struct packet *p = malloc(N * sizeof(struct packet));
+for (int i = 0; i < N; i++)                           /* packet i is p + i: the compiler      */
+    p[i] = malloc(sizeof(struct packet));             /* adds i * 44 bytes, not i bytes        */
+/* ... use, then free() a million times */            free(p);
+```
+
+| | alloc1 | alloc2 |
+|---|---|---|
+| Allocator calls | 1,000,000 `malloc` + 1,000,000 `free` | 1 + 1 |
+| Memory | 44 B data + header + padding per packet (48–64 B), plus an 8 MB pointer array | 44 MB, back to back |
+| Access | load the pointer, then jump to the block | sequential, prefetcher-friendly |
+| Time on the lecturer's Raspberry Pi | ~600 ms | ~7 ms |
+
+- `p + 1` on a `struct packet *` advances by `sizeof(struct packet)` = 44 bytes: pointer arithmetic counts elements, not bytes, and the assembly shows `add …, #44`.
+- In Java, `new Packet()` in a loop is cheap to allocate (a TLAB bump), but the objects still carry 12–16-byte headers, the array holds references to them, and the GC must trace a million objects. On a hot path, a few primitive arrays (one per field) or one `ByteBuffer` holding all the packets behave like alloc2.
+
+```anim
+malloc-many-vs-one
+```
 
 ### Limitations of virtual memory
 | Cost | Why |
@@ -165,6 +239,11 @@ redis-cow
 | | Not worth it for tiny, interrupt-driven input (keyboard, mouse): the CPU copying a few bytes is faster |
 
 - Java: `ByteBuffer.allocateDirect` is off-heap memory that does not move, so the OS can DMA into it directly; a heap `byte[]` can be moved by the GC, so the JDK copies it into a temporary direct buffer first ([[java-nio]]).
+
+- **Small input goes through the CPU.** Pressing a key puts a code in the keyboard controller's buffer and raises an interrupt; the CPU stops what it is doing, runs the keyboard's interrupt service routine in kernel mode, copies the few bytes into memory and wakes whoever is waiting for input. For a few bytes this is faster than setting up DMA. (A mouse that lags under heavy load is usually not a late interrupt, which preempts almost anything, but the GUI thread that draws the pointer not getting CPU time.)
+- **DMA attacks** are real: a malicious device on FireWire, Thunderbolt or PCIe can read or write RAM directly, for example to pull disk-encryption keys out of a locked laptop ("Thunderclap", 2019). The defence is the IOMMU (Windows calls it Kernel DMA Protection), which limits each device to the buffers the driver gave it.
+- Some NICs (SmartNICs, DPUs) go further and process packets on their own processors before anything reaches RAM.
+- Linus Torvalds has long criticised `O_DIRECT` as a badly designed interface; databases use it anyway, because they want to manage their own cache.
 
 ```anim
 dma-transfer
@@ -214,4 +293,6 @@ dmesg -T | grep -iE 'oom|killed process' | tail -3
 - Sizing a Redis host for the dataset only: `BGSAVE` and AOF rewrites need copy-on-write headroom, up to the size of the dataset on a write-heavy instance.
 - Leaving `oom_score_adj` at its default for a sidecar: the kernel may kill the main JVM (bigger RSS) instead of the leaking log shipper.
 - Default `vm.max_map_count` (65530) is too low for Elasticsearch and some JVM workloads, which create many mappings; raise it in `/etc/sysctl.d/`.
-- Related: [[anatomy-of-a-process]] for the layout of one address space, [[stack-vs-heap-memory]] for how allocation sits on top of pages, [[cpu-caches-and-cache-lines]] for the layer below the TLB, [[linux-memory-filesystems-io]] for the Linux commands.
+- Allocating millions of tiny objects or `malloc` blocks on a hot path: each pays allocator bookkeeping and a header, and they scatter in memory. Allocate in bulk, pool large buffers, or use primitive arrays.
+- Expecting new RAM to lower latency: DDR5 raises bandwidth and parallelism, but one cache-line miss still costs ~100 ns. Fewer misses beat faster DIMMs.
+- Related: [[anatomy-of-a-process]] for the layout of one address space, [[anatomy-of-a-process]] for how allocation sits on top of pages, [[cpu-caches-and-cache-lines]] for the layer below the TLB, [[linux-memory-filesystems-io]] for the Linux commands.

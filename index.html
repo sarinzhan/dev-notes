@@ -3568,6 +3568,120 @@ ANIMS["proc-maps"] = el=>{
   }});
 };
 
+// ============ 42. DRAM transfers: SDR vs DDR edges, DDR4 64-pin burst, DDR5 two subchannels, refresh stalls
+ANIMS["ddr-burst"] = el=>{
+  const ST = [
+    { t: ["SDRAM: one edge", "SDRAM: один фронт"], m: "sdr", en: "Synchronous DRAM runs on the same clock as the memory bus. Data moves once per clock cycle, on the rising edge. (Older asynchronous DRAM was not tied to the clock, so each side waited for the other.)",
+      ru: "Синхронная DRAM работает от того же тактового сигнала, что и шина памяти. Данные передаются раз за такт — по нарастающему фронту. (Старая асинхронная DRAM не была привязана к такту, и стороны ждали друг друга.)" },
+    { t: ["DDR: both edges", "DDR: оба фронта"], m: "ddr", en: "Double data rate: data moves on the rising and the falling edge, two transfers per clock with the same clock speed. DDR4-3200 means 3200 million transfers per second on a 1600 MHz clock.",
+      ru: "Double data rate: данные передаются и по нарастающему, и по спадающему фронту — две передачи за такт при той же частоте. DDR4-3200 означает 3200 миллионов передач в секунду при такте 1600 МГц." },
+    { t: ["DDR4: 64 pins × 8", "DDR4: 64 линии × 8"], m: "ddr4", en: "A DDR4 module has a 64-bit data bus. One read is a burst of 8 transfers (the 8n prefetch): 64 lines × 8 bits = 64 bytes, exactly one cache line. While it runs, the whole bus serves this one request.",
+      ru: "У модуля DDR4 шина данных 64 бита. Одно чтение — пакет из 8 передач (prefetch 8n): 64 линии × 8 бит = 64 байта, ровно одна кэш-линия. Пока он идёт, вся шина обслуживает только этот запрос." },
+    { t: ["DDR5: 2 × 32 pins × 16", "DDR5: 2 × 32 линии × 16"], m: "ddr5", en: "DDR5 doubles the prefetch to 16 but splits the module into two independent 32-bit subchannels: 32 × 16 bits = 64 bytes, still one cache line each. One request is not faster, but two cores can be served at the same time.",
+      ru: "DDR5 удваивает prefetch до 16, но делит модуль на два независимых 32-битных подканала: 32 × 16 бит = 64 байта — по-прежнему по кэш-линии на каждый. Один запрос не быстрее, зато два ядра обслуживаются одновременно." },
+    { t: ["Refresh stalls", "Простой на регенерацию"], m: "ref", en: "Capacitors leak, so the memory controller sends REFRESH commands: every row is rewritten within 64 ms. A bank that is refreshing cannot serve reads, so an unlucky access waits a little longer: one reason the same code shows slightly different timings run to run.",
+      ru: "Конденсаторы теряют заряд, поэтому контроллер памяти посылает команды REFRESH: каждая строка перезаписывается за 64 мс. Банк во время регенерации не обслуживает чтения, и невезучее обращение ждёт чуть дольше — одна из причин, почему один и тот же код от запуска к запуску даёт немного разное время." }
+  ];
+  return steppedAnim(el, { title: LL("How DRAM transfers data", "Как DRAM передаёт данные"), vb: [760, 320], steps: ST, stepMs: 6500, render(g, s, t){
+    const k = Math.min(1, t / 3000), m = s.m;
+    if(m === "sdr" || m === "ddr"){
+      const X0 = 60, CW = 80, Y = 90, H = 50, N = 8;
+      oT(g, 20, Y + 30, LL("clock", "такт"), "an-m an-b", "start");
+      let d = `M${X0} ${Y + H}`; for(let i = 0; i < N; i++){ const x = X0 + i * CW; d += ` L${x} ${Y} L${x + CW / 2} ${Y} L${x + CW / 2} ${Y + H} L${x + CW} ${Y + H}`; }
+      E(g, "path", { d, class: "an-link2", fill: "none" });
+      oT(g, 20, 215, LL("data", "данные"), "an-m an-b", "start");
+      let n = 0; const shown = Math.floor(k * N * 2);
+      for(let i = 0; i < N * 2; i++){ const rising = i % 2 === 0; if(m === "sdr" && !rising) continue; const x = X0 + (i / 2) * CW; const on = i <= shown;
+        E(g, "line", { x1: x, y1: Y - 6, x2: x, y2: 190, class: "an-link2 an-dash" }); oR(g, x - 14, 196, 28, 28, on ? "an-pg k1" : "an-box", 4); if(on) n++; }
+      oT(g, 380, 270, m === "sdr" ? LL(`${n} transfers in ${N} cycles`, `${n} передач за ${N} тактов`) : LL(`${n} transfers in ${N} cycles: double`, `${n} передач за ${N} тактов: вдвое больше`), "an-mid");
+      return;
+    }
+    if(m === "ddr4" || m === "ddr5"){
+      const cell = (x, y, on, c)=>oR(g, x, y, 12, 9, on ? "an-pg " + c : "an-box", 1);
+      if(m === "ddr4"){
+        oT(g, 380, 26, LL("one DIMM · 64 data lines · burst of 8", "один модуль · 64 линии данных · пакет из 8"), "an-m an-b");
+        const filled = Math.floor(k * 8);
+        for(let b = 0; b < 8; b++) for(let p = 0; p < 64; p++){ const x = 30 + p * 11, y = 50 + b * 13; oR(g, x, y, 9, 10, b <= filled ? "an-pg k1" : "an-box", 1); }
+        oT(g, 380, 168, LL("↓ 8 transfers, one per row", "↓ 8 передач, по строке на каждую"), "an-m");
+        oR(g, 150, 180, 120, 40, "an-reg on", 6); oT(g, 210, 205, LL("core 0: read", "ядро 0: чтение"), "an-m an-b");
+        oR(g, 490, 180, 120, 40, "an-leak", 6); oT(g, 550, 205, LL("core 1: waits", "ядро 1: ждёт"), "an-m an-b an-warn");
+        oT(g, 380, 270, "64 × 8 bit = 64 B = 1 cache line", "an-mid");
+        return;
+      }
+      oT(g, 200, 26, LL("subchannel A · 32 lines × 16", "подканал A · 32 линии × 16"), "an-m an-b"); oT(g, 565, 26, LL("subchannel B · 32 lines × 16", "подканал B · 32 линии × 16"), "an-m an-b");
+      const filled = Math.floor(k * 16);
+      for(let b = 0; b < 16; b++) for(let p = 0; p < 32; p++){ cell(30 + p * 10.6, 40 + b * 11, b <= filled, "k1"); cell(395 + p * 10.6, 40 + b * 11, b <= filled, "k2"); }
+      oR(g, 140, 232, 120, 36, "an-reg on", 6); oT(g, 200, 255, LL("core 0: read", "ядро 0: чтение"), "an-m an-b");
+      oR(g, 505, 232, 120, 36, "an-reg on", 6); oT(g, 565, 255, LL("core 1: read", "ядро 1: чтение"), "an-m an-b");
+      oT(g, 380, 300, "32 × 16 bit = 64 B   ·   32 × 16 bit = 64 B", "an-mid");
+      return;
+    }
+    // refresh
+    oT(g, 380, 26, LL("one rank: 8 banks, one row buffer each", "один ранг: 8 банков, у каждого свой буфер строки"), "an-m an-b");
+    const ref = Math.floor(t / 900) % 8;
+    for(let b = 0; b < 8; b++){ const x = 30 + b * 90, busy = b === ref;
+      oR(g, x, 50, 80, 120, busy ? "an-leak" : "an-frame", 6); oT(g, x + 40, 70, LL(`bank ${b}`, `банк ${b}`), "an-m an-b");
+      for(let r = 0; r < 5; r++) oR(g, x + 8, 82 + r * 14, 64, 10, busy && r === Math.floor(t / 180) % 5 ? "an-pg k2" : "an-box", 2);
+      oT(g, x + 40, 160, busy ? "REFRESH" : "", "an-m an-b an-warn"); }
+    const tx = 30 + ref * 90 + 40;
+    oR(g, tx - 70, 210, 140, 36, "an-reg on", 6); oT(g, tx, 233, LL("read waits ~100+ ns", "чтение ждёт ~100+ нс"), "an-m an-b");
+    E(g, "line", { x1: tx, y1: 210, x2: tx, y2: 172, class: "an-link2 on" });
+    oT(g, 380, 290, LL("every row rewritten within 64 ms", "каждая строка перезаписывается за 64 мс"), "an-mid");
+  }});
+};
+
+// ============ 43. A million mallocs vs one: headers, pointers, scattering, and time
+ANIMS["malloc-many-vs-one"] = el=>{
+  const ST = [
+    { t: ["A million mallocs", "Миллион malloc"], m: "many", en: "Program 1 allocates each 44-byte packet separately: malloc(44) a million times. Each call is a trip through the allocator, and each block gets a header (the chunk size) in front of it.",
+      ru: "Программа 1 выделяет каждый 44-байтный пакет отдельно: malloc(44) миллион раз. Каждый вызов — проход через аллокатор, и перед каждым блоком стоит заголовок (размер блока)." },
+    { t: ["Pointers and headers", "Указатели и заголовки"], m: "ptr", en: "It also needs an array of a million 8-byte pointers to find the packets. The blocks are 48–64 bytes with header and padding, and not necessarily next to each other: reading packet i means a load of the pointer, then a load from wherever the block is.",
+      ru: "Ещё нужен массив из миллиона 8-байтных указателей, чтобы находить пакеты. Блоки с заголовком и выравниванием занимают 48–64 байта и не обязательно лежат подряд: чтение пакета i — это загрузка указателя, а затем загрузка оттуда, где лежит блок." },
+    { t: ["A million frees", "Миллион free"], m: "free", en: "And at the end, free() a million times: each one reads the header and updates the allocator's free lists. Measured on the lecturer's Raspberry Pi: about 600 ms in total.",
+      ru: "А в конце — миллион вызовов free(): каждый читает заголовок и обновляет списки свободных блоков аллокатора. Измерено на Raspberry Pi автора курса: около 600 мс в сумме." },
+    { t: ["One allocation", "Одно выделение"], m: "one", en: "Program 2 makes one malloc(44 × 1,000,000): one header, packets back to back, no pointer array. packets + 1 is not +1 byte: the compiler multiplies by sizeof(packet), so it adds 44.",
+      ru: "Программа 2 делает один malloc(44 × 1 000 000): один заголовок, пакеты подряд, без массива указателей. packets + 1 — это не +1 байт: компилятор умножает на sizeof(packet), так что прибавляется 44." },
+    { t: ["Result", "Результат"], m: "res", en: "Same data, about 7 ms instead of 600 ms: one allocator call instead of two million, and sequential memory that the cache and prefetcher love. In Java the equivalent is preferring primitive arrays or one ByteBuffer to millions of small objects on a hot path.",
+      ru: "Те же данные, около 7 мс вместо 600 мс: один вызов аллокатора вместо двух миллионов и последовательная память, которую любят кэш и предвыборка. В Java аналог — на горячем пути предпочитать массивы примитивов или один ByteBuffer миллионам мелких объектов." }
+  ];
+  return steppedAnim(el, { title: LL("A million mallocs vs one", "Миллион malloc против одного"), vb: [760, 320], steps: ST, stepMs: 6500, render(g, s, t){
+    const k = Math.min(1, t / 3000), m = s.m, L = E(g, "g", {});
+    const many = m === "many" || m === "ptr" || m === "free";
+    if(many || m === "res"){
+      const Y = m === "res" ? 40 : 70;
+      oT(g, 20, Y - 12, LL("program 1: heap", "программа 1: куча"), "an-m an-b", "start");
+      const order = [0, 3, 1, 5, 2, 4, 6, 8, 7];
+      const shown = m === "many" ? Math.ceil(k * 9) : 9;
+      for(let i = 0; i < 9; i++){ const x = 20 + i * 80, idx = order[i], vis = idx < shown, freed = m === "free" && idx < Math.ceil(k * 9);
+        if(!vis) { oR(g, x, Y, 72, 34, "an-box", 4); continue; }
+        oR(g, x, Y, 14, 34, freed ? "an-free" : "an-pg k3", 3); oR(g, x + 16, Y, 50, 34, freed ? "an-free" : "an-pg k1", 3); oT(g, x + 41, Y + 22, `p${idx}`, "an-m an-b");
+      }
+      oT(g, 740, Y - 12, LL("▮ header  ▮ 44-byte packet (+ padding)", "▮ заголовок  ▮ пакет 44 байта (+ выравнивание)"), "an-m", "end");
+      if(m === "ptr" || m === "free"){
+        oT(g, 20, 168, LL("pointer array (8 B each)", "массив указателей (по 8 B)"), "an-m an-b", "start");
+        for(let i = 0; i < 9; i++){ const x = 20 + i * 80; oR(g, x, 178, 72, 26, "an-reg" + (i === Math.floor(k * 9) % 9 ? " on" : ""), 4); oT(g, x + 36, 196, `ptr[${i}]`, "an-m");
+          const j = order.indexOf(i); E(L, "line", { x1: x + 36, y1: 178, x2: 20 + j * 80 + 41, y2: Y + 34, class: i === Math.floor(k * 9) % 9 ? "an-link2 on" : "an-link2" }); }
+      }
+      if(m === "many") oT(g, 380, 240, LL(`malloc() calls: ${Math.round(k * 1e6).toLocaleString("en-US")}`, `вызовов malloc(): ${Math.round(k * 1e6).toLocaleString("en-US")}`), "an-mid");
+      if(m === "free") oT(g, 380, 250, LL(`free() calls: ${Math.round(k * 1e6).toLocaleString("en-US")}  ·  ~600 ms`, `вызовов free(): ${Math.round(k * 1e6).toLocaleString("en-US")}  ·  ~600 мс`), "an-mid");
+      if(m !== "res") return;
+    }
+    const Y2 = m === "res" ? 170 : 90;
+    oT(g, 20, Y2 - 12, LL("program 2: one block", "программа 2: один блок"), "an-m an-b", "start");
+    oR(g, 20, Y2, 14, 34, "an-pg k3", 3);
+    for(let i = 0; i < 12; i++){ const x = 36 + i * 58; oR(g, x, Y2, 56, 34, "an-pg k1", 3); oT(g, x + 28, Y2 + 22, `p${i}`, "an-m an-b"); }
+    if(m === "one"){
+      const i = Math.floor(k * 11); const x = 36 + i * 58 + 28;
+      E(g, "polygon", { points: `${x - 6},${Y2 + 52} ${x + 6},${Y2 + 52} ${x},${Y2 + 40}`, class: "an-dot an-flow" });
+      oT(g, x, Y2 + 70, `packets + ${i}  =  base + ${i * 44}`, "an-code");
+      oT(g, 380, 250, LL("malloc() calls: 1  ·  free() calls: 1", "вызовов malloc(): 1  ·  вызовов free(): 1"), "an-mid");
+      return;
+    }
+    oR(g, 120, 260, 220, 40, "an-leak", 6); oT(g, 230, 285, LL("program 1: ~600 ms", "программа 1: ~600 мс"), "an-m an-b an-warn");
+    oR(g, 420, 260, 220, 40, "an-reg on", 6); oT(g, 530, 285, LL("program 2: ~7 ms", "программа 2: ~7 мс"), "an-m an-b");
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
