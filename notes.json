@@ -1276,6 +1276,7 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/algorithms/big-o-and-complexity.md",
    "links": [
+    "anatomy-of-a-process",
     "arrays-and-dynamic-arrays",
     "binary-search-and-variants",
     "bit-manipulation",
@@ -1287,7 +1288,6 @@
     "interview-problem-patterns",
     "recursion-and-backtracking",
     "sorting-algorithms",
-    "stack-vs-heap-memory",
     "stream-api",
     "strings-and-string-pool",
     "topological-sort-and-union-find",
@@ -1365,6 +1365,7 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/algorithms/dynamic-programming.md",
    "links": [
+    "anatomy-of-a-process",
     "big-o-and-complexity",
     "binary-search-and-variants",
     "bit-manipulation",
@@ -1372,8 +1373,7 @@
     "greedy-algorithms",
     "interview-problem-patterns",
     "query-planning-and-execution",
-    "recursion-and-backtracking",
-    "stack-vs-heap-memory"
+    "recursion-and-backtracking"
    ],
    "words": 964,
    "ru": "notes-ru/computer-science/algorithms/dynamic-programming.md",
@@ -1530,6 +1530,7 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/algorithms/recursion-and-backtracking.md",
    "links": [
+    "anatomy-of-a-process",
     "big-o-and-complexity",
     "binary-search-and-variants",
     "dynamic-programming",
@@ -1540,7 +1541,6 @@
     "linked-lists",
     "maven",
     "sorting-algorithms",
-    "stack-vs-heap-memory",
     "stacks-and-queues",
     "temporal-concepts",
     "trees-and-bst"
@@ -1621,12 +1621,12 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/algorithms/stack-and-monotonic-stack.md",
    "links": [
+    "anatomy-of-a-process",
     "big-o-and-complexity",
     "casting-and-autoboxing",
     "collections-framework",
     "interview-problem-patterns",
     "recursion-and-backtracking",
-    "stack-vs-heap-memory",
     "stacks-and-queues",
     "two-pointers-and-sliding-window"
    ],
@@ -2051,6 +2051,7 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/data-structures/arrays-and-dynamic-arrays.md",
    "links": [
+    "anatomy-of-a-process",
     "big-o-and-complexity",
     "binary-search-and-variants",
     "collections-framework",
@@ -2063,7 +2064,6 @@
     "linked-lists",
     "prefix-sums-and-intervals",
     "primitives-and-wrappers",
-    "stack-vs-heap-memory",
     "stacks-and-queues",
     "two-pointers-and-sliding-window"
    ],
@@ -2303,6 +2303,7 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/data-structures/stacks-and-queues.md",
    "links": [
+    "anatomy-of-a-process",
     "arrays-and-dynamic-arrays",
     "backpressure-and-flow-control",
     "collections-framework",
@@ -2314,8 +2315,7 @@
     "heaps-and-priority-queues",
     "linked-lists",
     "message-queues-and-streams",
-    "stack-and-monotonic-stack",
-    "stack-vs-heap-memory"
+    "stack-and-monotonic-stack"
    ],
    "words": 844,
    "ru": "notes-ru/computer-science/data-structures/stacks-and-queues.md",
@@ -2336,6 +2336,7 @@
    "learned": "2026-10-27",
    "path": "notes/computer-science/data-structures/trees-and-bst.md",
    "links": [
+    "anatomy-of-a-process",
     "binary-search-and-variants",
     "collections-framework",
     "column-and-wide-column-stores",
@@ -2350,7 +2351,6 @@
     "prefix-sums-and-intervals",
     "query-planning-and-execution",
     "recursion-and-backtracking",
-    "stack-vs-heap-memory",
     "stacks-and-queues",
     "tries"
    ],
@@ -2403,23 +2403,30 @@
    ],
    "learned": "2026-10-27",
    "order": 3,
+   "aliases": [
+    "stack-vs-heap-memory"
+   ],
    "path": "notes/computer-science/operating-systems/anatomy-of-a-process.md",
    "links": [
     "compilation-interpretation-jit",
     "cpu",
     "cpu-caches-and-cache-lines",
     "docker-containers-and-resources",
+    "docker-fundamentals",
     "garbage-collection",
     "hikaricp-pool-sizing",
+    "jpa-entities-and-relationships",
     "jvm-memory-areas",
     "memory-management",
+    "operating-system-introduction",
     "process-management",
     "race-conditions-and-critical-sections",
+    "recursion-and-backtracking",
     "signals-and-process-lifecycle",
-    "stack-vs-heap-memory",
+    "spring-aop",
     "virtual-threads"
    ],
-   "words": 3448,
+   "words": 6880,
    "ru": "notes-ru/computer-science/operating-systems/anatomy-of-a-process.md",
    "title_ru": "Процесс"
   },
@@ -2601,7 +2608,6 @@
     "process-management",
     "redis-patterns-and-persistence",
     "signals-and-process-lifecycle",
-    "stack-vs-heap-memory",
     "storage-management"
    ],
    "words": 3580,
@@ -2790,35 +2796,6 @@
    "words": 4005,
    "ru": "notes-ru/computer-science/operating-systems/socket-management.md",
    "title_ru": "Управление сокетами"
-  },
-  {
-   "id": "stack-vs-heap-memory",
-   "sec": "computer-science",
-   "sub": "operating-systems",
-   "title": "Stack vs heap memory",
-   "tags": [
-    "operating-systems",
-    "memory",
-    "stack",
-    "heap"
-   ],
-   "learned": "2026-10-27",
-   "path": "notes/computer-science/operating-systems/stack-vs-heap-memory.md",
-   "links": [
-    "cpu-caches-and-cache-lines",
-    "garbage-collection",
-    "jpa-entities-and-relationships",
-    "jvm-memory-areas",
-    "lock-free-and-cas",
-    "memory-management",
-    "process-management",
-    "recursion-and-backtracking",
-    "spring-aop",
-    "virtual-threads"
-   ],
-   "words": 970,
-   "ru": "notes-ru/computer-science/operating-systems/stack-vs-heap-memory.md",
-   "title_ru": "Стек и куча"
   },
   {
    "id": "storage-management",

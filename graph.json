@@ -1008,18 +1008,6 @@
    ]
   },
   {
-   "id": "stack-vs-heap-memory",
-   "sec": "computer-science",
-   "sub": "operating-systems",
-   "title": "Stack vs heap memory",
-   "tags": [
-    "operating-systems",
-    "memory",
-    "stack",
-    "heap"
-   ]
-  },
-  {
    "id": "storage-management",
    "sec": "computer-science",
    "sub": "operating-systems",
@@ -3858,6 +3846,14 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "arrays-and-dynamic-arrays"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "big-o-and-complexity"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "compilation-interpretation-jit"
   },
   {
@@ -3874,11 +3870,23 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "docker-fundamentals"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "dynamic-programming"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "garbage-collection"
   },
   {
    "source": "anatomy-of-a-process",
    "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "jpa-entities-and-relationships"
   },
   {
    "source": "anatomy-of-a-process",
@@ -3910,11 +3918,27 @@
   },
   {
    "source": "anatomy-of-a-process",
+   "target": "recursion-and-backtracking"
+  },
+  {
+   "source": "anatomy-of-a-process",
    "target": "signals-and-process-lifecycle"
   },
   {
    "source": "anatomy-of-a-process",
-   "target": "stack-vs-heap-memory"
+   "target": "spring-aop"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "stack-and-monotonic-stack"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "stacks-and-queues"
+  },
+  {
+   "source": "anatomy-of-a-process",
+   "target": "trees-and-bst"
   },
   {
    "source": "anatomy-of-a-process",
@@ -4395,10 +4419,6 @@
   {
    "source": "arrays-and-dynamic-arrays",
    "target": "primitives-and-wrappers"
-  },
-  {
-   "source": "arrays-and-dynamic-arrays",
-   "target": "stack-vs-heap-memory"
   },
   {
    "source": "arrays-and-dynamic-arrays",
@@ -4951,10 +4971,6 @@
   {
    "source": "big-o-and-complexity",
    "target": "stack-and-monotonic-stack"
-  },
-  {
-   "source": "big-o-and-complexity",
-   "target": "stack-vs-heap-memory"
   },
   {
    "source": "big-o-and-complexity",
@@ -6415,10 +6431,6 @@
   {
    "source": "cpu-caches-and-cache-lines",
    "target": "process-management"
-  },
-  {
-   "source": "cpu-caches-and-cache-lines",
-   "target": "stack-vs-heap-memory"
   },
   {
    "source": "cqrs",
@@ -8154,10 +8166,6 @@
   },
   {
    "source": "dynamic-programming",
-   "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "dynamic-programming",
    "target": "string-algorithms"
   },
   {
@@ -8963,10 +8971,6 @@
   {
    "source": "garbage-collection",
    "target": "reference-types"
-  },
-  {
-   "source": "garbage-collection",
-   "target": "stack-vs-heap-memory"
   },
   {
    "source": "garbage-collection",
@@ -10258,10 +10262,6 @@
   },
   {
    "source": "jpa-entities-and-relationships",
-   "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "jpa-entities-and-relationships",
    "target": "value-objects-and-entities"
   },
   {
@@ -10451,10 +10451,6 @@
   {
    "source": "jvm-memory-areas",
    "target": "reference-types"
-  },
-  {
-   "source": "jvm-memory-areas",
-   "target": "stack-vs-heap-memory"
   },
   {
    "source": "jvm-memory-areas",
@@ -11113,10 +11109,6 @@
    "target": "rate-limiting"
   },
   {
-   "source": "lock-free-and-cas",
-   "target": "stack-vs-heap-memory"
-  },
-  {
    "source": "locks-and-lock-free",
    "target": "mutex-semaphore-monitor"
   },
@@ -11219,10 +11211,6 @@
   {
    "source": "memory-management",
    "target": "signals-and-process-lifecycle"
-  },
-  {
-   "source": "memory-management",
-   "target": "stack-vs-heap-memory"
   },
   {
    "source": "memory-management",
@@ -12194,10 +12182,6 @@
   },
   {
    "source": "process-management",
-   "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "process-management",
    "target": "storage-management"
   },
   {
@@ -12351,10 +12335,6 @@
   {
    "source": "recursion-and-backtracking",
    "target": "stack-and-monotonic-stack"
-  },
-  {
-   "source": "recursion-and-backtracking",
-   "target": "stack-vs-heap-memory"
   },
   {
    "source": "recursion-and-backtracking",
@@ -12714,10 +12694,6 @@
   },
   {
    "source": "spring-aop",
-   "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "spring-aop",
    "target": "structural-patterns"
   },
   {
@@ -12930,10 +12906,6 @@
   },
   {
    "source": "stack-and-monotonic-stack",
-   "target": "stack-vs-heap-memory"
-  },
-  {
-   "source": "stack-and-monotonic-stack",
    "target": "stacks-and-queues"
   },
   {
@@ -12943,18 +12915,6 @@
   {
    "source": "stack-and-monotonic-stack",
    "target": "two-pointers-and-sliding-window"
-  },
-  {
-   "source": "stack-vs-heap-memory",
-   "target": "stacks-and-queues"
-  },
-  {
-   "source": "stack-vs-heap-memory",
-   "target": "trees-and-bst"
-  },
-  {
-   "source": "stack-vs-heap-memory",
-   "target": "virtual-threads"
   },
   {
    "source": "stacks-and-queues",

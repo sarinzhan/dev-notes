@@ -3451,6 +3451,123 @@ ANIMS["http-request-journey"] = el=>{
   }});
 };
 
+// ============ 40. Compiling and linking: object files, static vs dynamic linking, the dynamic loader, a missing library
+ANIMS["linking-static-dynamic"] = el=>{
+  const ST = [
+    { t: ["Compile each file", "Компиляция файлов"], m: "compile",
+      en: "The compiler turns each source file into an object file (.o) of machine code for one CPU. Calls to functions in other files, like printf or SSL_connect, are left as unresolved symbols.",
+      ru: "Компилятор превращает каждый исходный файл в объектный файл (.o) с машинным кодом для одного CPU. Вызовы функций из других файлов, например printf или SSL_connect, остаются неразрешёнными символами." },
+    { t: ["Libraries", "Библиотеки"], m: "libs",
+      en: "The libraries you use (libc for printf and malloc, libssl for TLS) are compiled for the same CPU, available as a static archive (.a) or a shared object (.so; .dll on Windows).",
+      ru: "Библиотеки, которые вы используете (libc для printf и malloc, libssl для TLS), скомпилированы под тот же CPU и есть в виде статического архива (.a) или разделяемого объекта (.so; .dll в Windows)." },
+    { t: ["Static linking", "Статическая линковка"], m: "static",
+      en: "The linker resolves every symbol and copies all the code it needs, yours and the libraries', into one ELF file. Big, but self-contained: copy it to any machine with the same CPU and OS and it runs. Go binaries and GraalVM native images work this way.",
+      ru: "Линкер разрешает все символы и копирует весь нужный код — ваш и библиотечный — в один ELF-файл. Большой, но самодостаточный: скопируйте на любую машину с тем же CPU и ОС, и он запустится. Так работают бинарники Go и нативные образы GraalVM." },
+    { t: ["Dynamic linking", "Динамическая линковка"], m: "dyn",
+      en: "Or the linker copies only your code and writes a list of the shared libraries (with versions) the program needs. The file is small, and one copy of libc on disk and in RAM serves every program.",
+      ru: "Или линкер копирует только ваш код и записывает список нужных программе разделяемых библиотек (с версиями). Файл маленький, а одна копия libc на диске и в RAM обслуживает все программы." },
+    { t: ["Start: the loader", "Запуск: загрузчик"], m: "load",
+      en: "At exec, the kernel maps the program and its interpreter, ld-linux.so. The loader finds each needed library on disk, maps it into the process and patches the calls. `ldd ./app` shows the list.",
+      ru: "При exec ядро отображает программу и её интерпретатор ld-linux.so. Загрузчик находит каждую нужную библиотеку на диске, отображает её в процесс и подставляет адреса вызовов. `ldd ./app` показывает список." },
+    { t: ["Library missing", "Нет библиотеки"], m: "miss",
+      en: "Copy only the small file to a machine without libssl.so.3 and it fails before main: \"error while loading shared libraries\" (on Windows, \"DLL not found\"). Docker images exist largely to ship the program together with its libraries.",
+      ru: "Скопируйте только маленький файл на машину без libssl.so.3, и он упадёт ещё до main: «error while loading shared libraries» (в Windows — «DLL not found»). Docker-образы во многом существуют, чтобы поставлять программу вместе с её библиотеками." }
+  ];
+  const box = (g, x, y, w, h, cls, lab, sub)=>{ oR(g, x, y, w, h, cls, 6); oT(g, x + w / 2, y + (sub ? h / 2 - 1 : h / 2 + 4), lab, "an-m an-b"); if(sub) oT(g, x + w / 2, y + h / 2 + 12, sub, "an-m"); };
+  return steppedAnim(el, { title: LL("Compiling and linking", "Компиляция и линковка"), vb: [760, 330], steps: ST, stepMs: 6500, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1600)), m = s.m, L = E(g, "g", {});
+    const ln = (a, b, on)=>E(L, "line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], class: on ? "an-link2 on" : "an-link2" });
+    const dot = (P)=>{ const [x, y] = polyAt(P, k); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); };
+    oT(g, 70, 30, LL("source", "исходники"), "an-m an-b"); oT(g, 220, 30, LL("object files", "объектные файлы"), "an-m an-b");
+    box(g, 20, 50, 100, 40, "an-box", "main.c"); box(g, 20, 110, 100, 40, "an-box", "util.c");
+    const objOn = m === "compile";
+    box(g, 170, 50, 100, 40, objOn ? "an-reg on" : "an-box", "main.o", LL("? printf", "? printf")); box(g, 170, 110, 100, 40, objOn ? "an-reg on" : "an-box", "util.o", LL("? SSL_connect", "? SSL_connect"));
+    ln([120, 70], [170, 70], objOn); ln([120, 130], [170, 130], objOn);
+    if(m === "compile"){ dot([[120, 70], [170, 70]]); }
+    if(m !== "compile"){
+      oT(g, 220, 192, LL("libraries", "библиотеки"), "an-m an-b");
+      box(g, 170, 202, 100, 40, m === "libs" ? "an-reg on" : "an-box", "libc", ".a / .so"); box(g, 170, 254, 100, 40, m === "libs" ? "an-reg on" : "an-box", "libssl", ".a / .so");
+    }
+    if(m === "compile" || m === "libs") return;
+    const linkOn = m === "static" || m === "dyn";
+    box(g, 320, 120, 100, 60, linkOn ? "an-reg on" : "an-box", LL("linker", "линкер"), "ld, lld, mold");
+    [[270, 70], [270, 130], [270, 222], [270, 274]].forEach(p => ln(p, [320, 150], linkOn));
+    if(m === "static"){
+      oR(g, 480, 40, 250, 240, "an-frame", 10); oT(g, 605, 32, LL("app (static ELF) · 2.4 MB", "app (статический ELF) · 2.4 MB"), "an-m an-b");
+      [["main + util", "k0"], ["printf, malloc… (libc)", "k1"], ["SSL_connect… (libssl)", "k2"]].forEach(([lab, c], i)=>{ oR(g, 500, 60 + i * 70, 210, 56, "an-pg " + c, 6); oT(g, 605, 92 + i * 70, lab, "an-m an-b"); });
+      ln([420, 150], [480, 150], true); dot([[270, 274], [320, 150], [480, 150]]);
+      return;
+    }
+    // dynamic: small app file
+    const appY = 40;
+    oR(g, 480, appY, 250, 92, m === "dyn" ? "an-reg on" : "an-frame", 10); oT(g, 605, appY - 8, LL("app (dynamic ELF) · 18 KB", "app (динамический ELF) · 18 KB"), "an-m an-b");
+    oR(g, 496, appY + 12, 90, 34, "an-pg k0", 5); oT(g, 541, appY + 33, "main + util", "an-m an-b");
+    oT(g, 600, appY + 26, "NEEDED:", "an-m an-b", "start"); oT(g, 600, appY + 44, "libc.so.6", "an-code", "start"); oT(g, 600, appY + 62, "libssl.so.3", "an-code" + (m === "miss" ? " an-warn" : ""), "start");
+    oT(g, 496, appY + 80, LL("interp: ld-linux.so", "interp: ld-linux.so"), "an-m", "start");
+    ln([420, 150], [480, 90], m === "dyn"); if(m === "dyn") dot([[270, 70], [320, 150], [480, 90]]);
+    if(m === "dyn"){ oT(g, 605, 170, LL("library code is NOT copied in", "код библиотек НЕ копируется"), "an-m an-b an-sp"); return; }
+    // process at start
+    oR(g, 480, 160, 250, 140, "an-frame", 10); oT(g, 605, 154, m === "miss" ? LL("another machine: process at exec", "другая машина: процесс при exec") : LL("process after exec", "процесс после exec"), "an-m an-b");
+    oR(g, 496, 172, 218, 26, "an-pg k0", 5); oT(g, 605, 189, "app: main + util", "an-m an-b");
+    oR(g, 496, 204, 218, 26, "an-reg on", 5); oT(g, 605, 221, "ld-linux.so (loader)", "an-m an-b");
+    oR(g, 496, 236, 218, 26, "an-pg k1", 5); oT(g, 605, 253, "libc.so.6", "an-m an-b");
+    if(m === "load"){
+      oR(g, 496, 268, 218, 26, "an-pg k2", 5); oT(g, 605, 285, "libssl.so.3", "an-m an-b");
+      oT(g, 410, 244, LL("disk: /usr/lib/…", "диск: /usr/lib/…"), "an-m an-b"); ln([440, 252], [496, 281], true); dot([[440, 252], [496, 281]]);
+    } else {
+      oR(g, 496, 268, 218, 26, "an-leak", 5); oT(g, 605, 285, LL("libssl.so.3: not found", "libssl.so.3: не найдена"), "an-m an-b an-warn");
+      oT(g, 405, 236, "error while loading", "an-m an-b an-warn"); oT(g, 405, 252, "shared libraries", "an-m an-b an-warn");
+    }
+  }});
+};
+
+// ============ 41. Reading /proc/<pid>/maps: each line is one region of the process layout
+ANIMS["proc-maps"] = el=>{
+  const ROWS = [
+    { a: "5600a000-5600b000", p: "r-xp", f: "/home/pi/high_cpu", reg: "text" },
+    { a: "5601a000-5601b000", p: "r--p", f: "/home/pi/high_cpu", reg: "ro" },
+    { a: "5601b000-5601c000", p: "rw-p", f: "/home/pi/high_cpu", reg: "data" },
+    { a: "5602c000-5604d000", p: "rw-p", f: "[heap]", reg: "heap" },
+    { a: "7f8a1000-7f9f6000", p: "r-xp", f: "/usr/lib/…/libc.so.6", reg: "libc" },
+    { a: "7f9f6000-7f9fa000", p: "rw-p", f: "/usr/lib/…/libc.so.6", reg: "libcd" },
+    { a: "7ffc2000-7ffe3000", p: "rw-p", f: "[stack]", reg: "stack" }
+  ];
+  const ST = [
+    { t: ["Text", "Код"], row: 0, en: "r-xp: readable and executable, not writable. This is the machine code of the program, mapped straight from the executable file. 0x5600b000 − 0x5600a000 = 0x1000 = 4 KiB.",
+      ru: "r-xp: чтение и выполнение, без записи. Это машинный код программы, отображённый прямо из исполняемого файла. 0x5600b000 − 0x5600a000 = 0x1000 = 4 KiB." },
+    { t: ["Read-only data", "Данные только для чтения"], row: 1, en: "r--p from the same file: constants and string literals (.rodata). Readable only; writing here crashes with SIGSEGV.",
+      ru: "r--p из того же файла: константы и строковые литералы (.rodata). Только чтение; запись сюда падает с SIGSEGV." },
+    { t: ["Data", "Данные"], row: 2, en: "rw-p from the same file: initialised globals and statics. One int needs 4 bytes, yet the mapping is 4 KiB: memory is mapped in whole pages. 'p' means private: writes are copy-on-write and never reach the file.",
+      ru: "rw-p из того же файла: инициализированные глобальные и статические переменные. Одному int нужно 4 байта, а отображение — 4 KiB: память отображается целыми страницами. «p» значит private: записи идут через copy-on-write и не попадают в файл." },
+    { t: ["Heap", "Куча"], row: 3, en: "[heap]: no file behind it, it is built while the program runs. malloc extends it with brk; here 0x21000 = 132 KiB. Large allocations get their own anonymous mappings instead.",
+      ru: "[heap]: за ней нет файла, она строится во время работы программы. malloc расширяет её через brk; здесь 0x21000 = 132 KiB. Крупные выделения получают вместо этого собственные анонимные отображения." },
+    { t: ["Shared library", "Разделяемая библиотека"], row: 4, en: "libc.so.6, mapped by the dynamic loader at start: its code (r-xp) is shared in RAM by every process that uses libc. Its data (next line, rw-p) is private to this process.",
+      ru: "libc.so.6, отображённая динамическим загрузчиком при запуске: её код (r-xp) в RAM общий для всех процессов, использующих libc. Её данные (следующая строка, rw-p) у каждого процесса свои." },
+    { t: ["Stack", "Стек"], row: 6, en: "[stack]: the main thread's stack near the top of the user address space, growing down. Other threads' stacks appear as separate anonymous mappings.",
+      ru: "[stack]: стек главного потока у верхней границы пользовательского адресного пространства, растёт вниз. Стеки других потоков видны как отдельные анонимные отображения." }
+  ];
+  const REG = { stack: [40, 34, ["stack ↓", "стек ↓"], "k3"], libcd: [92, 20, ["libc data", "данные libc"], "k1"], libc: [114, 36, ["libc code", "код libc"], "k1"], heap: [196, 34, ["heap ↑", "куча ↑"], "k2"], data: [232, 20, ["data", "data"], "k0"], ro: [254, 20, ["rodata", "rodata"], "k0"], text: [276, 24, ["text", "text"], "k0"] };
+  return steppedAnim(el, { title: LL("Reading /proc/<pid>/maps", "Читаем /proc/<pid>/maps"), vb: [760, 320], steps: ST, stepMs: 6000, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1200)), L = E(g, "g", {});
+    oT(g, 14, 22, "$ cat /proc/13503/maps", "an-code", "start");
+    oT(g, 14, 44, LL("address range", "диапазон адресов"), "an-m an-b", "start"); oT(g, 180, 44, LL("perms", "права"), "an-m an-b", "start"); oT(g, 232, 44, LL("file", "файл"), "an-m an-b", "start");
+    ROWS.forEach((r, i)=>{
+      const y = 70 + i * 30, on = i === s.row || (s.row === 4 && i === 5);
+      if(on) oR(g, 8, y - 16, 450, 24, "an-rowhl", 5);
+      oT(g, 14, y, r.a, "an-code", "start"); oT(g, 180, y, r.p, "an-code" + (on ? " an-b" : ""), "start"); oT(g, 232, y, r.f, "an-code" + (on ? "" : " c"), "start");
+    });
+    // layout column
+    const X = 560, W = 150;
+    oT(g, X + W / 2, 24, LL("process layout", "раскладка процесса"), "an-m an-b"); oT(g, X - 8, 40, LL("high", "старшие"), "an-m", "end"); oT(g, X - 8, 300, LL("low", "младшие"), "an-m", "end");
+    oR(g, X, 34, W, 272, "an-frame", 6);
+    for(const r in REG){ const [y, h, lab, c] = REG[r]; const on = ROWS[s.row].reg === r || (s.row === 4 && r === "libcd"); oR(g, X + 6, y, W - 12, h, on ? "an-reg on" : "an-pg " + c + " dim", 4); oT(g, X + W / 2, y + h / 2 + 4, LL(...lab), "an-m an-b"); }
+    oT(g, X + W / 2, 170, "· · ·", "an-m"); oT(g, X + W / 2, 84, "· · ·", "an-m");
+    const reg = REG[ROWS[s.row].reg], y0 = 70 + s.row * 30 - 4, y1 = reg[0] + reg[1] / 2;
+    E(L, "path", { d: `M458 ${y0} C 510 ${y0}, 510 ${y1}, ${X + 6} ${y1}`, class: "an-link2 on" });
+    const P = [[458, y0], [X + 6, y1]]; const [dx, dy] = polyAt(P, k); E(g, "circle", { cx: dx, cy: dy, r: 5, class: "an-dot an-flow" });
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
