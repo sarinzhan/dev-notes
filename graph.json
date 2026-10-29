@@ -11730,6 +11730,14 @@
   },
   {
    "source": "operating-system-architecture",
+   "target": "socket-management"
+  },
+  {
+   "source": "operating-system-architecture",
+   "target": "storage-management"
+  },
+  {
+   "source": "operating-system-architecture",
    "target": "syscalls-and-file-descriptors"
   },
   {

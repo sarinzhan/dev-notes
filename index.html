@@ -3374,6 +3374,83 @@ ANIMS["kernel-entries"] = el=>{
   }});
 };
 
+// ============ 39. One HTTP request through the layers: NIC, interrupt, TCP/IP, socket, epoll, Tomcat, controller, JDBC, Postgres, response
+ANIMS["http-request-journey"] = el=>{
+  const ST = [
+    { t: ["Packet arrives", "Пакет приходит"], path: ["client", "nic"], on: ["nic"], sc: 0, irq: 0, mode: "hw",
+      en: "The client sends GET /orders/42. The bytes arrive at the network card as a frame. The card copies it into a ring buffer in RAM by itself (DMA), without the CPU. No code of yours or the kernel's has run yet.",
+      ru: "Клиент отправляет GET /orders/42. Байты приходят на сетевую карту в виде кадра. Карта сама копирует его в кольцевой буфер в RAM (DMA), без участия процессора. Ни ваш код, ни код ядра ещё не выполнялись." },
+    { t: ["Interrupt, TCP/IP", "Прерывание, TCP/IP"], path: ["nic", "tcp", "sock"], on: ["nic", "tcp", "sock"], sc: 0, irq: 1, mode: "kernel",
+      en: "The card raises an interrupt. The CPU stops what it was doing and runs the driver and the kernel's network stack: check the checksum, match the TCP connection, put the bytes in that socket's receive buffer and send the ACK. All of this is kernel code.",
+      ru: "Карта генерирует прерывание. Процессор прерывает текущую работу и выполняет драйвер и сетевой стек ядра: проверяет контрольную сумму, находит TCP-соединение, кладёт байты в буфер приёма этого сокета и отправляет ACK. Всё это код ядра." },
+    { t: ["epoll wakes Tomcat", "epoll будит Tomcat"], path: ["sock", "epoll", "tomcat"], on: ["sock", "epoll", "tomcat"], sc: 1, irq: 1, mode: "kernel",
+      en: "Tomcat's poller thread is asleep inside epoll_wait(). The socket is now readable, so the kernel marks the thread runnable; the scheduler runs it, and the system call returns to user mode with the list of ready sockets.",
+      ru: "Поток-поллер Tomcat спит внутри epoll_wait(). Сокет стал готов к чтению, поэтому ядро помечает поток готовым к запуску; планировщик запускает его, и системный вызов возвращается в режим пользователя со списком готовых сокетов." },
+    { t: ["read() and your controller", "read() и ваш контроллер"], path: ["sock", "tomcat", "ctrl"], on: ["tomcat", "ctrl"], sc: 2, irq: 1, mode: "user",
+      en: "A worker thread calls read(): one more trip into the kernel, which copies the bytes from the receive buffer into the JVM's memory. Tomcat parses the HTTP request, and Spring calls your controller. Only now does your code run.",
+      ru: "Рабочий поток вызывает read(): ещё один заход в ядро, которое копирует байты из буфера приёма в память JVM. Tomcat разбирает HTTP-запрос, и Spring вызывает ваш контроллер. Только сейчас выполняется ваш код." },
+    { t: ["Query to Postgres", "Запрос в Postgres"], path: ["ctrl", "jdbc", "dbsock", "nic", "pg"], on: ["ctrl", "jdbc", "dbsock", "nic"], sc: 4, irq: 1, mode: "kernel", block: true,
+      en: "Your code runs SELECT. The JDBC driver write()s the query to the database socket: the kernel copies it to the send buffer, builds TCP/IP packets and hands them to the card. Then the driver calls read() and the thread sleeps in the kernel, using no CPU.",
+      ru: "Ваш код выполняет SELECT. Драйвер JDBC делает write() запроса в сокет базы данных: ядро копирует его в буфер отправки, собирает TCP/IP-пакеты и передаёт их карте. Затем драйвер вызывает read(), и поток засыпает в ядре, не тратя процессор." },
+    { t: ["Reply wakes the thread", "Ответ будит поток"], path: ["pg", "nic", "tcp", "dbsock", "jdbc", "ctrl"], on: ["nic", "tcp", "dbsock", "jdbc", "ctrl"], sc: 4, irq: 2, mode: "user",
+      en: "Postgres answers. Again: card, DMA, interrupt, TCP/IP stack, the DB socket's receive buffer. The kernel wakes the sleeping thread; read() returns with the rows, and the controller builds the response object.",
+      ru: "Postgres отвечает. Снова: карта, DMA, прерывание, стек TCP/IP, буфер приёма сокета БД. Ядро будит спящий поток; read() возвращается со строками, и контроллер собирает объект ответа." },
+    { t: ["Response to the client", "Ответ клиенту"], path: ["ctrl", "tomcat", "sock", "tcp", "nic", "client"], on: ["ctrl", "tomcat", "sock", "tcp", "nic"], sc: 5, irq: 2, mode: "kernel",
+      en: "Tomcat serialises the JSON and calls write() on the client socket. The kernel copies it into the send buffer and write() returns at once; the network stack and the card send the packets, and the bytes stay in the buffer until the client ACKs them.",
+      ru: "Tomcat сериализует JSON и вызывает write() на сокете клиента. Ядро копирует его в буфер отправки, и write() сразу возвращается; сетевой стек и карта отправляют пакеты, а байты остаются в буфере, пока клиент их не подтвердит." },
+    { t: ["Who did the work", "Кто сделал работу"], path: null, on: ["ctrl"], sc: 5, irq: 2, mode: "sum",
+      en: "Your code ran in one box. The kernel handled two interrupts and at least five system calls; each crossing of the dashed line costs a few hundred nanoseconds, plus two copies of every byte. That is why fewer, larger IO calls and connection pools matter.",
+      ru: "Ваш код выполнялся в одном блоке. Ядро обработало два прерывания и не меньше пяти системных вызовов; каждое пересечение пунктирной линии стоит несколько сотен наносекунд, плюс две копии каждого байта. Поэтому важны меньшее число более крупных вызовов ввода-вывода и пулы соединений." }
+  ];
+  const B = {
+    tomcat: [130, 52, 150, 50, ["Tomcat thread", "поток Tomcat"]],
+    ctrl:   [305, 52, 150, 50, ["your controller", "ваш контроллер"]],
+    jdbc:   [480, 52, 150, 50, ["JDBC driver", "драйвер JDBC"]],
+    tcp:    [130, 152, 120, 50, ["driver + TCP/IP", "драйвер + TCP/IP"]],
+    sock:   [265, 152, 120, 50, ["socket :8080", "сокет :8080"]],
+    epoll:  [400, 152, 80, 50, ["epoll", "epoll"]],
+    dbsock: [495, 152, 135, 50, ["DB socket :5432", "сокет БД :5432"]],
+    nic:    [290, 252, 180, 44, ["network card (NIC)", "сетевая карта (NIC)"]],
+    client: [10, 252, 90, 44, ["client", "клиент"]],
+    pg:     [660, 252, 90, 44, ["Postgres", "Postgres"]]
+  };
+  const C = b => [B[b][0] + B[b][2] / 2, B[b][1] + B[b][3] / 2];
+  return steppedAnim(el, { title: LL("One HTTP request through the layers", "Один HTTP-запрос через слои"), vb: [760, 350], steps: ST, stepMs: 6500, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 3600));
+    oR(g, 115, 22, 530, 300, "an-frame", 10);
+    const lines = E(g, "g", {}); oT(g, 380, 16, LL("server", "сервер"), "an-m an-b");
+    oT(g, 122, 42, LL("user space · JVM", "пространство пользователя · JVM"), "an-m an-b", "start");
+    oT(g, 122, 142, LL("kernel space", "пространство ядра"), "an-m an-b", "start");
+    oT(g, 122, 242, LL("hardware", "железо"), "an-m an-b", "start");
+    E(lines, "line", { x1: 115, y1: 126, x2: 645, y2: 126, class: "an-link2 an-dash" });
+    E(lines, "line", { x1: 115, y1: 226, x2: 645, y2: 226, class: "an-link2 an-dash" });
+    oT(g, 640, 142, LL("system call boundary", "граница системных вызовов"), "an-m an-sp", "end");
+    for(const b in B){
+      const [x, y, w, h, lab] = B[b];
+      const on = s.on.includes(b), mine = b === "ctrl" && s.mode === "sum";
+      oR(g, x, y, w, h, mine ? "an-pg k1" : on ? "an-reg on" : "an-box", 6);
+      oT(g, x + w / 2, y + h / 2 + 5, LL(...lab), "an-m an-b");
+    }
+    if(s.block) oT(g, 555, 116, LL("thread asleep in read()", "поток спит в read()"), "an-m an-b an-warn");
+    if(s.path){
+      const P = s.path.map(C);
+      E(lines, "polyline", { points: P.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" });
+      const L = P.slice(1).map((q, j) => Math.hypot(q[0] - P[j][0], q[1] - P[j][1])), tot = L.reduce((a, b) => a + b, 0);
+      const done = [P[0]]; let acc = 0;
+      for(let i = 1; i < P.length; i++){ acc += L[i - 1]; if(acc / tot <= k) done.push(P[i]); else break; }
+      done.push(polyAt(P, k));
+      E(lines, "polyline", { points: done.map(q => q.join(",")).join(" "), class: "an-link2 on", fill: "none" });
+      const [x, y] = polyAt(P, k); E(g, "circle", { cx: x, cy: y, r: 7, class: "an-dot an-flow" });
+    } else {
+      oT(g, 380, 116, LL("your code: 1 box", "ваш код: 1 блок"), "an-m an-b an-sp");
+    }
+    oT(g, 10, 330, LL(`system calls: ${s.sc}`, `системных вызовов: ${s.sc}`), "an-code" + (s.mode === "sum" ? " an-b" : ""), "start");
+    oT(g, 10, 346, LL(`interrupts: ${s.irq}`, `прерываний: ${s.irq}`), "an-code" + (s.mode === "sum" ? " an-b" : ""), "start");
+    const ML = { hw: ["CPU not involved yet", "CPU ещё не участвует"], kernel: ["CPU in kernel mode", "CPU в режиме ядра"], user: ["CPU in user mode", "CPU в режиме пользователя"], sum: ["", ""] };
+    oT(g, 750, 340, LL(...ML[s.mode]), "an-m an-b", "end");
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
