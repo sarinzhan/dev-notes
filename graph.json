@@ -6410,6 +6410,10 @@
   },
   {
    "source": "cpu-caches-and-cache-lines",
+   "target": "operating-system-introduction"
+  },
+  {
+   "source": "cpu-caches-and-cache-lines",
    "target": "process-management"
   },
   {
@@ -10670,6 +10674,10 @@
   },
   {
    "source": "kernel-vs-user-mode",
+   "target": "operating-system-introduction"
+  },
+  {
+   "source": "kernel-vs-user-mode",
    "target": "process-management"
   },
   {
@@ -11739,6 +11747,10 @@
   {
    "source": "operating-system-introduction",
    "target": "socket-management"
+  },
+  {
+   "source": "operating-system-introduction",
+   "target": "storage-management"
   },
   {
    "source": "operating-system-introduction",
