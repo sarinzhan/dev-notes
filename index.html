@@ -3746,6 +3746,50 @@ ANIMS["cpu-vs-io-bound"] = el=>{
   }});
 };
 
+// ============ 46. fork + copy-on-write as /proc/<pid>/smaps sees it: RSS double-counts, PSS does not
+ANIMS["fork-cow-smaps"] = el=>{
+  const N = 8, MB = 1.25;
+  const ST = [
+    { t: ["malloc(10 MB)", "malloc(10 MB)"], m: 0, en: "The parent calls malloc(10 MB). The kernel only reserves virtual addresses: no page has a physical frame yet, so the process's resident size (RSS) barely moves.",
+      ru: "Родитель вызывает malloc(10 MB). Ядро лишь резервирует виртуальные адреса: ни у одной страницы ещё нет физического фрейма, поэтому резидентный размер процесса (RSS) почти не меняется." },
+    { t: ["memset touches it", "memset трогает память"], m: 1, en: "memset(buf, 0, 10 MB) writes every page, so each one faults and gets a frame. Now RSS is 10 MB, all of it Private_Dirty: written, and used only by this process.",
+      ru: "memset(buf, 0, 10 MB) пишет в каждую страницу, поэтому каждая вызывает page fault и получает фрейм. Теперь RSS — 10 MB, и всё это Private_Dirty: записано и используется только этим процессом." },
+    { t: ["fork()", "fork()"], m: 2, en: "fork() copies the page table, not the pages: the child maps the same frames, read-only for copy-on-write. top shows RES 10 MB for both, 20 MB in total, but RAM holds 10 MB. smaps shows the truth: Shared_Dirty 10 MB in each, and Pss (proportional set size) 5 MB each.",
+      ru: "fork() копирует таблицу страниц, а не сами страницы: потомок отображает те же фреймы, только для чтения ради copy-on-write. top показывает RES 10 MB у обоих, в сумме 20 MB, но в RAM лежит 10 MB. smaps показывает правду: Shared_Dirty 10 MB у каждого и Pss (proportional set size) по 5 MB." },
+    { t: ["Child writes 3 pages", "Потомок пишет 3 страницы"], m: 3, en: "The child changes one byte in three pages. Each write faults, the kernel copies that page to a new frame for the child, and remaps it. Those pages become Private_Dirty in the child, and the originals become private to the parent too. Reads alone would copy nothing.",
+      ru: "Потомок меняет по байту в трёх страницах. Каждая запись вызывает page fault, ядро копирует страницу в новый фрейм для потомка и перенастраивает отображение. Эти страницы становятся Private_Dirty у потомка, а оригиналы — приватными и у родителя. Одни чтения ничего бы не скопировали." },
+    { t: ["What it really costs", "Сколько на самом деле"], m: 4, en: "RSS adds up to 20 MB, but only 11 frames, 13.75 MB, exist. Pss splits each shared page between the processes that map it, so the sum of Pss is the real total. Use Pss (smaps_rollup, smem) to size a box running many forked workers.",
+      ru: "RSS в сумме 20 MB, но существует лишь 11 фреймов — 13,75 MB. Pss делит каждую общую страницу между процессами, которые её отображают, поэтому сумма Pss — реальный итог. Используйте Pss (smaps_rollup, smem), чтобы рассчитать машину со многими форкнутыми воркерами." }
+  ];
+  const copied = [1, 4, 6];
+  return steppedAnim(el, { title: LL("fork, copy-on-write and smaps", "fork, copy-on-write и smaps"), vb: [760, 330], steps: ST, stepMs: 7000, render(g, s, t){
+    const m = s.m, L = E(g, "g", {}), PX = i => 150 + i * 62, k = Math.min(1, t / 2500);
+    const hasChild = m >= 2, wrote = m >= 3 ? copied : [];
+    // frames row
+    oT(g, 20, 158, LL("RAM frames", "фреймы RAM"), "an-m an-b", "start");
+    const frames = m === 0 ? 0 : N + wrote.length;
+    for(let f = 0; f < N + 3; f++){ const x = 150 + f * 52; oR(g, x, 140, 44, 30, f < frames ? (f >= N ? "an-pg k2" : "an-pg k1") : "an-box", 3); }
+    const row = (y, lab, who)=>{
+      oT(g, 20, y + 20, lab, "an-m an-b", "start");
+      for(let i = 0; i < N; i++){
+        const x = PX(i), mapped = m >= 1, own = who === "c" && wrote.includes(i);
+        const priv = m >= 3 && wrote.includes(i), shared = hasChild && !priv;
+        oR(g, x, y, 54, 30, !mapped ? "an-box" : shared ? "an-reg on" : "an-pg " + (own ? "k2" : "k1"), 4);
+        oT(g, x + 27, y + 20, `p${i}`, "an-m an-b");
+        if(mapped){ const fi = own ? N + wrote.indexOf(i) : i; const fx = 150 + fi * 52 + 22; E(L, "line", { x1: x + 27, y1: who === "p" ? y + 30 : y, x2: fx, y2: who === "p" ? 140 : 170, class: own ? "an-link2 on" : "an-link2" }); }
+      }
+    };
+    row(70, LL("parent", "родитель"), "p");
+    if(hasChild) row(230, LL("child", "потомок"), "c");
+    const priv = wrote.length * MB, sh = hasChild ? (N - wrote.length) * MB : 0, pPriv = m >= 1 ? (hasChild ? priv : N * MB) : 0;
+    const pss = m >= 1 ? (hasChild ? priv + sh / 2 : N * MB) : 0;
+    const stat = (y, who)=>oT(g, 20, y, who + `  RSS ${m >= 1 ? 10 : 0} MB · Shared_Dirty ${sh.toFixed(2)} · Private_Dirty ${pPriv.toFixed(2)} · Pss ${pss.toFixed(2)}`, "an-code", "start");
+    stat(30, LL("parent:", "родитель:")); if(hasChild) stat(300, LL("child: ", "потомок:"));
+    if(m === 4) oT(g, 740, 52, LL("Σ RSS 20 MB · Σ Pss 13.75 MB = 11 frames", "Σ RSS 20 MB · Σ Pss 13,75 MB = 11 фреймов"), "an-m an-b an-sp", "end");
+    if(m === 3){ const i = copied[Math.min(2, Math.floor(k * 3))]; oT(g, PX(i) + 27, 222, LL("write → copy", "запись → копия"), "an-m an-b an-warn"); }
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
