@@ -32,9 +32,7 @@ A Linux system is a stack: hardware, the kernel, system libraries (glibc), syste
 - **Device drivers / kernel modules**: loaded on demand; `lsmod` lists, `modprobe <mod>` loads with dependencies, `insmod` loads a single `.ko`, `rmmod` unloads.
 - **sysfs (`/sys`) and procfs (`/proc`)**: in-memory pseudo-filesystems that expose kernel objects as files. `cat /proc/<pid>/status`, `/proc/meminfo`, `/sys/class/net/eth0/`; writing to `/proc/sys/...` (or `sysctl -w`) tunes the kernel at runtime.
 - **Scheduler**: CFS (Completely Fair Scheduler) since 2.6.23 gives each runnable task a fair share of CPU time weighted by nice value; replaced by **EEVDF** in kernel 6.6 (2023), same interface. See [[linux-processes]].
-- **Namespaces**: isolate what a process *sees*. PID (own process tree), NET (own interfaces, routing table, ports), MNT (own mount table), IPC (own shared memory and semaphores), UTS (own hostname), USER (uid mapping, root inside = unprivileged outside), plus cgroup and time. The basis of containers.
-- **cgroups** (control groups): limit and account what a process *uses*: CPU shares and quotas, memory, block IO, pids. cgroups v2 (unified hierarchy, default since systemd 248 / Ubuntu 22.04). The basis of `docker run --memory` and Kubernetes requests/limits.
-- A container = a process started with `clone()` into new namespaces, placed in a cgroup, with a different root filesystem (`pivot_root`) and a reduced capability set.
+- **Namespaces** (what a process sees) and **cgroups** (what it may use) are the kernel features containers are built from; both, with examples, are in [[virtualization-and-containers]].
 
 ## Example
 ```bash
@@ -43,11 +41,6 @@ sudo strace -f -tt -e trace=network,connect,openat -p "$(pgrep -f app.jar)" 2>&1
 # 12:03:11.118 connect(27, {sa_family=AF_INET, sin_port=htons(5432), ...}, 16) = -1 EINPROGRESS
 # 12:03:41.120 ... ETIMEDOUT   -> the DB host is unreachable, not the JVM
 
-# Namespaces of a running container's main process
-PID=$(docker inspect -f '{{.State.Pid}}' esim-api)
-sudo ls -l /proc/$PID/ns/            # pid, net, mnt, ipc, uts, user, cgroup
-sudo nsenter -t $PID -n ss -ltnp      # run ss inside the container's NET namespace
-cat /sys/fs/cgroup/system.slice/docker-*.scope/memory.max   # cgroup v2 memory limit
 ```
 
 ## Pitfalls

@@ -2862,6 +2862,40 @@
    "title_ru": "Системные вызовы и файловые дескрипторы"
   },
   {
+   "id": "virtualization-and-containers",
+   "sec": "computer-science",
+   "sub": "operating-systems",
+   "title": "Virtualization and containers",
+   "tags": [
+    "operating-systems",
+    "virtualization",
+    "containers",
+    "namespaces",
+    "cgroups",
+    "docker"
+   ],
+   "learned": "2026-10-29",
+   "order": 10,
+   "path": "notes/computer-science/operating-systems/virtualization-and-containers.md",
+   "links": [
+    "anatomy-of-a-process",
+    "cpu",
+    "docker-containers-and-resources",
+    "docker-fundamentals",
+    "dockerfile-and-images",
+    "jvm-memory-areas",
+    "kubernetes-basics",
+    "linux-architecture-and-kernel",
+    "linux-networking",
+    "memory-management",
+    "process-management",
+    "signals-and-process-lifecycle"
+   ],
+   "words": 2386,
+   "ru": "notes-ru/computer-science/operating-systems/virtualization-and-containers.md",
+   "title_ru": "Виртуализация и контейнеры"
+  },
+  {
    "id": "error-handling-strategies",
    "sec": "computer-science",
    "sub": "programming",
@@ -3912,9 +3946,10 @@
     "docker-swarm",
     "docker-volumes-and-registry",
     "dockerfile-and-images",
-    "linux-architecture-and-kernel"
+    "linux-architecture-and-kernel",
+    "virtualization-and-containers"
    ],
-   "words": 978,
+   "words": 850,
    "ru": "notes-ru/devops/docker/docker-fundamentals.md",
    "title_ru": "Основы Docker, контейнеры и виртуальные машины"
   },
@@ -4129,9 +4164,10 @@
     "linux-basics",
     "linux-commands",
     "linux-memory-filesystems-io",
-    "linux-processes"
+    "linux-processes",
+    "virtualization-and-containers"
    ],
-   "words": 812,
+   "words": 679,
    "ru": "notes-ru/devops/linux/linux-architecture-and-kernel.md",
    "title_ru": "Архитектура Linux, пространство ядра и пространство пользователя"
   },
