@@ -93,9 +93,7 @@ sendfile-zero-copy
 ```
 
 ### Nagle's algorithm and delayed ACK
-- **Nagle's algorithm** holds back a small write while earlier data is still unacknowledged, to avoid sending many tiny packets, each carrying 40 bytes of IP and TCP headers. **Delayed ACK** on the other side holds back the acknowledgement for up to ~40 ms, hoping to send it with a response. Together they can stall a request–response exchange: the sender waits for an ACK, the receiver waits to send one.
-- Daniel Stenberg traced unexplained delays in curl to exactly this during the TLS handshake, where small messages sat in the send buffer waiting; curl has set `TCP_NODELAY` (Nagle off) by default since 2016. Most latency-sensitive software does the same: Netty, gRPC, many database drivers. In Java: `socket.setTcpNoDelay(true)`, or `ChannelOption.TCP_NODELAY` in Netty.
-- The trade-off: Nagle saves bandwidth on chatty protocols, `TCP_NODELAY` saves latency. With `TCP_NODELAY`, batch your own writes (one `write()` per response, not per header line).
+- Nagle holds back small writes until earlier data is ACKed, and the peer's delayed ACK holds back that ACK; together they cause ~40 ms stalls on write-write-read exchanges, which is why latency-sensitive software sets `TCP_NODELAY`. Details, timeline and the related socket options: [[nagle-and-delayed-ack]].
 
 ### Problems with reading and sending
 - **The backend does not read fast enough**: the receive queue fills, the advertised window shrinks to zero, and the client has to stop: its send buffer fills and its `write()` blocks. The client slows down. This is TCP flow control: backpressure all the way to the sender ([[backpressure-and-flow-control]]).

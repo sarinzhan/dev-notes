@@ -19,7 +19,16 @@ An L4 load balancer forwards TCP/UDP flows by IP and port: fast, protocol-agnost
 | Examples | AWS NLB, Linux IPVS/kube-proxy, HAProxy `mode tcp`, MetalLB | nginx, HAProxy `mode http`, Envoy, AWS ALB, Kubernetes Ingress/Gateway API, API gateways ([[api-gateway-and-service-discovery]]) |
 
 - Long-lived connections (HTTP/2, gRPC, WebSocket, DB) make L4 balancing lumpy: one client's connection sits on one backend forever. L7 balances per stream; for gRPC that is the difference between even load and one hot pod ([[grpc-and-protobuf]]).
-- Databases and Kafka are balanced at L4 or not at all (clients do their own routing); HTTP APIs at L7.
+
+### L4 forwarding modes
+| Mode | How a packet travels | State on the balancer | Trade-off |
+|---|---|---|---|
+| NAT | balancer rewrites destination (and often source) IP of each packet of the one client connection; replies must come back through it | per-flow entry (conntrack/IPVS table) | simple; the balancer carries both directions; client IP lost if source NAT is used |
+| TCP proxy (HAProxy `mode tcp`, nginx `stream`) | terminates the client's TCP connection and opens a second one to the backend, copying bytes | two sockets per client, buffers | can do TLS termination and PROXY protocol, but no request parsing; costs the most of the three |
+| DSR (direct server return) | balancer rewrites only the destination MAC; the backend owns the VIP on loopback and replies straight to the client | per-flow entry, inbound only | replies (usually most bytes) bypass the balancer, huge throughput; backends need special network config; no TLS termination |
+
+- L7 is always a full proxy ([[reverse-proxy-nginx-basics]]): two connections, TLS terminated, request parsed. **Pros**: smart routing, retries, observability, caching, per-request balancing. **Cons**: more CPU and memory per connection, it holds the certificates and sees plaintext, adds latency, and a proxy that only understands HTTP cannot carry Postgres or Kafka.
+- L4 **pros**: fast, cheap, protocol-agnostic, TLS stays end-to-end. **Cons**: no content-based routing, sticky per connection, retries impossible once bytes flowed.
 
 ### Algorithms
 | Algorithm | Behaviour | Use when |
@@ -35,7 +44,6 @@ An L4 load balancer forwards TCP/UDP flows by IP and port: fast, protocol-agnost
 - **Active**: the balancer calls `/actuator/health/readiness` every N seconds; unhealthy after K failures, healthy after M successes. Readiness, not liveness: a pod that is alive but warming up should not get traffic ([[kubernetes-basics]]).
 - **Passive (outlier detection)**: eject a backend after consecutive 5xx or connection errors for a cooling period; catches failures faster than the active interval.
 - **Draining**: on deploy, mark the backend not-ready, stop new connections, let in-flight requests finish (`server.shutdown=graceful`, `spring.lifecycle.timeout-per-shutdown-phase`), then stop. With HTTP/2, send `GOAWAY`. Without this step every rolling deploy produces a burst of 502s.
-- Check the dependency chain carefully: a readiness check that fails when the DB is down takes the whole fleet out at once; fail readiness only for conditions local to the instance.
 
 ### Sticky sessions
 - Cookie-based (`SERVERID`, ALB `AWSALB`) or source-IP hashing routes a user to the same backend. Needed for in-memory HTTP sessions, SSE/WebSocket state ([[websockets-sse-and-long-polling]]), local caches.

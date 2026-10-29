@@ -12,7 +12,12 @@ DNS turns a name into addresses through a chain of caches: the application's own
 2. Stub resolver on the host: `/etc/hosts` and `/etc/resolv.conf` (`nameserver`, `search`, `options ndots:N`), ordered by `/etc/nsswitch.conf`. On modern Linux `127.0.0.53` is `systemd-resolved`; in Docker it is `127.0.0.11`, the embedded DNS ([[linux-networking]]).
 3. **Recursive resolver** (ISP, `1.1.1.1`, CoreDNS, corporate DNS): answers from cache or walks the hierarchy: root servers → `.kg` TLD servers → the zone's **authoritative** servers (`NS` records), caching each step.
 4. Authoritative answer with TTL; every cache along the path keeps it up to that TTL.
-- Transport: UDP 53 with 512-byte classic limit (EDNS0 raises it); falls back to TCP for large answers (big `TXT`, DNSSEC) and zone transfers. DoT/DoH encrypt the stub→resolver hop ([[tcp-vs-udp]]).
+
+### Message format and transport
+- One format for queries and responses: a 12-byte header, then **Question**, **Answer**, **Authority** (`NS`/`SOA`) and **Additional** (glue `A` records, the EDNS0 `OPT` record) sections.
+- Header: a 16-bit **ID** pairing response with query; flags `AA` (authoritative), `TC` (truncated), `RD`/`RA` (recursion desired/available), `AD` (DNSSEC-validated); `RCODE` `NOERROR`, `NXDOMAIN`, `SERVFAIL`, `REFUSED`. `NOERROR` with no answer means the name exists, the record type does not.
+- **UDP 53**: one datagram each way, no handshake, one RTT ([[udp-in-depth]], [[tcp-vs-udp]]). Classic limit 512 bytes; EDNS0 advertises a bigger buffer, 1232 bytes recommended to avoid IP fragmentation ([[mss-mtu-pmtud]]).
+- **TCP 53 fallback**: an answer that still does not fit comes back with `TC=1`, and the client repeats the query over TCP. Zone transfers (`AXFR`/`IXFR`) also use TCP. Lost UDP packets are retried after the stub timeout (glibc: 5 s, `options timeout:1 attempts:2`).
 
 ### Records you actually use
 | Record | Maps | Backend relevance |
@@ -28,9 +33,16 @@ DNS turns a name into addresses through a chain of caches: the application's own
 
 ### TTL and caching layers
 - Authoritative TTL is a maximum; each cache counts it down. Lowering the TTL before a migration must happen one old-TTL in advance, because caches still hold the old value with the old TTL.
+- Recursive resolvers cache delegations too, so they rarely ask the root; many clamp TTLs and serve stale records (RFC 8767) when authoritative servers are down.
 - Negative caching (`NXDOMAIN`) is cached too, governed by the SOA `minimum`; a name queried before it was created stays "not found" for minutes.
 - **JVM cache**: successful lookups 30 s by default (`networkaddress.cache.ttl`), failures 10 s (`networkaddress.cache.negative.ttl`); with a `SecurityManager` it used to be forever, which is where the "Java caches DNS forever" folklore comes from. Set `-Dnetworkaddress.cache.ttl=10` or in `java.security` for services behind changing IPs.
 - Client libraries cache above the JVM: a connection pool holds sockets to the old IP until `maxLifetime` ([[sockets-and-connection-pooling]]); Netty's `DnsNameResolver` (used by Reactor Netty `WebClient`) has its own cache honouring TTL; the Kafka client re-resolves bootstrap servers per reconnect.
+
+### Spoofing, DNSSEC and encrypted DNS
+- A resolver accepts the first UDP response whose question, ID, source IP and port match. **Cache poisoning** wins that race with forged responses, and the forged record reaches every client of the resolver for its TTL.
+- **Kaminsky attack (2008)**: query random non-existent names (`x1.bank.example`, `x2...`) so every attempt is a fresh race, and add a forged `NS` + glue to hijack the whole zone. A 16-bit ID falls in seconds; the fix is **source-port randomization** (about 2^32 combinations) plus bailiwick checks and 0x20 case randomization.
+- **DNSSEC** signs data instead of hiding it: `RRSIG` over each record set made with the zone's `DNSKEY`, a `DS` record in the parent vouching for that key, a chain up to the root. Integrity, not confidentiality; a broken signature means `SERVFAIL` for the whole domain; answers get large.
+- **DoT** (TLS, TCP 853) and **DoH** (HTTPS, 443) encrypt only the stub→resolver hop and validate nothing. Browser DoH bypasses the corporate resolver, so split-horizon internal names stop resolving ([[tls-handshake-and-certificates]]).
 
 ### DNS in Kubernetes
 - CoreDNS serves the cluster zone. Names: `<svc>.<ns>.svc.cluster.local` → ClusterIP; a **headless** service (`clusterIP: None`) returns the pod IPs directly, which is what client-side load balancing (gRPC `round_robin`, Kafka, Cassandra) needs ([[grpc-and-protobuf]]). `<pod-name>.<svc>` names exist for StatefulSets.
@@ -61,6 +73,11 @@ $ dig @ns1.beeline.kg. api.beeline.kg. +norecurse
 # walk the delegation yourself (what a recursive resolver does on a cold cache)
 $ dig +trace api.beeline.kg. | grep -E '^(kg\.|beeline\.kg\.|api)'
 
+# small buffer + DNSSEC: the UDP answer is truncated, dig retries over TCP
+$ dig +bufsize=512 +dnssec cloudflare.com DNSKEY | grep -E 'Truncated|flags:'
+;; Truncated, retrying in TCP mode.
+;; flags: qr rd ra ad; QUERY: 1, ANSWER: 3, AUTHORITY: 0, ADDITIONAL: 1
+
 # inside a pod: why one external lookup costs five queries
 $ kubectl exec -it esim-api-0 -- cat /etc/resolv.conf
 search esim.svc.cluster.local svc.cluster.local cluster.local
@@ -80,4 +97,5 @@ JAVA_TOOL_OPTIONS: "-Dnetworkaddress.cache.ttl=10 -Dnetworkaddress.cache.negativ
 - Services that resolve once at startup (`new InetSocketAddress(host, port)` kept in a field) never see a failover; resolve per connection.
 - Kubernetes `ndots:5` plus a flaky CoreDNS turns every external call into multiple timeouts; always test name resolution from inside a pod, not from the node.
 - Split-horizon DNS (different answers inside and outside the office) explains "works on VPN, fails from CI"; `dig @8.8.8.8` versus `dig @corp-dns` shows it.
-- Related: [[linux-networking]] for resolver configuration on the host, [[network-debugging-toolkit]] for the `dig`/`drill`/`nslookup` recipes.
+- A firewall that allows UDP 53 but blocks TCP 53: large and DNSSEC answers fail, small ones work, so the failure looks random.
+- Related: [[linux-networking]] for resolver configuration on the host, [[network-debugging-toolkit]] for the `dig`/`drill`/`nslookup` recipes, [[tcpdump]] to see the queries on the wire.

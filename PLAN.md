@@ -146,12 +146,40 @@ Later (after April 2027), still under operating-systems:
 
 ## networking
 
+Ordered bottom-up by layer: overview notes on top, deeper notes further down. Sections 2–8 of "Fundamentals of Network Engineering" (Oct 2026).
+
 ### fundamentals
-- [x] osi-and-tcp-ip-models — layers with real examples, where HTTP/TLS/TCP/IP sit
-- [x] tcp-vs-udp — handshake, reliability, flow/congestion control, when UDP
-- [x] tcp-handshake-and-connection-states — SYN/ACK, TIME_WAIT, keep-alive, half-open
-- [x] ip-addressing-ports-nat — IPv4/IPv6, private ranges, NAT, port binding in containers
-- [x] sockets-and-connection-pooling — socket lifecycle, ephemeral ports, why pools exist
+- [x] osi-and-tcp-ip-models — layers, PDU names, encapsulation of a POST, which device works at which layer
+- [x] host-to-host-communication — client-server, MAC vs IP vs port, switch vs router, same subnet vs via gateway
+
+### ip-layer
+- [x] ip-addressing-and-nat (was ip-addressing-ports-nat) — CIDR, private/special ranges, SNAT/DNAT/PAT, conntrack, NAT traversal, CG-NAT
+- [x] ip-packet-structure — header fields, TTL, fragmentation, DF/MF, IPv6 differences
+- [x] arp — request/reply, cache, gratuitous ARP, poisoning, NDP
+- [x] icmp-ping-traceroute — ICMP types, ping, traceroute via TTL, why not to block all ICMP
+- [x] network-routing — routing tables, default gateway, longest-prefix match, worked example, private IP + NAT path
+
+### transport
+- [x] tcp-vs-udp — comparison overview, ports, pros/cons
+- [x] udp-in-depth — 8-byte header, message boundaries, use cases, amplification
+- [x] tcp-segment-structure — header, flags, options, seq/ack arithmetic
+- [x] tcp-handshake-and-connection-states — all 11 states, TIME_WAIT and 2×MSL
+- [x] tcp-flow-control — rwnd, sliding window, window scaling, zero window, back-pressure
+- [x] tcp-congestion-control — cwnd, slow start, AIMD, fast recovery, CUBIC/BBR, slow start after idle
+- [x] sockets-and-connection-pooling — client-side sockets, ephemeral ports, why pools exist
+- [x] building-tcp-udp-servers — C and Java echo servers, what Tomcat/Netty add
+- kernel queues, listening, SO_REUSEPORT live in computer-science/operating-systems/socket-management (link only)
+
+### performance
+- [x] mss-mtu-pmtud — MTU, MSS, PMTUD and black holes, MSS clamping, tunnels
+- [x] nagle-and-delayed-ack — the 40 ms stall, TCP_NODELAY, QUICKACK, CORK (moved from socket-management)
+- [x] connection-establishment-cost — RTTs of TCP + TLS, pools and keep-alive, TCP Fast Open, QUIC 0-RTT
+- [x] head-of-line-blocking — HTTP/1.1, TCP-level HOL under HTTP/2, QUIC streams
+
+### protocols
+- [x] dns-resolution — message format, UDP/TCP 53, EDNS, poisoning, DNSSEC, DoT/DoH, Kubernetes DNS
+- [x] tls-handshake-and-certificates — TLS 1.3 handshake, CA chain, SNI, where it fails
+- [x] tls-key-exchange — symmetric vs asymmetric, RSA vs (EC)DHE, forward secrecy, 1.2 vs 1.3, 0-RTT, openssl/keytool
 
 ### http
 - [x] http-fundamentals — request/response, methods, status codes, headers, idempotent methods; link rest-and-http
@@ -161,21 +189,24 @@ Later (after April 2027), still under operating-systems:
 - [x] websockets-sse-and-long-polling — real-time options and trade-offs; link spring-reactive-webclient-sse
 - [x] grpc-and-protobuf — when binary RPC beats REST, streaming, schema evolution
 
+### proxies-and-load-balancing
+- [x] reverse-proxy-nginx-basics — forward vs reverse, transparent proxies, two TCP connections, nginx building blocks
+- [x] load-balancers-l4-vs-l7 — L4 modes (NAT/proxy/DSR), L7, algorithms, health checks; link api-gateway-and-service-discovery
+- CDN lives in system-design/building-blocks/cdn (do not duplicate here)
+
 ### security
-- [x] tls-handshake-and-certificates — TLS 1.3 handshake, CA chain, SNI, where it fails (corporate proxies)
 - [x] mtls-and-service-to-service-auth — client certs, SPIFFE idea, vs API keys
 - [x] authentication-vs-authorization — sessions, tokens, JWT vs opaque, OAuth2/OIDC flows; link jwt-authentication
 - [x] api-security-checklist — rate limits, input validation, replay protection, HMAC webhooks
-
-### dns-and-routing
-- [x] dns-resolution — recursive/authoritative, records, TTL, DNS in Kubernetes
-- [x] load-balancers-l4-vs-l7 — algorithms, health checks, sticky sessions; link api-gateway-and-service-discovery
-- [x] reverse-proxy-nginx-basics — upstreams, timeouts, buffering, TLS termination
-- CDN lives in system-design/building-blocks/cdn (do not duplicate here)
+- [x] network-access-to-databases — private subnets, listen_addresses, pg_hba.conf, bastion, PgBouncer, roles
 
 ### tools
 - [x] linux-networking (stays in devops/linux; link from here)
 - [x] network-debugging-toolkit — curl, dig, nc, ss, tcpdump, traceroute, mtr with recipes
+- [x] tcpdump — BPF filters, reading handshakes and DNS, pcap + Wireshark, capturing in containers
+- [ ] wireshark — course section 9 (later)
+
+Related outside networking: devops/docker/docker-networking (bridge, veth, DNAT for -p, embedded DNS).
 
 ## distributed-systems
 

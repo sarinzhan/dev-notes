@@ -11,7 +11,11 @@ TLS wraps a TCP stream in encryption and authentication. The TLS 1.3 handshake t
 1. **ClientHello**: supported versions, cipher suites, key share (X25519 or P-256 public value), **SNI** (the hostname, in clear text), **ALPN** (`h2`, `http/1.1`), and session ticket for resumption.
 2. **ServerHello**: chosen suite and key share; from here on everything is encrypted with handshake keys. Then `EncryptedExtensions`, `Certificate` (the chain), `CertificateVerify` (signature over the transcript with the certificate's private key, proving possession), `Finished`.
 3. Client verifies the chain, hostname and signature, sends `Finished`; application data flows. Total: 1 RTT before the first HTTP byte (plus TCP's 1 RTT). Resumption with a pre-shared key allows 0-RTT data, replayable, only for idempotent requests.
-- TLS 1.2 needed 2 RTT and allowed RSA key exchange without forward secrecy; 1.3 removed that, removed renegotiation and compression, and left only AEAD ciphers (`TLS_AES_128_GCM_SHA256`, `TLS_AES_256_GCM_SHA384`, `TLS_CHACHA20_POLY1305_SHA256`). TLS 1.0/1.1 are disabled in Java 11.0.11+/Java 17 by default. Key exchange math is in [[symmetric-and-asymmetric-crypto]].
+
+```anim
+tls13-handshake
+```
+- TLS 1.2 needed 2 RTT and allowed RSA key exchange without forward secrecy. Why both kinds of crypto are needed, (EC)DHE, the 1.2 vs 1.3 differences, 0-RTT replay, and generating keys and certificates with `openssl`: [[tls-key-exchange]]. TLS 1.0/1.1 are disabled in Java 11.0.11+/Java 17 by default.
 - Server picks the cipher; a server preferring weak suites is a configuration problem, not a client one.
 
 ### Certificates and the chain
@@ -88,4 +92,4 @@ RestClient smdp = RestClient.builder()
 - Rebuilding the Docker image with a new JDK silently drops a CA someone imported into `cacerts`; keep custom CAs in a mounted trust store or an SSL bundle.
 - Expired intermediates and cross-signed roots (the Let's Encrypt DST Root expiry in 2021) break old trust stores even when the leaf is valid; keep base images updated.
 - Clock skew in a container makes valid certificates "not yet valid"; check `date` before anything else.
-- Related: [[mtls-and-service-to-service-auth]] for the client-certificate side, [[network-debugging-toolkit]] for the `openssl`/`curl` recipes in one place.
+- Related: [[tls-key-exchange]] for the crypto behind the handshake and the `openssl`/PKCS12 recipes, [[mtls-and-service-to-service-auth]] for the client-certificate side, [[network-debugging-toolkit]] for the `openssl`/`curl` recipes in one place.

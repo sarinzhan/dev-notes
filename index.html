@@ -4095,6 +4095,860 @@ ANIMS["jit-hot-path"] = el=>{
   }});
 };
 
+// ============ networking: host-to-host-packet
+ANIMS["host-to-host-packet"] = el=>{
+  // Host A (10.0.1.10) → switch 1 → router → switch 2 → host B (10.0.2.20). IPs stay, MACs change per hop.
+  const MAC = { a: "aa:aa:aa:00:00:0a", r1: "52:54:00:00:01:01", r2: "52:54:00:00:02:01", b: "bb:bb:bb:00:00:14" };
+  const ST = [
+    { t: ["Build the packet", "Сборка пакета"], at: "a", hl: ["sip", "dip", "ttl", "sp", "dp"], ttl: 64, smac: "?", dmac: "?",
+      en: "A service on host A (10.0.1.10) connects to 10.0.2.20:443. The kernel builds a TCP segment (ports 51514 → 443) and wraps it in an IP packet: source 10.0.1.10, destination 10.0.2.20, TTL 64. The routing table says 10.0.2.20 is not in A's subnet 10.0.1.0/24, so the next hop is the default gateway 10.0.1.1.",
+      ru: "Сервис на хосте A (10.0.1.10) подключается к 10.0.2.20:443. Ядро собирает TCP-сегмент (порты 51514 → 443) и оборачивает его в IP-пакет: источник 10.0.1.10, назначение 10.0.2.20, TTL 64. По таблице маршрутизации 10.0.2.20 не входит в подсеть A 10.0.1.0/24, поэтому следующий хоп — шлюз по умолчанию 10.0.1.1." },
+    { t: ["Frame for the gateway", "Кадр для шлюза"], at: "a", hl: ["smac", "dmac"], ttl: 64, smac: MAC.a, dmac: MAC.r1,
+      en: "A needs a MAC address to put the packet on the wire. It asks ARP for the MAC of the gateway 10.0.1.1, not of 10.0.2.20, and wraps the packet in an Ethernet frame: source MAC = A, destination MAC = the router's left interface. The destination IP is still 10.0.2.20.",
+      ru: "Чтобы отправить пакет в провод, A нужен MAC-адрес. Он спрашивает через ARP MAC шлюза 10.0.1.1, а не 10.0.2.20, и оборачивает пакет в Ethernet-кадр: MAC источника = A, MAC назначения = левый интерфейс маршрутизатора. IP назначения по-прежнему 10.0.2.20." },
+    { t: ["Switch 1 forwards", "Коммутатор 1 пересылает"], at: "s1", path: ["a", "s1", "r"], ttl: 64, smac: MAC.a, dmac: MAC.r1,
+      en: "Switch 1 reads only the Ethernet header. It records that A's MAC lives on port 1 (MAC learning), finds the destination MAC in its MAC table on port 3 and sends the frame out of that port only. It never looks at IP addresses or TTL.",
+      ru: "Коммутатор 1 читает только Ethernet-заголовок. Он запоминает, что MAC A живёт на порту 1 (MAC learning), находит MAC назначения в своей MAC-таблице на порту 3 и отправляет кадр только туда. На IP-адреса и TTL он не смотрит." },
+    { t: ["Router: route lookup", "Маршрутизатор: поиск маршрута"], at: "r", hl: ["ttl"], ttl: 63, smac: "—", dmac: "—",
+      en: "The destination MAC is the router's own, so it accepts the frame and strips the Ethernet header. It reads the destination IP, does a longest-prefix match: 10.0.2.0/24 is directly connected on eth1. It decrements TTL from 64 to 63 and recomputes the header checksum. A packet whose TTL reaches 0 would be dropped here with ICMP Time Exceeded.",
+      ru: "MAC назначения — собственный адрес маршрутизатора, поэтому он принимает кадр и снимает Ethernet-заголовок. Он читает IP назначения и ищет самый длинный совпадающий префикс: 10.0.2.0/24 подключена напрямую на eth1. TTL уменьшается с 64 до 63, контрольная сумма заголовка пересчитывается. Пакет, у которого TTL дошёл бы до 0, был бы здесь отброшен с ICMP Time Exceeded." },
+    { t: ["Router: new frame", "Маршрутизатор: новый кадр"], at: "r", hl: ["smac", "dmac"], ttl: 63, smac: MAC.r2, dmac: MAC.b,
+      en: "The router ARPs on eth1 for 10.0.2.20 and builds a brand-new frame: source MAC = its right interface, destination MAC = host B. The IP addresses and ports are unchanged; only the L2 envelope was replaced. With NAT on the router, the source IP and port would be rewritten too.",
+      ru: "Маршрутизатор делает ARP на eth1 для 10.0.2.20 и собирает совершенно новый кадр: MAC источника = его правый интерфейс, MAC назначения = хост B. IP-адреса и порты не изменились; заменён только конверт L2. Если бы на маршрутизаторе был NAT, переписались бы ещё IP и порт источника." },
+    { t: ["Switch 2 forwards", "Коммутатор 2 пересылает"], at: "s2", path: ["r", "s2", "b"], ttl: 63, smac: MAC.r2, dmac: MAC.b,
+      en: "Switch 2 does the same L2 job as switch 1: look up B's MAC, forward out of one port. Switches are invisible to IP: traceroute never shows them as hops.",
+      ru: "Коммутатор 2 делает ту же работу L2, что и коммутатор 1: находит MAC B и пересылает кадр через один порт. Для IP коммутаторы невидимы: traceroute никогда не показывает их как хопы." },
+    { t: ["Host B delivers", "Хост B доставляет"], at: "b", hl: ["dmac", "dip", "dp"], ttl: 63, smac: MAC.r2, dmac: MAC.b,
+      en: "B's NIC accepts the frame because the destination MAC is its own. The kernel checks that 10.0.2.20 is a local address, sees protocol 6 (TCP), and uses the 4-tuple to find the socket listening on 443. The reply travels back the same way with every address pair swapped.",
+      ru: "Сетевая карта B принимает кадр, потому что MAC назначения — её собственный. Ядро проверяет, что 10.0.2.20 — локальный адрес, видит протокол 6 (TCP) и по четырём полям находит сокет, слушающий 443. Ответ идёт обратно тем же путём, все пары адресов меняются местами." }
+  ];
+  const N = {
+    a:  [14, 60, 128, 74, LL("host A", "хост A"), "10.0.1.10/24", "gw 10.0.1.1"],
+    s1: [172, 70, 92, 54, LL("switch 1", "коммутатор 1"), "L2", ""],
+    r:  [296, 54, 168, 86, LL("router", "маршрутизатор"), "eth0 10.0.1.1", "eth1 10.0.2.1"],
+    s2: [496, 70, 92, 54, LL("switch 2", "коммутатор 2"), "L2", ""],
+    b:  [618, 60, 128, 74, LL("host B", "хост B"), "10.0.2.20/24", "gw 10.0.2.1"]
+  };
+  const C = id => [N[id][0] + N[id][2] / 2, 97];
+  return steppedAnim(el, { title: LL("Host to host: what changes at each hop", "От хоста к хосту: что меняется на каждом хопе"), vb: [760, 340], steps: ST, stepMs: 6400, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1600));
+    oT(g, 160, 24, LL("subnet 10.0.1.0/24", "подсеть 10.0.1.0/24"), "an-m an-b");
+    oT(g, 600, 24, LL("subnet 10.0.2.0/24", "подсеть 10.0.2.0/24"), "an-m an-b");
+    E(g, "line", { x1: 380, y1: 34, x2: 380, y2: 50, class: "an-flowline an-dash" });
+    for(const [a, b] of [["a", "s1"], ["s1", "r"], ["r", "s2"], ["s2", "b"]]){ const [x1] = C(a), [x2] = C(b); E(g, "line", { x1: x1 + N[a][2] / 2, y1: 97, x2: x2 - N[b][2] / 2, y2: 97, class: "an-flowline" }); }
+    for(const id in N){ const [x, y, w, h, name, l1, l2] = N[id]; oR(g, x, y, w, h, s.at === id ? "an-reg on" : "an-box", 8);
+      oT(g, x + w / 2, y + 20, name, "an-t an-b"); oT(g, x + w / 2, y + 38, l1, "an-m"); if(l2) oT(g, x + w / 2, y + 54, l2, "an-m"); }
+    oT(g, 320, 156, "MAC " + MAC.r1.slice(-5), "an-m", "middle"); oT(g, 440, 156, "MAC " + MAC.r2.slice(-5), "an-m", "middle");
+    // moving frame
+    let pos = C(s.at);
+    if(s.path){ const pts = s.path.map(C); pos = polyAt(pts, k); }
+    else if(s.at === "a" && s.hl && s.hl.includes("smac")) pos = polyAt([C("a"), [C("a")[0] + 70, 97]], k);
+    E(g, "circle", { cx: pos[0], cy: pos[1] - 2, r: 8, class: "an-dot an-flow" });
+    // header panel
+    oR(g, 14, 180, 732, 150, "an-frame", 10);
+    oT(g, 24, 200, LL("what is on the wire right now", "что сейчас в проводе"), "an-m an-b", "start");
+    const F = [
+      ["L2 Ethernet", [["smac", LL("src MAC", "MAC ист."), s.smac], ["dmac", LL("dst MAC", "MAC назн."), s.dmac]]],
+      ["L3 IP", [["sip", LL("src IP", "IP ист."), "10.0.1.10"], ["dip", LL("dst IP", "IP назн."), "10.0.2.20"], ["ttl", "TTL", String(s.ttl)]]],
+      ["L4 TCP", [["sp", LL("src port", "порт ист."), "51514"], ["dp", LL("dst port", "порт назн."), "443"]]]
+    ];
+    F.forEach(([layer, cells], r)=>{
+      const y = 212 + r * 38; oT(g, 30, y + 22, layer, "an-m an-b", "start");
+      cells.forEach(([id, lab, val], j)=>{ const x = 130 + j * 205, on = (s.hl || []).includes(id);
+        oR(g, x, y, 196, 32, on ? "an-reg on" : "an-box", 5); oT(g, x + 8, y + 20, lab, "an-m", "start"); oT(g, x + 188, y + 21, val, "an-code" + (on ? " an-b" : ""), "end"); });
+    });
+  }});
+};
+
+// ============ networking: arp-resolution
+ANIMS["arp-resolution"] = el=>{
+  // One LAN 192.168.1.0/24: host A, host B, gateway, attacker C, all on one switch. A's ARP cache shown at the bottom.
+  const ST = [
+    { t: ["Cache miss", "Промах кеша"], at: ["a"], cache: [],
+      en: "Host A (192.168.1.10) wants to send an IP packet to B (192.168.1.20), which is in the same /24, so it can deliver directly. To build the Ethernet frame it needs B's MAC address. A checks its ARP cache: empty.",
+      ru: "Хост A (192.168.1.10) хочет отправить IP-пакет хосту B (192.168.1.20), который в той же /24, поэтому доставка прямая. Чтобы собрать Ethernet-кадр, нужен MAC-адрес B. A смотрит в свой кеш ARP: пусто." },
+    { t: ["Broadcast request", "Широковещательный запрос"], at: ["a", "sw"], fly: [["a", "sw"], ["sw", "b"], ["sw", "gw"], ["sw", "c"]], msg: "Who has 192.168.1.20? Tell 192.168.1.10", cache: [],
+      en: "A sends an ARP request to the broadcast MAC ff:ff:ff:ff:ff:ff: \"Who has 192.168.1.20? Tell 192.168.1.10\". The switch floods a broadcast out of every port, so every host in the L2 segment (the broadcast domain) receives it.",
+      ru: "A отправляет ARP-запрос на широковещательный MAC ff:ff:ff:ff:ff:ff: «У кого 192.168.1.20? Ответь 192.168.1.10». Коммутатор рассылает широковещательный кадр во все порты, поэтому его получают все хосты сегмента L2 (широковещательного домена)." },
+    { t: ["Others ignore it", "Остальные игнорируют"], at: ["gw", "c"], dim: ["gw", "c"], cache: [],
+      en: "The gateway and C see that the target IP is not theirs and drop the request. ARP has no authentication: it is a plain L2 broadcast that every neighbour can read, which is why huge flat networks drown in ARP traffic.",
+      ru: "Шлюз и C видят, что целевой IP не их, и отбрасывают запрос. В ARP нет аутентификации: это обычная рассылка L2, которую читает каждый сосед, поэтому огромные плоские сети тонут в ARP-трафике." },
+    { t: ["Unicast reply", "Unicast-ответ"], at: ["b"], fly: [["b", "sw"], ["sw", "a"]], msg: "192.168.1.20 is at bb:bb:bb:00:00:14", cache: [],
+      en: "B answers with a unicast ARP reply straight to A's MAC: \"192.168.1.20 is at bb:bb:bb:00:00:14\". B also caches A's mapping from the request, because A is about to talk to it.",
+      ru: "B отвечает unicast ARP-ответом прямо на MAC A: «192.168.1.20 находится по адресу bb:bb:bb:00:00:14». B тоже кеширует соответствие A из запроса, ведь A сейчас начнёт с ним общаться." },
+    { t: ["Cache and send", "Кеш и отправка"], at: ["a", "b"], fly: [["a", "sw"], ["sw", "b"]], msg: "IP → 192.168.1.20 in frame → bb:..:14", cache: [["192.168.1.20", "bb:bb:bb:00:00:14", "REACHABLE"]],
+      en: "A stores the entry in its ARP cache (ip neigh shows it as REACHABLE; Linux revalidates it after tens of seconds) and sends the queued IP packet in a frame addressed to B's MAC. Later packets skip ARP entirely.",
+      ru: "A сохраняет запись в кеш ARP (ip neigh показывает её как REACHABLE; Linux перепроверяет её через десятки секунд) и отправляет ожидавший IP-пакет в кадре на MAC B. Следующие пакеты обходятся без ARP." },
+    { t: ["Remote IP: ARP for the gateway", "Удалённый IP: ARP для шлюза"], at: ["a", "gw"], fly: [["a", "sw"], ["sw", "gw"]], msg: "Who has 192.168.1.1?", cache: [["192.168.1.20", "bb:bb:bb:00:00:14", "REACHABLE"], ["192.168.1.1", "11:11:11:00:00:01", "REACHABLE"]],
+      en: "Now A sends to 8.8.8.8. That address is outside the subnet, so A never ARPs for it (nobody on the LAN would answer). The route says \"via 192.168.1.1\", so A resolves the gateway's MAC and sends the frame there, with the IP destination still 8.8.8.8.",
+      ru: "Теперь A отправляет на 8.8.8.8. Этот адрес вне подсети, поэтому A никогда не делает для него ARP (в LAN никто бы не ответил). Маршрут говорит «via 192.168.1.1», поэтому A узнаёт MAC шлюза и отправляет кадр туда, а IP назначения остаётся 8.8.8.8." },
+    { t: ["Gratuitous ARP", "Gratuitous ARP"], at: ["b"], fly: [["b", "sw"], ["sw", "a"], ["sw", "gw"], ["sw", "c"]], msg: "192.168.1.20 is at bb:..:99 (unasked)", cache: [["192.168.1.20", "bb:bb:bb:00:00:99", "updated"], ["192.168.1.1", "11:11:11:00:00:01", "REACHABLE"]],
+      en: "A gratuitous ARP is an announcement nobody asked for: a host broadcasts its own IP-to-MAC mapping. Used at boot to detect duplicate IPs and on failover: when keepalived moves a virtual IP to another machine, a gratuitous ARP makes every neighbour update its cache at once.",
+      ru: "Gratuitous ARP — объявление, о котором никто не просил: хост рассылает собственное соответствие IP и MAC. Используется при загрузке для поиска дублей IP и при failover: когда keepalived переносит виртуальный IP на другую машину, gratuitous ARP заставляет всех соседей сразу обновить кеш." },
+    { t: ["ARP poisoning", "Отравление ARP"], at: ["c"], evil: true, fly: [["c", "sw"], ["sw", "a"]], msg: "192.168.1.1 is at cc:cc:cc:00:00:66 (forged)", cache: [["192.168.1.20", "bb:bb:bb:00:00:99", "REACHABLE"], ["192.168.1.1", "cc:cc:cc:00:00:66", "poisoned"]],
+      en: "Attacker C keeps sending forged replies: \"192.168.1.1 is at C's MAC\". A accepts them, so all its internet traffic now goes to C, which can read or modify it and forward it on (man in the middle). Defences: dynamic ARP inspection on switches, static entries for the gateway, and TLS everywhere.",
+      ru: "Атакующий C постоянно шлёт поддельные ответы: «192.168.1.1 находится по MAC C». A их принимает, и весь его интернет-трафик теперь идёт через C, который может читать и менять его и пересылать дальше (man in the middle). Защита: dynamic ARP inspection на коммутаторах, статическая запись для шлюза и TLS везде." }
+  ];
+  const N = {
+    a:  [20, 112, 150, 62, LL("host A", "хост A"), "192.168.1.10", "aa:..:0a"],
+    b:  [590, 112, 150, 62, LL("host B", "хост B"), "192.168.1.20", "bb:..:14"],
+    gw: [305, 10, 150, 62, LL("gateway", "шлюз"), "192.168.1.1", "11:..:01"],
+    c:  [590, 220, 150, 62, LL("host C", "хост C"), "192.168.1.66", "cc:..:66"],
+    sw: [330, 118, 100, 50, LL("switch", "коммутатор"), "L2", ""]
+  };
+  const C = id => [N[id][0] + N[id][2] / 2, N[id][1] + N[id][3] / 2];
+  return steppedAnim(el, { title: LL("ARP: from IP address to MAC address", "ARP: от IP-адреса к MAC-адресу"), vb: [760, 350], steps: ST, stepMs: 6200, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 1500));
+    for(const id of ["a", "b", "gw", "c"]){ const [x1, y1] = C(id), [x2, y2] = C("sw"); E(g, "line", { x1, y1, x2, y2, class: "an-flowline an-dash" }); }
+    for(const id in N){ const [x, y, w, h, name, l1, l2] = N[id];
+      const cls = id === "c" && s.evil ? "an-leak" : s.at.includes(id) ? "an-reg on" : "an-box";
+      const node = oR(g, x, y, w, h, cls, 8); if((s.dim || []).includes(id)) node.setAttribute("class", cls + " an-dim");
+      oT(g, x + w / 2, y + 20, name, "an-t an-b" + (id === "c" && s.evil ? " an-warn" : "")); oT(g, x + w / 2, y + 37, l1, "an-m"); if(l2) oT(g, x + w / 2, y + 52, l2, "an-m"); }
+    if(s.fly){
+      const legs = s.fly, first = legs.filter(l => l[0] !== "sw"), rest = legs.filter(l => l[0] === "sw");
+      const k1 = Math.min(1, k * 2), k2 = Math.max(0, k * 2 - 1);
+      for(const [a, b] of first){ const [x, y] = polyAt([C(a), C(b)], k1); E(g, "circle", { cx: x, cy: y, r: 7, class: "an-dot an-flow" }); }
+      if(k2 > 0) for(const [a, b] of rest){ const [x, y] = polyAt([C(a), C(b)], k2); E(g, "circle", { cx: x, cy: y, r: 7, class: "an-dot an-flow" }); }
+    }
+    if(s.msg){ oR(g, 190, 186, 380, 26, s.evil ? "an-leak" : "an-box", 5); oT(g, 380, 203, s.msg, "an-code" + (s.evil ? " an-warn" : "")); }
+    // A's ARP cache
+    oR(g, 20, 222, 540, 118, "an-frame", 8);
+    oT(g, 30, 240, LL("A's ARP cache (ip neigh)", "кеш ARP хоста A (ip neigh)"), "an-m an-b", "start");
+    [LL("IP", "IP"), "MAC", LL("state", "состояние")].forEach((h, j)=> oT(g, 34 + [0, 170, 380][j], 260, h, "an-m an-b", "start"));
+    if(!s.cache.length) oT(g, 290, 296, LL("(empty)", "(пусто)"), "an-m");
+    s.cache.forEach(([ip, mac, state], i)=>{ const y = 268 + i * 32, bad = state === "poisoned", upd = state === "updated";
+      oR(g, 30, y, 520, 26, bad ? "an-leak" : upd ? "an-reg on" : "an-box", 4);
+      oT(g, 38, y + 17, ip, "an-code", "start"); oT(g, 200, y + 17, mac, "an-code" + (bad ? " an-warn" : ""), "start"); oT(g, 410, y + 17, state, "an-m an-b" + (bad ? " an-warn" : ""), "start"); });
+  }});
+};
+
+// ============ networking: traceroute-ttl
+ANIMS["traceroute-ttl"] = el=>{
+  // Your host → R1 → R2 → R3 → server. Each probe has TTL+1; the router where TTL hits 0 answers with ICMP Time Exceeded.
+  const H = [
+    ["you", LL("your host", "твой хост"), "192.168.1.10"],
+    ["r1", "R1", "192.168.1.1"],
+    ["r2", "R2", "100.64.0.1"],
+    ["r3", "R3", "203.0.113.9"],
+    ["dst", LL("server", "сервер"), "93.184.216.34"]
+  ];
+  const ROWS = [["1", "192.168.1.1", "0.9 ms"], ["2", "100.64.0.1", "6.2 ms"], ["3", "* * *", ""], ["4", "93.184.216.34", "24.8 ms"]];
+  const ST = [
+    { t: ["Probe with TTL 1", "Проба с TTL 1"], ttl: 1, stop: 1, back: "time", rows: 0,
+      en: "traceroute 93.184.216.34 sends the first probe with TTL = 1 (on Linux a UDP datagram to port 33434 by default; -I uses ICMP echo, -T uses TCP SYN). Every router decrements TTL by one before forwarding.",
+      ru: "traceroute 93.184.216.34 отправляет первую пробу с TTL = 1 (в Linux по умолчанию UDP-датаграмму на порт 33434; -I использует ICMP echo, -T — TCP SYN). Каждый маршрутизатор перед пересылкой уменьшает TTL на единицу." },
+    { t: ["Hop 1: Time Exceeded", "Хоп 1: Time Exceeded"], ttl: 1, stop: 1, back: "time", reply: true, rows: 1,
+      en: "R1 decrements TTL to 0, drops the probe and sends back ICMP type 11 Time Exceeded from its own address. traceroute prints that source address as hop 1, with the round-trip time it measured. It sends three probes per hop, so you see three times.",
+      ru: "R1 уменьшает TTL до 0, отбрасывает пробу и отправляет обратно ICMP типа 11 Time Exceeded со своего адреса. traceroute печатает этот адрес источника как хоп 1 вместе с измеренным временем туда-обратно. На каждый хоп уходят три пробы, поэтому времени три." },
+    { t: ["TTL 2 reaches R2", "TTL 2 доходит до R2"], ttl: 2, stop: 2, back: "time", reply: true, rows: 2,
+      en: "The next probe has TTL = 2: R1 forwards it with TTL 1, R2 decrements it to 0 and answers. Each step reveals one more router. 100.64.0.1 is a carrier-grade NAT address: your ISP's network.",
+      ru: "Следующая проба с TTL = 2: R1 пересылает её с TTL 1, R2 уменьшает до 0 и отвечает. Каждый шаг открывает ещё один маршрутизатор. 100.64.0.1 — адрес carrier-grade NAT: сеть твоего провайдера." },
+    { t: ["Silent hop: * * *", "Молчаливый хоп: * * *"], ttl: 3, stop: 3, back: "none", rows: 3,
+      en: "R3 drops the probe but sends nothing back (or rate-limits ICMP generation), so traceroute prints * * * after a timeout. The path is not broken: the next probe goes further. Stars only matter if every hop after them is stars too.",
+      ru: "R3 отбрасывает пробу, но ничего не отвечает (или ограничивает частоту генерации ICMP), поэтому traceroute после тайм-аута печатает * * *. Путь не оборван: следующая проба идёт дальше. Звёздочки важны, только если все хопы после них тоже звёздочки." },
+    { t: ["Destination answers", "Отвечает назначение"], ttl: 4, stop: 4, back: "unreach", reply: true, rows: 4,
+      en: "With TTL = 4 the probe reaches the server. Nobody listens on UDP port 33434+, so the server answers ICMP type 3 code 3 Port Unreachable, and traceroute knows it has arrived. With -I the server sends an Echo Reply instead; with -T a SYN-ACK or RST.",
+      ru: "С TTL = 4 проба доходит до сервера. На UDP-порту 33434+ никто не слушает, поэтому сервер отвечает ICMP типа 3 кода 3 Port Unreachable, и traceroute понимает, что дошёл. С -I сервер присылает Echo Reply, с -T — SYN-ACK или RST." },
+    { t: ["Reading the result", "Как читать результат"], ttl: 0, stop: 0, back: "none", rows: 4, all: true,
+      en: "Each line is a hop and its round-trip time. RTT is the full round trip from you to that router and back, and replies may take a different return path, so a slow middle hop with fast later hops usually means that router deprioritises ICMP, not that the path is slow. mtr runs the same probes continuously and shows loss per hop.",
+      ru: "Каждая строка — хоп и время туда-обратно. RTT — полный путь от тебя до маршрутизатора и обратно, причём ответы могут идти другим путём, поэтому медленный средний хоп при быстрых следующих обычно значит, что маршрутизатор понижает приоритет ICMP, а не что путь медленный. mtr шлёт те же пробы непрерывно и показывает потери на каждом хопе." }
+  ];
+  const X = i => 20 + i * 150, W = 120, Y = 50, HH = 64, CX = i => X(i) + W / 2;
+  return steppedAnim(el, { title: LL("traceroute: one TTL step at a time", "traceroute: по одному шагу TTL"), vb: [760, 356], steps: ST, stepMs: 6200, render(g, s, t){
+    for(let i = 0; i < H.length - 1; i++) E(g, "line", { x1: X(i) + W, y1: Y + HH / 2, x2: X(i + 1), y2: Y + HH / 2, class: "an-flowline" });
+    H.forEach(([id, name, ip], i)=>{
+      const on = i === s.stop || (s.all && i > 0), silent = i === 3 && s.back === "none" && s.stop === 3;
+      oR(g, X(i), Y, W, HH, silent ? "an-leak" : on ? "an-reg on" : "an-box", 8);
+      oT(g, CX(i), Y + 26, name, "an-t an-b"); oT(g, CX(i), Y + 46, ip, "an-m");
+    });
+    if(s.stop){
+      const goT = 1700, k1 = easeIO(Math.min(1, t / goT)), k2 = easeIO(Math.max(0, Math.min(1, (t - goT - 300) / 1500)));
+      // outbound probe, TTL counting down hop by hop
+      const pts = []; for(let i = 0; i <= s.stop; i++) pts.push([CX(i), Y + HH / 2 - 2]);
+      const [px, py] = polyAt(pts, k1), passed = Math.floor(k1 * s.stop + 1e-6);
+      const left = Math.max(s.stop === 4 ? 1 : 0, s.ttl - passed);
+      if(k1 < 1 || s.back === "none" || !s.reply){ E(g, "circle", { cx: px, cy: py, r: 9, class: "an-dot an-flow" }); oT(g, px, py - 14, "TTL " + left, "an-m an-b"); }
+      if(k1 >= 1 && s.back === "none") oT(g, CX(s.stop), Y + HH + 18, LL("dropped, no reply", "отброшено, ответа нет"), "an-m an-b an-warn");
+      if(s.reply && k1 >= 1){
+        const back = pts.slice().reverse().map(([x]) => [x, Y + HH + 30]);
+        const [bx, by] = polyAt(back, k2);
+        E(g, "circle", { cx: bx, cy: by, r: 8, class: "an-dot an-ack" });
+        oT(g, bx, by + 22, s.back === "time" ? LL("ICMP 11 Time Exceeded", "ICMP 11 Time Exceeded") : LL("ICMP 3/3 Port Unreachable", "ICMP 3/3 Port Unreachable"), "an-m an-b");
+      }
+    }
+    // output table
+    oR(g, 20, 182, 720, 166, "an-frame", 8);
+    oT(g, 32, 202, "$ traceroute -n 93.184.216.34", "an-code", "start");
+    ROWS.slice(0, s.rows).forEach(([n, ip, rtt], i)=>{
+      const y = 228 + i * 28, star = ip.startsWith("*"), cur = i === s.rows - 1 && !s.all;
+      oR(g, 30, y - 16, 700, 24, cur ? "an-reg on" : "an-box", 4);
+      oT(g, 44, y, n, "an-code an-b", "start"); oT(g, 80, y, ip, "an-code" + (star ? " an-warn" : ""), "start");
+      if(rtt){ const v = parseFloat(rtt); oT(g, 260, y, `${rtt}  ${(v * 1.1).toFixed(1)} ms  ${(v * 0.95).toFixed(1)} ms`, "an-code", "start"); }
+    });
+  }});
+};
+
+// ============ networking: tcp-segment-flow
+ANIMS["tcp-segment-flow"] = el=>{
+  // Each step = one segment on the wire. dir: "cs" client→server, "sc" server→client.
+  // cs/ss = states after the step; cn/cr/sn/sr = next seq to send / next byte expected (the ack value) on each side.
+  const ST = [
+    { t: ["Pick ISNs", "Выбор ISN"], cs: "CLOSED", ss: "LISTEN", cn: 1000, cr: null, sn: 5000, sr: null,
+      en: "Before anything is sent, each side picks a random initial sequence number (ISN). Here the client picks 1000 and the server 5000 to keep the arithmetic readable; real ISNs are random 32-bit values. The server is in LISTEN.",
+      ru: "До отправки чего-либо каждая сторона выбирает случайный начальный номер последовательности (ISN). Здесь клиент выбрал 1000, а сервер 5000, чтобы арифметика читалась легко; настоящие ISN — случайные 32-битные числа. Сервер в состоянии LISTEN." },
+    { t: ["SYN", "SYN"], dir: "cs", f: "SYN", seq: 1000, ack: null, len: 0, cs: "SYN-SENT", ss: "SYN-RECV", cn: 1001, cr: null, sn: 5000, sr: 1001,
+      en: "The client sends SYN with seq 1000. It carries no data, but SYN consumes one sequence number, so the client's next byte will be 1001. The server records that it now expects byte 1001.",
+      ru: "Клиент отправляет SYN с seq 1000. Данных в нём нет, но SYN занимает один номер последовательности, поэтому следующий байт клиента будет 1001. Сервер запоминает, что теперь ждёт байт 1001." },
+    { t: ["SYN-ACK", "SYN-ACK"], dir: "sc", f: "SYN, ACK", seq: 5000, ack: 1001, len: 0, cs: "ESTABLISHED", ss: "SYN-RECV", cn: 1001, cr: 5001, sn: 5001, sr: 1001,
+      en: "The server answers SYN-ACK: its own seq 5000 and ack 1001, meaning 'I have everything before 1001, send 1001 next'. Its SYN also consumes a number, so the server's next byte is 5001. The client is now ESTABLISHED.",
+      ru: "Сервер отвечает SYN-ACK: свой seq 5000 и ack 1001, то есть «у меня есть всё до 1001, присылай 1001». Его SYN тоже занимает номер, поэтому следующий байт сервера — 5001. Клиент теперь в ESTABLISHED." },
+    { t: ["ACK: handshake done", "ACK: рукопожатие завершено"], dir: "cs", f: "ACK", seq: 1001, ack: 5001, len: 0, cs: "ESTABLISHED", ss: "ESTABLISHED", cn: 1001, cr: 5001, sn: 5001, sr: 1001,
+      en: "The client ACKs with seq 1001, ack 5001. A pure ACK carries no data and consumes no sequence number, so the next data segment will also start at 1001. Both sides are ESTABLISHED after one round trip.",
+      ru: "Клиент подтверждает: seq 1001, ack 5001. Чистый ACK не несёт данных и не занимает номер, поэтому следующий сегмент с данными тоже начнётся с 1001. После одного round trip обе стороны в ESTABLISHED." },
+    { t: ["Data: 100 bytes", "Данные: 100 байт"], dir: "cs", f: "PSH, ACK", seq: 1001, ack: 5001, len: 100, cs: "ESTABLISHED", ss: "ESTABLISHED", cn: 1101, cr: 5001, sn: 5001, sr: 1101,
+      en: "The client sends a 100-byte request: seq 1001, bytes 1001–1100. The next seq is always seq + length, so the client's next byte is 1101, and the server now expects 1101.",
+      ru: "Клиент отправляет запрос в 100 байт: seq 1001, байты 1001–1100. Следующий seq всегда равен seq + длина, поэтому следующий байт клиента — 1101, и сервер теперь ждёт 1101." },
+    { t: ["Data: 300 bytes back", "Данные: 300 байт в ответ"], dir: "sc", f: "PSH, ACK", seq: 5001, ack: 1101, len: 300, cs: "ESTABLISHED", ss: "ESTABLISHED", cn: 1101, cr: 5301, sn: 5301, sr: 1101,
+      en: "The server's 300-byte response has seq 5001 (bytes 5001–5300) and ack 1101: one segment both confirms the request and carries the answer (piggybacking). ACKs are cumulative: 1101 confirms every byte before it.",
+      ru: "Ответ сервера в 300 байт имеет seq 5001 (байты 5001–5300) и ack 1101: один сегмент и подтверждает запрос, и несёт ответ (piggybacking). ACK кумулятивны: 1101 подтверждает все байты до него." },
+    { t: ["Client FIN", "FIN клиента"], dir: "cs", f: "FIN, ACK", seq: 1101, ack: 5301, len: 0, cs: "FIN-WAIT-1", ss: "CLOSE-WAIT", cn: 1102, cr: 5301, sn: 5301, sr: 1102,
+      en: "The client is done and closes: FIN with seq 1101 and ack 5301, which also confirms the 300-byte response. Like SYN, FIN consumes one sequence number. The server enters CLOSE-WAIT until its application calls close().",
+      ru: "Клиент закончил и закрывает: FIN с seq 1101 и ack 5301, который заодно подтверждает ответ в 300 байт. Как и SYN, FIN занимает один номер. Сервер переходит в CLOSE-WAIT, пока его приложение не вызовет close()." },
+    { t: ["ACK of FIN", "ACK на FIN"], dir: "sc", f: "ACK", seq: 5301, ack: 1102, len: 0, cs: "FIN-WAIT-2", ss: "CLOSE-WAIT", cn: 1102, cr: 5301, sn: 5301, sr: 1102,
+      en: "The server acknowledges the FIN with ack 1102 (1101 + 1 for the FIN). The connection is half-closed: the client will send nothing more, but the server could still send data.",
+      ru: "Сервер подтверждает FIN: ack 1102 (1101 + 1 за FIN). Соединение наполовину закрыто: клиент больше ничего не отправит, но сервер ещё мог бы слать данные." },
+    { t: ["Server FIN", "FIN сервера"], dir: "sc", f: "FIN, ACK", seq: 5301, ack: 1102, len: 0, cs: "TIME-WAIT", ss: "LAST-ACK", cn: 1102, cr: 5302, sn: 5302, sr: 1102,
+      en: "The server application calls close(), so the server sends its own FIN with seq 5301 and goes to LAST-ACK. The client receives it and enters TIME-WAIT.",
+      ru: "Приложение сервера вызывает close(), поэтому сервер отправляет свой FIN с seq 5301 и переходит в LAST-ACK. Клиент получает его и входит в TIME-WAIT." },
+    { t: ["Final ACK", "Последний ACK"], dir: "cs", f: "ACK", seq: 1102, ack: 5302, len: 0, cs: "TIME-WAIT", ss: "CLOSED", cn: 1102, cr: 5302, sn: 5302, sr: 1102,
+      en: "The client sends the last ACK: ack 5302. The server is CLOSED. The client, as the active closer, stays in TIME-WAIT for 2×MSL (60 s on Linux) in case this ACK is lost and the FIN comes again.",
+      ru: "Клиент отправляет последний ACK: ack 5302. Сервер в CLOSED. Клиент, как активно закрывающая сторона, остаётся в TIME-WAIT на 2×MSL (60 с в Linux) на случай, если этот ACK потеряется и FIN придёт снова." }
+  ];
+  const CX = 10, SX = 560, BW = 190, LX = 220, RX = 540, PY = 78;
+  return steppedAnim(el, { title: LL("Sequence and acknowledgement numbers over a connection", "Номера последовательности и подтверждения за время соединения"), vb: [760, 430], steps: ST, stepMs: 6400, render(g, s, t, i){
+    const k = easeIO(Math.min(1, t / 1600));
+    // endpoints
+    const side = (x, name, state, nxt, rcv, active)=>{
+      oR(g, x, 14, BW, 128, "an-frame" + (active ? " lead" : ""), 10);
+      oT(g, x + BW / 2, 34, name, "an-t an-b");
+      oR(g, x + 12, 44, BW - 24, 28, "an-reg on", 6); oT(g, x + BW / 2, 63, state, "an-code an-b");
+      oT(g, x + 14, 96, LL("next seq to send", "след. seq к отправке"), "an-m", "start"); oT(g, x + BW - 14, 96, String(nxt), "an-code an-b", "end");
+      oT(g, x + 14, 122, LL("expecting (ack)", "ждёт (ack)"), "an-m", "start"); oT(g, x + BW - 14, 122, rcv == null ? "—" : String(rcv), "an-code an-b", "end");
+    };
+    side(CX, LL("client 10.0.0.5:51000", "клиент 10.0.0.5:51000"), s.cs, s.cn, s.cr, s.dir === "cs");
+    side(SX, LL("server 10.0.0.9:5432", "сервер 10.0.0.9:5432"), s.ss, s.sn, s.sr, s.dir === "sc");
+    // segment in flight
+    if(s.dir){
+      const x1 = s.dir === "cs" ? LX : RX, x2 = s.dir === "cs" ? RX : LX, x = x1 + (x2 - x1) * k;
+      E(g, "line", { x1: LX, y1: PY, x2: RX, y2: PY, class: "an-flowline" });
+      const w = 150, cls = s.len ? "an-pg k2" : /SYN|FIN/.test(s.f) ? "an-pg k3" : "an-pg k1";
+      oR(g, x - w / 2, PY - 30, w, 60, cls, 6);
+      oT(g, x, PY - 12, s.f, "an-code an-b");
+      oT(g, x, PY + 5, `seq ${s.seq}` + (s.ack == null ? "" : ` · ack ${s.ack}`), "an-code");
+      oT(g, x, PY + 21, s.len ? LL(`${s.len} bytes: ${s.seq}–${s.seq + s.len - 1}`, `${s.len} байт: ${s.seq}–${s.seq + s.len - 1}`) : LL("no data", "без данных"), "an-m an-b");
+      if(k >= 1 && /SYN|FIN/.test(s.f)) oT(g, 380, PY + 50, LL(`${s.f.split(",")[0]} consumes 1 number`, `${s.f.split(",")[0]} занимает 1 номер`), "an-m an-b an-sp");
+      else if(k >= 1 && s.len) oT(g, 380, PY + 50, LL(`next seq = ${s.seq} + ${s.len} = ${s.seq + s.len}`, `след. seq = ${s.seq} + ${s.len} = ${s.seq + s.len}`), "an-m an-b an-sp");
+    } else {
+      oT(g, 380, PY + 4, LL("ISN: client 1000 · server 5000", "ISN: клиент 1000 · сервер 5000"), "an-t an-b");
+    }
+    // ledger of segments sent so far
+    const TY = 168, cols = [[30, "#"], [70, LL("dir", "напр.")], [150, LL("flags", "флаги")], [290, "seq"], [390, "ack"], [490, LL("len", "длина")], [580, LL("after it", "после него")]];
+    oR(g, 10, TY, 740, 252, "an-frame", 8);
+    cols.forEach(([x, h])=> oT(g, x, TY + 20, h, "an-m an-b", "start"));
+    let row = 0;
+    for(let j = 1; j <= i; j++){ const q = ST[j], y = TY + 30 + row * 22, cur = j === i; row++;
+      if(cur) oR(g, 16, y, 728, 20, "an-rowhl", 4);
+      const cells = [String(j), q.dir === "cs" ? "C → S" : "S → C", q.f, String(q.seq), q.ack == null ? "—" : String(q.ack), String(q.len), q.dir === "cs" ? `C ${q.cs}` : `S ${q.ss}`];
+      cells.forEach((c, ci)=> oT(g, cols[ci][0], y + 14, c, (ci === 3 || ci === 4) ? "an-code an-b" : "an-code", "start"));
+    }
+    if(i === 0) oT(g, 380, TY + 60, LL("segments will appear here as they are sent", "сегменты появятся здесь по мере отправки"), "an-m");
+  }});
+};
+
+// ============ networking: tcp-sliding-window
+ANIMS["tcp-sliding-window"] = el=>{
+  const ST = [
+    { t: ["Handshake: window 8 KB", "Рукопожатие: окно 8 КБ"], acked: 0, sent: 0, rw: 8, buf: 0,
+      en: "The receiver's socket receive buffer holds 8 KB (8 segments of 1 KB here). In the handshake it advertises rwnd = 8 KB, so the sender may have up to 8 unacknowledged segments in flight: segments 1–8 form the usable window, everything after it is not allowed yet.",
+      ru: "Буфер приёма сокета у получателя вмещает 8 КБ (здесь 8 сегментов по 1 КБ). В рукопожатии он объявляет rwnd = 8 КБ, значит у отправителя может быть до 8 неподтверждённых сегментов в полёте: сегменты 1–8 — доступное окно, всё дальше пока запрещено." },
+    { t: ["Send 5 segments", "Отправка 5 сегментов"], acked: 0, sent: 5, rw: 8, buf: 0, pkt: [["data", "seg 1–5"]],
+      en: "The application writes, and the kernel sends segments 1–5 without waiting for ACKs. They are now in flight: kept in the send buffer until acknowledged, in case they must be retransmitted. Usable window = rwnd − in flight = 8 − 5 = 3.",
+      ru: "Приложение пишет, и ядро отправляет сегменты 1–5, не дожидаясь ACK. Теперь они в полёте: лежат в буфере отправки до подтверждения на случай повторной передачи. Доступное окно = rwnd − в полёте = 8 − 5 = 3." },
+    { t: ["ACK: left edge moves, right edge stays", "ACK: левый край двигается, правый стоит"], acked: 5, sent: 5, rw: 3, buf: 5, busy: true, pkt: [["ack", "ACK 6, win 3"]],
+      en: "The kernel on the receiver stores the 5 KB and ACKs them, but the application is busy and has not called read(). Only 3 KB of the buffer is free, so the ACK says win 3. The left edge of the window slides to segment 6, the right edge stays at 8: the window shrank.",
+      ru: "Ядро получателя кладёт 5 КБ в буфер и подтверждает их, но приложение занято и не вызывает read(). Свободно только 3 КБ буфера, поэтому ACK говорит win 3. Левый край окна сдвигается к сегменту 6, правый остаётся на 8: окно сжалось." },
+    { t: ["Fill the usable window", "Заполняем доступное окно"], acked: 5, sent: 8, rw: 3, buf: 5, busy: true, pkt: [["data", "seg 6–8"]],
+      en: "The sender uses the remaining 3 KB and sends segments 6–8. In flight = 3 = rwnd, usable = 0. Segment 9 is ready in the send buffer but may not be sent.",
+      ru: "Отправитель использует оставшиеся 3 КБ и шлёт сегменты 6–8. В полёте 3 = rwnd, доступно 0. Сегмент 9 уже лежит в буфере отправки, но отправлять его нельзя." },
+    { t: ["Zero window", "Нулевое окно"], acked: 8, sent: 8, rw: 0, buf: 8, busy: true, pkt: [["ack", "ACK 9, win 0"]],
+      en: "The receive buffer is full: 8 KB acknowledged by the kernel but not read by the application (Recv-Q = 8 KB in ss). The ACK advertises win 0. The sender stops completely; if the application keeps writing, its send buffer fills and write() blocks. That is back-pressure.",
+      ru: "Буфер приёма полон: 8 КБ подтверждены ядром, но не прочитаны приложением (Recv-Q = 8 КБ в ss). ACK объявляет win 0. Отправитель полностью останавливается; если приложение продолжает писать, его буфер отправки заполняется и write() блокируется. Это и есть обратное давление (back-pressure)." },
+    { t: ["Persist timer: window probe", "Persist-таймер: проба окна"], acked: 8, sent: 8, rw: 0, buf: 8, busy: true, pkt: [["data", "probe"], ["ack", "win 0"]],
+      en: "A window update could get lost, and then both sides would wait forever. So the sender starts the persist timer and sends a small window probe; the receiver answers with its current window, still 0. Probes repeat with exponential backoff. The connection is healthy, just paused.",
+      ru: "Обновление окна может потеряться, и тогда обе стороны будут ждать вечно. Поэтому отправитель запускает persist-таймер и шлёт маленькую пробу окна; получатель отвечает текущим окном, всё ещё 0. Пробы повторяются с экспоненциальной задержкой. Соединение исправно, просто на паузе." },
+    { t: ["read(): window update", "read(): обновление окна"], acked: 8, sent: 8, rw: 6, buf: 2, read: true, pkt: [["ack", "win 6"]],
+      en: "The application finally calls read() and takes 6 KB out of the buffer. 6 KB is free, at least one MSS, so the receiver sends a window update: win 6. The right edge jumps from 8 to 14.",
+      ru: "Приложение наконец вызывает read() и забирает из буфера 6 КБ. Свободно 6 КБ — не меньше одного MSS, поэтому получатель отправляет обновление окна: win 6. Правый край прыгает с 8 на 14." },
+    { t: ["Sending resumes", "Отправка возобновляется"], acked: 8, sent: 14, rw: 6, buf: 2, pkt: [["data", "seg 9–14"]],
+      en: "The sender immediately sends segments 9–14 and fills the reopened window. The blocked write() in the producer returns.",
+      ru: "Отправитель сразу шлёт сегменты 9–14 и заполняет вновь открывшееся окно. Заблокированный write() у производителя возвращается." },
+    { t: ["Fast reader: full window", "Быстрый читатель: полное окно"], acked: 14, sent: 14, rw: 8, buf: 0, read: true, pkt: [["ack", "ACK 15, win 8"]],
+      en: "Now the application reads as fast as data arrives, the buffer stays empty and every ACK advertises the full 8 KB. The window slides forward smoothly. Throughput is now limited by window / RTT, which is why high-latency links need bigger buffers.",
+      ru: "Теперь приложение читает так же быстро, как приходят данные, буфер остаётся пустым, и каждый ACK объявляет полные 8 КБ. Окно плавно едет вперёд. Пропускная способность теперь ограничена окном / RTT, поэтому каналам с большой задержкой нужны буферы побольше." }
+  ];
+  const N = 24, BX = i => 20 + (i - 1) * 30, BW = 27, BY = 36, CAP = 8;
+  const lerp = (a, b, k) => a + (b - a) * k;
+  return steppedAnim(el, { title: LL("Sliding window and the receive window (rwnd)", "Скользящее окно и окно приёма (rwnd)"), vb: [760, 330], steps: ST, stepMs: 6800, render(g, s, t, i){
+    const k = easeIO(Math.min(1, t / 1400)), p = i > 0 ? ST[i - 1] : s;
+    const edge = s.acked + s.rw, pEdge = p.acked + p.rw;
+    // sender byte stream
+    oT(g, 20, 24, LL("sender: byte stream in the send buffer (1 box = 1 KB segment)", "отправитель: поток байтов в буфере отправки (1 ячейка = сегмент 1 КБ)"), "an-m an-b", "start");
+    for(let b = 1; b <= N; b++){
+      const cls = b <= s.acked ? "an-pg dim k2" : b <= s.sent ? "an-pg k1" : b <= edge ? "an-hl" : "an-box";
+      oR(g, BX(b), BY, BW, 30, cls, 4); oT(g, BX(b) + BW / 2, BY + 19, String(b), "an-m an-b");
+    }
+    // window outline, sliding between the previous and the current step
+    const L = lerp(p.acked, s.acked, k), R = lerp(pEdge, edge, k);
+    const x1 = BX(L + 1) - 3, x2 = BX(R + 1) - 3;
+    if(x2 - x1 > 4){ oR(g, x1, BY - 5, x2 - x1, 40, "an-cow", 6); oT(g, (x1 + x2) / 2, BY + 50, LL(`window = ${Math.round(R - L)} KB`, `окно = ${Math.round(R - L)} КБ`), "an-m an-b an-sp"); }
+    else { E(g, "line", { x1, y1: BY - 8, x2: x1, y2: BY + 38, class: "an-limit on" }); oT(g, x1, BY + 50, LL("window = 0", "окно = 0"), "an-m an-b an-warn"); }
+    // legend
+    [["an-pg dim k2", LL("sent + acked", "отправлено и подтверждено")], ["an-pg k1", LL("in flight (unacked)", "в полёте (без ACK)")], ["an-hl", LL("usable: may send now", "доступно: можно слать")], ["an-box", LL("not allowed yet", "пока нельзя")]]
+      .forEach(([c, l], j)=>{ oR(g, 20 + j * 185, 100, 14, 14, c, 3); oT(g, 40 + j * 185, 111, l, "an-m", "start"); });
+    const inFlight = s.sent - s.acked, usable = Math.max(0, edge - s.sent);
+    oT(g, 380, 138, LL(`rwnd = ${s.rw} KB · in flight = ${inFlight} · usable = rwnd − in flight = ${usable}`, `rwnd = ${s.rw} КБ · в полёте = ${inFlight} · доступно = rwnd − в полёте = ${usable}`), "an-t an-b" + (s.rw === 0 ? " an-warn" : ""));
+    // receiver
+    oR(g, 150, 214, 470, 108, "an-frame", 10);
+    oT(g, 166, 236, LL("receiver kernel: socket receive buffer (8 KB)", "ядро получателя: буфер приёма сокета (8 КБ)"), "an-m an-b", "start");
+    const fill = Math.round(lerp(p.buf, s.buf, k));
+    for(let j = 0; j < CAP; j++){ oR(g, 166 + j * 42, 248, 38, 34, j < fill ? "an-pg k1" : "an-free", 4); }
+    const free = CAP - fill;
+    oT(g, 560, 262, LL("rwnd = free", "rwnd = свободно"), "an-m", "middle");
+    oT(g, 560, 284, LL(`${free} KB`, `${free} КБ`), "an-big" + (free === 0 ? " an-warn" : ""));
+    oT(g, 166, 306, LL(`Recv-Q = ${fill} KB (ACKed by the kernel, not read by the app)`, `Recv-Q = ${fill} КБ (подтверждено ядром, не прочитано приложением)`), "an-m", "start");
+    // application
+    oR(g, 636, 226, 114, 84, s.read ? "an-reg on" : s.busy ? "an-leak" : "an-box", 8);
+    oT(g, 693, 252, LL("application", "приложение"), "an-t an-b");
+    oT(g, 693, 274, "read()", "an-code an-b");
+    oT(g, 693, 294, s.read ? LL("reading", "читает") : s.busy ? LL("busy, not reading", "занято, не читает") : LL("idle", "ждёт"), "an-m" + (s.busy ? " an-b an-warn" : ""));
+    if(s.read){ const kk = (t % 1500) / 1500; E(g, "circle", { cx: lerp(500, 636, kk), cy: 265, r: 5, class: "an-dot an-ack" }); }
+    // packets on the wire: each leg takes an equal share of the first 2.8 s
+    if(s.pkt){
+      const legs = s.pkt, dur = 2800 / legs.length, j = Math.min(legs.length - 1, Math.floor(t / dur)), kk = easeIO(Math.min(1, (t - j * dur) / dur));
+      const [kind, label] = legs[j], down = kind === "data";
+      const y1 = down ? 150 : 244, y2 = down ? 244 : 150, x = down ? 74 : 128, y = lerp(y1, y2, kk);
+      E(g, "line", { x1: x, y1, x2: x, y2, class: "an-flowline" });
+      E(g, "circle", { cx: x, cy: y, r: 7, class: "an-dot " + (down ? "an-flow" : "an-ack") });
+      oT(g, x - 12, y + 4, label, "an-m an-b", "end");
+    }
+  }});
+};
+
+// ============ networking: tcp-cwnd-growth
+ANIMS["tcp-cwnd-growth"] = el=>{
+  // Reno-style trace, one value per RTT, in segments (MSS)
+  const W = [1, 2, 4, 8, 16, 17, 18, 19, 20, 21, 22, 23, 24, 12, 13, 14, 15, 16, 1, 2, 4, 8, 9, 10];
+  const ST = [
+    { t: ["Start: cwnd = 1 segment", "Старт: cwnd = 1 сегмент"], n: 1, th: 16,
+      en: "A new connection knows nothing about the path. The sender keeps a congestion window cwnd and may have min(cwnd, rwnd) bytes in flight. Here rwnd (the receiver's limit) is high, so cwnd decides. The chart starts at 1 segment so the doubling is easy to see; Linux actually starts at 10 segments (about 14 KB).",
+      ru: "Новое соединение ничего не знает о пути. Отправитель держит окно перегрузки cwnd и может иметь в полёте min(cwnd, rwnd) байт. Здесь rwnd (лимит получателя) большой, поэтому решает cwnd. График начинается с 1 сегмента, чтобы удвоение было хорошо видно; Linux на самом деле стартует с 10 сегментов (около 14 КБ)." },
+    { t: ["Slow start: doubling every RTT", "Медленный старт: удвоение каждый RTT"], n: 5, th: 16,
+      en: "Slow start: every ACK adds one segment to cwnd, and a full window of ACKs arrives per round trip, so cwnd doubles each RTT: 1, 2, 4, 8, 16. Growth is exponential; the name only means it does not start at full speed.",
+      ru: "Медленный старт: каждый ACK добавляет к cwnd один сегмент, а за один круг приходит целое окно ACK, поэтому cwnd удваивается каждый RTT: 1, 2, 4, 8, 16. Рост экспоненциальный; название значит лишь то, что старт не на полной скорости." },
+    { t: ["ssthresh reached", "Достигнут ssthresh"], n: 8, th: 16,
+      en: "At cwnd = ssthresh (16 here) the sender switches to congestion avoidance: cwnd now grows by about one segment per RTT instead of doubling. It is probing carefully for spare capacity.",
+      ru: "При cwnd = ssthresh (здесь 16) отправитель переходит в режим избегания перегрузки (congestion avoidance): cwnd растёт примерно на один сегмент за RTT вместо удвоения. Он осторожно ищет свободную ёмкость." },
+    { t: ["Additive increase", "Аддитивный рост"], n: 13, th: 16,
+      en: "Linear growth continues: 17, 18 … 24. This is the 'additive increase' half of AIMD. At some point the bottleneck router's queue overflows.",
+      ru: "Линейный рост продолжается: 17, 18 … 24. Это половина «аддитивный рост» в AIMD. В какой-то момент очередь роутера в узком месте переполняется." },
+    { t: ["Loss: 3 duplicate ACKs", "Потеря: 3 дублирующих ACK"], n: 13, th: 16, loss: true,
+      en: "One segment is dropped. Later segments still arrive, so the receiver keeps ACKing the last in-order byte: the sender sees three duplicate ACKs. That is a strong hint of a single loss, and the sender retransmits the missing segment at once (fast retransmit) instead of waiting for the timer.",
+      ru: "Один сегмент потерян. Следующие всё ещё доходят, поэтому получатель продолжает подтверждать последний байт по порядку: отправитель видит три дублирующих ACK. Это явный признак одиночной потери, и отправитель сразу повторяет пропавший сегмент (fast retransmit), не дожидаясь таймера." },
+    { t: ["Fast recovery: halve, don't restart", "Fast recovery: половина, а не сброс"], n: 14, th: 12, loss: true,
+      en: "Multiplicative decrease: ssthresh = cwnd / 2 = 12, and cwnd continues from 12, not from 1. ACKs are still flowing, so the network is congested but working. CUBIC cuts less, to 0.7 × cwnd.",
+      ru: "Мультипликативное уменьшение: ssthresh = cwnd / 2 = 12, и cwnd продолжает с 12, а не с 1. ACK всё ещё идут, значит сеть перегружена, но работает. CUBIC урезает меньше, до 0,7 × cwnd." },
+    { t: ["Back to linear growth", "Снова линейный рост"], n: 18, th: 12, loss: true,
+      en: "Congestion avoidance again, one segment per RTT. Over time the window saws up and down around the available capacity: the classic AIMD sawtooth that lets competing flows converge to a fair share.",
+      ru: "Снова избегание перегрузки, один сегмент за RTT. Со временем окно ходит пилой вокруг доступной ёмкости: классическая пила AIMD, благодаря которой конкурирующие потоки сходятся к справедливой доле." },
+    { t: ["Timeout (RTO): back to 1", "Тайм-аут (RTO): обратно к 1"], n: 19, th: 8, loss: true, rto: true,
+      en: "This time no ACKs come back at all, and the retransmission timer (RTO, at least 200 ms on Linux) fires. That signals heavy congestion: ssthresh = cwnd / 2 = 8, cwnd drops to 1 segment, and slow start begins again. Users see this as a latency spike.",
+      ru: "На этот раз ACK вообще не возвращаются, и срабатывает таймер повторной передачи (RTO, в Linux минимум 200 мс). Это сигнал сильной перегрузки: ssthresh = cwnd / 2 = 8, cwnd падает до 1 сегмента, и медленный старт начинается заново. Пользователи видят это как всплеск задержки." },
+    { t: ["Slow start up to the new ssthresh", "Медленный старт до нового ssthresh"], n: 24, th: 8, loss: true, rto: true,
+      en: "Doubling up to the new ssthresh of 8, then linear again. The same reset happens without any loss after an idle period longer than the RTO (tcp_slow_start_after_idle = 1), which is why idle pooled connections feel slow on the next burst.",
+      ru: "Удвоение до нового ssthresh = 8, затем снова линейно. Такой же сброс происходит и без потерь после простоя дольше RTO (tcp_slow_start_after_idle = 1), поэтому простаивающие соединения из пула медленны на следующем всплеске." },
+    { t: ["CUBIC instead of Reno", "CUBIC вместо Reno"], n: 24, th: 8, loss: true, cubic: true,
+      en: "Linux's default, CUBIC, makes the window a cubic function of the time since the last loss: after cutting to 0.7 × W_max it climbs fast, flattens near the old maximum W_max, then probes upward faster again. It recovers bandwidth much quicker on long, fat links. BBR goes further and ignores loss, pacing by measured bandwidth and minimum RTT.",
+      ru: "CUBIC, алгоритм Linux по умолчанию, делает окно кубической функцией от времени с последней потери: после урезания до 0,7 × W_max оно быстро растёт, выравнивается около прежнего максимума W_max, а потом снова ускоряется вверх. На длинных и широких каналах он гораздо быстрее возвращает пропускную способность. BBR идёт дальше и не смотрит на потери, задавая темп по измеренной пропускной способности и минимальному RTT." }
+  ];
+  const X = r => 60 + r * 28.8, Y = v => 300 - v * 8.125, RW = 31;
+  const PH = [[0, 4, "slow start", "медл. старт", true], [4, 12, "congestion avoidance: +1 / RTT", "избегание перегрузки: +1 / RTT"], [12, 17, "fast recovery → +1 / RTT", "fast recovery → +1 / RTT"], [18, 21, "slow start", "медл. старт", true]];
+  return steppedAnim(el, { title: LL("Congestion window over time", "Окно перегрузки во времени"), vb: [760, 340], steps: ST, stepMs: 7000, render(g, s, t, i){
+    const p = i > 0 ? ST[i - 1] : { n: 0, th: s.th };
+    const from = Math.min(p.n, s.n), add = s.n - from, shown = add > 0 ? from + add * Math.min(1, t / (450 * add)) : s.n;
+    const k = easeIO(Math.min(1, t / 1200));
+    // phase bands
+    if(!s.cubic) for(const [a, b, en, ru, ss] of PH){ if(shown - 1 <= a) continue;
+      const bb = Math.min(b, shown - 1);
+      if(ss) oR(g, X(a), 40, X(bb) - X(a), 260, "an-rowhl", 0);
+      oT(g, (X(a) + X(b)) / 2, 72, LL(en, ru), "an-m an-b"); }
+    // axes and grid
+    E(g, "line", { x1: 60, y1: 300, x2: 730, y2: 300, class: "an-link2" }); E(g, "line", { x1: 60, y1: 40, x2: 60, y2: 300, class: "an-link2" });
+    for(let r = 0; r <= 22; r += 2) oT(g, X(r), 316, String(r), "an-m");
+    oT(g, 730, 316, LL("RTT →", "RTT →"), "an-m an-b", "end");
+    for(let v = 0; v <= 32; v += 8){ oT(g, 52, Y(v) + 4, String(v), "an-m", "end"); if(v) E(g, "line", { x1: 60, y1: Y(v), x2: 730, y2: Y(v), class: "an-lane" }); }
+    oT(g, 14, 34, LL("cwnd, segments", "cwnd, сегменты"), "an-m an-b", "start");
+    // rwnd: the receiver's cap
+    E(g, "line", { x1: 60, y1: Y(RW), x2: 730, y2: Y(RW), class: "an-hw" });
+    oT(g, 726, Y(RW) - 6, LL("rwnd: receiver limit · in flight = min(cwnd, rwnd)", "rwnd: лимит получателя · в полёте = min(cwnd, rwnd)"), "an-m an-b", "end");
+    // ssthresh line, sliding when it changes
+    const th = p.th + (s.th - p.th) * k;
+    E(g, "line", { x1: 60, y1: Y(th), x2: 730, y2: Y(th), class: "an-limit" + (p.th !== s.th ? " on" : "") });
+    oT(g, 66, Y(th) - 6, `ssthresh = ${Math.round(th)}`, "an-m an-b an-warn", "start");
+    // cwnd trace (Reno), drawn up to a fractional point
+    const full = Math.floor(shown), pts = [];
+    for(let j = 0; j < Math.min(full, W.length); j++) pts.push([X(j), Y(W[j])]);
+    if(full < s.n && full > 0){ const f = shown - full; pts.push([X(full - 1 + f), Y(W[full - 1] + (W[full] - W[full - 1]) * f)]); }
+    const cut = s.cubic ? 13 : pts.length;
+    if(pts.length > 1) E(g, "polyline", { points: pts.slice(0, cut).map(q => q.join(",")).join(" "), class: "an-link2 on", fill: "none" });
+    if(s.cubic && pts.length > 13) E(g, "polyline", { points: pts.slice(12).map(q => q.join(",")).join(" "), class: "an-link2 on an-dim", fill: "none" });
+    pts.slice(0, s.cubic ? 13 : Math.min(full, W.length)).forEach(([x, y])=>E(g, "circle", { cx: x, cy: y, r: 3.5, class: "an-dot an-flow" }));
+    // loss and timeout markers
+    if(s.loss){ oT(g, X(12), Y(24) - 10, LL("✕ 3 dup ACKs", "✕ 3 дубл. ACK"), "an-m an-b an-warn"); }
+    if(s.rto){ oT(g, X(17) - 4, Y(16) - 10, LL("✕ RTO", "✕ RTO"), "an-m an-b an-warn", "end"); }
+    // CUBIC overlay: W(t) = C (t − K)^3 + W_max, W_max = 24, starts at 0.7 × W_max
+    if(s.cubic){
+      const Wm = 24, C = 0.0576, K = Math.cbrt(Wm * 0.3 / C), cp = [];
+      const end = 9 * k;
+      for(let x = 0; x <= end + 1e-9; x += 0.25) cp.push([X(12 + x), Y(C * Math.pow(x - K, 3) + Wm)]);
+      E(g, "line", { x1: X(12), y1: Y(Wm), x2: 730, y2: Y(Wm), class: "an-hw" });
+      oT(g, 726, Y(Wm) + 14, "W_max", "an-m an-b", "end");
+      if(cp.length > 1) E(g, "polyline", { points: cp.map(q => q.join(",")).join(" "), class: "an-map s2", fill: "none", style: "stroke-width:3" });
+      oT(g, X(16.5), 70, LL("CUBIC: concave, plateau near W_max, then convex", "CUBIC: вогнутый рост, плато у W_max, затем выпуклый"), "an-m an-b");
+      oT(g, X(19.5), Y(9), LL("Reno (faded)", "Reno (бледно)"), "an-m");
+    }
+    // readout
+    const cur = Math.max(0, Math.min(W.length - 1, Math.ceil(shown) - 1));
+    const phase = s.cubic ? "CUBIC" : (cur <= 4 || (cur >= 18 && cur <= 21)) ? LL("slow start", "медленный старт") : LL("congestion avoidance", "избегание перегрузки");
+    if(s.cubic) oT(g, 380, 22, LL("W_max = 24 · after loss: cwnd = 0.7 × 24 ≈ 17 · then cubic growth", "W_max = 24 · после потери: cwnd = 0,7 × 24 ≈ 17 · затем кубический рост"), "an-t an-b");
+    else oT(g, 380, 22, LL(`RTT ${cur} · cwnd = ${W[cur]} · ssthresh = ${s.th} · ${phase}`, `RTT ${cur} · cwnd = ${W[cur]} · ssthresh = ${s.th} · ${phase}`), "an-t an-b");
+  }});
+};
+
+// ============ networking: nagle-delayed-ack-stall
+ANIMS["nagle-delayed-ack-stall"] = el=>{
+  const CX = 170, SX = 560, TOP = 46, BOT = 404;
+  const M = {
+    hdr:   { a: "c", y0: 70,  y1: 112, l: ["write(header) · 40 B", "write(заголовок) · 40 Б"] },
+    ack:   { a: "s", y0: 262, y1: 300, l: ["ACK (timer fired)", "ACK (сработал таймер)"], ack: true },
+    body:  { a: "c", y0: 300, y1: 342, l: ["body · 60 B (released)", "тело · 60 Б (отпущено)"] },
+    resp:  { a: "s", y0: 342, y1: 384, l: ["response + ACK", "ответ + ACK"] },
+    hdr2:  { a: "c", y0: 70,  y1: 112, l: ["header · 40 B", "заголовок · 40 Б"], ly: -10 },
+    body2: { a: "c", y0: 80,  y1: 122, l: ["body · 60 B (no wait)", "тело · 60 Б (без ожидания)"], ly: 22 },
+    resp2: { a: "s", y0: 124, y1: 166, l: ["response + ACK", "ответ + ACK"] },
+    one:   { a: "c", y0: 70,  y1: 112, l: ["header + body · 100 B, one write()", "заголовок + тело · 100 Б, один write()"] },
+    resp3: { a: "s", y0: 114, y1: 156, l: ["response + ACK", "ответ + ACK"] }
+  };
+  const ST = [
+    { t: ["Two defaults", "Две настройки по умолчанию"], nd: false, done: [], fly: [],
+      en: "A client sends a request in two small write() calls: a header, then a body. The client socket has Nagle's algorithm on (the default without TCP_NODELAY), the server has delayed ACK on (the Linux default). Time runs downward.",
+      ru: "Клиент отправляет запрос двумя маленькими вызовами write(): сначала заголовок, потом тело. На сокете клиента включён алгоритм Нейгла (по умолчанию, без TCP_NODELAY), на сервере включён отложенный ACK (по умолчанию в Linux). Время идёт сверху вниз." },
+    { t: ["write(header)", "write(заголовок)"], nd: false, done: [], fly: [["hdr", 0]],
+      en: "The first write: 40 bytes. Nothing is in flight, so Nagle lets it go immediately, even though it is far smaller than one MSS (1460 bytes).",
+      ru: "Первая запись: 40 байт. В полёте ничего нет, поэтому Нейгл отпускает её сразу, хотя она намного меньше одного MSS (1460 байт)." },
+    { t: ["write(body): held", "write(тело): задержано"], nd: false, done: ["hdr"], fly: [], held: true,
+      en: "The second write: 60 bytes. The header is still unacknowledged and the body is smaller than one MSS, so Nagle keeps it in the send buffer until an ACK arrives. write() has already returned; the application thinks the data is sent.",
+      ru: "Вторая запись: 60 байт. Заголовок ещё не подтверждён, а тело меньше одного MSS, поэтому Нейгл держит его в буфере отправки до прихода ACK. write() уже вернулся; приложение думает, что данные отправлены." },
+    { t: ["Server: delayed ACK", "Сервер: отложенный ACK"], nd: false, done: ["hdr"], fly: [], held: true, timer: "run", wait: true,
+      en: "The server has the header but not the body, so the request is incomplete and it has nothing to send back. Delayed ACK holds the acknowledgement, hoping to piggyback it on a response that cannot come. Both sides now wait for each other.",
+      ru: "У сервера есть заголовок, но нет тела: запрос неполный, и отвечать нечем. Отложенный ACK придерживает подтверждение в надежде отправить его вместе с ответом, который не может появиться. Обе стороны ждут друг друга." },
+    { t: ["Timer fires: ACK", "Таймер срабатывает: ACK"], nd: false, done: ["hdr"], fly: [["ack", 0]], held: true, timer: "full", stall: true,
+      en: "After about 40 ms (200 ms on Windows) the delayed-ACK timer fires and the server sends a bare ACK. Nothing useful happened during those 40 ms: no CPU work, no network transfer, just two timers.",
+      ru: "Примерно через 40 мс (200 мс в Windows) таймер отложенного ACK срабатывает, и сервер отправляет пустой ACK. За эти 40 мс не произошло ничего полезного: ни работы CPU, ни передачи по сети, только два таймера." },
+    { t: ["Nagle releases the body", "Нейгл отпускает тело"], nd: false, done: ["hdr", "ack"], fly: [["body", 0]], timer: "full", stall: true,
+      en: "The ACK means nothing is in flight any more, so Nagle sends the buffered body.",
+      ru: "ACK означает, что в полёте больше ничего нет, и Нейгл отправляет тело из буфера." },
+    { t: ["Response: 40 ms late", "Ответ: на 40 мс позже"], nd: false, done: ["hdr", "ack", "body"], fly: [["resp", 0]], timer: "full", stall: true, total: ["≈ 40.3 ms", "≈ 40,3 мс"], ty: 384,
+      en: "The server processes the request in microseconds and answers, with its ACK inside the response. A request that needs 0.3 ms on a LAN took 40.3 ms. The latency is fixed by a timer, not by load or payload size: that is how you recognise it.",
+      ru: "Сервер обрабатывает запрос за микросекунды и отвечает, вкладывая ACK в ответ. Запрос, которому в локальной сети нужно 0,3 мс, занял 40,3 мс. Задержку задаёт таймер, а не нагрузка или размер данных: так её и узнают." },
+    { t: ["With TCP_NODELAY", "С TCP_NODELAY"], nd: true, done: [], fly: [["hdr2", 0], ["body2", 220], ["resp2", 1500]], total: ["≈ 0.3 ms", "≈ 0,3 мс"], ty: 166,
+      en: "Same exchange with setTcpNoDelay(true): Nagle is off, so the body leaves right behind the header. The server has the full request at once and answers immediately, so delayed ACK never waits: the ACK rides on the response. Netty, gRPC, the PostgreSQL JDBC driver and Kafka clients all set this.",
+      ru: "Тот же обмен с setTcpNoDelay(true): Нейгл выключен, и тело уходит сразу за заголовком. Сервер сразу получает весь запрос и отвечает немедленно, поэтому отложенный ACK не ждёт: ACK едет в ответе. Так делают Netty, gRPC, драйвер PostgreSQL JDBC и клиенты Kafka." },
+    { t: ["Best: one write()", "Лучше всего: один write()"], nd: true, done: [], fly: [["one", 0], ["resp3", 1400]], total: ["≈ 0.3 ms", "≈ 0,3 мс"], ty: 156,
+      en: "TCP_NODELAY makes batching your job. Build the whole message in a buffer and write it once: one segment instead of two, fewer packets and syscalls, and no dependence on Nagle or delayed ACK at all.",
+      ru: "С TCP_NODELAY группировка — твоя задача. Собери всё сообщение в буфере и запиши его одним вызовом: один сегмент вместо двух, меньше пакетов и системных вызовов и никакой зависимости ни от Нейгла, ни от отложенного ACK." }
+  ];
+  const arrow = (g, m, k, on)=>{
+    const x0 = m.a === "c" ? CX : SX, x1 = m.a === "c" ? SX : CX;
+    const x = x0 + (x1 - x0) * k, y = m.y0 + (m.y1 - m.y0) * k;
+    E(g, "line", { x1: x0, y1: m.y0, x2: x, y2: y, class: on ? "an-link2 on" : "an-flowline" });
+    if(!on) E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot " + (m.ack ? "an-ack" : "an-flow") });
+    if(k > .15) oT(g, (CX + SX) / 2, (m.y0 + m.y1) / 2 + (m.ly != null ? m.ly : -8), LL(...m.l), "an-m an-b");
+  };
+  return steppedAnim(el, { title: LL("Nagle meets delayed ACK: the 40 ms stall", "Нейгл и отложенный ACK: задержка 40 мс"), vb: [760, 420], steps: ST, stepMs: 6400, render(g, s, t){
+    // lanes
+    oR(g, CX - 60, 10, 120, 28, "an-box", 6); oT(g, CX, 29, LL("client", "клиент"), "an-t an-b");
+    oR(g, SX - 60, 10, 120, 28, "an-box", 6); oT(g, SX, 29, LL("server", "сервер"), "an-t an-b");
+    E(g, "line", { x1: CX, y1: TOP, x2: CX, y2: BOT, class: "an-lane" });
+    E(g, "line", { x1: SX, y1: TOP, x2: SX, y2: BOT, class: "an-lane" });
+    oT(g, (CX + SX) / 2, 22, s.nd ? "TCP_NODELAY · Nagle OFF" : LL("Nagle ON · delayed ACK ON", "Нейгл ВКЛ · отложенный ACK ВКЛ"), "an-m an-b" + (s.nd ? "" : " an-warn"));
+    oT(g, 100, 74, "0 ms", "an-m", "end");
+    // finished and flying messages
+    s.done.forEach(id => arrow(g, M[id], 1, true));
+    s.fly.forEach(([id, d]) => { const k = easeIO(Math.max(0, Math.min(1, (t - d) / 1300))); if(k > 0) arrow(g, M[id], k, k >= 1); });
+    // body held in the client's send buffer
+    if(s.held){
+      oR(g, CX + 12, 130, 170, 40, "an-leak", 6);
+      oT(g, CX + 97, 146, LL("send buffer: body (60 B)", "буфер отправки: тело (60 Б)"), "an-m an-b");
+      oT(g, CX + 97, 162, LL("held: header not ACKed", "держит Нейгл: нет ACK"), "an-m an-warn");
+    }
+    // delayed ACK timer on the server
+    if(s.timer){
+      const f = s.timer === "full" ? 1 : Math.min(.85, t / 5000), h = 150 * f;
+      oR(g, SX + 10, 112, 12, 150, "an-box", 3); oR(g, SX + 10, 112, 12, Math.max(1, h), "an-pg k3", 3);
+      oT(g, SX + 30, 180, LL("delayed-ACK timer", "таймер отложенного ACK"), "an-m an-b", "start");
+      oT(g, SX + 30, 196, s.timer === "full" ? "40 ms ✓" : Math.round(40 * f) + " ms…", "an-m", "start");
+    }
+    if(s.wait){
+      oT(g, SX - 10, 142, LL("request incomplete,", "запрос неполный,"), "an-m an-warn", "end");
+      oT(g, SX - 10, 156, LL("nothing to reply", "отвечать нечем"), "an-m an-warn", "end");
+    }
+    // the stall bracket on the time axis
+    if(s.stall){ oR(g, 108, 112, 6, 188, "an-leak", 2); oT(g, 100, 210, LL("stall", "простой"), "an-m an-b an-warn", "end"); oT(g, 100, 224, "≈ 40 ms", "an-m an-b an-warn", "end"); }
+    if(s.total){ const last = s.fly[s.fly.length - 1]; if(!last || t - last[1] > 1300){ E(g, "line", { x1: 104, y1: s.ty, x2: CX - 6, y2: s.ty, class: "an-lane" }); oT(g, 100, s.ty + 4, LL(...s.total), "an-m an-b" + (s.nd ? "" : " an-warn"), "end"); } }
+  }});
+};
+
+// ============ networking: tcp-hol-blocking
+ANIMS["tcp-hol-blocking"] = el=>{
+  const SEG = [["A1", "A"], ["B1", "B"], ["C1", "C"], ["A2", "A"], ["B2", "B"], ["C2", "C"]];
+  const K = { A: "k1", B: "k2", C: "k3" }, LOST = 1;
+  const SY = i => 56 + i * 38, BX = i => 448 + i * 50, BY = 70, LY = j => 172 + j * 46;
+  const ALL = { A: ["A1", "A2"], B: ["B1", "B2"], C: ["C1", "C2"] };
+  const ST = [
+    { t: ["Three streams, one TCP connection", "Три потока, одно TCP-соединение"], mode: "tcp", buf: "______", app: {}, cw: 1,
+      en: "An HTTP/2 client multiplexes three requests (streams A, B, C) over one TCP connection. Their frames are interleaved into one byte stream, which TCP cuts into segments 1–6.",
+      ru: "Клиент HTTP/2 мультиплексирует три запроса (потоки A, B, C) в одном TCP-соединении. Их кадры перемежаются в одном потоке байтов, который TCP режет на сегменты 1–6." },
+    { t: ["Segment 2 is lost", "Сегмент 2 потерян"], mode: "tcp", fly: true, buf: "d_hhhh", app: { A: ["A1"] }, cw: 1,
+      en: "All six segments are sent. Segment 2, carrying frame B1, is dropped by a congested router. The other five arrive.",
+      ru: "Все шесть сегментов отправлены. Сегмент 2 с кадром B1 отбрасывает перегруженный маршрутизатор. Остальные пять доходят." },
+    { t: ["Everyone waits for segment 2", "Все ждут сегмент 2"], mode: "tcp", lostMark: true, buf: "d_hhhh", app: { A: ["A1"] }, cw: 1, gapNote: true,
+      en: "TCP must deliver bytes in order. Segment 1 goes to the application; 3–6 stay in the kernel's out-of-order queue. C1 and C2 are complete and stream C needs nothing from B, yet read() returns nothing past the gap. This is head-of-line blocking at the TCP level.",
+      ru: "TCP обязан отдавать байты по порядку. Сегмент 1 уходит приложению; 3–6 остаются в очереди ядра для пришедших не по порядку. C1 и C2 целы, и потоку C ничего не нужно от B, но read() ничего не возвращает дальше разрыва. Это блокировка начала очереди на уровне TCP." },
+    { t: ["Duplicate ACKs, retransmit", "Дубликаты ACK, повторная отправка"], mode: "tcp", lostMark: true, acks: true, retx: true, buf: "d_hhhh", app: { A: ["A1"] }, cw: .5,
+      after: { buf: "dddddd", app: ALL },
+      en: "Each later segment triggers ACK 2 again (with SACK for 3–6). After three duplicate ACKs the sender retransmits segment 2 and halves its congestion window for the whole connection. That costs at least one more RTT; a lost tail segment waits for the retransmission timeout, 200 ms or more.",
+      ru: "Каждый следующий сегмент снова вызывает ACK 2 (с SACK для 3–6). После трёх дубликатов ACK отправитель повторяет сегмент 2 и вдвое уменьшает окно перегрузки всего соединения. Это минимум ещё один RTT; потерянный последний сегмент ждёт тайм-аута повторной передачи, 200 мс и больше." },
+    { t: ["Released all at once", "Всё освобождается разом"], mode: "tcp", buf: "dddddd", app: ALL, cw: .5,
+      en: "Segment 2 fills the gap and the kernel hands 2–6 to the application in one go. Streams A and C waited a full recovery for a packet that belonged to B, and every stream now shares the halved window.",
+      ru: "Сегмент 2 закрывает разрыв, и ядро разом отдаёт приложению 2–6. Потоки A и C ждали целое восстановление ради пакета потока B, а все потоки теперь делят уменьшенное окно." },
+    { t: ["QUIC: same loss", "QUIC: та же потеря"], mode: "quic", fly: true, buf: "d_ddhd", app: { A: ["A1", "A2"], C: ["C1", "C2"] }, wait: { B: ["B2"] }, cw: 1,
+      en: "Now the same streams over QUIC (HTTP/3). Packets carry STREAM frames with a stream id and offset, and ordering is per stream. Packet 2 (B1) is lost again, but A and C get all their data immediately; only stream B holds B2 while it waits for B1.",
+      ru: "Теперь те же потоки поверх QUIC (HTTP/3). Пакеты несут кадры STREAM с идентификатором потока и смещением, порядок соблюдается внутри потока. Пакет 2 (B1) снова потерян, но A и C сразу получают все данные; только поток B держит B2, пока ждёт B1." },
+    { t: ["QUIC retransmits the frame", "QUIC повторяет кадр"], mode: "quic", lostMark: true, retx: true, buf: "d_ddhd", app: { A: ["A1", "A2"], C: ["C1", "C2"] }, wait: { B: ["B2"] }, cw: .5,
+      after: { buf: "dddddd", app: ALL, wait: {} },
+      en: "The sender re-sends the lost B1 frame in a new packet, number 7 (QUIC never reuses packet numbers, so ACKs are unambiguous). Only stream B waited. The congestion window is still shared, so the connection's send rate drops for everyone.",
+      ru: "Отправитель повторяет потерянный кадр B1 в новом пакете с номером 7 (QUIC не переиспользует номера пакетов, поэтому ACK однозначны). Ждал только поток B. Окно перегрузки по-прежнему общее, поэтому скорость отправки соединения падает для всех." }
+  ];
+  const kOf = (t, i) => easeIO(Math.max(0, Math.min(1, (t - i * 180) / 1400)));
+  const segPath = i => [[136, SY(i) + 14], [BX(i) + 23, BY + 15]];
+  return steppedAnim(el, { title: LL("Head-of-line blocking: HTTP/2 over TCP vs QUIC", "Блокировка начала очереди: HTTP/2 поверх TCP и QUIC"), vb: [760, 380], steps: ST, stepMs: 7000, render(g, s, t){
+    const quic = s.mode === "quic";
+    const retxK = s.retx ? easeIO(Math.max(0, Math.min(1, (t - (s.acks ? 1300 : 300)) / 1400))) : 0;
+    const st = s.after && retxK >= 1 ? Object.assign({}, s, s.after) : s;
+    const arrived = i => !s.fly || (i !== LOST && kOf(t, i) >= 1);
+    // sender
+    oR(g, 10, 22, 140, 262, "an-frame", 8); oT(g, 80, 16, LL("client (sender)", "клиент (отправитель)"), "an-m an-b");
+    SEG.forEach(([f, sid], i) => { oR(g, 24, SY(i), 112, 28, "an-pg " + K[sid], 5); oT(g, 80, SY(i) + 18, (quic ? LL("pkt ", "пакет ") : LL("seg ", "сег. ")) + (i + 1) + " · " + f, "an-m an-b"); });
+    // network
+    oT(g, 290, 16, quic ? LL("UDP · one QUIC connection", "UDP · одно QUIC-соединение") : LL("one TCP connection", "одно TCP-соединение"), "an-m an-b");
+    if(s.fly) SEG.forEach((x, i) => {
+      const k = kOf(t, i); if(k <= 0) return;
+      const P = segPath(i), kk = i === LOST ? Math.min(k, .5) : k, [px, py] = polyAt(P, kk);
+      if(k < 1 || i === LOST){ E(g, "line", { x1: P[0][0], y1: P[0][1], x2: px, y2: py, class: "an-flowline" }); E(g, "circle", { cx: px, cy: py, r: 6, class: "an-dot an-flow" }); }
+      if(i === LOST && k >= .5) oT(g, px, py - 10, "✕ " + LL("dropped", "потерян"), "an-m an-b an-warn");
+    });
+    if(s.lostMark && !(s.after && retxK >= 1)){ const [px, py] = polyAt(segPath(LOST), .5); oT(g, px, py - 10, "✕ " + LL("dropped", "потерян"), "an-m an-b an-warn"); }
+    if(s.acks) for(let j = 0; j < 3; j++){
+      const k = easeIO(Math.max(0, Math.min(1, (t - j * 200) / 1000))); if(k <= 0 || k >= 1) continue;
+      const x = 440 - 290 * k, y = 120 + j * 8; E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot an-ack" });
+      if(j === 0) oT(g, x, y - 10, LL("ACK 2 ×3 (SACK 3–6)", "ACK 2 ×3 (SACK 3–6)"), "an-m an-b");
+    }
+    if(s.retx && retxK > 0 && retxK < 1){
+      const P = segPath(LOST), [px, py] = polyAt(P, retxK);
+      E(g, "line", { x1: P[0][0], y1: P[0][1], x2: px, y2: py, class: "an-flowline" }); E(g, "circle", { cx: px, cy: py, r: 6, class: "an-dot an-flow" });
+      oT(g, px, py + 20, quic ? LL("pkt 7 · B1", "пакет 7 · B1") : LL("retransmit seg 2", "повтор сег. 2"), "an-m an-b an-sp");
+    }
+    // receiver: transport buffer
+    oR(g, 436, 22, 316, 108, "an-frame", 8);
+    oT(g, 594, 16, quic ? LL("receiver · QUIC stack (user space)", "получатель · стек QUIC (user space)") : LL("receiver · kernel TCP receive buffer", "получатель · буфер приёма TCP в ядре"), "an-m an-b");
+    oT(g, 448, 58, quic ? LL("received packets", "принятые пакеты") : LL("by sequence number", "по порядковому номеру"), "an-m", "start");
+    SEG.forEach(([f, sid], i) => {
+      const c = st.buf[i], show = c !== "_" && arrived(i);
+      oR(g, BX(i), BY, 46, 30, !show ? "an-box" : "an-pg " + K[sid] + (c === "d" ? " dim" : ""), 4);
+      if(show){ if(c === "h") oR(g, BX(i), BY, 46, 30, "an-leak", 4); oT(g, BX(i) + 23, BY + 19, f, "an-m an-b"); }
+      else oT(g, BX(i) + 23, BY + 19, String(i + 1), "an-m");
+    });
+    const blocked = st.buf.includes("h") && st.buf[LOST] === "_";
+    if(blocked && (!s.fly || t > 2400)) oT(g, 594, 120, quic ? LL("only B2 waits (stream B)", "ждёт только B2 (поток B)") : LL("3–6 blocked: read() stops at the gap", "3–6 заблокированы: read() стоит на разрыве"), "an-m an-b an-warn");
+    else if(!blocked && st.buf === "dddddd") oT(g, 594, 120, LL("delivered", "доставлено"), "an-m an-b");
+    // receiver: application streams
+    oT(g, 594, 160, quic ? LL("HTTP/3 streams", "потоки HTTP/3") : LL("application · HTTP/2 streams", "приложение · потоки HTTP/2"), "an-m an-b");
+    ["A", "B", "C"].forEach((sid, j) => {
+      oR(g, 436, LY(j), 316, 36, "an-box", 6); oT(g, 450, LY(j) + 23, LL("stream ", "поток ") + sid, "an-m an-b", "start");
+      const got = (st.app[sid] || []).filter(f => arrived(SEG.findIndex(x => x[0] === f)));
+      got.forEach((f, n) => { oR(g, 530 + n * 56, LY(j) + 5, 50, 26, "an-pg " + K[sid], 4); oT(g, 555 + n * 56, LY(j) + 22, f, "an-m an-b"); });
+      const w = ((st.wait || {})[sid] || []).filter(f => arrived(SEG.findIndex(x => x[0] === f)));
+      w.forEach((f, n) => { const x = 530 + (got.length + n) * 56; oR(g, x, LY(j) + 5, 50, 26, "an-leak", 4); oT(g, x + 25, LY(j) + 22, f, "an-m an-b an-warn"); oT(g, x + 60, LY(j) + 22, LL("waits for B1", "ждёт B1"), "an-m an-warn", "start"); });
+      if(!quic && !got.length && blocked && sid !== "A" && (!s.fly || t > 2400)) oT(g, 530, LY(j) + 22, LL("nothing: blocked behind seg 2", "пусто: стоит за сег. 2"), "an-m an-warn", "start");
+    });
+    // shared congestion window
+    oT(g, 10, 318, LL("congestion window (whole connection)", "окно перегрузки (всё соединение)"), "an-m an-b", "start");
+    oR(g, 10, 326, 300, 18, "an-box", 4); oR(g, 10, 326, 300 * s.cw, 18, "an-pg " + (s.cw < 1 ? "k3" : "k2"), 4);
+    if(s.cw < 1) oT(g, 320, 340, LL("halved after the loss", "уменьшено вдвое после потери"), "an-m an-b an-warn", "start");
+  }});
+};
+
+// ============ networking: tls13-handshake
+ANIMS["tls13-handshake"] = el=>{
+  const ST = [
+    { t: ["ClientHello + key share", "ClientHello + key share"], mode: "13", en: "TCP is already connected (that cost 1 RTT). The client sends ClientHello: supported versions, cipher suites, the hostname in SNI, ALPN (h2, http/1.1) and, new in TLS 1.3, a key share: a fresh ephemeral X25519 public value. It guesses the group the server will accept, so the key exchange starts in the very first message.",
+      ru: "TCP уже установлен (это стоило 1 RTT). Клиент отправляет ClientHello: поддерживаемые версии, наборы шифров, имя хоста в SNI, ALPN (h2, http/1.1) и, что нового в TLS 1.3, key share: свежее эфемерное публичное значение X25519. Клиент угадывает группу, которую примет сервер, поэтому обмен ключами начинается уже в первом сообщении." },
+    { t: ["ServerHello + key share", "ServerHello + key share"], mode: "13", en: "The server picks a cipher suite and answers with its own ephemeral X25519 public value. Now each side combines its private value with the other's public one (ECDHE) and gets the same shared secret, which never crossed the wire. Both derive handshake keys from it; everything after ServerHello is encrypted.",
+      ru: "Сервер выбирает набор шифров и отвечает своим эфемерным публичным значением X25519. Теперь каждая сторона комбинирует свой закрытый ключ с чужим публичным (ECDHE) и получает один и тот же общий секрет, который никогда не передавался по сети. Обе выводят из него ключи рукопожатия; всё после ServerHello зашифровано." },
+    { t: ["EncryptedExtensions", "EncryptedExtensions"], mode: "13", en: "In the same flight the server sends EncryptedExtensions: the negotiated ALPN protocol (h2) and other settings that do not affect the key exchange. In TLS 1.2 these travelled in clear text; now an observer sees only SNI.",
+      ru: "В том же пакете ответов сервер отправляет EncryptedExtensions: выбранный протокол ALPN (h2) и другие настройки, не влияющие на обмен ключами. В TLS 1.2 они шли открытым текстом; теперь наблюдатель видит только SNI." },
+    { t: ["Certificate + CertificateVerify", "Certificate + CertificateVerify"], mode: "13", en: "Certificate carries the chain: leaf plus intermediates. CertificateVerify is a signature over the whole handshake transcript made with the certificate's private key. It proves the server owns that key and ties the certificate to this exact key exchange, so a man in the middle cannot splice in his own key share.",
+      ru: "Certificate несёт цепочку: конечный сертификат и промежуточные. CertificateVerify — подпись над всем транскриптом рукопожатия, сделанная закрытым ключом сертификата. Она доказывает, что сервер владеет этим ключом, и привязывает сертификат именно к этому обмену ключами, так что посредник (man in the middle) не может подставить свой key share." },
+    { t: ["Server Finished", "Finished сервера"], mode: "13", en: "Finished is a MAC over the transcript with a key derived from the handshake secret: proof that both sides saw the same messages, so nobody downgraded the version or stripped a cipher suite. The server can now derive application keys and could even send data before hearing back (0.5-RTT).",
+      ru: "Finished — это MAC над транскриптом с ключом, выведенным из секрета рукопожатия: доказательство того, что обе стороны видели одни и те же сообщения и никто не понизил версию и не вычеркнул набор шифров. Сервер уже может вывести ключи приложения и даже отправить данные, не дожидаясь ответа (0.5-RTT)." },
+    { t: ["Client Finished + request", "Finished клиента + запрос"], mode: "13", en: "The client checks the chain against its trust store, the hostname against SAN, the CertificateVerify signature and the server Finished. Then it sends its own Finished and, in the same flight, the first HTTP request, encrypted with application keys. The request leaves after exactly 1 RTT of TLS.",
+      ru: "Клиент проверяет цепочку по своему trust store, имя хоста по SAN, подпись CertificateVerify и Finished сервера. Затем отправляет свой Finished и в том же пакете — первый HTTP-запрос, зашифрованный ключами приложения. Запрос уходит ровно через 1 RTT TLS." },
+    { t: ["Application data", "Данные приложения"], mode: "13", en: "The response comes back on the application keys. The server may also send a NewSessionTicket: a pre-shared key the client can use to resume later without the certificate exchange. Total before the first response byte: 1 RTT TCP + 1 RTT TLS + 1 RTT request.",
+      ru: "Ответ приходит на ключах приложения. Сервер также может прислать NewSessionTicket: pre-shared key, с которым клиент позже возобновит сессию без обмена сертификатами. Итого до первого байта ответа: 1 RTT TCP + 1 RTT TLS + 1 RTT запрос." },
+    { t: ["TLS 1.2: two round trips", "TLS 1.2: два round trip"], mode: "cmp", en: "TLS 1.2 had no key share in ClientHello. The server first announced its choice and parameters (ServerKeyExchange), the client answered with ClientKeyExchange, ChangeCipherSpec and Finished, and only after the server's Finished could the request go. That is 2 RTT of TLS against 1 in TLS 1.3, and it allowed static RSA key exchange without forward secrecy.",
+      ru: "В TLS 1.2 в ClientHello не было key share. Сервер сначала сообщал выбор и параметры (ServerKeyExchange), клиент отвечал ClientKeyExchange, ChangeCipherSpec и Finished, и только после Finished сервера мог уйти запрос. Это 2 RTT TLS против 1 в TLS 1.3, и это допускало статический обмен ключами через RSA без прямой секретности (forward secrecy)." },
+    { t: ["Resumption: 0-RTT", "Возобновление: 0-RTT"], mode: "zero", en: "With a session ticket from an earlier connection the client can send the request inside the first flight as early data, encrypted with a key derived from the PSK. The server answers in its first flight: no TLS round trip at all. The cost: early data has no protection against replay. An attacker who copies the flight can send it again, so only idempotent requests belong in 0-RTT.",
+      ru: "С session ticket от прошлого соединения клиент может отправить запрос прямо в первом пакете как early data, зашифровав его ключом, выведенным из PSK. Сервер отвечает в первом же своём пакете: TLS не тратит ни одного round trip. Цена: у early data нет защиты от повтора. Атакующий, скопировавший пакет, может отправить его снова, поэтому в 0-RTT допустимы только идемпотентные запросы." }
+  ];
+  const tx = v => Array.isArray(v) ? LL(...v) : v;
+  const M13 = [
+    { s: 0, d: 1, y: 84, n: "ClientHello", x: [["versions · suites · key_share X25519", "версии · шифры · key_share X25519"], "SNI api.beeline.kg · ALPN h2"] },
+    { s: 1, d: -1, y: 140, n: "ServerHello + key_share", x: [["chosen suite · server X25519 public", "выбранный шифр · публичный X25519 сервера"]] },
+    { s: 2, d: -1, y: 184, n: "{EncryptedExtensions}", x: [] },
+    { s: 3, d: -1, y: 214, n: "{Certificate}", x: [] },
+    { s: 3, d: -1, y: 244, n: "{CertificateVerify}", x: [] },
+    { s: 4, d: -1, y: 274, n: "{Finished}", x: [] },
+    { s: 5, d: 1, y: 316, n: "{Finished} + [GET /api/v1/esim]", x: [["application keys from here on", "дальше ключи приложения"]] },
+    { s: 6, d: -1, y: 360, n: "[HTTP/2 200] + NewSessionTicket", x: [] }
+  ];
+  const M0 = [
+    { s: 8, d: 1, y: 84, n: "ClientHello + pre_shared_key", x: [["+ early_data: [GET /api/v1/esim]", "+ early_data: [GET /api/v1/esim]"], ["request in the first flight", "запрос в первом пакете"]] },
+    { s: 8, d: -1, y: 150, n: "ServerHello … {Finished} + [200]", x: [["response already in the first answer", "ответ уже в первом ответе сервера"]] },
+    { s: 8, d: 1, y: 206, n: "{EndOfEarlyData} {Finished}", x: [] }
+  ];
+  const KEYS = {
+    c: [["ephemeral key pair", "эфемерная пара ключей"], ["handshake keys", "ключи рукопожатия"], ["handshake keys", "ключи рукопожатия"], ["handshake keys", "ключи рукопожатия"], ["handshake keys", "ключи рукопожатия"], ["application keys", "ключи приложения"], ["application keys", "ключи приложения"]],
+    s: [["waiting", "ожидание"], ["handshake keys", "ключи рукопожатия"], ["handshake keys", "ключи рукопожатия"], ["handshake keys", "ключи рукопожатия"], ["application keys", "ключи приложения"], ["application keys", "ключи приложения"], ["application keys", "ключи приложения"]]
+  };
+  const arrow = (g, x1, y1, x2, y2, on)=>{
+    E(g, "line", { x1, y1, x2, y2, class: on ? "an-link2 on" : "an-link2" });
+    const a = Math.atan2(y2 - y1, x2 - x1), L = 9;
+    const p = [[x2, y2], [x2 - L * Math.cos(a - .4), y2 - L * Math.sin(a - .4)], [x2 - L * Math.cos(a + .4), y2 - L * Math.sin(a + .4)]];
+    E(g, "polygon", { points: p.map(q => q.join(",")).join(" "), class: on ? "an-sp" : "an-mark" });
+  };
+  const seq = (g, msgs, i, t, CX, SX, small)=>{
+    let ci = 0;
+    for(const m of msgs){ if(m.s > i) continue;
+      const cur = m.s === i, delay = cur ? 900 * ci++ : 0;
+      if(cur && t < delay) continue;
+      const kk = cur ? easeIO(Math.min(1, (t - delay) / 1200)) : 1, x1 = m.d > 0 ? CX : SX, x2 = m.d > 0 ? SX : CX, y1 = m.y, y2 = m.y + 24, mx = (CX + SX) / 2;
+      arrow(g, x1, y1, x2, y2, cur);
+      oT(g, mx, y1 + 7, m.n, (small ? "an-m an-b" : "an-code an-b"));
+      (m.x || []).forEach((d, j) => oT(g, mx, y2 + 2 + 12 * (j + 1), tx(d), "an-m"));
+      if(cur){ const x = x1 + (x2 - x1) * kk, y = y1 + (y2 - y1) * kk; E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); }
+    }
+  };
+  const lanes = (g, CX, SX, top, bot, ck, sk)=>{
+    [[CX, LL("client", "клиент"), ck], [SX, LL("server", "сервер"), sk]].forEach(([x, n, kk])=>{
+      oR(g, x - 80, 8, 160, 44, "an-reg on", 6); oT(g, x, 26, n, "an-t an-b"); if(kk) oT(g, x, 43, kk, "an-m");
+      E(g, "line", { x1: x, y1: top, x2: x, y2: bot, class: "an-lane" }); });
+  };
+  return steppedAnim(el, { title: LL("TLS 1.3 handshake: one round trip", "Рукопожатие TLS 1.3: один round trip"), vb: [760, 420], steps: ST, stepMs: 7000, render(g, s, t, i){
+    if(s.mode === "13"){
+      const CX = 150, SX = 610;
+      lanes(g, CX, SX, 56, 400, tx(KEYS.c[i]), tx(KEYS.s[i]));
+      oT(g, 380, 66, LL("TCP already connected: +1 RTT before this", "TCP уже установлен: +1 RTT до этого"), "an-m");
+      seq(g, M13, i, t, CX, SX, false);
+      if(i >= 4){ E(g, "line", { x1: 60, y1: 84, x2: 60, y2: 298, class: "an-limit" }); E(g, "line", { x1: 54, y1: 84, x2: 66, y2: 84, class: "an-limit" }); E(g, "line", { x1: 54, y1: 298, x2: 66, y2: 298, class: "an-limit" }); oT(g, 48, 195, "1 RTT", "an-code an-b", "end"); }
+      if(i >= 1) oT(g, 380, 412, LL("{ } handshake keys · [ ] application keys · the shared secret never crosses the wire", "{ } ключи рукопожатия · [ ] ключи приложения · общий секрет не передаётся по сети"), "an-m");
+    } else if(s.mode === "cmp"){
+      oR(g, 6, 8, 368, 404, "an-frame lead", 10); oR(g, 386, 8, 368, 404, "an-frame", 10);
+      oT(g, 190, 30, "TLS 1.3", "an-t an-b"); oT(g, 570, 30, "TLS 1.2", "an-t an-b");
+      const mini = (ox, list, rtts)=>{
+        const CX = ox + 40, SX = ox + 330;
+        oT(g, CX, 54, "C", "an-code an-b"); oT(g, SX, 54, "S", "an-code an-b");
+        E(g, "line", { x1: CX, y1: 60, x2: CX, y2: 330, class: "an-lane" }); E(g, "line", { x1: SX, y1: 60, x2: SX, y2: 330, class: "an-lane" });
+        list.forEach((m, j)=>{ const y = 72 + j * 40, x1 = m[0] > 0 ? CX : SX, x2 = m[0] > 0 ? SX : CX, req = m[2];
+          arrow(g, x1, y, x2, y + 22, req); oT(g, (CX + SX) / 2, y + 6, tx(m[1]), "an-m" + (req ? " an-b an-warn" : "")); });
+        oT(g, ox + 185, 360, rtts[0], "an-big"); oT(g, ox + 185, 384, rtts[1], "an-m");
+      };
+      const vis = Math.min(1, t / 900);
+      mini(0, [[1, "ClientHello + key_share"], [-1, "SH · {EE · Cert · CV · Fin}"], [1, ["{Fin} + [GET]  ← request", "{Fin} + [GET]  ← запрос"], true], [-1, "[200]"]], ["1 RTT", LL("of TLS before the request", "TLS до запроса")]);
+      if(vis > .3) mini(380, [[1, "ClientHello"], [-1, "SH · Cert · SKE · SHDone"], [1, "CKE · CCS · Finished"], [-1, "CCS · Finished"], [1, ["[GET]  ← request", "[GET]  ← запрос"], true], [-1, "[200]"]], ["2 RTT", LL("of TLS before the request", "TLS до запроса")]);
+      oT(g, 380, 406, LL("both add 1 RTT of TCP first; QUIC (HTTP/3) folds transport and TLS into one", "к обоим сначала добавляется 1 RTT TCP; QUIC (HTTP/3) объединяет транспорт и TLS в один"), "an-m");
+    } else {
+      const CX = 150, SX = 610;
+      lanes(g, CX, SX, 56, 290, LL("has PSK from a ticket", "есть PSK из ticket"), LL("knows the ticket", "знает ticket"));
+      seq(g, M0, i, t, CX, SX, false);
+      if(t > 3200){
+        oR(g, 250, 300, 260, 34, "an-leak", 6); oT(g, 380, 322, LL("attacker: copies the first flight", "атакующий: копирует первый пакет"), "an-m an-b an-warn");
+        E(g, "line", { x1: 510, y1: 317, x2: SX, y2: 340, class: "an-limit" });
+        oT(g, SX, 356, LL("same GET executed twice", "тот же GET выполнен дважды"), "an-m an-b an-warn");
+        oT(g, 380, 390, LL("0-RTT: only idempotent requests; servers cap or reject early data", "0-RTT: только идемпотентные запросы; серверы ограничивают или отклоняют early data"), "an-m an-b");
+      }
+    }
+  }});
+};
+
+// ============ networking: docker-bridge-publish
+ANIMS["docker-bridge-publish"] = el=>{
+  const ST = [
+    { t: ["docker run -p 8080:80", "docker run -p 8080:80"], mode: "pub", hl: ["veth", "rule"],
+      hdr: null,
+      en: "docker run -p 8080:80 nginx. Docker creates a network namespace for the container and a veth pair: one end becomes eth0 inside the container with 172.17.0.2, the other end, vethA, is plugged into the docker0 bridge (172.17.0.1, the container's default gateway). It also adds a DNAT rule: tcp dport 8080 → 172.17.0.2:80.",
+      ru: "docker run -p 8080:80 nginx. Docker создаёт сетевое пространство имён для контейнера и пару veth: один конец становится eth0 внутри контейнера с адресом 172.17.0.2, другой, vethA, втыкается в мост docker0 (172.17.0.1, шлюз контейнера по умолчанию). Ещё он добавляет DNAT-правило: tcp dport 8080 → 172.17.0.2:80." },
+    { t: ["Client sends to host:8080", "Клиент шлёт на host:8080"], mode: "pub", path: ["client", "eth0"], hl: ["eth0"],
+      hdr: ["192.168.1.50:51000", "10.0.0.5:8080", null],
+      en: "A client on the LAN opens a TCP connection to the host's address, 10.0.0.5:8080. Nothing on the host listens on 8080 in the usual sense; the packet arrives at the host's eth0 and enters netfilter.",
+      ru: "Клиент в LAN открывает TCP-соединение на адрес хоста 10.0.0.5:8080. На хосте никто не слушает 8080 в обычном смысле; пакет приходит на eth0 хоста и попадает в netfilter." },
+    { t: ["PREROUTING: DNAT", "PREROUTING: DNAT"], mode: "pub", path: ["eth0", "pre"], hl: ["pre", "ct"],
+      hdr: ["192.168.1.50:51000", "172.17.0.2:80", "dst"],
+      en: "In the nat table's PREROUTING hook the DOCKER chain matches dport 8080 and rewrites the destination to 172.17.0.2:80. Conntrack records the mapping for this connection, so every later packet of it is translated the same way without walking the rules again.",
+      ru: "В хуке PREROUTING таблицы nat цепочка DOCKER совпадает по dport 8080 и переписывает назначение на 172.17.0.2:80. Conntrack запоминает это отображение для соединения, поэтому все следующие его пакеты транслируются так же, без повторного прохода по правилам." },
+    { t: ["Route and FORWARD", "Маршрут и FORWARD"], mode: "pub", path: ["pre", "fwd", "br"], hl: ["fwd", "br"],
+      hdr: ["192.168.1.50:51000", "172.17.0.2:80", null],
+      en: "The new destination is not a host address, so the kernel routes the packet (172.17.0.0/16 is reachable via docker0) and it takes the FORWARD path, which Docker allows for published ports. It never reaches INPUT, where ufw and firewalld rules live: that is why they do not protect published ports.",
+      ru: "Новое назначение — не адрес хоста, поэтому ядро маршрутизирует пакет (172.17.0.0/16 доступна через docker0), и он идёт по пути FORWARD, который Docker разрешает для опубликованных портов. До INPUT, где живут правила ufw и firewalld, он не доходит: поэтому они и не защищают опубликованные порты." },
+    { t: ["Bridge and veth pair", "Мост и пара veth"], mode: "pub", path: ["br", "veth", "ceth", "app"], hl: ["br", "veth", "ceth", "app"],
+      hdr: ["192.168.1.50:51000", "172.17.0.2:80", null],
+      en: "docker0 is a virtual switch: it finds 172.17.0.2's MAC (learned via ARP) behind port vethA. Whatever enters vethA comes out of eth0 in the container's namespace, like the two ends of a cable. nginx, listening on 0.0.0.0:80, accepts the connection and sees the real client IP, 192.168.1.50.",
+      ru: "docker0 — виртуальный коммутатор: он находит MAC адреса 172.17.0.2 (выученный через ARP) за портом vethA. Всё, что входит в vethA, выходит из eth0 в пространстве имён контейнера, как из двух концов кабеля. nginx, слушающий 0.0.0.0:80, принимает соединение и видит настоящий IP клиента, 192.168.1.50." },
+    { t: ["Reply: reverse NAT", "Ответ: обратный NAT"], mode: "pub", path: ["app", "ceth", "veth", "br", "post", "eth0", "client"], hl: ["ct", "post"],
+      hdr: ["10.0.0.5:8080", "192.168.1.50:51000", "src"],
+      en: "nginx replies from 172.17.0.2:80 to 192.168.1.50:51000 through its gateway 172.17.0.1. On the way out conntrack finds the entry and undoes the DNAT: the source becomes 10.0.0.5:8080. The client gets the answer from the exact address it connected to, otherwise its TCP stack would drop it.",
+      ru: "nginx отвечает с 172.17.0.2:80 на 192.168.1.50:51000 через свой шлюз 172.17.0.1. На выходе conntrack находит запись и отменяет DNAT: источником становится 10.0.0.5:8080. Клиент получает ответ ровно с того адреса, к которому подключался, иначе его TCP-стек отбросил бы пакет." },
+    { t: ["Outbound: MASQUERADE", "Исходящий: MASQUERADE"], mode: "pub", out: true, path: ["app", "ceth", "veth", "br", "post", "eth0", "client"], hl: ["post", "ct"],
+      hdr: ["10.0.0.5:40312", "151.101.0.1:443", "src"],
+      en: "The other direction: the container itself calls the internet. 172.17.0.2 is a private address, so the MASQUERADE rule in POSTROUTING (source NAT) replaces the source with the host's 10.0.0.5 and a free port. Conntrack maps the replies back to 172.17.0.2.",
+      ru: "Обратное направление: контейнер сам обращается в интернет. 172.17.0.2 — частный адрес, поэтому правило MASQUERADE в POSTROUTING (NAT источника) заменяет источник на адрес хоста 10.0.0.5 и свободный порт. Conntrack сопоставляет ответы обратно с 172.17.0.2." },
+    { t: ["User-defined network", "Пользовательская сеть"], mode: "dns", hl: ["br2", "dockerd"],
+      en: "docker network create app (or any Compose project) makes a new bridge, br-app, with its own subnet. Containers api and db join it; each gets a veth pair and an IP. On user-defined networks Docker also runs an embedded DNS server, and every container's /etc/resolv.conf says nameserver 127.0.0.11.",
+      ru: "docker network create app (или любой проект Compose) создаёт новый мост br-app со своей подсетью. Контейнеры api и db подключаются к нему; каждый получает пару veth и IP. В пользовательских сетях Docker ещё запускает встроенный DNS-сервер, и в /etc/resolv.conf каждого контейнера написано nameserver 127.0.0.11." },
+    { t: ["Resolve \"db\" via 127.0.0.11", "Разрешение \"db\" через 127.0.0.11"], mode: "dns", dns: true, hl: ["stub", "dockerd"],
+      en: "The app in api connects to jdbc:postgresql://db:5432. The resolver asks 127.0.0.11, a loopback address inside api's own namespace; an iptables rule there hands the query to dockerd, which knows every container and service name on this network and answers db → 172.18.0.3. Unknown names are forwarded to the host's resolvers.",
+      ru: "Приложение в api подключается к jdbc:postgresql://db:5432. Резолвер спрашивает 127.0.0.11 — loopback-адрес внутри собственного пространства имён api; правило iptables там передаёт запрос dockerd, который знает все имена контейнеров и сервисов этой сети и отвечает db → 172.18.0.3. Неизвестные имена пересылаются резолверам хоста." },
+    { t: ["Direct over the bridge", "Напрямую через мост"], mode: "dns", conn: true, hl: ["br2", "db"],
+      en: "api now sends the SYN to 172.18.0.3:5432. Both containers are on the same bridge, so this is plain L2 switching between two veth ports: no DNAT, no published port, and the host's firewall is not involved. Containers on another network cannot reach db at all.",
+      ru: "Теперь api отправляет SYN на 172.18.0.3:5432. Оба контейнера на одном мосту, поэтому это обычная L2-коммутация между двумя портами veth: ни DNAT, ни опубликованного порта, и файрвол хоста не участвует. Контейнеры из другой сети вообще не могут достучаться до db." }
+  ];
+  const P = {
+    client: [120, 178], eth0: [196, 178], pre: [345, 86], fwd: [345, 114], post: [345, 142],
+    br: [400, 262], veth: [548, 262], ceth: [652, 248], app: [652, 292]
+  };
+  return steppedAnim(el, { title: LL("Docker bridge: port publishing and embedded DNS", "Мост Docker: публикация порта и встроенный DNS"), vb: [760, 380], steps: ST, stepMs: 6600, render(g, s, t){
+    const k = easeIO(Math.min(1, t / 2200));
+    const on = id => (s.hl || []).includes(id);
+    // host frame
+    oR(g, 140, 14, 610, 352, "an-frame", 10); oT(g, 445, 32, LL("Docker host · 10.0.0.5", "хост Docker · 10.0.0.5"), "an-m an-b");
+    if(s.mode === "pub"){
+      // outside
+      oR(g, 10, 148, 110, 60, s.out ? "an-box" : "an-pg k3", 6);
+      oT(g, 65, 172, s.out ? LL("internet", "интернет") : LL("client", "клиент"), "an-t an-b");
+      oT(g, 65, 192, s.out ? "151.101.0.1" : "192.168.1.50", "an-m");
+      // host eth0
+      oR(g, 160, 158, 72, 40, on("eth0") ? "an-reg on" : "an-reg", 6); oT(g, 196, 176, "eth0", "an-code an-b"); oT(g, 196, 191, "10.0.0.5", "an-m");
+      E(g, "line", { x1: 120, y1: 178, x2: 160, y2: 178, class: "an-link2" });
+      // netfilter
+      oR(g, 250, 46, 190, 132, "an-box", 8); oT(g, 345, 62, LL("netfilter (iptables)", "netfilter (iptables)"), "an-m an-b");
+      [["pre", 74, "PREROUTING · DNAT"], ["fwd", 102, "FORWARD · DOCKER"], ["post", 130, "POSTROUTING · MASQ"]].forEach(([id, y, label])=>{
+        oR(g, 260, y, 170, 24, on(id) ? "an-reg on" : "an-reg", 4); oT(g, 345, y + 16, label, "an-m an-b");
+      });
+      oR(g, 260, 158, 170, 14, on("ct") ? "an-pg k1" : "an-free", 3); oT(g, 345, 169, "conntrack", "an-m");
+      // rule
+      oR(g, 456, 46, 284, 46, on("rule") ? "an-reg on" : "an-box", 6);
+      oT(g, 466, 64, "-A DOCKER -p tcp --dport 8080", "an-code", "start");
+      oT(g, 466, 82, "  -j DNAT --to 172.17.0.2:80", "an-code", "start");
+      oT(g, 456, 112, LL("INPUT (ufw) is skipped for published ports", "INPUT (ufw) пропускается для опубл. портов"), "an-m" + (on("fwd") ? " an-b an-warn" : ""), "start");
+      // docker0 bridge
+      oR(g, 250, 248, 316, 28, on("br") ? "an-reg on" : "an-reg", 6); oT(g, 330, 267, "docker0 · 172.17.0.1", "an-code an-b");
+      oR(g, 526, 251, 44, 22, on("veth") ? "an-pg k2" : "an-box", 4); oT(g, 548, 266, "vethA", "an-m an-b");
+      // container
+      oR(g, 582, 206, 160, 120, "an-frame", 8); oT(g, 662, 222, LL("container web · netns", "контейнер web · netns"), "an-m an-b");
+      oR(g, 596, 234, 132, 28, on("ceth") ? "an-pg k2" : "an-box", 4); oT(g, 662, 252, "eth0 172.17.0.2", "an-m an-b");
+      oR(g, 596, 276, 132, 32, on("app") ? "an-reg on" : "an-reg", 4); oT(g, 662, 296, s.out ? "curl https://…" : "nginx · 0.0.0.0:80", "an-code");
+      E(g, "line", { x1: 570, y1: 262, x2: 596, y2: 248, class: "an-link2" + (on("veth") ? " on" : "") });
+      oT(g, 548, 296, LL("veth pair", "пара veth"), "an-m", "middle");
+      // links host internals
+      E(g, "polyline", { points: "232,178 250,178", class: "an-link2" });
+      E(g, "polyline", { points: "345,178 345,248", class: "an-link2" });
+      // moving packet
+      if(s.path){
+        const pts = s.path.map(id => P[id]);
+        E(g, "polyline", { points: pts.map(q => q.join(",")).join(" "), class: "an-flowline", fill: "none" });
+        const [x, y] = polyAt(pts, k); E(g, "circle", { cx: x, cy: y, r: 7, class: "an-dot an-flow" });
+      }
+      // packet header
+      if(s.hdr){
+        const [src, dst, ch] = s.hdr;
+        oT(g, 160, 346, LL("packet:", "пакет:"), "an-m an-b", "start");
+        oR(g, 212, 330, 214, 24, ch === "src" ? "an-reg on" : "an-reg", 4); oT(g, 220, 346, "src " + src, "an-code", "start");
+        oT(g, 438, 346, "→", "an-code");
+        oR(g, 452, 330, 214, 24, ch === "dst" ? "an-reg on" : "an-reg", 4); oT(g, 460, 346, "dst " + dst, "an-code", "start");
+        if(ch) oT(g, 676, 346, LL("rewritten", "переписан"), "an-m an-b an-warn", "start");
+      } else {
+        oT(g, 160, 346, LL("veth pair = virtual cable: vethA on the bridge ↔ eth0 in the container", "пара veth = виртуальный кабель: vethA на мосту ↔ eth0 в контейнере"), "an-m an-b", "start");
+      }
+    } else {
+      // dockerd with name table
+      oR(g, 160, 46, 270, 64, on("dockerd") ? "an-reg on" : "an-box", 8);
+      oT(g, 172, 64, LL("dockerd · embedded DNS", "dockerd · встроенный DNS"), "an-m an-b", "start");
+      oT(g, 172, 82, "api → 172.18.0.2", "an-code", "start"); oT(g, 172, 100, "db  → 172.18.0.3", "an-code", "start");
+      oR(g, 450, 46, 290, 64, "an-box", 8);
+      oT(g, 462, 66, "/etc/resolv.conf", "an-m an-b", "start"); oT(g, 462, 86, "nameserver 127.0.0.11", "an-code", "start");
+      oT(g, 462, 102, LL("other names → host resolvers", "прочие имена → резолверы хоста"), "an-m", "start");
+      // containers
+      const box = (x, title, ip, proc, hlProc, extra)=>{
+        oR(g, x, 130, 220, 160, "an-frame", 8); oT(g, x + 110, 146, title, "an-m an-b");
+        oR(g, x + 14, 158, 192, 32, hlProc ? "an-reg on" : "an-reg", 4); oT(g, x + 110, 178, proc, "an-code");
+        if(extra) extra(x);
+        oR(g, x + 44, 250, 132, 28, "an-pg k2", 4); oT(g, x + 110, 268, "eth0 " + ip, "an-m an-b");
+      };
+      box(180, LL("container api · netns", "контейнер api · netns"), "172.18.0.2", "db:5432 → ?", s.dns, x=>{
+        oR(g, x + 14, 202, 192, 30, on("stub") ? "an-reg on" : "an-box", 4); oT(g, x + 110, 221, "lo · 127.0.0.11:53", "an-code");
+      });
+      box(510, LL("container db · netns", "контейнер db · netns"), "172.18.0.3", "postgres · :5432", s.conn && k > .9);
+      // bridge
+      oR(g, 180, 316, 550, 30, on("br2") ? "an-reg on" : "an-reg", 6); oT(g, 455, 336, "br-app · 172.18.0.1/16 · " + LL("user-defined network", "пользовательская сеть"), "an-code an-b");
+      E(g, "line", { x1: 290, y1: 278, x2: 290, y2: 316, class: "an-link2" }); E(g, "line", { x1: 620, y1: 278, x2: 620, y2: 316, class: "an-link2" });
+      oT(g, 298, 302, "veth", "an-m", "start"); oT(g, 628, 302, "veth", "an-m", "start");
+      if(s.dns){
+        const ph = Math.min(1, t / 3600), q = ph < .5;
+        const path = q ? [[290, 190], [290, 202], [330, 202], [330, 110]] : [[330, 110], [330, 202], [290, 202], [290, 190]];
+        const kk = easeIO(q ? ph * 2 : (ph - .5) * 2);
+        E(g, "polyline", { points: path.map(p => p.join(",")).join(" "), class: "an-flowline", fill: "none" });
+        const [x, y] = polyAt(path, kk); E(g, "circle", { cx: x, cy: y, r: 7, class: "an-dot an-flow" });
+        oT(g, 440, 124, q ? LL("query: A? db", "запрос: A? db") : LL("answer: db = 172.18.0.3", "ответ: db = 172.18.0.3"), "an-m an-b an-sp", "start");
+      }
+      if(s.conn){
+        const path = [[290, 190], [290, 330], [620, 330], [620, 190]];
+        E(g, "polyline", { points: path.map(p => p.join(",")).join(" "), class: "an-flowline", fill: "none" });
+        const [x, y] = polyAt(path, k); E(g, "circle", { cx: x, cy: y, r: 7, class: "an-dot an-flow" });
+        oT(g, 455, 360, LL("SYN 172.18.0.2 → 172.18.0.3:5432 · L2 switching, no NAT", "SYN 172.18.0.2 → 172.18.0.3:5432 · L2-коммутация, без NAT"), "an-m an-b");
+      }
+    }
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }

@@ -2,6 +2,7 @@
 title: OSI and TCP/IP models with real examples
 tags: [networking, osi, tcp-ip, fundamentals]
 learned: 2026-10-27
+order: 1
 ---
 ## TL;DR
 The OSI model is a seven-layer teaching vocabulary; the TCP/IP model is the four-layer stack that actually runs. For a backend developer the useful mapping is: HTTP/gRPC/DNS are application protocols, TLS sits between them and TCP, TCP/UDP give you ports and (for TCP) reliability, IP routes packets between networks, Ethernet/Wi-Fi move frames on one link. Every "layer N" phrase in a job interview (L4 vs L7 load balancer, L3 switch, L2 network) refers to the OSI numbering, so learn the numbers even though nobody implements OSI.
@@ -21,6 +22,19 @@ The OSI model is a seven-layer teaching vocabulary; the TCP/IP model is the four
 - Layers 5–7 of OSI collapse into one TCP/IP application layer; in practice everybody says "L7" for anything above TCP.
 - **Encapsulation**: each layer wraps the one above with its own header. An HTTP request becomes `Ethernet[ IP[ TCP[ TLS[ HTTP ] ] ] ]`. Receiving reverses it; this is why a packet capture shows nested headers ([[network-debugging-toolkit]]).
 - A layer talks to its peer on the other host through the layers below, and only knows the interface of the layer directly below it. That is why you can swap TCP for QUIC under HTTP ([[http-1-1-vs-2-vs-3]]) without changing the application.
+- **PDU names** (protocol data unit) are worth using precisely: L7 *message* or *data*, L4 *segment* (TCP) or *datagram* (UDP), L3 *packet*, L2 *frame*, L1 *bits*. "The packet was dropped" and "the frame was dropped" point at different devices.
+
+### Encapsulation walk-through: sending a POST
+A Spring service sends `POST /payments` with a 300-byte JSON body to `https://api.example.com` over an existing TLS connection.
+1. **L7**: the HTTP client serialises headers and body into a ~600-byte message. HTTP has no idea about packets; it writes bytes into a socket.
+2. **L6**: the JSON encoding (and gzip, if enabled) already happened; TLS encrypts the message into a record, adding a 5-byte header and a 16-byte authentication tag.
+3. **L5**: the "session" is the TLS session and, with HTTP/2, the stream the request rides on (a 9-byte frame header per HTTP/2 frame); HTTP/1.1 adds nothing here.
+4. **L4**: `write()` copies the bytes into the kernel's socket send buffer ([[socket-management]]). TCP cuts the stream into segments no larger than the MSS (1460 bytes on Ethernet; [[mss-mtu-pmtud]]) and adds a 20–60 byte header: ports, sequence and ACK numbers, window ([[tcp-segment-structure]]). Small writes may wait for coalescing ([[nagle-and-delayed-ack]]).
+5. **L3**: IP adds a 20-byte header with source and destination addresses, TTL and protocol = 6 ([[ip-packet-structure]]).
+6. **L2**: the kernel picks the next hop from the routing table, finds its MAC via ARP and adds a 14-byte Ethernet header plus a 4-byte CRC trailer.
+7. **L1**: the NIC turns the frame into electrical, optical or radio signals, with a preamble and inter-frame gap.
+- On the receiving server the stack unwraps in reverse: NIC checks the CRC, IP checks the address, TCP reorders and ACKs, TLS decrypts, the HTTP parser in Tomcat sees the request. Overhead for one small request: about 40 bytes of TCP/IP and 18 of Ethernet per segment, plus TLS framing, which is why many tiny messages cost more than a few large ones.
+- How the frame is rewritten at every router on the way is covered in [[host-to-host-communication]].
 
 ### Which layer am I debugging?
 - **L2**: wrong VLAN, ARP cache stale after a server moved, MTU mismatch. Symptoms: host unreachable on the same subnet, large packets vanish.
@@ -33,10 +47,11 @@ The OSI model is a seven-layer teaching vocabulary; the TCP/IP model is the four
 ### Where common infrastructure sits
 | Device / component | Layer it works at | Why it matters |
 |---|---|---|
-| Switch | L2 (MAC) | Cannot route between subnets |
+| Cable, hub, repeater, NIC PHY | L1 (bits) | Hubs repeat to all ports; a bad cable shows as CRC errors in `ip -s link` |
+| Switch, bridge, Wi-Fi access point | L2 (MAC) | Cannot route between subnets |
 | Router, Kubernetes CNI, VPN | L3 (IP) | Decides next hop; NAT lives here |
-| L4 load balancer, `iptables`, kube-proxy | L4 (IP + port) | Forwards TCP flows without reading HTTP ([[load-balancers-l4-vs-l7]]) |
-| nginx, Envoy, API gateway, CDN | L7 (HTTP) | Can route by path/header, terminate TLS, cache ([[reverse-proxy-nginx-basics]], [[cdn]]) |
+| L4 load balancer, `iptables`, kube-proxy, stateful firewall, cloud security group | L4 (IP + port) | Forwards or filters TCP flows without reading HTTP ([[load-balancers-l4-vs-l7]]) |
+| nginx, Envoy, API gateway, CDN, WAF | L7 (HTTP) | Can route by path/header, terminate TLS, cache, block by payload ([[reverse-proxy-nginx-basics]], [[cdn]]) |
 | Service mesh sidecar | L4 + L7 | mTLS and retries per request ([[mtls-and-service-to-service-auth]]) |
 
 ### Interview-style questions folded in
@@ -64,4 +79,4 @@ Reading it: MAC addresses are the Docker bridge interfaces (L2), `10.20.5.2 -> 1
 - Saying "L7 load balancer" when the product only forwards TCP (many cloud "network" load balancers are L4). The difference decides whether you get path routing, header-based canaries and TLS termination.
 - Forgetting that NAT and firewalls rewrite or drop at L3/L4 before your HTTP code ever runs; a `504` from a gateway often means a dropped SYN two layers down.
 - Thinking HTTP/3 "replaces TCP with UDP"; QUIC reimplements reliability inside UDP, the layering still holds.
-- Related: [[tcp-vs-udp]] for the transport layer in depth, [[linux-networking]] for the packet path through the kernel.
+- Related: [[host-to-host-communication]] for what happens hop by hop, [[tcp-vs-udp]] for the transport layer in depth, [[linux-networking]] for the packet path through the kernel.
