@@ -33,6 +33,8 @@ A **socket** is a kernel data structure (a `struct sock` in Linux) that the proc
 - Strictly, `socket()` creates the fd and `listen()` only marks it as passive (it returns 0); the course's "listen returns the socket" folds the three calls into one. Frameworks do all of this for you: `app.listen(8080)` in Node.js, Tomcat's connector in Spring Boot.
 - The listening socket and the per-connection sockets are different fds: a server holding 10,000 clients has 10,000 fds plus one. `ulimit -n` (1024 by default on some images) is a real ceiling; give a server process 65,536.
 
+- **A connection is identified by four values**: source IP, source port, destination IP, destination port. When one client opens a thousand connections to the same server, only the source port differs, so the kernel can still tell them apart. That also limits a single client: the ephemeral port range (`net.ipv4.ip_local_port_range`, 32768–60999 by default, about 28,000 ports) caps connections from one IP to one destination IP:port, and a service that opens and closes connections fast can run out of ports while old ones sit in `TIME_WAIT`. Connection pools avoid this.
+
 ### SYN queue and accept queue
 - Creating a listening socket gives it two queues:
   - **SYN queue**: incoming SYNs whose handshake is not finished yet (`SYN_RECV`).
@@ -79,6 +81,21 @@ socket-sharding
 - **Receive**: the client sends data on a connection; the kernel puts it into the connection's **receive queue** (receive buffer), **ACKs** it (possibly delayed, up to ~40 ms, so the ACK can ride on the response) and updates the **window** it advertises: the free space left in the buffer. The app calls `read()` to copy the data from the kernel into its own memory. Unless you use zero-copy techniques (`sendfile`, `MSG_ZEROCOPY`, `io_uring` registered buffers), every byte is copied once between kernel and user space.
 - **Send**: `send()`/`write()` copies the app's bytes into the **send buffer** and returns; returning means "the kernel has it", not "the peer got it". The kernel cuts the data into segments of at most one MSS, sends as much as the peer's window allows, and keeps each segment until it is ACKed, in case it has to be retransmitted. Nagle's algorithm may hold back small writes until earlier data is ACKed; `TCP_NODELAY` turns it off for latency-sensitive protocols.
 - Buffer sizes are auto-tuned per connection between the limits in `net.ipv4.tcp_rmem` / `tcp_wmem`; `SO_RCVBUF` / `SO_SNDBUF` fix them by hand (and turn autotuning off). On an established connection, `ss -tn` shows the bytes waiting: `Recv-Q` not yet read by the app, `Send-Q` not yet ACKed by the peer.
+
+### Zero-copy: sendfile
+- Serving a static file with `read()` and `write()` moves the bytes disk → page cache (DMA) → app buffer (copy) → socket send buffer (copy) → NIC (DMA): two system calls and two CPU copies of data the app never changes.
+- `sendfile(out_fd, in_fd, offset, count)` asks the kernel to move file data to a socket directly: one system call, nothing copied into user space, and with a scatter-gather NIC no CPU copy at all. Bun advertised this for static files; Node.js and nginx (`sendfile on;`) use it too. In Java it is `FileChannel.transferTo()`, which Kafka uses to send log segments to consumers straight from the page cache.
+- It only works when the bytes go out unchanged. HTTPS must encrypt them with a key held by the TLS library in the app, and gzip compression happens in the app, so the data has to come up into user space after all. **Kernel TLS** (kTLS, Linux 4.13+, used by nginx and OpenSSL 3) moves the symmetric encryption into the kernel so `sendfile` works with HTTPS again; compression still breaks it. Kafka with TLS between brokers and clients loses its zero-copy path for the same reason.
+- Every byte a server receives is copied at least twice before the app sees it: NIC to kernel memory (DMA), then kernel to user space on `read()`. Copies are not free: each passes through the CPU caches and memory bus.
+
+```anim
+sendfile-zero-copy
+```
+
+### Nagle's algorithm and delayed ACK
+- **Nagle's algorithm** holds back a small write while earlier data is still unacknowledged, to avoid sending many tiny packets, each carrying 40 bytes of IP and TCP headers. **Delayed ACK** on the other side holds back the acknowledgement for up to ~40 ms, hoping to send it with a response. Together they can stall a request–response exchange: the sender waits for an ACK, the receiver waits to send one.
+- Daniel Stenberg traced unexplained delays in curl to exactly this during the TLS handshake, where small messages sat in the send buffer waiting; curl has set `TCP_NODELAY` (Nagle off) by default since 2016. Most latency-sensitive software does the same: Netty, gRPC, many database drivers. In Java: `socket.setTcpNoDelay(true)`, or `ChannelOption.TCP_NODELAY` in Netty.
+- The trade-off: Nagle saves bandwidth on chatty protocols, `TCP_NODELAY` saves latency. With `TCP_NODELAY`, batch your own writes (one `write()` per response, not per header line).
 
 ### Problems with reading and sending
 - **The backend does not read fast enough**: the receive queue fills, the advertised window shrinks to zero, and the client has to stop: its send buffer fills and its `write()` blocks. The client slows down. This is TCP flow control: backpressure all the way to the sender ([[backpressure-and-flow-control]]).
@@ -157,14 +174,40 @@ for (;;) {
 ```
 The invariant in the last comment is the whole discipline of reactive programming: a blocking JDBC call or `Thread.sleep` inside the loop freezes all connections on that event loop. This is why [[spring-reactive-webclient-sse|WebFlux]] needs R2DBC and why Netty warns about blocking handlers.
 
+- **libuv** (Node.js) picks the native mechanism per OS: epoll on Linux, kqueue on macOS and BSD, event ports on Solaris, IOCP (a completion API) on Windows. What cannot be made non-blocking that way runs on its thread pool (4 threads by default, `UV_THREADPOOL_SIZE`): file system calls, DNS lookups with `getaddrinfo`, and CPU-heavy crypto and zlib work. That is what people mean by "Node is single-threaded but uses threads".
+
 ### io_uring
 - Based on **completion**: the kernel does the work. The process and the kernel share memory holding two ring buffers: the process puts "jobs" (submission queue entries: read this socket into this buffer, write this file at this offset, accept, send…) into the **submission queue**; the kernel does the work and writes the results into the **completion queue**.
 - Many operations per system call (`io_uring_enter`), or none at all with kernel-side polling (`SQPOLL`); it covers sockets **and** files, so it fixes epoll's blind spot for disk IO. Available since Linux 5.1; Netty, Postgres 18 and newer databases have `io_uring` backends.
-- The shared rings and the large new kernel surface have produced many security bugs, so some environments turn it off: Google disables it on production servers and in ChromeOS and Android apps, and Docker's default seccomp profile blocks it.
+- The shared rings and the large new kernel surface have produced many security bugs, so some environments turn it off. In 2023 Google reported that 60% of the kernel exploits submitted to its bug bounty in 2022 targeted io_uring (about $1 million in rewards); it disables it on production servers and in ChromeOS and Android apps, and Docker's default seccomp profile blocks it.
 
 ```anim
 io-multiplexing
 ```
+
+### A web server in C, line by line (the demo)
+```c
+int server_fd = socket(AF_INET, SOCK_STREAM, 0);       // IPv4, stream (TCP), default protocol
+struct sockaddr_in addr = { .sin_family = AF_INET,
+                            .sin_addr.s_addr = INADDR_ANY,   // 0.0.0.0: all interfaces (demo only)
+                            .sin_port = htons(8080) };        // port in network byte order
+bind(server_fd, (struct sockaddr *)&addr, sizeof addr); // name the socket; fails if the port is taken
+listen(server_fd, 10);                                  // now the kernel builds the queues; backlog 10
+for (;;) {
+    int client_fd = accept(server_fd, NULL, NULL);     // blocks until a connection is in the accept queue
+    char buf[1024] = {0};
+    read(client_fd, buf, sizeof buf - 1);              // blocks until request bytes arrive; may be partial
+    const char *resp = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n"
+                       "Content-Length: 13\r\n\r\nHello, world!";
+    write(client_fd, resp, strlen(resp));             // copies into the send buffer and returns
+    close(client_fd);                                 // one request per connection: no keep-alive
+}
+```
+- Every framework runs this loop for you: Tomcat's acceptor thread, Node's `server.listen`, Netty's boss group. Seeing it in C shows that "an HTTP request" is just bytes in the receive buffer; HTTP is parsed in user space.
+- `htons()` converts the port to **network byte order** (big-endian); x86 and ARM are little-endian, so forgetting it binds port 36895 instead of 8080. `INADDR_ANY` is all zeros, which is why it happens to work without conversion.
+- An `AF_INET` socket accepts only IPv4: in the demo `curl http://[::1]:8080` failed while `127.0.0.1` worked. Listening on `::` with `IPV6_V6ONLY` off serves both.
+- `read()` returns whatever has arrived, up to the buffer size: a large or slow request needs a loop until the end of the headers and `Content-Length` bytes of body. If the response's `Content-Length` is larger than the bytes actually sent, the client keeps waiting for the rest; the lecture uses that to simulate slow backends.
+- Everything here blocks: one slow client stalls every other one. Real servers use threads, epoll or both.
 
 ### What the kernel does per packet
 - The kernel manages the whole TCP/IP part of networking. For every packet received from the NIC it allocates a **socket buffer** (`sk_buff`) with metadata, and merges packets (GRO) to reduce the overhead. On a busy machine this is real CPU work, and network-heavy servers often reserve a core or two for interrupts and the network stack (IRQ affinity, RSS queues).
@@ -206,6 +249,8 @@ ss -tn state established '( sport = :8080 )'
 Tomcat is a hybrid: one or two poller threads run `epoll_wait` and hand ready connections to a bounded worker pool that then does blocking JDBC. Netty/WebFlux keep everything on the event loops. Virtual threads make the worker pool unbounded and cheap while the JDK's scheduler multiplexes them over epoll.
 
 ## Pitfalls
+- Leaving Nagle on for a request–response protocol with small messages: 40 ms stalls from Nagle meeting delayed ACK. Set `TCP_NODELAY`, and batch writes yourself.
+- Expecting `sendfile`/`transferTo` to stay zero-copy behind TLS or compression: the bytes go through user space unless kernel TLS is on.
 - Binding databases, admin panels and debug ports to `0.0.0.0` on a host with a public interface. Bind to `127.0.0.1` or a private IP and keep a firewall in front anyway.
 - Debugging "random connection timeouts" by looking only at the application: the drops happen in the kernel's accept queue before any log line is written. Check `ss -ltn` and `ListenOverflows`.
 - Raising the framework backlog but not `net.core.somaxconn` (or the reverse): the kernel silently uses the smaller value.
