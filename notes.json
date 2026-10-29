@@ -2633,10 +2633,12 @@
     "operating-system-introduction",
     "osi-and-tcp-ip-models",
     "process-management",
+    "socket-management",
+    "storage-management",
     "syscalls-and-file-descriptors",
     "tcp-vs-udp"
    ],
-   "words": 2494,
+   "words": 4044,
    "ru": "notes-ru/computer-science/operating-systems/operating-system-architecture.md",
    "title_ru": "Обзор архитектуры системы"
   },
@@ -2672,7 +2674,7 @@
     "syscalls-and-file-descriptors",
     "virtual-threads"
    ],
-   "words": 2295,
+   "words": 2298,
    "ru": "notes-ru/computer-science/operating-systems/operating-system-introduction.md",
    "title_ru": "Что такое операционная система и зачем она нужна"
   },

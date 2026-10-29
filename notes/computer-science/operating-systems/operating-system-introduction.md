@@ -98,6 +98,10 @@ client ──TCP──▶ network card
 
 Your code is two lines in this picture; the kernel is in every other one. Each crossing of the line between the JVM and the kernel costs a few hundred nanoseconds, which is why "fewer, larger I/O calls" is a universal performance rule.
 
+```anim
+http-request-journey
+```
+
 ## Pitfalls
 - "The OS is slow" is almost never the diagnosis. The OS is doing what the program asked; the fix is to ask for less (fewer syscalls, fewer threads, bigger buffers).
 - The JVM is not an operating system. It manages its own heap and threads, but every thread is still an OS thread (until virtual threads, [[virtual-threads]]) and every allocation beyond the current heap is an OS request.
