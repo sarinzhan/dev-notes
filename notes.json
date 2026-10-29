@@ -2657,8 +2657,10 @@
    "path": "notes/computer-science/operating-systems/operating-system-introduction.md",
    "links": [
     "anatomy-of-a-process",
+    "cpu-caches-and-cache-lines",
     "docker-containers-and-resources",
     "docker-fundamentals",
+    "kernel-vs-user-mode",
     "kubernetes-basics",
     "linux-architecture-and-kernel",
     "memory-management",
@@ -2666,10 +2668,11 @@
     "process-management",
     "signals-and-process-lifecycle",
     "socket-management",
+    "storage-management",
     "syscalls-and-file-descriptors",
     "virtual-threads"
    ],
-   "words": 938,
+   "words": 2295,
    "ru": "notes-ru/computer-science/operating-systems/operating-system-introduction.md",
    "title_ru": "Что такое операционная система и зачем она нужна"
   },
