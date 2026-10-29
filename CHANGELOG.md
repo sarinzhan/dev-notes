@@ -3,6 +3,8 @@
 What was added or changed in the vault, newest first. One line per change, with the pull request in brackets.
 
 ## 2026-10-29
+- **Changes page on the site:** a "Changes" tab next to Notes and Graph shows this changelog (`#changes`). [#32](https://github.com/sarinzhan/dev-notes/pull/32)
+- **Changelog added** (`CHANGELOG.md`), backfilled from all earlier PRs. [#31](https://github.com/sarinzhan/dev-notes/pull/31)
 - **Networking restructured by layer** (fundamentals, ip-layer, transport, performance, protocols, security, tools). 18 new notes from course sections 2–8 (ARP, routing, TCP internals, UDP, TLS key exchange, tcpdump, Docker networking…); 10 animations. [#30](https://github.com/sarinzhan/dev-notes/pull/30)
 - **New note: Compilers and linkers.** Toolchain stages, object files, linking, PLT/GOT, ELF/PE/Mach-O, runtimes, JIT and GC; 2 animations. Linking content moved here from the Process note. [#29](https://github.com/sarinzhan/dev-notes/pull/29)
 - **New note: Virtualization and containers.** Hypervisors, namespaces, cgroups, OverlayFS; 2 animations. Container content moved here from the Docker and Linux kernel notes. [#28](https://github.com/sarinzhan/dev-notes/pull/28)

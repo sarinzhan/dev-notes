@@ -171,6 +171,8 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
   .search{min-width:0}
   .search input{box-sizing:border-box}
   .tabs button{padding:6px 8px}
+  .tabs{flex-shrink:0}
+  #t-changes{display:none}
   .tabs.lang button{padding:4px 6px}
   .note h1{font-size:28px}
 }
@@ -268,6 +270,10 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
 .mob-right h4{font:500 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
 .mob-right ul{list-style:none;margin:0 0 18px;padding:0}
 .mob-right li button{padding:4px 0;font-size:13.5px;color:var(--accent)}
+.body.changes li{margin:6px 0}
+.changes-sub{color:var(--muted);font-size:14px;margin:-4px 0 18px}
+.side .side-changes{display:none;width:100%;margin:0 0 10px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;color:var(--accent);gap:6px;align-items:center}
+@media (max-width:760px){ .side .side-changes{display:flex} }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
 </style>
 
@@ -284,6 +290,7 @@ line.e.hi{stroke:var(--accent);stroke-width:1.8}
   <nav class="tabs">
     <button id="t-notes" aria-pressed="true">Notes</button>
     <button id="t-graph" aria-pressed="false">Graph</button>
+    <button id="t-changes" aria-pressed="false">Changes</button>
   </nav>
   <nav class="tabs lang" aria-label="Language">
     <button data-lang="en" aria-pressed="true">EN</button>
@@ -325,11 +332,11 @@ const FM=/^---\s*\n[\s\S]*?\n---\s*\n/;
 // ---- language: one note per topic; the EN/RU switch picks which text is shown.
 // Russian files live in notes-ru/ under the same path and id; a note without one falls back to English.
 const UI={
-  en:{search:"Search notes, tags…",notes:"Notes",graph:"Graph",notesWord:"notes",expandAll:"Expand all",collapseAll:"Collapse all",recent:"Recently learned",learned:"learned",contents:"Contents",localGraph:"Local graph",linkedFrom:"Linked from",linksTo:"Links to",noBacklinks:"No backlinks yet",nothingLinks:"Nothing links here yet.",noOutgoing:"No outgoing links.",noMatch:"No notes match",play:"Play",pause:"Pause",speed:"Speed",step:"Step",of:"of",allSteps:"All steps",openNote:"Open note",notWritten:"Note not written yet",notTranslated:"",
+  en:{search:"Search notes, tags…",notes:"Notes",graph:"Graph",changes:"Changes",changesTitle:"What changed",changesSub:"What was added or changed in the vault, newest first.",changesRu:"",notesWord:"notes",expandAll:"Expand all",collapseAll:"Collapse all",recent:"Recently learned",learned:"learned",contents:"Contents",localGraph:"Local graph",linkedFrom:"Linked from",linksTo:"Links to",noBacklinks:"No backlinks yet",nothingLinks:"Nothing links here yet.",noOutgoing:"No outgoing links.",noMatch:"No notes match",play:"Play",pause:"Pause",speed:"Speed",step:"Step",of:"of",allSteps:"All steps",openNote:"Open note",notWritten:"Note not written yet",notTranslated:"",
       depth:"Depth",d1:"1 · sections",d2:"2 · + subsections",d3:"3 · + notes",gFolders:"Folder edges",gHover:"Links only on hover",gTags:"Tags as nodes",gLabels:"Labels",kSec:"section",kSub:"subsection",kNote:"note",kTag:"tag",
       hint3:"Drag nodes, scroll to zoom, click a note to open it. Notes are grouped by section (solid outline), then by subsection (dashed). Faint lines are [[wikilinks]] between notes; hover a node to highlight its links. Tick Folder edges to also draw section → note lines.",
       hintUp:lvl=>`Links between notes are rolled up to the ${lvl===2?"subsection":"section"} level; thicker edge = more cross-links. Click a node to open its first note.`},
-  ru:{search:"Поиск по заметкам и тегам…",notes:"Заметки",graph:"Граф",notesWord:"заметок",expandAll:"Развернуть всё",collapseAll:"Свернуть всё",recent:"Недавно изученное",learned:"изучено",contents:"Содержание",localGraph:"Локальный граф",linkedFrom:"Ссылаются сюда",linksTo:"Ссылки отсюда",noBacklinks:"Пока никто не ссылается",nothingLinks:"Пока никто не ссылается.",noOutgoing:"Нет исходящих ссылок.",noMatch:"Ничего не найдено по запросу",play:"Пуск",pause:"Пауза",speed:"Скорость",step:"Шаг",of:"из",allSteps:"Все шаги",openNote:"Открыть заметку",notWritten:"Заметка ещё не написана",notTranslated:"Перевода этой заметки пока нет — показан английский оригинал.",
+  ru:{search:"Поиск по заметкам и тегам…",notes:"Заметки",graph:"Граф",changes:"Изменения",changesTitle:"Что изменилось",changesSub:"Что добавлено или изменено в заметках, сначала новое.",changesRu:"Журнал изменений ведётся на английском.",notesWord:"заметок",expandAll:"Развернуть всё",collapseAll:"Свернуть всё",recent:"Недавно изученное",learned:"изучено",contents:"Содержание",localGraph:"Локальный граф",linkedFrom:"Ссылаются сюда",linksTo:"Ссылки отсюда",noBacklinks:"Пока никто не ссылается",nothingLinks:"Пока никто не ссылается.",noOutgoing:"Нет исходящих ссылок.",noMatch:"Ничего не найдено по запросу",play:"Пуск",pause:"Пауза",speed:"Скорость",step:"Шаг",of:"из",allSteps:"Все шаги",openNote:"Открыть заметку",notWritten:"Заметка ещё не написана",notTranslated:"Перевода этой заметки пока нет — показан английский оригинал.",
       depth:"Глубина",d1:"1 · разделы",d2:"2 · + подразделы",d3:"3 · + заметки",gFolders:"Связи папок",gHover:"Связи только при наведении",gTags:"Теги как узлы",gLabels:"Подписи",kSec:"раздел",kSub:"подраздел",kNote:"заметка",kTag:"тег",
       hint3:"Перетаскивайте узлы, колесом меняйте масштаб, кликните по заметке, чтобы открыть её. Заметки сгруппированы по разделам (сплошной контур) и подразделам (пунктир). Тонкие линии — [[wikilinks]] между заметками; наведите на узел, чтобы подсветить его связи. Включите «Связи папок», чтобы нарисовать ещё и линии раздел → заметка.",
       hintUp:lvl=>`Связи между заметками собраны до уровня ${lvl===2?"подразделов":"разделов"}; чем толще линия, тем больше перекрёстных ссылок. Кликните по узлу, чтобы открыть его первую заметку.`}
@@ -360,6 +367,7 @@ function applyLang(){
   document.getElementById("q").placeholder=t("search");
   document.getElementById("t-notes").textContent=t("notes");
   document.getElementById("t-graph").textContent=t("graph");
+  document.getElementById("t-changes").textContent=t("changes");
   document.getElementById("glegend").innerHTML=Object.entries(SECTIONS).map(([k,v])=>`<span style="--c:${v.c}">${v.name.toLowerCase()}</span>`).join("")+`<span style="--c:var(--c-tag)">${t("kTag")}</span>`;
   const nRu=NOTES.filter(n=>n.ru).length;
   document.querySelector(".brand small").textContent=`sarinzhan / dev-notes · ${NOTES.length} ${t("notesWord")}`+(ru?` · RU ${nRu}/${NOTES.length}`:"");
@@ -369,7 +377,7 @@ async function setLang(l){
   LANG=l; try{ localStorage.setItem("dn-lang",l); }catch(e){}
   if(l==="ru") await loadRu();
   applyLang(); renderSide();
-  if(current){ renderNote(); renderRight(); }
+  if(VIEW==="changes") showChanges(); else if(current){ renderNote(); renderRight(); }
   if(document.getElementById("graph").classList.contains("on")) drawGraph();
   search();
 }
@@ -401,7 +409,8 @@ function md(src){
 // ---- state + routing
 let current = null;
 const $ = s=>document.querySelector(s);
-function go(id){ if(!byId[id]) return; id=byId[id].id; current=id; revealCurrent(); try{ history.replaceState(null,"",`#${id}`);}catch(e){} showNotes(); renderNote(); renderSide(); renderRight(); $("#main").scrollTop=0; }
+let VIEW="note";
+function go(id){ if(!byId[id]) return; id=byId[id].id; current=id; VIEW="note"; revealCurrent(); try{ history.replaceState(null,"",`#${id}`);}catch(e){} showNotes(); renderNote(); renderSide(); renderRight(); $("#main").scrollTop=0; }
 function openTag(tag){ $("#q").value="#"+tag; search(); $("#q").focus(); }
 
 // ---- sidebar tree: collapsible sections and subsections
@@ -417,6 +426,7 @@ const CHEV='<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6
 
 function renderSide(){
   const side=$("#side"), top=side.scrollTop; let h="";
+  h+=`<button class="side-changes" data-changes="1">${t("changes")} →</button>`;
   h+=`<div class="tree-tools"><button data-all="expand">${t("expandAll")}</button><button data-all="collapse">${t("collapseAll")}</button></div>`;
   const recent=[...NOTES].sort((a,b)=>b.learned.localeCompare(a.learned)).slice(0,4);
   const rOpen=!openKeys.has("recent-closed");
@@ -511,6 +521,7 @@ document.addEventListener("click",e=>{
   const tc=e.target.closest("[data-toc]"); if(tc){ scrollToHeading(tc.dataset.toc); return; }
   const tg=e.target.closest("[data-toggle]"); if(tg){ toggleKey(tg.dataset.toggle); return; }
   const al=e.target.closest("[data-all]"); if(al){ setAll(al.dataset.all==="expand"); return; }
+  if(e.target.closest("[data-changes]")){ $("#side").classList.remove("open"); showChanges(); return; }
   const g=e.target.closest("[data-go]"); if(g){ go(g.dataset.go); $("#q").value=""; $("#side").classList.remove("open"); return; }
   const w=e.target.closest("a.wl"); if(w){ e.preventDefault(); if(byId[w.dataset.id]) go(w.dataset.id); return; }
   const t=e.target.closest("[data-tag]"); if(t){ openTag(t.dataset.tag); return; }
@@ -519,9 +530,32 @@ $("#main").addEventListener("scroll",()=>requestAnimationFrame(spyToc),{passive:
 $("#menu").addEventListener("click",()=>$("#side").classList.toggle("open"));
 
 // ---- views
-function showNotes(){ $("#graph").classList.remove("on"); $("#main").style.display=""; $("#t-notes").setAttribute("aria-pressed","true"); $("#t-graph").setAttribute("aria-pressed","false"); }
-function showGraph(){ $("#graph").classList.add("on"); $("#main").style.display="none"; $("#t-notes").setAttribute("aria-pressed","false"); $("#t-graph").setAttribute("aria-pressed","true"); drawGraph(); }
-$("#t-notes").onclick=showNotes; $("#t-graph").onclick=showGraph;
+function setTab(id){ ["t-notes","t-graph","t-changes"].forEach(k=>$("#"+k).setAttribute("aria-pressed",String(k===id))); }
+function showNotes(){ $("#graph").classList.remove("on"); $("#main").style.display=""; setTab("t-notes"); }
+function showGraph(){ $("#graph").classList.add("on"); $("#main").style.display="none"; setTab("t-graph"); drawGraph(); }
+// ---- Changes: CHANGELOG.md rendered as a page (#changes)
+let CHANGELOG=null;
+async function showChanges(){
+  VIEW="changes"; stopAnims();
+  $("#graph").classList.remove("on"); $("#main").style.display=""; setTab("t-changes");
+  try{ history.replaceState(null,"","#changes"); }catch(e){}
+  if(CHANGELOG===null){ try{ const r=await fetch("CHANGELOG.md",{cache:"no-cache"}); CHANGELOG=r.ok?await r.text():""; }catch(e){ CHANGELOG=""; } }
+  if(VIEW!=="changes") return;
+  const body=CHANGELOG.replace(/^# .*\n+/,"").replace(/^What was added.*\n+/m,"");
+  $("#note").innerHTML=`
+    <div class="crumb"><span>CHANGELOG.md</span></div>
+    <h1>${t("changesTitle")}</h1>
+    <p class="changes-sub">${t("changesSub")}</p>
+    ${t("changesRu")?`<div class="trnote">${t("changesRu")}</div>`:""}
+    <details class="toc-inline" id="toc-inline"><summary>${t("contents")}</summary><ul class="toc"></ul></details>
+    <div class="body changes">${marked.parse(body)}</div>`;
+  $("#note").querySelectorAll(".body a[href^='http']").forEach(a=>{ a.target="_blank"; a.rel="noopener"; });
+  buildToc();
+  $("#right").innerHTML=TOC.length>1?`<div class="block"><h4>${t("contents")}</h4><ul class="toc">${tocItems()}</ul></div>`:"";
+  spyToc(); $("#main").scrollTop=0;
+}
+$("#t-notes").onclick=()=>{ if(VIEW!=="note") go(current||NOTES[0].id); else showNotes(); };
+$("#t-graph").onclick=showGraph; $("#t-changes").onclick=showChanges;
 $("#g-tags").onchange=drawGraph; $("#g-labels").onchange=drawGraph; $("#g-folders").onchange=()=>$("#gsvg").classList.toggle("nofolders",!$("#g-folders").checked); $("#g-hoveronly").onchange=()=>$("#gsvg").classList.toggle("edges-hover",$("#g-hoveronly").checked);
 
 // ---- graph data
@@ -4950,8 +4984,8 @@ ANIMS["docker-bridge-publish"] = el=>{
 };
 
 // ---- boot
-function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
-  window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }
+function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id); if(start==="changes") showChanges();
+  window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(id==="changes"){ if(VIEW!=="changes") showChanges(); return; } if(byId[id] && (id!==current||VIEW!=="note")) go(id); }); }
 load();
 window.addEventListener("resize",()=>{ if($("#graph").classList.contains("on")) drawGraph(); });
 </script>
