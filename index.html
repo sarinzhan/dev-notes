@@ -3941,6 +3941,160 @@ ANIMS["container-isolation"] = el=>{
   }});
 };
 
+ANIMS["symbol-relocation"] = el=>{
+  const ST = [
+    { t: ["Object files", "Объектные файлы"], m: "obj",
+      en: "gcc -c gives one .o per source file. Its code starts at address 0, and each call into another file is a hole: e8 00 00 00 00, plus a relocation saying which symbol belongs there. The symbol table lists what the file defines (T) and what it needs (U).",
+      ru: "gcc -c даёт по одному .o на исходный файл. Его код начинается с адреса 0, а каждый вызов в другой файл — это дыра: e8 00 00 00 00 плюс релокация, говорящая, какой символ туда должен попасть. Таблица символов перечисляет, что файл определяет (T) и что ему нужно (U)." },
+    { t: ["Resolve symbols", "Разрешение символов"], m: "res",
+      en: "The linker matches every U with exactly one definition. add is found in math.o. printf is in no object file, but in libc.so.6, a shared library, so it will be resolved when the program starts. No match at all is 'undefined reference'; two matches are 'multiple definition'.",
+      ru: "Линкер сопоставляет каждый U ровно с одним определением. add нашёлся в math.o. printf нет ни в одном объектном файле, он в libc.so.6, разделяемой библиотеке, поэтому разрешится при запуске программы. Нет совпадения — «undefined reference»; два совпадения — «multiple definition»." },
+    { t: ["Lay out", "Раскладка"], m: "lay",
+      en: "Same-named sections are merged and every byte gets its final address: _start from crt1.o at 0x1060, main at 0x1149, add at 0x117d. For printf the linker adds a stub, printf@plt at 0x1050, and a GOT slot at 0x3fd0.",
+      ru: "Одноимённые секции объединяются, и каждый байт получает окончательный адрес: _start из crt1.o — 0x1060, main — 0x1149, add — 0x117d. Для printf линкер добавляет заглушку printf@plt по адресу 0x1050 и ячейку GOT по адресу 0x3fd0." },
+    { t: ["Patch the holes", "Заполнение дыр"], m: "patch",
+      en: "A relative call stores the distance from the next instruction. The call to add ends at 0x1160 and add is at 0x117d, so the hole becomes 0x1d: e8 1d 00 00 00. The call to printf gets the distance to printf@plt. These are real addresses from GCC 13.",
+      ru: "Относительный call хранит расстояние от следующей инструкции. Вызов add заканчивается на 0x1160, а add лежит по 0x117d, поэтому дыра становится 0x1d: e8 1d 00 00 00. Вызов printf получает расстояние до printf@plt. Это реальные адреса из GCC 13." },
+    { t: ["First call: the loader", "Первый вызов: загрузчик"], m: "lazy",
+      en: "libc is mapped at a random address (ASLR), so printf@plt jumps through the GOT slot. With lazy binding the slot first points into ld.so: it looks printf up in libc.so.6 and writes its address into the GOT. With -z now (Ubuntu's default) this happens at start instead.",
+      ru: "libc отображается по случайному адресу (ASLR), поэтому printf@plt прыгает через ячейку GOT. При ленивом связывании ячейка сначала указывает в ld.so: он ищет printf в libc.so.6 и записывает его адрес в GOT. С -z now (по умолчанию в Ubuntu) это происходит сразу при запуске." },
+    { t: ["Every later call", "Все следующие вызовы"], m: "fast",
+      en: "From now on: call printf@plt → jmp through the GOT → printf in libc, one extra indirect jump and no lookup. Full RELRO then makes the GOT read-only, so an attacker cannot redirect the call.",
+      ru: "Дальше всегда: call printf@plt → jmp через GOT → printf в libc, один лишний косвенный переход и никакого поиска. Full RELRO затем делает GOT только для чтения, чтобы атакующий не мог перенаправить вызов." }
+  ];
+  return steppedAnim(el, { title: LL("Symbols, relocations and the PLT", "Символы, релокации и PLT"), vb: [760, 330], steps: ST, stepMs: 7500, render(g, s, t){
+    const m = s.m, k = easeIO(Math.min(1, t / 1800)), L = E(g, "g", {});
+    const ln = (a, b, on, cls)=>E(L, "line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], class: cls || (on ? "an-link2 on" : "an-link2") });
+    const dot = P=>{ const [x, y] = polyAt(P, k); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); };
+    const early = m === "obj" || m === "res";
+    if(early){
+      // main.o
+      oR(g, 10, 30, 330, 190, "an-frame", 10); oT(g, 175, 22, "main.o", "an-m an-b");
+      oT(g, 22, 54, ".text", "an-m an-b", "start");
+      oR(g, 22, 62, 306, 24, "an-rowhl", 4); oT(g, 30, 79, "12: e8 00 00 00 00  call ?", "an-code", "start");
+      oR(g, 22, 90, 306, 24, "an-rowhl", 4); oT(g, 30, 107, "28: e8 00 00 00 00  call ?", "an-code", "start");
+      oT(g, 22, 136, LL("relocations", "релокации"), "an-m an-b", "start");
+      oT(g, 30, 154, "13: R_X86_64_PLT32 add-4", "an-code c", "start"); oT(g, 30, 170, "29: R_X86_64_PLT32 printf-4", "an-code c", "start");
+      oT(g, 22, 196, LL("symbols", "символы"), "an-m an-b", "start");
+      oT(g, 100, 196, "T main", "an-code", "start"); oT(g, 170, 196, "U add", "an-code" + (m === "res" ? "" : " an-warn"), "start"); oT(g, 240, 196, "U printf", "an-code" + (m === "res" ? "" : " an-warn"), "start");
+      // math.o
+      oR(g, 420, 30, 330, 80, "an-frame", 10); oT(g, 585, 22, "math.o", "an-m an-b");
+      oT(g, 432, 60, "00: 8d 04 37  lea eax,[rdi+rsi]", "an-code", "start"); oT(g, 432, 92, LL("symbols", "символы"), "an-m an-b", "start"); oT(g, 520, 92, "T add", "an-code", "start");
+      // libc
+      oR(g, 420, 150, 330, 70, m === "res" ? "an-pg k1" : "an-pg dim", 10); oT(g, 585, 180, "libc.so.6 (shared)", "an-m an-b"); oT(g, 585, 200, "T printf, T malloc, …", "an-code");
+      if(m === "obj"){ oT(g, 380, 270, LL("addresses start at 0 · nothing says where to begin", "адреса с нуля · нигде не сказано, откуда начинать"), "an-m an-b an-sp"); return; }
+      ln([200, 192], [520, 88], true); ln([270, 192], [480, 200], true, "an-flowline");
+      dot([[200, 192], [520, 88]]);
+      oT(g, 380, 270, LL("linker: every U needs exactly one definition", "линкер: каждому U — ровно одно определение"), "an-m an-b an-sp");
+      oT(g, 380, 292, LL("printf: in a shared library → resolved at load time", "printf: в разделяемой библиотеке → разрешится при загрузке"), "an-m");
+      return;
+    }
+    // output executable layout
+    oR(g, 10, 30, 330, 290, "an-frame", 10); oT(g, 175, 22, LL("app (ELF executable)", "app (исполняемый ELF)"), "an-m an-b");
+    const rows = [["0x1050", "printf@plt", "k3"], ["0x1060", "_start (crt1.o)", "k0"], ["0x1149", "main (main.o)", "k0"], ["0x117d", "add (math.o)", "k0"], ["0x3fd0", "GOT[printf]", "k2"]];
+    rows.forEach(([a, n, c], i)=>{ const y = 44 + i * 40; const hot = (m === "lay") || (m === "patch" && (i === 2 || i === 3)) || ((m === "lazy" || m === "fast") && (i === 0 || i === 4)); oR(g, 22, y, 306, 32, "an-pg " + (hot ? c : "dim"), 5); oT(g, 32, y + 21, a, "an-code", "start"); oT(g, 110, y + 21, n, "an-m an-b", "start"); });
+    oT(g, 175, 262, LL("entry point: 0x1060 (_start → main)", "точка входа: 0x1060 (_start → main)"), "an-m");
+    if(m === "lay"){ oT(g, 550, 120, LL("merge .text of all objects,", "объединить .text всех объектов,"), "an-m an-b"); oT(g, 550, 140, LL("give every symbol its address", "дать каждому символу адрес"), "an-m an-b"); oT(g, 550, 180, LL("+ PLT stub and GOT slot for printf", "+ заглушка PLT и ячейка GOT для printf"), "an-m"); return; }
+    if(m === "patch"){
+      oR(g, 380, 40, 370, 150, "an-frame", 10); oT(g, 565, 32, LL("patching the call to add", "заполнение вызова add"), "an-m an-b");
+      oT(g, 395, 70, "115b: e8 ?? ?? ?? ??  call add", "an-code", "start");
+      oT(g, 395, 100, LL("next instruction: 0x1160", "следующая инструкция: 0x1160"), "an-m", "start");
+      oT(g, 395, 120, "0x117d − 0x1160 = 0x1d", "an-code", "start");
+      const done = t > 2200;
+      oR(g, 390, 140, 350, 30, done ? "an-reg on" : "an-box", 5); oT(g, 400, 160, done ? "115b: e8 1d 00 00 00  call 117d <add>" : "115b: e8 __ __ __ __", "an-code", "start");
+      ln([330, 136], [390, 155], true); dot([[328, 120], [390, 155]]);
+      oT(g, 565, 225, LL("same for printf: 1171: e8 da fe ff ff", "то же для printf: 1171: e8 da fe ff ff"), "an-code"); oT(g, 565, 245, LL("→ call 1050 <printf@plt>", "→ call 1050 <printf@plt>"), "an-code");
+      return;
+    }
+    // runtime: lazy / fast
+    oR(g, 400, 40, 340, 60, "an-reg on", 8); oT(g, 570, 64, "1054: jmp *0x3fd0", "an-code"); oT(g, 570, 84, LL("printf@plt: jump via the GOT", "printf@plt: прыжок через GOT"), "an-m");
+    oR(g, 400, 150, 160, 60, m === "lazy" ? "an-reg on" : "an-pg dim", 8); oT(g, 480, 175, "ld.so", "an-m an-b"); oT(g, 480, 193, LL("resolver", "резолвер"), "an-m");
+    oR(g, 580, 150, 160, 60, "an-pg k1", 8); oT(g, 660, 175, "libc.so.6", "an-m an-b"); oT(g, 660, 193, "printf @ 0x7f3a…", "an-code");
+    const gotTxt = m === "lazy" ? (t < 3200 ? "→ ld.so (not yet)" : "→ 0x7f3a… printf") : "→ 0x7f3a… printf";
+    oT(g, 175, 304, "GOT[printf] " + gotTxt, "an-code" + (m === "lazy" && t < 3200 ? " an-warn" : ""));
+    if(m === "lazy"){
+      ln([175, 220], [400, 70], true); ln([450, 100], [450, 150], true); ln([560, 180], [580, 180], true, "an-flowline"); ln([480, 210], [328, 220], true, "an-flowline");
+      dot([[175, 140], [400, 70], [450, 150], [580, 180], [480, 210], [328, 220]]);
+      oT(g, 570, 250, LL("first call: look up, write GOT, jump", "первый вызов: найти, записать GOT, прыгнуть"), "an-m an-b an-sp");
+      return;
+    }
+    ln([175, 140], [400, 70], true); ln([700, 100], [660, 150], true);
+    dot([[175, 140], [400, 70], [700, 100], [660, 150]]);
+    oT(g, 570, 250, LL("later calls: no lookup, one indirect jump", "дальше: без поиска, один косвенный переход"), "an-m an-b an-sp");
+    oT(g, 570, 272, LL("full RELRO: GOT becomes read-only", "full RELRO: GOT только для чтения"), "an-m");
+  }});
+};
+
+ANIMS["jit-hot-path"] = el=>{
+  const ST = [
+    { t: ["Interpret", "Интерпретация"], m: "int",
+      en: "The runtime's own machine code (its text segment, r-x) runs the interpreter loop: fetch a bytecode, dispatch to its handler, execute, repeat. Several native instructions are spent per bytecode just deciding what to do. A counter per function ticks on every call.",
+      ru: "Собственный машинный код среды выполнения (её сегмент text, r-x) крутит цикл интерпретатора: взять байт-код, перейти к обработчику, выполнить, повторить. На каждый байт-код уходит несколько нативных инструкций только на то, чтобы решить, что делать. Счётчик функции растёт при каждом вызове." },
+    { t: ["Hot: compile", "Горячая: компиляция"], m: "hot",
+      en: "The counter crosses the threshold, so the JIT compiles this function into machine code for this exact CPU, using what it observed: the argument is always an int, the branch is never taken.",
+      ru: "Счётчик переходит порог, и JIT компилирует функцию в машинный код именно для этого CPU, используя увиденное: аргумент всегда int, ветка никогда не выполняется." },
+    { t: ["Write: page is RW", "Запись: страница RW"], m: "rw",
+      en: "The code goes into the code cache, a region from mmap, not the malloc heap. While the JIT writes, its pages are read-write and not executable.",
+      ru: "Код попадает в кэш кода — область из mmap, а не кучу malloc. Пока JIT пишет, его страницы доступны для чтения и записи, но не для выполнения." },
+    { t: ["mprotect: R-X", "mprotect: R-X"], m: "rx",
+      en: "W^X: a page is writable or executable, never both. mprotect(PROT_READ|PROT_EXEC) flips the page table entries; on ARM the JIT also flushes the instruction cache. (HotSpot on Linux skips this and keeps its code cache rwx.)",
+      ru: "W^X: страница либо записываемая, либо исполняемая, но не обе сразу. mprotect(PROT_READ|PROT_EXEC) меняет записи в таблице страниц; на ARM JIT ещё сбрасывает кэш инструкций. (HotSpot в Linux это пропускает и держит кэш кода rwx.)" },
+    { t: ["Jump: native speed", "Прыжок: нативная скорость"], m: "run",
+      en: "The interpreter's entry for the function is patched to point into the code cache. The program counter goes there and the CPU runs the instructions directly: no dispatch, no type checks, values in registers.",
+      ru: "Вход интерпретатора для этой функции перенаправляется в кэш кода. Счётчик команд уходит туда, и CPU выполняет инструкции напрямую: без диспетчеризации, без проверок типов, значения в регистрах." },
+    { t: ["Heap is not executable", "Куча не исполняемая"], m: "nx",
+      en: "Jump into the heap or stack instead, as an exploit would after a buffer overflow, and the MMU refuses the instruction fetch: the page's NX bit is set. Page fault, the kernel sends SIGSEGV. That is why the JIT has to ask for executable memory explicitly.",
+      ru: "Если прыгнуть в кучу или стек, как сделал бы эксплойт после переполнения буфера, MMU откажет в выборке инструкции: у страницы стоит бит NX. Page fault, ядро посылает SIGSEGV. Поэтому JIT и должен явно просить исполняемую память." }
+  ];
+  return steppedAnim(el, { title: LL("A JIT turns hot code into native code", "JIT превращает горячий код в нативный"), vb: [760, 330], steps: ST, stepMs: 7000, render(g, s, t){
+    const m = s.m, k = easeIO(Math.min(1, t / 1800)), L = E(g, "g", {});
+    const ln = (a, b, cls)=>E(L, "line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], class: cls || "an-link2 on" });
+    const dot = P=>{ const [x, y] = polyAt(P, k); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); };
+    // memory map, right side
+    oR(g, 470, 30, 280, 290, "an-frame", 10); oT(g, 610, 22, LL("process memory", "память процесса"), "an-m an-b");
+    const ccPerm = (m === "int" || m === "hot") ? "—" : m === "rw" ? "rw-" : "r-x";
+    const reg = [["stack", "rw-", "k1", 44], ["code cache (mmap)", ccPerm, "k2", 96], ["heap", "rw-", "k1", 176], ["runtime text", "r-x", "k0", 256]];
+    const regRu = { "stack": "стек", "code cache (mmap)": "кэш кода (mmap)", "heap": "куча", "runtime text": "text среды выполнения" };
+    reg.forEach(([n, p, c, y])=>{ const hot = (n === "code cache (mmap)" && ["rw", "rx", "run"].includes(m)) || (n === "runtime text" && m === "int") || (n === "heap" && m === "nx");
+      oR(g, 485, y, 250, n === "code cache (mmap)" ? 64 : 48, hot ? (n === "heap" && m === "nx" ? "an-leak" : "an-reg on") : "an-pg " + c, 6);
+      oT(g, 497, y + 22, LL(n, regRu[n]), "an-m an-b", "start"); oT(g, 722, y + 22, p, "an-code" + (p === "rw-" && n === "code cache (mmap)" ? " an-warn" : ""), "end"); });
+    // left: function and counter
+    oR(g, 10, 30, 420, 110, "an-frame", 10); oT(g, 220, 22, LL("hot function: sum(xs)", "горячая функция: sum(xs)"), "an-m an-b");
+    ["LOAD_FAST  total", "LOAD_FAST  x", "BINARY_OP  +", "STORE_FAST total"].forEach((b, i)=>{ const on = m === "int" && Math.floor(t / 350) % 4 === i; if(on) oR(g, 20, 40 + i * 22, 190, 20, "an-rowhl", 3); oT(g, 26, 55 + i * 22, b, "an-code", "start"); });
+    const thr = 10000, cnt = m === "int" ? Math.floor(6000 + 3900 * Math.min(1, t / 6000)) : thr;
+    oT(g, 230, 60, LL("calls:", "вызовов:"), "an-m an-b", "start"); oT(g, 300, 60, `${cnt.toLocaleString("en-US")} / ${thr.toLocaleString("en-US")}`, "an-code" + (m === "int" ? "" : " an-warn"), "start");
+    oR(g, 230, 72, 190, 12, "an-track", 3); oR(g, 230, 72, 190 * Math.min(1, cnt / thr), 12, "an-bar on", 3);
+    oT(g, 230, 112, m === "int" ? LL("interpreted: ~30 ns / iteration", "интерпретация: ~30 нс / итерация") : LL("compiled: ~1 ns / iteration", "скомпилировано: ~1 нс / итерация"), "an-m an-b" + (m === "int" ? "" : " an-sp"), "start");
+    if(m === "int"){
+      oT(g, 220, 175, LL("interpreter loop (in runtime text):", "цикл интерпретатора (в text среды):"), "an-m an-b");
+      ["fetch", "dispatch", "execute"].forEach((w, i)=>{ const on = Math.floor(t / 500) % 3 === i; oR(g, 40 + i * 130, 190, 110, 34, on ? "an-reg on" : "an-box", 6); oT(g, 95 + i * 130, 212, LL(w, ["взять", "перейти", "выполнить"][i]), "an-m an-b"); });
+      ln([430, 207], [485, 280]); oT(g, 220, 260, LL("PC stays inside the interpreter", "PC остаётся внутри интерпретатора"), "an-m");
+      return;
+    }
+    // machine code panel
+    const bytes = ["8b 07        mov eax,[rdi]", "03 47 04     add eax,[rdi+4]", "48 83 c7 08  add rdi,8", "ff c9        dec ecx", "75 f3        jne loop"];
+    if(m === "nx"){
+      oR(g, 10, 160, 420, 150, "an-frame", 10); oT(g, 220, 182, LL("overflowed buffer on the heap", "переполненный буфер в куче"), "an-m an-b");
+      oT(g, 30, 210, "90 90 90 31 c0 50 68 2f 2f 73 68 …", "an-code", "start");
+      oT(g, 30, 240, LL("jmp → heap address", "jmp → адрес в куче"), "an-code an-warn", "start");
+      ln([300, 236], [485, 200], "an-flowline"); dot([[300, 236], [485, 200]]);
+      if(t > 2000){ oT(g, 220, 272, LL("MMU: NX bit set → page fault", "MMU: бит NX → page fault"), "an-m an-b an-warn"); oT(g, 220, 292, LL("kernel → SIGSEGV", "ядро → SIGSEGV"), "an-m an-b an-warn"); }
+      return;
+    }
+    oR(g, 10, 160, 420, 150, m === "hot" ? "an-reg on" : "an-frame", 10); oT(g, 220, 152, LL("JIT output: x86-64 machine code", "результат JIT: машинный код x86-64"), "an-m an-b");
+    const shown = m === "hot" ? Math.min(5, Math.floor(t / 400) + 1) : 5;
+    bytes.slice(0, shown).forEach((b, i)=>oT(g, 26, 186 + i * 24, b, "an-code", "start"));
+    if(m === "hot") return;
+    if(m === "rw"){ ln([430, 230], [485, 128], "an-flowline"); dot([[430, 230], [485, 128]]); oT(g, 610, 152, LL("write bytes here", "пишем байты сюда"), "an-m an-b an-warn"); return; }
+    if(m === "rx"){ oT(g, 610, 140, "mprotect(PROT_READ|PROT_EXEC)", "an-code"); oT(g, 220, 324, LL("on ARM: also flush the instruction cache", "на ARM: ещё сбросить кэш инструкций"), "an-m an-b"); return; }
+    // run: PC loops inside code cache
+    const a = (t / 260) % 4; const py = 104 + (a < 3 ? a * 16 : (4 - a) * 16 * 3 / 1);
+    E(g, "circle", { cx: 715, cy: Math.min(152, py), r: 6, class: "an-dot an-flow" });
+    ln([430, 186], [485, 128]);
+    oT(g, 220, 330 - 6, LL("no dispatch, no type checks, values in registers", "без диспетчеризации и проверок типов, значения в регистрах"), "an-m an-sp");
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id);
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(byId[id] && id!==current) go(id); }); }

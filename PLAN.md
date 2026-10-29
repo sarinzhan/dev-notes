@@ -55,6 +55,7 @@ Suggested order for interview prep: architecture/styles + system-design + databa
 - [x] socket-management (all 5 parts; io-models-blocking-nonblocking-epoll merged in) — socket as fd, listening on IP:port, lifecycle, SYN/accept queues, backlog, SYN flood, SO_REUSEPORT, send/receive buffers, blocking, select, epoll, io_uring
 - [x] kernel-vs-user-mode — CPU modes, address-space split, syscall walkthrough, interrupts and page faults, mode vs context switch cost, vDSO, user vs system time
 - [x] virtualization-and-containers — multi-boot, hypervisors (type 1/2, VT-x, EPT, virtio), namespaces, cgroups, OverlayFS, container networking, security (moved from docker-fundamentals and linux-architecture-and-kernel)
+- [x] compilers-and-linkers — ISAs, toolchain stages, object files, symbol resolution and relocation, PLT/GOT, sonames, mold/lld, ELF/PE/Mach-O, runtimes, JIT and W^X, GC (moved from anatomy-of-a-process)
 - [x] memory-management — RAM, CPU↔RAM, alignment, virtual memory, fragmentation, page tables, sharing, copy-on-write (Redis), swap, DMA, O_DIRECT
 - [x] stack-vs-heap-memory — merged into anatomy-of-a-process (alias)
 - [x] syscalls-and-file-descriptors — user/kernel boundary, fd table, everything is a file
