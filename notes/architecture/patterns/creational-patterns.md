@@ -6,6 +6,14 @@ learned: 2026-10-22
 ## TL;DR
 Design patterns are recurring solutions to common design problems: ready-made, standardised, a shared vocabulary between programmers. Creational patterns are about **creating objects without adding unnecessary dependencies** on concrete classes: Singleton, Prototype, Builder, Factory Method and Abstract Factory. "Creational patterns give birth to objects, structural ones join them, behavioural ones teach them to talk."
 
+## The problem it solves
+- **Singleton:** several parts of the code create their own copy of a resource that must be shared (config, connection pool) → one instance with one access point.
+- **Prototype:** code needs a copy of an object it sees only through an interface, so it cannot call the right constructor → the object copies itself.
+- **Builder:** a constructor with many mostly optional parameters leads to calls like `new X(a, null, 3, null, true)` that nobody can read → the object is built step by step with named methods and checked in `build()`.
+- **Factory Method:** code creates objects with `new ConcreteClass()` and must change for every new type → a creation method decides the class, and subclasses or callers do not depend on it.
+- **Abstract Factory:** related objects must come from the same family (one vendor's parser and builder), and mixing families breaks things → one factory creates the whole family.
+- **When you don't need them:** a class with one implementation and a few required fields; a plain constructor is clearer. In Spring the container already gives you singletons and factories.
+
 ## Key points
 | Pattern | Intent | JDK / Spring example |
 |---|---|---|

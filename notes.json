@@ -450,7 +450,7 @@
     "slo-sli-and-alerting",
     "spring-kafka-consumer"
    ],
-   "words": 956,
+   "words": 1107,
    "ru": "notes-ru/architecture/messaging/dead-letter-queues-and-retries.md",
    "title_ru": "Очереди недоставленных сообщений, retry-топики и ядовитые сообщения"
   },
@@ -479,7 +479,7 @@
     "spring-kafka-consumer",
     "spring-transactional"
    ],
-   "words": 805,
+   "words": 947,
    "ru": "notes-ru/architecture/messaging/idempotency.md",
    "title_ru": "Идемпотентные потребители и API"
   },
@@ -507,7 +507,7 @@
     "kafka-producer",
     "outbox-pattern"
    ],
-   "words": 957,
+   "words": 1125,
    "ru": "notes-ru/architecture/messaging/message-schema-evolution.md",
    "title_ru": "Эволюция схем сообщений — JSON, Avro, Protobuf и schema registry"
   },
@@ -534,7 +534,7 @@
     "saga",
     "spring-transactional"
    ],
-   "words": 826,
+   "words": 847,
    "ru": "notes-ru/architecture/messaging/outbox-pattern.md",
    "title_ru": "Паттерн transactional outbox"
   },
@@ -890,7 +890,7 @@
     "structural-patterns",
     "threads-basics"
    ],
-   "words": 758,
+   "words": 1067,
    "ru": "notes-ru/architecture/patterns/behavioral-patterns.md",
    "title_ru": "Поведенческие паттерны проектирования"
   },
@@ -921,7 +921,7 @@
     "spring-ioc-and-di",
     "structural-patterns"
    ],
-   "words": 680,
+   "words": 869,
    "ru": "notes-ru/architecture/patterns/creational-patterns.md",
    "title_ru": "Порождающие паттерны проектирования"
   },
@@ -954,7 +954,7 @@
     "spring-transactional",
     "strings-and-string-pool"
    ],
-   "words": 692,
+   "words": 870,
    "ru": "notes-ru/architecture/patterns/structural-patterns.md",
    "title_ru": "Структурные паттерны проектирования"
   },
@@ -1243,7 +1243,7 @@
     "saga",
     "system-design-basics"
    ],
-   "words": 1101,
+   "words": 1265,
    "ru": "notes-ru/architecture/workflows/temporal-concepts.md",
    "title_ru": "Основы Temporal — workflow, activity, replay, Spring Boot"
   },
@@ -1273,7 +1273,7 @@
     "temporal-concepts",
     "use-cases-and-application-layer"
    ],
-   "words": 1267,
+   "words": 1359,
    "ru": "notes-ru/architecture/workflows/workflow-engines-vs-sagas.md",
    "title_ru": "Движки workflow vs самописные саги — Temporal, Camunda, конечные автоматы"
   },

@@ -3,6 +3,7 @@
 What was added or changed in the vault, newest first. One line per change, with the pull request in brackets.
 
 ## 2026-10-30
+- **"The problem it solves" block in all architecture notes** (32 notes, EN + RU): what goes wrong without the pattern, what it changes, when you don't need it. Shown as a highlighted box right after the TL;DR; scattered "why" text moved into it. [#35](https://github.com/sarinzhan/dev-notes/pull/35)
 - **DDD animation:** one command end to end (bounded contexts, use case, aggregate and invariant, domain event, outbox, integration event, anti-corruption layer), in DDD basics. [#34](https://github.com/sarinzhan/dev-notes/pull/34)
 - **Databases: notes from the Database Engineering course (sections 2–17).** New subsection `databases/internals` with 7 notes (storage pages and heap, row vs column, primary vs secondary indexes, B-tree vs B+tree, WAL/redo/undo, database engines, wire protocols); 7 more new notes (concurrency control, OFFSET vs keyset, cursors, Postgres architecture, Memcached, DB security, homomorphic encryption); 23 existing notes expanded (ACID, isolation levels rewritten, indexes, EXPLAIN, partitioning, sharding, replication, MongoDB/Redis internals…); B-tree content moved from trees-and-bst; 8 animations. [#33](https://github.com/sarinzhan/dev-notes/pull/33)
 

@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 Temporal is a durable execution engine: you write a long-running business flow as ordinary Java code (a **workflow**), the side-effecting steps as **activities**, and the Temporal server persists every event (activity scheduled, completed, timer fired) in an **event history**. If the worker dies, another worker **replays** the history and the workflow code continues from where it was — which is why workflow code must be **deterministic**. Timers, retries, signals, queries and compensation come built in, making Temporal a persistent [[saga]] orchestrator.
 
+## The problem it solves
+- **Without it:** an eSIM order is reserve a profile → order the download at SM-DP+ → wait up to 24 h for the subscriber to install → activate on the network. If the pod restarts during the 24-hour wait, or SM-DP+ times out on the third attempt, the current step, the retry count and the timer must already be stored somewhere, and the code must know which compensations to run. By hand that is a status table, a scheduler and backoff code around every call.
+- **What it changes:** the flow is one Java method; the server records every step in the event history, so after a crash another worker replays it and continues. Retries, timers, signals and compensation are built in.
+- **When you don't need it:** short, linear flows of two or three steps with no long waits, where Kafka + outbox and idempotent consumers are enough, or when the team cannot run another stateful cluster.
+
 ## Key points
 
 ### Workflow vs activity

@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 An event on Kafka is read by consumers you do not deploy, from offsets days old, so its schema is an API that must stay **backward compatible** (new consumer reads old data) and usually **forward compatible** (old consumer reads new data). The safe moves are: add optional fields with defaults, never rename or change a type, never reuse a field, and version the topic (`...v2`) for breaking changes with a migration period. A **schema registry** (Confluent, Apicurio, Karapace) enforces this at produce time for Avro, Protobuf and JSON Schema; plain JSON relies on discipline and a `version` field.
 
+## The problem it solves
+- **Without it:** the eSIM service renames `iccid` to `iccId`, or changes `amount` from cents to a decimal string, and deploys. Consumers in other teams, still on the old class, fail to deserialise new messages or silently read `null`, and a consumer that upgrades and then replays last week's offsets fails on the old messages. The failure shows up at night in their DLT, not in the producer's build.
+- **What it changes:** the event schema becomes a public API with explicit compatibility rules (optional fields with defaults, a new topic version for breaking changes), and a schema registry or a CI check rejects an incompatible schema before any message is produced with it.
+- **When you don't need it:** the topic has a single consumer that lives and deploys together with the producer, and retention is short, so nobody replays old messages. A registry is also overkill for a few JSON topics with a `version` field; consumers should still ignore unknown fields.
+
 ## Key points
 
 ### Compatibility modes
