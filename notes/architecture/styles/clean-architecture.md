@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 Clean architecture (Robert C. Martin, 2012) arranges code in concentric rings — entities, use cases, interface adapters, frameworks and drivers — with one **dependency rule**: source code dependencies point inwards only; nothing in an inner ring knows a name from an outer ring. Each use case is an explicit **interactor** class with an input port (what it accepts) and an output port (how it reports back). It is [[hexagonal-architecture]] with more vocabulary and an explicit use-case layer; the added ceremony is worth it in a large, long-lived domain and a trap in a 2,000-line service.
 
+## The problem it solves
+- **Without it:** even a service with ports and adapters has no agreed place for application logic: `ProfileService` mixes activation, suspension and reporting in 40 methods, and nothing stops a use case from returning `ResponseEntity` or taking a JPA entity. Over time, dependencies drift outwards again.
+- **What it changes:** the dependency rule fixes the direction (inner rings never know outer names), and each user intention becomes its own interactor behind an input port, such as `ActivateProfileUseCase`, so the code reads as a list of use cases.
+- **When you don't need it:** a small CRUD service where every use case is "load, set field, save"; there the ceremony costs more than it protects (see the over-engineering trap below).
+
 ## Key points
 ### The rings
 | Ring | Contains | Spring equivalent |

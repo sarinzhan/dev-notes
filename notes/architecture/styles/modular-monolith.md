@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 A modular monolith is one deployable unit whose code is split into **modules with enforced boundaries**: each module owns its data and exposes a small public API (Java types or events), and the build fails when another module reaches into its internals. It keeps the operational simplicity of a monolith — one process, one database, local transactions, one deploy — while preserving the option to cut a module out into a service later. Spring Modulith supplies the module convention, verification and asynchronous events; ArchUnit enforces any rule Modulith does not.
 
+## The problem it solves
+- **Without it:** in a package-by-layer monolith every class is public and every table is reachable, so billing code queries the profile tables directly and order code calls profile internals; extracting a service later means untangling these joins and calls first.
+- **What it changes:** each module owns its data and exposes a small API or events, and Spring Modulith or ArchUnit tests fail the build on forbidden access, while the system stays one process with one database and local transactions.
+- **When you don't need it:** a small service with one team and one or two features has no boundaries worth enforcing; parts that already need separate scaling or release cadence may fit better as real services.
+
 ## Key points
 ### Package-by-layer vs package-by-feature
 - **Package-by-layer** (`controller/`, `service/`, `repository/`) groups by technical role; every feature is spread across all packages and everything is public ([[layered-architecture]]).
