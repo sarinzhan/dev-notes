@@ -38,6 +38,28 @@ Partitioning splits one logical table into child tables by a key (range of dates
 - Each partition is a relation the planner must consider; thousands of partitions make simple queries plan slowly (milliseconds per query, noticeable at high QPS). Aim for tens to low hundreds of partitions: monthly for a few years, daily only for very large volumes with short retention.
 - Lock count: a query touching all partitions takes a lock per partition and can exceed `max_locks_per_transaction` in a big `SELECT`.
 
+### Vertical vs horizontal partitioning
+- **Horizontal**: split **rows** into tables with the same columns (`events_2026_10`, `events_2026_11`). This is what `PARTITION BY` does and what "partitioning" usually means.
+- **Vertical**: split **columns** into separate tables: move a rarely-read wide `blob`/`jsonb` column into `orders_details(order_id, payload)` so the hot table has narrow rows, more rows per page and a smaller cache footprint ([[row-vs-column-storage]]). Postgres TOAST does a little of this automatically for big values.
+
+### Partitioning vs sharding
+- **Partitioning**: the pieces live in **one database server**; the client queries the parent table and the planner routes. Transactions, joins and constraints still work (within the partition-key limits above).
+- **Sharding**: the pieces live on **different servers**; the client (or a proxy like Citus or Vitess) must know which server holds a key. Cross-shard transactions and joins become distributed problems ([[sharding-strategies]], [[cross-shard-queries-and-transactions]]).
+- Hash partitioning on one server is the natural rehearsal for sharding with the same key.
+
+### Advantages and disadvantages
+| Advantages | Disadvantages |
+|---|---|
+| queries that carry the key scan one small partition (or its small index) | queries without the key scan all partitions, slower than one big index |
+| bulk loads and retention: attach/detach, drop instead of delete | moving a row between partitions (updating the key) is a delete + insert |
+| per-partition vacuum, indexes fit in memory | more relations to plan and lock; schema changes touch every partition |
+| cold partitions can go to cheaper tablespaces | uniqueness only together with the partition key |
+- Demo from the course: a 10-million-row `grades_org` table partitioned by grade range into 4 tables; `WHERE g = 30` uses one small partition's index, and each partition's index is a quarter of the size of the original.
+
+### Automating partition creation
+- Partitions must exist before rows arrive. Options: **pg_partman** (`create_parent()` + `run_maintenance()` creates future and drops expired partitions), a scheduled job with **pg_cron**, or the application's migration/scheduler creating next month's partition with `CREATE TABLE IF NOT EXISTS ... PARTITION OF`.
+- Pre-create several periods ahead and alert when the newest partition is less than N periods in the future.
+
 ## Example
 ```sql
 -- V12__partition_sim_events.sql: event log kept for 12 months, queried by subscriber and time

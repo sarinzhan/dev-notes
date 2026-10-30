@@ -43,6 +43,22 @@ The source conflated some of these; here is the standard set, each with the two-
 - Set it per transaction (`SET TRANSACTION ISOLATION LEVEL ...`) or in Spring with `@Transactional(isolation = Isolation.SERIALIZABLE)`.
 - Locks vs MVCC: lock-based engines make readers wait for writers; MVCC engines (Postgres, Oracle, InnoDB) keep old row versions so readers never block writers and vice versa, and only writer–writer conflicts block.
 
+### Transaction lifecycle
+- **BEGIN** starts a transaction (in Postgres every statement outside an explicit one is its own transaction, "autocommit"). Changes are written into memory pages and the WAL as they happen, not at commit; commit is cheap because the work is already done.
+- **COMMIT** writes a commit record to the WAL and flushes it; only then are the changes visible to others. **ROLLBACK** discards them: Postgres just marks the transaction id as aborted (its row versions stay invisible), InnoDB applies the undo log.
+- **Crash in the middle**: on restart, recovery replays the WAL; transactions without a commit record are treated as aborted ([[wal-redo-undo-and-durability]]). Some databases optimize for fast commits (Postgres), others for fast rollbacks; long rollbacks in InnoDB after a crash can take as long as the transaction ran.
+- **Read-only transactions** (`BEGIN READ ONLY`) let the database skip some bookkeeping and can run on replicas; they still need a snapshot for consistent reads.
+- **Savepoints** (`SAVEPOINT s; ... ROLLBACK TO s`) undo part of a transaction; this is how "nested transactions" (`NESTED` propagation in Spring) work.
+
+### Atomicity in practice
+- A failed statement inside a Postgres transaction puts it into the aborted state: every further statement fails until ROLLBACK (`current transaction is aborted, commands ignored until end of transaction block`). Use a savepoint if you want to continue after an expected error.
+- Atomicity covers one database. A transaction that also sends an email or a Kafka message is not atomic with it: the message may go out and the commit fail ([[outbox-pattern]]).
+
+### Two meanings of consistency
+- **Consistency in data**: constraints, foreign keys, triggers and the application's invariants hold after every commit (the "C" in ACID). Breaking it = corruption, e.g. orphaned rows, a balance that does not match its ledger.
+- **Consistency in reads**: after a write is committed, does every reader see it? On one node, yes. With replicas and caches, a reader may see an older value for a while: **eventual consistency**. The "C" in CAP is this kind ([[consistency-models]], [[cap-and-pacelc]]).
+- Both kinds can be traded for performance: denormalized counters (data) or async replicas (reads).
+
 ## Example
 ```sql
 -- Lost update, step by step under READ COMMITTED (two sessions)

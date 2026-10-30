@@ -42,6 +42,8 @@ HTTP/1.1 sends one request at a time per TCP connection, so clients open many co
 - h2 on one connection makes client-side load balancing by DNS round-robin ineffective: all streams go to the one IP the connection was opened to ([[dns-resolution]]).
 - Spring Boot: `server.http2.enabled=true` works with Tomcat (needs TLS or h2c), Jetty, Undertow and Netty (WebFlux); Spring's `RestClient` on the JDK client uses h2 when the server offers it ([[rest-clients]]).
 
+- Could QUIC carry database protocols? It would remove head-of-line blocking between concurrent queries and allow connection migration, but database drivers multiplex little (one transaction per connection), most traffic stays inside a data center with tiny loss, and QUIC's user-space stack costs CPU. So databases stay on TCP; the gain would mostly be for clients over lossy mobile networks ([[head-of-line-blocking]], [[database-wire-protocols]]).
+
 ## Example
 Checking what a server actually negotiates. The output tells you the protocol version, ALPN result and whether h3 is advertised.
 ```bash

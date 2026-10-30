@@ -36,6 +36,10 @@ When one leader is not enough, because users write in several regions, or becaus
 
 - CRDT examples: G-counter (per-node counters summed), PN-counter (two G-counters), OR-set (add wins over concurrent remove), LWW-register (the honest name for LWW). A PN-counter works for likes; it does not work for an account balance that must not go negative, because the invariant is global.
 
+### Why the course says "avoid multi-master"
+- Every leader accepts writes, so two leaders can change the same row concurrently; you must detect and resolve conflicts (last-write-wins silently loses data). Unique constraints and sequences cannot be enforced globally without coordination.
+- Reasonable uses: one leader per region with data mostly owned by one region, offline-first clients that sync later, collaborative editing with CRDTs. For "more write throughput" shard instead.
+
 ### Interview framing
 - "How do you handle writes in two regions?" First answer: do not; give each record a home region and route writes there (a telecom subscriber belongs to one country). Second: multi-leader with conflict-free data (append-only events, CRDT counters). Third, only if forced: LWW with the data loss spelled out.
 - "Cassandra `QUORUM` is consistent, right?" Consistent as in `W + R > N`; not linearizable, not transactional, and LWW on write conflicts.

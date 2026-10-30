@@ -38,6 +38,10 @@ Once data is sharded, two things become expensive: a **query** whose filter does
 
 - A saga is not a transaction: a step can observe the partial result of another saga. Design for it with reservation states (`RESERVED` → `CONFIRMED`) rather than pretending isolation exists.
 
+### What makes a transaction "distributed"
+- Any unit of work whose writes land in more than one independent store with its own commit log: two shards, two services' databases, a database and a message broker. Each participant can commit or fail on its own, so atomicity has to be coordinated (2PC) or given up and compensated (sagas, outbox).
+- Most "distributed transactions" in microservices are better avoided by putting the data that changes together behind one key or one service ([[saga]], [[outbox-pattern]]).
+
 ### Interview framing
 - "Transfer money between two users on different shards?" Do not 2PC the balances. Append a transfer record on the sender's shard (debit + outbox event), consume it on the receiver's shard idempotently, mark the transfer complete; compensate on rejection. A ledger with immutable entries makes this natural ([[design-payment-processing]]).
 - "Search users by name across shards?" Scatter-gather works for small N with bounded fan-out; at scale, a search index fed by events.

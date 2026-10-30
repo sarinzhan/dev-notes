@@ -36,6 +36,12 @@ A consistency model is a contract about which values a read may return when data
 - Timelines, counters, analytics, notifications: eventual with session guarantees where the user would notice.
 - Anything "the user just did and now expects to see": read-your-writes is the minimum.
 
+### Eventual consistency, concretely
+- Where it comes from: an async read replica that is 200 ms behind, a cache entry that lives until its TTL, a search index fed by CDC, a second region. In each case a read right after a write can return the old value.
+- It is not limited to distributed databases: a single Postgres with a read replica, or Redis in front of it, is already eventually consistent for whoever reads from the replica or cache ([[read-replicas-and-stale-reads]], [[caching]]).
+- Make it acceptable rather than pretending it is not there: read your own writes from the primary, show "processing" states, version cache keys, and design idempotent consumers that tolerate reordering ([[idempotency]]).
+- Two meanings of "consistency" (ACID vs CAP) are compared in [[transactions-acid-and-isolation]].
+
 ## Example
 Read-your-writes on top of Postgres streaming replication: the writer returns the commit LSN, the reader waits for the replica to replay past it (or falls back to the primary) before serving the follow-up request.
 ```java

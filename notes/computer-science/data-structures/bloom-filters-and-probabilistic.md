@@ -28,6 +28,8 @@ Probabilistic data structures trade exactness for a huge memory saving. A **Bloo
 - **Dedup at the edge**: has this event id / notification id already been processed? A filter in front of the exact store (Redis/DB) turns most "no" answers into zero round trips ([[idempotency]], [[design-notification-service]]).
 - **Distributed joins**: ship a filter of the join keys to the other side instead of the full key set; also spell checkers and malicious-URL lists in browsers.
 
+- **"Is this username taken?"** in front of the users table: a negative answer from the filter skips the database round trip; a positive answer (maybe) goes to the database to confirm. Deletes are a problem: a classic filter cannot remove an element, so stale "maybe" answers accumulate until it is rebuilt (counting Bloom filters or cuckoo filters support deletion).
+
 ### HyperLogLog (cardinality)
 - Hash each element; the number of leading zeros in the hash is a hint of how many distinct values you saw (seeing a hash with 20 leading zeros suggests ~2²⁰ distinct items). Keep the max per 2^p registers and combine with a harmonic mean.
 - Standard error ≈ 1.04/√(2^p): p = 14 gives 16384 registers, ~0.8% error, 12 KB. Counts billions.

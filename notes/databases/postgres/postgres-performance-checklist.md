@@ -43,6 +43,11 @@ Most Postgres performance problems in a typical Spring Boot service come from fi
 ### 6. Observability
 - Export `pg_stat_*` with `postgres_exporter` into Prometheus/Mimir and dashboard: connections by state, transactions per second, cache hit ratio, longest transaction age, replication lag, dead tuples per table, slow queries from `pg_stat_statements`. Alert on `idle in transaction` age, connection pool saturation (`hikaricp_connections_pending`), and `age(datfrozenxid)` ([[grafana-dashboards-and-red-use]], [[slo-sli-and-alerting]]).
 
+### 7. Very large tables
+- Working with a billion-row table, in order of preference: avoid scanning it at all (indexes, covering indexes); **partition** it so queries touch one slice ([[postgres-partitioning]]); **shard** across servers only when one machine is not enough ([[sharding-strategies]]); and question the model: a big table often stores derived data that could be a counter or a summary (Twitter's follower count is a column, not `count(*)` over a billion follow rows).
+- `SELECT count(*)` has to visit every visible row (MVCC: there is no stored count). It uses an index-only scan if the visibility map is fresh, otherwise reads the heap. For UI totals use `pg_class.reltuples`, `EXPLAIN` estimates, or a maintained counter.
+- **Long-running transactions** are expensive even when idle: they pin a snapshot, so VACUUM cannot remove dead tuples anywhere in the database, tables and indexes bloat, index-only scans degrade, and on a replica with `hot_standby_feedback` they hold back the primary too. In InnoDB the undo log grows instead ([[wal-redo-undo-and-durability]]).
+
 ## Example
 ```yaml
 # application.yml: bounded pool, statement timeout from the client, slow query log from the server

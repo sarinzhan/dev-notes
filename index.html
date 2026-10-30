@@ -4983,6 +4983,369 @@ ANIMS["docker-bridge-publish"] = el=>{
   }});
 };
 
+// ============ databases: heap-index-lookup
+ANIMS["heap-index-lookup"] = el=>{
+  const ST = [
+    { t: ["Full table scan", "Полное сканирование"], mode: "seq",
+      en: "SELECT * FROM employees WHERE id = 42 with no index. The heap is an unordered pile of 8 KB pages, so the database reads page after page and checks every row. All 8 pages are read to find one row (and it cannot stop early: another row might match).",
+      ru: "SELECT * FROM employees WHERE id = 42 без индекса. Heap — неупорядоченная куча страниц по 8 КБ, поэтому база читает страницу за страницей и проверяет каждую строку. Ради одной строки читаются все 8 страниц (и остановиться раньше нельзя: может подойти ещё одна строка)." },
+    { t: ["Descend the index", "Спуск по индексу"], mode: "idx",
+      en: "With a B+tree index on id: read the root page, pick the child whose key range contains 42, read it, reach the leaf. Each level is one page read; internal pages are usually cached.",
+      ru: "С B+-деревом по id: прочитать корневую страницу, выбрать дочернюю, в диапазон ключей которой попадает 42, прочитать её, дойти до листа. Каждый уровень — одно чтение страницы; внутренние страницы обычно в кэше." },
+    { t: ["Follow the row id", "Переход по идентификатору строки"], mode: "page",
+      en: "The leaf entry is 42 → ctid (5, 2): page 5, slot 2. One heap page read fetches the row. Total: 3 index pages + 1 heap page instead of 8, and on a real table 4 pages instead of 12,500.",
+      ru: "Запись в листе: 42 → ctid (5, 2): страница 5, слот 2. Одно чтение страницы heap достаёт строку. Итого: 3 страницы индекса + 1 страница heap вместо 8, а на реальной таблице 4 страницы вместо 12 500." },
+    { t: ["Index-only scan", "Index-only scan"], mode: "ionly",
+      en: "SELECT id, name with an index on (id) INCLUDE (name): the leaf already holds name, so the heap is not touched at all (Postgres still checks the visibility map). That is a covering index.",
+      ru: "SELECT id, name с индексом по (id) INCLUDE (name): в листе уже есть name, поэтому heap вообще не трогается (Postgres только проверяет карту видимости). Это покрывающий индекс." }
+  ];
+  const PX = i => 24 + i * 91, PY = 236;
+  return steppedAnim(el, { title: LL("Heap pages vs an index lookup", "Страницы heap и поиск по индексу"), vb: [760, 340], steps: ST, stepMs: 6500, render(g, s, t){
+    const seqN = s.mode === "seq" ? Math.min(8, Math.floor(t / 550) + 1) : 0;
+    const lv = s.mode === "idx" ? Math.min(3, Math.floor(t / 900) + 1) : (s.mode === "page" || s.mode === "ionly") ? 3 : 0;
+    // tree
+    oT(g, 380, 16, LL("B+tree index on id (pages)", "индекс B+-дерево по id (страницы)"), "an-m an-b");
+    const node = (x, y, w, txt, on) => { oR(g, x, y, w, 28, on ? "an-reg on" : "an-box", 5); oT(g, x + w / 2, y + 18, txt, "an-code"); };
+    node(320, 26, 120, "< 30 | ≥ 30", lv >= 1 && s.mode !== "seq");
+    node(130, 88, 140, "< 10 | 10–29", false); node(490, 88, 140, "30–49 | ≥ 50", lv >= 2);
+    E(g, "line", { x1: 350, y1: 54, x2: 200, y2: 88, class: "an-link2" }); E(g, "line", { x1: 410, y1: 54, x2: 560, y2: 88, class: lv >= 2 ? "an-link2 on" : "an-link2" });
+    const leaves = [["1 · 4 · 7", 30], ["12 · 19 · 25", 190], ["33 · 38 · 42", 410], ["51 · 60 · 77", 590]];
+    leaves.forEach(([k, x], j) => { node(x, 150, 140, (j === 2 && s.mode === "ionly") ? "42 → Ann" : k, lv >= 3 && j === 2); });
+    E(g, "line", { x1: 560, y1: 116, x2: 480, y2: 150, class: lv >= 3 ? "an-link2 on" : "an-link2" });
+    E(g, "line", { x1: 200, y1: 116, x2: 100, y2: 150, class: "an-link2" }); E(g, "line", { x1: 200, y1: 116, x2: 260, y2: 150, class: "an-link2" }); E(g, "line", { x1: 560, y1: 116, x2: 660, y2: 150, class: "an-link2" });
+    for(let j = 0; j < 3; j++) E(g, "line", { x1: leaves[j][1] + 140, y1: 164, x2: leaves[j + 1][1], y2: 164, class: "an-link2 an-dash" });
+    // heap
+    oT(g, 380, 226, LL("heap: table file, 8 KB pages, rows in no order", "heap: файл таблицы, страницы по 8 КБ, строки без порядка"), "an-m an-b");
+    for(let i = 0; i < 8; i++){
+      const read = (s.mode === "seq" && i < seqN) || ((s.mode === "page") && i === 5 && t > 600);
+      oR(g, PX(i), PY, 80, 74, read ? "an-reg on" : (s.mode === "ionly" ? "an-box an-dim" : "an-box"), 5);
+      oT(g, PX(i) + 40, PY + 14, LL("page ", "стр. ") + i, "an-m an-b");
+      for(let r = 0; r < 3; r++){
+        const hit = i === 5 && r === 1 && (s.mode === "page" && t > 600 || s.mode === "seq" && seqN > 5);
+        oR(g, PX(i) + 8, PY + 22 + r * 16, 64, 12, hit ? "an-pg k3" : "an-pg k1 dim", 2);
+        if(hit) oT(g, PX(i) + 40, PY + 32 + r * 16, "id=42", "an-m an-b");
+      }
+    }
+    if(s.mode === "page"){ const k = easeIO(Math.min(1, t / 600)); E(g, "line", { x1: 480, y1: 178, x2: 480 + (PX(5) + 40 - 480) * k, y2: 178 + (PY - 178) * k, class: "an-flowline" }); oT(g, 560, 204, "ctid (5, 2)", "an-m an-b an-sp", "start"); }
+    const reads = s.mode === "seq" ? seqN : s.mode === "idx" ? lv : s.mode === "page" ? 3 + (t > 600 ? 1 : 0) : 3;
+    oT(g, 740, 330, LL("pages read: ", "прочитано страниц: ") + reads, "an-m an-b" + (s.mode === "seq" && seqN === 8 ? " an-warn" : ""), "end");
+  }});
+};
+
+// ============ databases: row-vs-column-read
+ANIMS["row-vs-column-read"] = el=>{
+  const COLS = [["id", "k0"], ["name", "k1"], ["salary", "k2"], ["dept", "k3"]];
+  const ST = [
+    { t: ["Row store: one row", "Строковое: одна строка"], store: "row", pages: [1], rowHl: 2,
+      en: "Row store (Postgres, MySQL): each page holds whole rows, all four columns side by side. SELECT * WHERE id = 3 finds the row through an index and reads one page: every column is already there.",
+      ru: "Строковое хранилище (Postgres, MySQL): каждая страница хранит целые строки, все четыре колонки рядом. SELECT * WHERE id = 3 находит строку через индекс и читает одну страницу: все колонки уже в ней." },
+    { t: ["Row store: SUM(salary)", "Строковое: SUM(salary)"], store: "row", pages: [0, 1, 2], colHl: 2,
+      en: "SELECT sum(salary): every page has a bit of salary, so all pages are read, and three quarters of every page (id, name, dept) is dragged along for nothing.",
+      ru: "SELECT sum(salary): в каждой странице есть кусочек salary, поэтому читаются все страницы, и три четверти каждой (id, name, dept) тащатся впустую." },
+    { t: ["Column store: SUM(salary)", "Колоночное: SUM(salary)"], store: "col", cols: [2], colHl: 2,
+      en: "Column store (ClickHouse, Redshift): each column lives in its own pages. SUM(salary) reads only the salary column, which is all the same type and compresses very well.",
+      ru: "Колоночное хранилище (ClickHouse, Redshift): каждая колонка живёт в своих страницах. SUM(salary) читает только колонку salary, где всё одного типа и отлично сжимается." },
+    { t: ["Column store: one row", "Колоночное: одна строка"], store: "col", cols: [0, 1, 2, 3], rowHl: 2,
+      en: "SELECT * WHERE id = 3 on a column store: find position 3 in the id column, then jump into name, salary and dept at that position. One read per column: four reads for one row. Inserts touch every column the same way.",
+      ru: "SELECT * WHERE id = 3 в колоночном хранилище: найти позицию 3 в колонке id, затем прыгнуть в name, salary и dept на эту позицию. Одно чтение на колонку: четыре чтения ради одной строки. Вставки так же трогают каждую колонку." }
+  ];
+  return steppedAnim(el, { title: LL("Row store vs column store", "Строковое и колоночное хранение"), vb: [760, 330], steps: ST, stepMs: 6000, render(g, s, t){
+    const k = Math.min(1, t / 900);
+    COLS.forEach(([n, c], j) => { oR(g, 250 + j * 70, 8, 12, 12, "an-pg " + c, 2); oT(g, 266 + j * 70, 18, n, "an-m", "start"); });
+    // row store
+    oT(g, 180, 46, LL("row store: page = whole rows", "строковое: страница = целые строки"), "an-m an-b" + (s.store === "row" ? "" : " an-dim"));
+    for(let p = 0; p < 3; p++){
+      const read = s.store === "row" && s.pages.includes(p) && k > p * .3;
+      oR(g, 20, 58 + p * 86, 320, 74, read ? "an-reg on" : "an-box" + (s.store === "row" ? "" : " an-dim"), 6);
+      oT(g, 28, 72 + p * 86, LL("page ", "стр. ") + p, "an-m", "start");
+      for(let r = 0; r < 2; r++){
+        const row = p * 2 + r;
+        COLS.forEach(([, c], j) => {
+          const hl = s.store === "row" && read && ((s.rowHl === row) || (s.colHl === j));
+          oR(g, 40 + j * 72, 80 + p * 86 + r * 24, 68, 20, "an-pg " + c + (hl || s.store !== "row" ? "" : " dim"), 3);
+          if(hl) oT(g, 74 + j * 72, 94 + p * 86 + r * 24, j === 0 ? "id " + (row + 1) : "✓", "an-m an-b");
+        });
+      }
+    }
+    // column store
+    oT(g, 560, 46, LL("column store: page = one column", "колоночное: страница = одна колонка"), "an-m an-b" + (s.store === "col" ? "" : " an-dim"));
+    COLS.forEach(([n, c], j) => {
+      const read = s.store === "col" && s.cols.includes(j) && k > j * .2;
+      oR(g, 400, 58 + j * 64, 340, 52, read ? "an-reg on" : "an-box" + (s.store === "col" ? "" : " an-dim"), 6);
+      oT(g, 408, 74 + j * 64, n, "an-m", "start");
+      for(let r = 0; r < 6; r++){
+        const hl = s.store === "col" && read && (s.rowHl === r || s.colHl === j);
+        oR(g, 452 + r * 47, 80 + j * 64, 43, 20, "an-pg " + c + (hl || s.store !== "col" ? "" : " dim"), 3);
+        if(hl && s.rowHl === r) oT(g, 473 + r * 47, 94 + j * 64, "#" + (r + 1), "an-m an-b");
+      }
+    });
+    const reads = s.store === "row" ? s.pages.length : s.cols.length;
+    oT(g, 380, 322, LL("pages read: ", "прочитано страниц: ") + reads + (s.store === "row" && s.pages.length === 3 ? LL(" (whole table)", " (вся таблица)") : s.store === "col" && s.cols.length === 4 ? LL(" (one per column)", " (по одной на колонку)") : ""), "an-m an-b" + (reads > 2 ? " an-warn" : ""));
+  }});
+};
+
+// ============ databases: btree-search-split
+ANIMS["btree-search-split"] = el=>{
+  const BASE = { root: [20, 40], leaves: [[5, 10, 15], [20, 30], [40, 50, 60]] };
+  const ST = [
+    { t: ["Search for 30", "Поиск 30"], tree: BASE, path: [1], hl: [30],
+      en: "A B+tree of order 4 (at most 3 keys per node; a real page holds hundreds). Search 30: in the root, 20 ≤ 30 < 40, so follow the middle pointer. The leaf holds 30 and its row pointer. Two page reads.",
+      ru: "B+-дерево порядка 4 (не больше 3 ключей в узле; настоящая страница держит сотни). Поиск 30: в корне 20 ≤ 30 < 40, идём по среднему указателю. В листе лежит 30 и указатель на строку. Два чтения страниц." },
+    { t: ["Range 10..50", "Диапазон 10..50"], tree: BASE, path: [0], range: [10, 50], links: true,
+      en: "WHERE k BETWEEN 10 AND 50: descend once to the leaf holding 10, then walk the linked leaves to the right until a key exceeds 50. A classic B-tree keeps values in internal nodes too, so a range scan would have to climb up and down the tree.",
+      ru: "WHERE k BETWEEN 10 AND 50: один раз спуститься к листу с 10, затем идти по связанным листьям вправо, пока ключ не превысит 50. Классическое B-дерево хранит значения и во внутренних узлах, поэтому сканирование диапазона ходило бы по дереву вверх и вниз." },
+    { t: ["Insert 55: overflow", "Вставка 55: переполнение"], tree: { root: [20, 40], leaves: [[5, 10, 15], [20, 30], [40, 50, 55, 60]] }, path: [2], hl: [55], over: 2,
+      en: "Insert 55: it belongs in the right leaf, which already has 3 keys. Now it has 4: the node no longer fits its page.",
+      ru: "Вставка 55: ей место в правом листе, где уже 3 ключа. Теперь их 4: узел больше не помещается в свою страницу." },
+    { t: ["Split and push up", "Расщепление и подъём"], tree: { root: [20, 40, 55], leaves: [[5, 10, 15], [20, 30], [40, 50], [55, 60]] }, path: [3], hl: [55], split: true,
+      en: "Split the leaf into two half-full pages [40 50] and [55 60] and copy the first key of the new page, 55, up into the root as a separator. If the root overflowed too, it would split and the tree would grow one level. Random keys cause splits all over the tree; increasing keys only split the right-most leaf.",
+      ru: "Лист делится на две наполовину заполненные страницы [40 50] и [55 60], а первый ключ новой страницы, 55, копируется в корень как разделитель. Если бы переполнился и корень, он бы тоже разделился, и дерево выросло бы на уровень. Случайные ключи вызывают расщепления по всему дереву; растущие ключи расщепляют только самый правый лист." }
+  ];
+  return steppedAnim(el, { title: LL("B+tree: search, range scan, page split", "B+-дерево: поиск, диапазон, расщепление страницы"), vb: [760, 300], steps: ST, stepMs: 6500, render(g, s, t){
+    const tr = s.tree, nl = tr.leaves.length, W = 34;
+    const rw = tr.root.length * W + 16, rx = 380 - rw / 2;
+    const k = Math.min(1, t / 1200);
+    oR(g, rx, 30, rw, 36, k > .1 ? "an-reg on" : "an-box", 6);
+    tr.root.forEach((v, i) => { oR(g, rx + 8 + i * W, 36, W - 4, 24, "an-pg " + (s.split && v === 55 ? "k3" : "k0"), 3); oT(g, rx + 8 + i * W + 15, 52, String(v), "an-m an-b"); });
+    oT(g, 380, 22, LL("root: keys only", "корень: только ключи"), "an-m");
+    const gap = 760 / nl;
+    tr.leaves.forEach((lf, j) => {
+      const w = Math.max(3, lf.length) * W + 16, x = gap * j + gap / 2 - w / 2, y = 170;
+      const onPath = s.path.includes(j) && k > .5;
+      const inRange = s.range && lf.some(v => v >= s.range[0] && v <= s.range[1]);
+      const walk = s.range ? Math.min(nl, Math.floor(t / 1000)) : 0;
+      const lit = onPath || (inRange && j <= walk);
+      oR(g, x, y, w, 40, s.over === j ? "an-leak" : lit ? "an-reg on" : "an-box", 6);
+      lf.forEach((v, i) => {
+        const h = (s.hl || []).includes(v) || (s.range && lit && v >= s.range[0] && v <= s.range[1]);
+        oR(g, x + 8 + i * W, y + 8, W - 4, 24, "an-pg " + (h ? "k3" : "k1 dim"), 3); oT(g, x + 8 + i * W + 15, y + 24, String(v), "an-m an-b");
+      });
+      E(g, "line", { x1: 380, y1: 66, x2: x + w / 2, y2: y, class: onPath ? "an-link2 on" : "an-link2" });
+      if(j < nl - 1){ const x2 = gap * (j + 1) + gap / 2 - (Math.max(3, tr.leaves[j + 1].length) * W + 16) / 2; E(g, "line", { x1: x + w, y1: y + 20, x2, y2: y + 20, class: s.links && lit ? "an-link2 on" : "an-link2 an-dash" }); }
+      oT(g, x + w / 2, y + 56, LL("leaf → row ptrs", "лист → указатели"), "an-m");
+    });
+    oT(g, 380, 280, s.over != null ? LL("4 keys > 3: overflow", "4 ключа > 3: переполнение") : s.split ? LL("two half-full leaves; root gained 55", "два наполовину полных листа; в корне появилось 55") : s.links ? LL("leaves are linked: sequential walk", "листья связаны: последовательный проход") : LL("height 2 → 2 page reads", "высота 2 → 2 чтения страниц"), "an-m an-b" + (s.over != null ? " an-warn" : ""));
+  }});
+};
+
+// ============ databases: wal-crash-recovery
+ANIMS["wal-crash-recovery"] = el=>{
+  const ST = [
+    { t: ["T1 updates a page", "T1 меняет страницу"], mem: { A: "90", B: "50" }, dirty: ["A"], wal: [["T1: A 100→90", 0]], disk: { A: "100", B: "50" },
+      en: "T1 runs UPDATE accounts SET balance = 90 WHERE id = A. The page is changed in the buffer pool (now dirty) and a redo record is appended to the WAL buffer. Nothing is on disk yet.",
+      ru: "T1 выполняет UPDATE accounts SET balance = 90 WHERE id = A. Страница меняется в буферном пуле (теперь она грязная), а запись redo дописывается в буфер WAL. На диске пока ничего." },
+    { t: ["COMMIT = flush the WAL", "COMMIT = сброс WAL"], mem: { A: "90", B: "50" }, dirty: ["A"], wal: [["T1: A 100→90", 1], ["T1: COMMIT", 1]], disk: { A: "100", B: "50" }, flush: true,
+      en: "COMMIT appends a commit record and fsyncs the WAL: one sequential write. Only now does the client get success. The data file still says 100; that is fine, the log is the source of truth.",
+      ru: "COMMIT дописывает запись о коммите и делает fsync WAL: одна последовательная запись. Только теперь клиент получает успех. В файле данных всё ещё 100; это нормально, источник истины — журнал." },
+    { t: ["T2 starts, no commit", "T2 начат, без коммита"], mem: { A: "90", B: "20" }, dirty: ["A", "B"], wal: [["T1: A 100→90", 1], ["T1: COMMIT", 1], ["T2: B 50→20", 1]], disk: { A: "100", B: "50" },
+      en: "T2 changes B to 20. Its WAL record may already be on disk (a later flush wrote it), but T2 has not committed.",
+      ru: "T2 меняет B на 20. Его запись WAL может уже быть на диске (её записал более поздний сброс), но T2 не закоммичен." },
+    { t: ["Crash", "Сбой"], crash: true, wal: [["T1: A 100→90", 1], ["T1: COMMIT", 1], ["T2: B 50→20", 1]], disk: { A: "100", B: "50" },
+      en: "Power loss. The buffer pool is gone: both dirty pages are lost. On disk: old data files and the WAL.",
+      ru: "Отключение питания. Буферного пула больше нет: обе грязные страницы потеряны. На диске: старые файлы данных и WAL." },
+    { t: ["Redo from the checkpoint", "Redo с контрольной точки"], mem: { A: "90", B: "20" }, dirty: ["A", "B"], wal: [["T1: A 100→90", 2], ["T1: COMMIT", 2], ["T2: B 50→20", 2]], disk: { A: "100", B: "50" }, redo: true,
+      en: "Restart: recovery reads the WAL from the last checkpoint and re-applies every record to the pages. A becomes 90 again.",
+      ru: "Перезапуск: восстановление читает WAL с последней контрольной точки и заново применяет каждую запись к страницам. A снова 90." },
+    { t: ["Uncommitted work is undone", "Неподтверждённое откатывается"], mem: { A: "90", B: "50" }, dirty: ["A"], wal: [["T1: A 100→90", 2], ["T1: COMMIT", 2], ["T2: B 50→20", 3]], disk: { A: "100", B: "50" },
+      en: "T2 has no commit record, so it counts as aborted: InnoDB rolls it back with the undo log; Postgres simply never shows T2's row versions (they are marked as from an aborted transaction). Committed T1 survived, uncommitted T2 vanished: atomicity + durability.",
+      ru: "У T2 нет записи о коммите, поэтому он считается прерванным: InnoDB откатывает его по undo log; Postgres просто никогда не показывает версии строк T2 (они помечены как от прерванной транзакции). Подтверждённый T1 выжил, неподтверждённый T2 исчез: атомарность + надёжность." },
+    { t: ["Checkpoint", "Контрольная точка"], mem: { A: "90", B: "50" }, dirty: [], wal: [["T1: A 100→90", 4], ["T1: COMMIT", 4], ["T2: B 50→20", 4]], disk: { A: "90", B: "50" }, ckpt: true,
+      en: "Later a checkpoint writes dirty pages to the data files in the background and records the position. WAL before it is no longer needed for recovery and can be recycled.",
+      ru: "Позже контрольная точка в фоне пишет грязные страницы в файлы данных и записывает позицию. WAL до неё больше не нужен для восстановления и может быть переиспользован." }
+  ];
+  return steppedAnim(el, { title: LL("WAL: commit, crash and recovery", "WAL: коммит, сбой и восстановление"), vb: [760, 320], steps: ST, stepMs: 6500, render(g, s, t){
+    const k = Math.min(1, t / 1000);
+    // memory
+    oR(g, 20, 34, 300, 120, s.crash ? "an-leak" : "an-frame", 8); oT(g, 170, 26, LL("RAM · buffer pool", "RAM · буферный пул"), "an-m an-b");
+    if(s.crash) oT(g, 170, 100, LL("✕ lost on power failure", "✕ потеряно при отключении питания"), "an-m an-b an-warn");
+    else ["A", "B"].forEach((p, i) => {
+      const d = s.dirty.includes(p); oR(g, 44 + i * 140, 58, 112, 74, d ? "an-reg on" : "an-box", 6);
+      oT(g, 100 + i * 140, 78, LL("page ", "стр. ") + p, "an-m an-b"); oT(g, 100 + i * 140, 106, s.mem[p], "an-mid");
+      oT(g, 100 + i * 140, 124, d ? LL("dirty", "грязная") : LL("clean", "чистая"), "an-m" + (d ? " an-b an-warn" : ""));
+    });
+    // WAL
+    oR(g, 360, 34, 380, 120, "an-frame", 8); oT(g, 550, 26, LL("WAL · append-only, sequential", "WAL · только дописывание, последовательно"), "an-m an-b");
+    s.wal.forEach(([txt, st], i) => {
+      const cls = st === 0 ? "an-box" : st === 3 ? "an-leak" : st === 4 ? "an-pg knone dim" : "an-pg " + (txt.includes("COMMIT") ? "k2" : "k1");
+      const lit = (s.redo && t > i * 800) || (s.flush && i < 2);
+      oR(g, 372 + i * 122, 64, 114, 36, lit ? "an-reg on" : cls, 5); oT(g, 429 + i * 122, 86, txt, "an-m an-b");
+      oT(g, 429 + i * 122, 120, st === 0 ? LL("in buffer", "в буфере") : st === 3 ? LL("no COMMIT → ignored", "нет COMMIT → игнор") : st === 4 ? LL("recyclable", "можно удалить") : LL("on disk", "на диске"), "an-m" + (st === 3 ? " an-warn" : ""));
+    });
+    if(s.flush){ oT(g, 550, 146, "fsync()", "an-m an-b an-sp"); }
+    // disk data files
+    oR(g, 20, 196, 720, 100, "an-frame", 8); oT(g, 380, 188, LL("disk · data files (heap / B+tree pages)", "диск · файлы данных (страницы heap / B+-дерева)"), "an-m an-b");
+    ["A", "B"].forEach((p, i) => { oR(g, 60 + i * 160, 216, 130, 60, s.ckpt && p === "A" && k > .5 ? "an-reg on" : "an-box", 6); oT(g, 125 + i * 160, 236, LL("page ", "стр. ") + p, "an-m an-b"); oT(g, 125 + i * 160, 264, s.ckpt && p === "A" && k < .5 ? "100" : s.disk[p], "an-mid"); });
+    if(s.redo){ const kk = easeIO(Math.min(1, t / 1600)); E(g, "line", { x1: 429, y1: 100, x2: 429 + (100 - 429) * kk, y2: 100 + (60 - 100) * kk, class: "an-flowline" }); }
+    if(s.ckpt){ const kk = easeIO(k); E(g, "line", { x1: 100, y1: 132, x2: 100 + 25 * kk, y2: 132 + 84 * kk, class: "an-flowline" }); }
+    oT(g, 560, 250, s.crash ? LL("data files: old values, WAL: complete", "файлы данных: старые значения, WAL: полный") : s.ckpt ? LL("checkpoint: data files caught up", "контрольная точка: файлы данных догнали") : LL("data files lag behind the WAL", "файлы данных отстают от WAL"), "an-m an-b");
+  }});
+};
+
+// ============ databases: double-booking-locks
+ANIMS["double-booking-locks"] = el=>{
+  const ST = [
+    { t: ["Both see the seat free", "Оба видят место свободным"], seat: "NULL", a: ["SELECT … WHERE id = 13 → free"], b: ["SELECT … WHERE id = 13 → free"],
+      en: "Alice and Bob open the booking page at the same moment. Both transactions read seat 13 with a plain SELECT: booked_by is NULL. Nothing is locked; MVCC readers never block.",
+      ru: "Алиса и Боб одновременно открывают страницу бронирования. Обе транзакции читают место 13 обычным SELECT: booked_by равно NULL. Ничего не заблокировано; MVCC-читатели никогда не блокируют." },
+    { t: ["Last write wins", "Побеждает последняя запись"], seat: "bob", lost: true, a: ["SELECT → free", "UPDATE booked_by='alice'", "COMMIT ✓"], b: ["SELECT → free", "UPDATE booked_by='bob' (waits)", "COMMIT ✓"],
+      en: "Both run UPDATE seats SET booked_by = … WHERE id = 13. Bob's UPDATE waits for Alice's row lock, then overwrites her value. Both got 'success'; Alice's booking silently disappeared: a lost update, the double-booking bug.",
+      ru: "Оба выполняют UPDATE seats SET booked_by = … WHERE id = 13. UPDATE Боба ждёт блокировку строки Алисы, затем перезаписывает её значение. Оба получили «успех»; бронь Алисы молча исчезла: потерянное обновление, баг двойного бронирования." },
+    { t: ["SELECT … FOR UPDATE", "SELECT … FOR UPDATE"], seat: "NULL", lockA: true, waitB: true, a: ["BEGIN", "SELECT … FOR UPDATE → free 🔒"], b: ["BEGIN", "SELECT … FOR UPDATE … waits"],
+      en: "Fix: read with SELECT … WHERE id = 13 AND booked_by IS NULL FOR UPDATE. Alice gets an exclusive row lock. Bob's identical statement blocks on that lock.",
+      ru: "Исправление: читать через SELECT … WHERE id = 13 AND booked_by IS NULL FOR UPDATE. Алиса получает исключительную блокировку строки. Такое же выражение Боба блокируется на этой блокировке." },
+    { t: ["Alice books and commits", "Алиса бронирует и коммитит"], seat: "alice", waitB: true, a: ["BEGIN", "SELECT … FOR UPDATE → free 🔒", "UPDATE booked_by='alice'", "COMMIT ✓ (lock released)"], b: ["BEGIN", "SELECT … FOR UPDATE … waits"],
+      en: "Alice updates the seat and commits; the lock is released.",
+      ru: "Алиса обновляет место и коммитит; блокировка снимается." },
+    { t: ["Bob re-checks: taken", "Боб перепроверяет: занято"], seat: "alice", a: ["BEGIN", "SELECT … FOR UPDATE → free 🔒", "UPDATE booked_by='alice'", "COMMIT ✓"], b: ["BEGIN", "SELECT … FOR UPDATE → 0 rows", "ROLLBACK: 'seat taken'"],
+      en: "Bob's SELECT wakes up and Postgres re-evaluates the WHERE on the new row version: booked_by is no longer NULL, so 0 rows. Bob is told the seat is taken. The same effect without an explicit lock: UPDATE … WHERE id = 13 AND booked_by IS NULL and check the row count.",
+      ru: "SELECT Боба просыпается, и Postgres заново проверяет WHERE на новой версии строки: booked_by уже не NULL, значит 0 строк. Бобу сообщают, что место занято. Тот же эффект без явной блокировки: UPDATE … WHERE id = 13 AND booked_by IS NULL и проверка числа строк." }
+  ];
+  return steppedAnim(el, { title: LL("Double booking: lost update vs row lock", "Двойное бронирование: потерянное обновление и блокировка строки"), vb: [760, 320], steps: ST, stepMs: 6500, render(g, s, t){
+    const lane = (x, who, list, cls) => {
+      oR(g, x, 30, 230, 270, "an-frame", 8); oT(g, x + 115, 22, who, "an-m an-b");
+      list.forEach((txt, i) => { const show = t > i * 700; if(!show) return;
+        const warn = /waits|0 rows|ROLLBACK/.test(txt);
+        oR(g, x + 10, 44 + i * 52, 210, 40, warn ? "an-leak" : "an-pg " + cls, 5); oT(g, x + 115, 68 + i * 52, txt, "an-m an-b"); });
+    };
+    lane(16, LL("T1 · Alice", "T1 · Алиса"), s.a, "k1");
+    lane(514, LL("T2 · Bob", "T2 · Боб"), s.b, "k2");
+    // seat row
+    oT(g, 380, 96, LL("seats table, row id = 13", "таблица seats, строка id = 13"), "an-m an-b");
+    oR(g, 280, 108, 200, 70, s.lost ? "an-leak" : "an-reg on", 8);
+    oT(g, 380, 136, "id = 13", "an-code"); oT(g, 380, 162, "booked_by = " + s.seat, "an-code an-b");
+    if(s.lockA){ oT(g, 380, 200, "🔒 " + LL("row lock: T1", "блокировка строки: T1"), "an-m an-b an-sp"); }
+    if(s.waitB){ oT(g, 380, 222, LL("T2 waits for T1", "T2 ждёт T1"), "an-m an-b an-warn"); E(g, "line", { x1: 514, y1: 148, x2: 482, y2: 148, class: "an-flowline" }); }
+    if(s.lost) oT(g, 380, 210, LL("alice's booking overwritten", "бронь alice перезаписана"), "an-m an-b an-warn");
+  }});
+};
+
+// ============ databases: offset-vs-keyset
+ANIMS["offset-vs-keyset"] = el=>{
+  const ST = [
+    { t: ["Page 1", "Страница 1"], mode: "off", skip: 0, take: 5,
+      en: "An index on id DESC holds 60 entries (picture millions). Page 1: ORDER BY id DESC LIMIT 5. Read 5, return 5.",
+      ru: "Индекс по id DESC содержит 60 записей (представь миллионы). Страница 1: ORDER BY id DESC LIMIT 5. Прочитано 5, возвращено 5." },
+    { t: ["OFFSET 20", "OFFSET 20"], mode: "off", skip: 20, take: 5,
+      en: "Page 5: LIMIT 5 OFFSET 20. The database cannot jump to the 21st entry; it reads 25 entries (and usually their heap rows) and throws 20 away.",
+      ru: "Страница 5: LIMIT 5 OFFSET 20. База не может прыгнуть к 21-й записи; она читает 25 записей (и обычно их строки в heap) и выбрасывает 20." },
+    { t: ["OFFSET 50", "OFFSET 50"], mode: "off", skip: 50, take: 5,
+      en: "Page 11: 55 read, 50 discarded. Cost grows linearly with the page number; at OFFSET 1,000,000 the request takes seconds.",
+      ru: "Страница 11: прочитано 55, выброшено 50. Стоимость растёт линейно с номером страницы; на OFFSET 1 000 000 запрос идёт секунды." },
+    { t: ["Keyset: seek", "Keyset: переход"], mode: "key", skip: 50, take: 5,
+      en: "Keyset: the client sends the last id it saw (511). WHERE id < 511 ORDER BY id DESC LIMIT 5: the B+tree descent lands right on 510, then reads 5 entries. Same cost for page 1 and page 100,000.",
+      ru: "Keyset: клиент присылает последний увиденный id (511). WHERE id < 511 ORDER BY id DESC LIMIT 5: спуск по B+-дереву приземляется прямо на 510, затем читается 5 записей. Одинаковая стоимость для страницы 1 и страницы 100 000." },
+    { t: ["New row: OFFSET drifts", "Новая строка: OFFSET съезжает"], mode: "ins", skip: 5, take: 5,
+      en: "A new row (id 561) is inserted while the user reads page 1. OFFSET 5 now starts one row earlier: page 2 repeats the last row of page 1. Keyset continues strictly after the last seen id and is not affected.",
+      ru: "Пока пользователь читает страницу 1, вставляется новая строка (id 561). OFFSET 5 теперь начинается на строку раньше: страница 2 повторяет последнюю строку страницы 1. Keyset продолжает строго после последнего увиденного id и не страдает." }
+  ];
+  return steppedAnim(el, { title: LL("Pagination: OFFSET vs keyset", "Пагинация: OFFSET и keyset"), vb: [760, 300], steps: ST, stepMs: 6000, render(g, s, t){
+    const ins = s.mode === "ins", N = 60, base = 560;
+    const ids = Array.from({ length: N }, (_, i) => base - i); if(ins) ids.unshift(561);
+    const cx = i => 20 + (i % 20) * 36, cy = i => 60 + Math.floor(i / 20) * 54;
+    const prog = Math.min(1, t / 2400);
+    const readN = s.mode === "key" ? s.take : s.skip + s.take, cur = Math.floor(prog * readN);
+    oT(g, 380, 30, s.mode === "key" ? "WHERE id < 511 ORDER BY id DESC LIMIT 5" : "ORDER BY id DESC LIMIT 5 OFFSET " + s.skip, "an-code an-b");
+    ids.slice(0, N).forEach((id, i) => {
+      let cls = "an-box";
+      if(s.mode === "key"){ if(i >= s.skip && i < s.skip + s.take && i - s.skip < cur) cls = "an-pg k2"; }
+      else if(i < s.skip && i < cur) cls = "an-pg knone dim";
+      else if(i >= s.skip && i < s.skip + s.take && i < cur) cls = "an-pg k2";
+      if(ins && id === 561) cls = "an-pg k3";
+      if(ins && i === 5 && cur > 5) cls = "an-leak";
+      oR(g, cx(i), cy(i), 32, 40, cls, 4); oT(g, cx(i) + 16, cy(i) + 25, String(id), "an-m");
+    });
+    if(s.mode === "key"){ const k = easeIO(Math.min(1, t / 900)); E(g, "line", { x1: 380, y1: 40, x2: 380 + (cx(s.skip) + 16 - 380) * k, y2: 40 + (cy(s.skip) - 40) * k, class: "an-flowline" }); oT(g, cx(s.skip) + 40, cy(s.skip) - 6, LL("seek via index", "переход по индексу"), "an-m an-b an-sp", "start"); }
+    const discarded = s.mode === "key" ? 0 : Math.min(cur, s.skip);
+    oT(g, 20, 248, LL("entries read: ", "прочитано записей: ") + cur, "an-m an-b", "start");
+    oT(g, 220, 248, LL("discarded: ", "выброшено: ") + discarded, "an-m an-b" + (discarded > 10 ? " an-warn" : ""), "start");
+    if(ins) oT(g, 20, 274, LL("page 2 with OFFSET 5 starts at 556 again: duplicate", "страница 2 с OFFSET 5 снова начинается с 556: дубль"), "an-m an-b an-warn", "start");
+    oR(g, 560, 236, 14, 14, "an-pg k2", 3); oT(g, 580, 247, LL("returned", "возвращено"), "an-m", "start");
+    oR(g, 660, 236, 14, 14, "an-pg knone dim", 3); oT(g, 680, 247, LL("thrown away", "выброшено"), "an-m", "start");
+  }});
+};
+
+// ============ databases: pg-update-hot
+ANIMS["pg-update-hot"] = el=>{
+  const T = (slot, note, status, xmin, xmax, dead) => ({ slot, note, status, xmin, xmax, dead });
+  const ST = [
+    { t: ["One row, two indexes", "Одна строка, два индекса"], tup: [T(1, "hi", "NEW", 100, "", false)], pk: [1], st: [["NEW", 1]],
+      en: "Table orders(id, status, note) with two indexes: the primary key on id and an index on status. Row id = 7 lives in heap page 0, slot 1. Both indexes point to ctid (0,1).",
+      ru: "Таблица orders(id, status, note) с двумя индексами: первичный ключ по id и индекс по status. Строка id = 7 лежит в странице heap 0, слот 1. Оба индекса указывают на ctid (0,1)." },
+    { t: ["UPDATE note: HOT", "UPDATE note: HOT"], tup: [T(1, "hi", "NEW", 100, 101, true), T(2, "bye", "NEW", 101, "", false)], pk: [1], st: [["NEW", 1]], chain: [[1, 2]],
+      en: "UPDATE orders SET note = 'bye' WHERE id = 7. MVCC never overwrites: a new version goes to slot 2 (xmin = 101) and the old one gets xmax = 101. No indexed column changed and the page had room, so this is a HOT update: the indexes still point to (0,1), which redirects to (0,2). Zero index writes.",
+      ru: "UPDATE orders SET note = 'bye' WHERE id = 7. MVCC никогда не перезаписывает: новая версия идёт в слот 2 (xmin = 101), а старая получает xmax = 101. Ни одна индексированная колонка не изменилась, и в странице было место, поэтому это HOT-обновление: индексы по-прежнему указывают на (0,1), который перенаправляет на (0,2). Ноль записей в индексы." },
+    { t: ["UPDATE status: not HOT", "UPDATE status: не HOT"], tup: [T(1, "hi", "NEW", 100, 101, true), T(2, "bye", "NEW", 101, 102, true), T(3, "bye", "PAID", 102, "", false)], pk: [1, 3], st: [["NEW", 1], ["PAID", 3]], chain: [[1, 2]], newIdx: true,
+      en: "UPDATE orders SET status = 'PAID'. status is indexed, so HOT is impossible: the new version (0,3) needs a new entry in EVERY index, the primary key too, although id did not change. Plus WAL for each. This is Postgres write amplification.",
+      ru: "UPDATE orders SET status = 'PAID'. status индексирован, поэтому HOT невозможен: новой версии (0,3) нужна новая запись в КАЖДОМ индексе, включая первичный ключ, хотя id не менялся. Плюс WAL на каждую. Это усиление записи в Postgres." },
+    { t: ["VACUUM cleans up", "VACUUM убирает"], tup: [T(3, "bye", "PAID", 102, "", false)], pk: [3], st: [["PAID", 3]], vac: true,
+      en: "Once no snapshot can see the old versions, VACUUM (or page pruning) removes dead tuples (0,1) and (0,2) and the index entries that pointed to them. The space is reused by later inserts in this page.",
+      ru: "Когда ни один снимок уже не может видеть старые версии, VACUUM (или очистка страницы) удаляет мёртвые кортежи (0,1) и (0,2) и записи индексов, указывавшие на них. Место переиспользуется следующими вставками в эту страницу." }
+  ];
+  return steppedAnim(el, { title: LL("Postgres UPDATE: new tuple versions and HOT", "UPDATE в Postgres: новые версии кортежей и HOT"), vb: [760, 330], steps: ST, stepMs: 7000, render(g, s, t){
+    const k = Math.min(1, t / 1000), SX = slot => 260 + (slot - 1) * 166;
+    const IDX = [[30, LL("PK index (id)", "индекс PK (id)"), s.pk.map(sl => ["7", sl])], [150, LL("index on status", "индекс по status"), s.st]];
+    oR(g, 240, 150, 510, 160, "an-frame", 8); oT(g, 740, 142, LL("heap page 0", "страница heap 0"), "an-m an-b", "end");
+    // links first, so boxes are drawn over them
+    IDX.forEach(([y, , entries]) => entries.forEach(([, slot], i) => {
+      const isNew = s.newIdx && i === entries.length - 1;
+      E(g, "line", { x1: 204, y1: y + 24 + i * 30, x2: SX(slot) + 75, y2: 170, class: isNew ? "an-link2 on" : "an-link2" });
+    }));
+    s.tup.forEach(tp => {
+      const x = SX(tp.slot), fresh = !tp.dead && tp.slot > 1 && !s.vac;
+      oR(g, x, 170, 150, 120, tp.dead ? "an-pg knone dim" : fresh && k < 1 ? "an-reg on" : "an-reg", 6);
+      oT(g, x + 75, 188, "(0," + tp.slot + ")" + (tp.dead ? LL(" dead", " мёртвый") : ""), "an-m an-b" + (tp.dead ? " an-warn" : ""));
+      oT(g, x + 10, 210, "id = 7", "an-code", "start"); oT(g, x + 10, 228, "status = " + tp.status, "an-code", "start"); oT(g, x + 10, 246, "note = " + tp.note, "an-code", "start");
+      oT(g, x + 10, 270, "xmin " + tp.xmin + (tp.xmax ? " · xmax " + tp.xmax : ""), "an-m", "start");
+    });
+    (s.chain || []).forEach(([a, b]) => { E(g, "line", { x1: SX(a) + 150, y1: 230, x2: SX(b), y2: 230, class: "an-link2 on" }); oT(g, (SX(a) + 150 + SX(b)) / 2, 300, LL("HOT redirect", "HOT-перенаправление"), "an-m an-b an-sp"); });
+    IDX.forEach(([y, name, entries]) => {
+      oR(g, 16, y, 200, 26 + entries.length * 30, "an-frame", 8); oT(g, 116, y - 6, name, "an-m an-b");
+      entries.forEach(([key, slot], i) => {
+        const isNew = s.newIdx && i === entries.length - 1;
+        oR(g, 28, y + 12 + i * 30, 176, 24, isNew && k < 1 ? "an-reg on" : isNew ? "an-pg k3" : "an-pg k1", 4);
+        oT(g, 116, y + 28 + i * 30, key + " → (0," + slot + ")", "an-m an-b");
+      });
+    });
+    const writes = s.newIdx ? LL("index writes: 2 (one per index)", "записей в индексы: 2 (по одной на индекс)") : s.chain && !s.newIdx ? LL("index writes: 0", "записей в индексы: 0") : "";
+    if(writes) oT(g, 495, 30, writes, "an-m an-b" + (s.newIdx ? " an-warn" : " an-sp"));
+  }});
+};
+
+// ============ databases: phantom-rr-vs-serializable
+ANIMS["phantom-rr-vs-serializable"] = el=>{
+  const ST = [
+    { t: ["T1 counts today's orders", "T1 считает заказы за сегодня"], tbl: "orders", rows: ["#1 today", "#2 today"], t1: ["BEGIN", "count(today) = 2"], t2: [],
+      en: "T1 starts and runs SELECT count(*) FROM orders WHERE day = today: 2. Under REPEATABLE READ and SERIALIZABLE its snapshot is taken now.",
+      ru: "T1 начинается и выполняет SELECT count(*) FROM orders WHERE day = today: 2. На REPEATABLE READ и SERIALIZABLE его снимок берётся сейчас." },
+    { t: ["T2 inserts and commits", "T2 вставляет и коммитит"], tbl: "orders", rows: ["#1 today", "#2 today", "#3 today (new)"], newRow: 2, t1: ["BEGIN", "count(today) = 2"], t2: ["INSERT #3 today", "COMMIT ✓"],
+      en: "T2 inserts a third order for today and commits. No row T1 read was changed: this is a new row matching T1's predicate.",
+      ru: "T2 вставляет третий заказ за сегодня и коммитит. Ни одна строка, которую читал T1, не изменилась: это новая строка, подходящая под условие T1." },
+    { t: ["Re-read: phantom or not", "Повторное чтение: фантом или нет"], tbl: "orders", rows: ["#1 today", "#2 today", "#3 today (new)"], newRow: 2, t1: ["BEGIN", "count(today) = 2", "count again:", "RC → 3 (phantom)", "RR / SER → 2"], t2: ["INSERT #3 today", "COMMIT ✓"],
+      en: "T1 repeats the query. READ COMMITTED takes a new snapshot per statement: 3, a phantom. REPEATABLE READ and SERIALIZABLE reuse the transaction snapshot: still 2. In Postgres REPEATABLE READ already prevents phantoms.",
+      ru: "T1 повторяет запрос. READ COMMITTED берёт новый снимок на каждый оператор: 3, фантом. REPEATABLE READ и SERIALIZABLE используют снимок транзакции: по-прежнему 2. В Postgres фантомы предотвращает уже REPEATABLE READ." },
+    { t: ["Write skew: both read 2 on call", "Write skew: оба видят 2 дежурных"], tbl: "doctors", rows: ["Alice · on call", "Bob · on call"], t1: ["count(on_call) = 2"], t2: ["count(on_call) = 2"],
+      en: "A rule: at least one doctor must be on call. Alice (T1) and Bob (T2) both want to leave. Each reads count(on_call) = 2 and decides it is safe.",
+      ru: "Правило: хотя бы один врач должен дежурить. Алиса (T1) и Боб (T2) хотят уйти. Каждый читает count(on_call) = 2 и решает, что это безопасно." },
+    { t: ["REPEATABLE READ: both commit", "REPEATABLE READ: оба коммитятся"], tbl: "doctors", rows: ["Alice · off", "Bob · off"], bad: true, t1: ["count(on_call) = 2", "UPDATE Alice off", "COMMIT ✓"], t2: ["count(on_call) = 2", "UPDATE Bob off", "COMMIT ✓"],
+      en: "Each updates only their own row, so there is no row conflict, and REPEATABLE READ lets both commit. Nobody is on call: write skew. Snapshot isolation is not serializable.",
+      ru: "Каждый обновляет только свою строку, конфликта по строкам нет, и REPEATABLE READ пропускает оба коммита. Дежурных нет: write skew. Изоляция снимков не сериализуема." },
+    { t: ["SERIALIZABLE: one aborts", "SERIALIZABLE: один прерван"], tbl: "doctors", rows: ["Alice · off", "Bob · on call"], t1: ["count(on_call) = 2", "UPDATE Alice off", "COMMIT ✓"], t2: ["count(on_call) = 2", "UPDATE Bob off", "COMMIT ✕ 40001", "retry: count = 1 → stay"],
+      en: "SERIALIZABLE (SSI) remembered what each transaction read. T1 read rows T2 wrote and T2 read rows T1 wrote: a dangerous cycle, so the second commit fails with 40001. Bob's retry sees count = 1 and stays on call. The invariant holds.",
+      ru: "SERIALIZABLE (SSI) запомнил, что читала каждая транзакция. T1 читал строки, которые писал T2, а T2 — строки, которые писал T1: опасный цикл, поэтому второй коммит падает с 40001. Повтор Боба видит count = 1, и он остаётся на дежурстве. Инвариант соблюдён." }
+  ];
+  return steppedAnim(el, { title: LL("Phantoms and write skew: RC, RR, SERIALIZABLE", "Фантомы и write skew: RC, RR, SERIALIZABLE"), vb: [760, 320], steps: ST, stepMs: 7000, render(g, s, t){
+    oR(g, 270, 40, 220, 30 + s.rows.length * 40, s.bad ? "an-leak" : "an-frame", 8); oT(g, 380, 32, LL("table ", "таблица ") + s.tbl, "an-m an-b");
+    s.rows.forEach((r, i) => { const nw = s.newRow === i; oR(g, 282, 56 + i * 40, 196, 32, nw ? "an-pg k3" : /off/.test(r) ? "an-pg knone dim" : "an-pg k1", 5); oT(g, 380, 76 + i * 40, r, "an-m an-b"); });
+    if(s.bad) oT(g, 380, 70 + s.rows.length * 40 + 20, LL("on call: 0 — invariant broken", "дежурных: 0 — инвариант нарушен"), "an-m an-b an-warn");
+    const lane = (x, who, list, cls) => {
+      oR(g, x, 40, 230, 266, "an-frame", 8); oT(g, x + 115, 32, who, "an-m an-b");
+      list.forEach((txt, i) => { if(t < i * 600) return; const warn = /phantom|✕/.test(txt);
+        oR(g, x + 10, 52 + i * 48, 210, 38, warn ? "an-leak" : "an-pg " + cls, 5); oT(g, x + 115, 75 + i * 48, txt, "an-m an-b"); });
+    };
+    lane(16, "T1", s.t1, "k2"); lane(514, "T2", s.t2, "k0");
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id); if(start==="changes") showChanges();
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(id==="changes"){ if(VIEW!=="changes") showChanges(); return; } if(byId[id] && (id!==current||VIEW!=="note")) go(id); }); }

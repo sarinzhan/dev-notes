@@ -18,6 +18,15 @@ Redis is a single-threaded in-memory server with typed values. Pick the structur
 - **Geo** (`GEOADD` / `GEOSEARCH`): points with lat/lon stored as a Sorted set with a geohash score; radius and box queries in O(log n).
 - Typical roles in one stack: cache in front of Postgres, idempotency and lock keys, rate limiter, session store, lightweight message queue or stream, pub/sub bus. For durable, replayable, high-volume streams it is not a replacement for [[kafka-architecture|Kafka]].
 
+
+### Internals
+- **One command thread** runs an event loop over all client sockets (epoll, [[socket-management]]): every command is atomic with no locks, and one slow command (`KEYS *`, `HGETALL` on a huge hash, a big Lua script) stalls every client. Since 6.0, optional I/O threads parse and write sockets; execution is still single-threaded.
+- The keyspace is one big **hash table** with incremental rehashing: when it grows, each command moves a few buckets so there is no stop-the-world resize.
+- Each type has compact and full **encodings**, switched automatically by size: small hashes, lists and sorted sets are a **listpack** (one contiguous block, cache friendly); bigger ones become a hash table, a **quicklist** (linked list of listpacks), or a **skiplist + hash table** for sorted sets (O(log n) by score, O(1) by member). Small sets of integers are an **intset**. `OBJECT ENCODING key` shows which.
+- Memory is everything: values, keys and per-key overhead (~50–70 bytes) must fit in RAM; `maxmemory` + an eviction policy (`allkeys-lru`, `allkeys-lfu`, `volatile-ttl`) decide what goes when it is full.
+- Persistence (RDB snapshots via fork + copy-on-write, AOF log) and its trade-offs: [[redis-patterns-and-persistence]], [[wal-redo-undo-and-durability]].
+- Replication is asynchronous (a replica can lag and lose acknowledged writes on failover); Redis Cluster splits keys into 16,384 hash slots across primaries; multi-key commands work only when all keys share a slot (use `{hash tags}`).
+- Compared with Memcached: typed values and persistence vs a simpler multithreaded string cache ([[memcached-architecture]]).
 ## Example
 ```java
 // idempotency key with 24h TTL, see idempotency note

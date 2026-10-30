@@ -29,6 +29,8 @@ GET  /v1/users/{id}/posts?cursor=     (profile timeline, separate from the home 
 - `post_cache:{postId}` — hash в Redis с отрендеренным постом, TTL — часы, чтобы чтение ленты для горячих постов вообще не обращалось к Postgres.
 - Счётчики (лайки, комментарии) — в Redis с периодическим сбросом в Postgres.
 
+- Разбор схемы базы (из упражнения курса про Twitter): `profile(id, name, followers_count, following_count)`, `follows(source_id, target_id)` с индексами в обе стороны, `tweet(id, profile_id, content, created_at)`, секционированная по времени, `likes(tweet_id, profile_id)`. Счётчики — это **хранимые колонки**, обновляемые асинхронно, никогда не `count(*)` по миллиардам строк подписок; домашняя лента вычисляется заранее, а не соединением подписок × твитов во время чтения.
+
 ### Общая архитектура
 ```
 POST /posts ──▶ post service ──tx: post + outbox──▶ Postgres ──relay──▶ Kafka post.created

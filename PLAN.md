@@ -96,6 +96,7 @@ Later (after April 2027), still under operating-systems:
 - [x] symmetric-and-asymmetric-crypto — AES, RSA/EC, key exchange, signatures, where HMAC fits
 - [x] owasp-top-10-for-backend — injection, broken auth, SSRF, deserialization, secrets in logs
 - [x] secrets-management — env vars vs vaults, rotation, never in git
+- [x] homomorphic-encryption — computing on ciphertexts, PHE/FHE, why databases cannot use it yet (DB engineering course)
 
 ## java
 (existing section, unchanged; see `notes/java/`)
@@ -116,8 +117,22 @@ Later (after April 2027), still under operating-systems:
 - [m] constraints-and-relationships
 - [x] query-planning-and-execution — parser → planner → executor, cost model, statistics
 - [x] sql-vs-nosql-choosing — consistency, schema, access patterns, when document/kv/column/graph
+- [x] concurrency-control — shared/exclusive locks, deadlocks, 2PL, double booking, optimistic vs pessimistic, InnoDB gap locks (DB engineering course)
+- [x] pagination-offset-vs-keyset — why OFFSET is slow and wrong, keyset/seek pagination, cursors in APIs (DB engineering course)
+- [x] database-cursors — server-side vs client-side cursors, JDBC fetchSize, SQL Server cursor types (DB engineering course)
+
+### internals
+Notes from the Udemy course "Fundamentals of Database Engineering" (Hussein Nasser), sections 2–17.
+- [x] how-tables-and-indexes-are-stored — pages, heap, ctid, IO, index → heap lookup, clustered tables, NULL storage
+- [x] row-vs-column-storage — row vs column stores, OLTP vs OLAP, why SELECT * hurts
+- [x] primary-vs-secondary-indexes — clustered vs secondary, Postgres vs MySQL, UUID keys, index scan vs seek
+- [x] b-tree-vs-b-plus-tree — original B-tree, limitations, B+tree, DBMS considerations, storage cost (B-tree content moved here from trees-and-bst)
+- [x] wal-redo-undo-and-durability — WAL, redo/undo, checkpoints, fsync, write amplification, durability knobs
+- [x] database-engines — DBMS vs engine, MyISAM/InnoDB/XtraDB/Aria/SQLite/BerkeleyDB/LevelDB/RocksDB, B+tree vs LSM
+- [x] database-wire-protocols — Postgres protocol v3 (simple/extended query), MongoDB OP_MSG, largest statement
 
 ### postgres
+- [x] postgres-architecture — process model, shared buffers, MVCC tuples, HOT updates (DB engineering course)
 - [m] postgres-indexes
 - [m] postgres-isolation-levels
 - [x] explain-analyze — reading plans, seq vs index scan, nested loop/hash/merge join, buffers
@@ -134,12 +149,14 @@ Later (after April 2027), still under operating-systems:
 - [x] mongodb-basics — documents, indexes, aggregation, transactions, when to use
 - [x] column-and-wide-column-stores — Cassandra/ClickHouse idea, write path, use cases
 - [x] elasticsearch-basics — inverted index, mappings, when search belongs outside Postgres
+- [x] memcached-architecture — slabs, per-class LRU, threads, client-side consistent hashing, vs Redis (DB engineering course)
 
 ### design
 - [x] data-modeling-for-services — one DB per service, aggregates as tables, soft delete, audit columns
 - [x] schema-migrations-flyway-liquibase — versioned migrations, zero-downtime changes (expand/contract)
 - [x] multi-tenancy-strategies — shared schema vs schema-per-tenant vs db-per-tenant
 - [x] time-money-and-ids — timestamptz, BigDecimal/numeric, UUID v4 vs v7 vs sequences
+- [x] database-security-and-permissions — pg_hba, TLS verify-full, SCRAM, least-privilege roles, default privileges (DB engineering course)
 
 ## messaging
 (existing section, unchanged)

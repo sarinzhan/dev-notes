@@ -72,6 +72,7 @@
    "name": "Databases",
    "subs": {
     "fundamentals": "Fundamentals",
+    "internals": "Internals & storage engines",
     "postgres": "PostgreSQL",
     "nosql": "NoSQL",
     "design": "Data modeling & migrations"
@@ -79,6 +80,7 @@
    "name_ru": "Базы данных",
    "subs_ru": {
     "fundamentals": "Основы",
+    "internals": "Внутреннее устройство и движки",
     "postgres": "PostgreSQL",
     "nosql": "NoSQL",
     "design": "Моделирование и миграции"
@@ -2106,7 +2108,7 @@
     "rate-limiting",
     "redis-data-structures"
    ],
-   "words": 1138,
+   "words": 1198,
    "ru": "notes-ru/computer-science/data-structures/bloom-filters-and-probabilistic.md",
    "title_ru": "Фильтры Блума и вероятностные структуры данных"
   },
@@ -2346,11 +2348,12 @@
    "path": "notes/computer-science/data-structures/trees-and-bst.md",
    "links": [
     "anatomy-of-a-process",
+    "b-tree-vs-b-plus-tree",
     "binary-search-and-variants",
     "collections-framework",
-    "column-and-wide-column-stores",
     "concurrent-collections",
     "data-structures",
+    "database-engines",
     "database-indexes",
     "graphs-representation",
     "hash-tables",
@@ -2363,7 +2366,7 @@
     "stacks-and-queues",
     "tries"
    ],
-   "words": 1135,
+   "words": 1132,
    "ru": "notes-ru/computer-science/data-structures/trees-and-bst.md",
    "title_ru": "Деревья, двоичные деревья поиска и сбалансированные деревья"
   },
@@ -3107,6 +3110,31 @@
    "title_ru": "Хеширование и шифрование"
   },
   {
+   "id": "homomorphic-encryption",
+   "sec": "computer-science",
+   "sub": "security-basics",
+   "title": "Homomorphic encryption",
+   "tags": [
+    "security",
+    "cryptography",
+    "encryption",
+    "privacy",
+    "databases"
+   ],
+   "learned": "2026-10-30",
+   "path": "notes/computer-science/security-basics/homomorphic-encryption.md",
+   "links": [
+    "database-security-and-permissions",
+    "hashing-vs-encryption",
+    "owasp-top-10-for-backend",
+    "secrets-management",
+    "symmetric-and-asymmetric-crypto"
+   ],
+   "words": 678,
+   "ru": "notes-ru/computer-science/security-basics/homomorphic-encryption.md",
+   "title_ru": "Гомоморфное шифрование"
+  },
+  {
    "id": "owasp-top-10-for-backend",
    "sec": "computer-science",
    "sub": "security-basics",
@@ -3235,6 +3263,37 @@
    "title_ru": "Моделирование данных для сервисов: владение, агрегаты, мягкое удаление, аудит"
   },
   {
+   "id": "database-security-and-permissions",
+   "sec": "databases",
+   "sub": "design",
+   "title": "Database security and permissions",
+   "tags": [
+    "databases",
+    "security",
+    "postgres",
+    "permissions",
+    "least-privilege"
+   ],
+   "learned": "2026-10-30",
+   "path": "notes/databases/design/database-security-and-permissions.md",
+   "links": [
+    "api-security-checklist",
+    "authentication-vs-authorization",
+    "database-wire-protocols",
+    "mtls-and-service-to-service-auth",
+    "multi-tenancy-strategies",
+    "network-access-to-databases",
+    "owasp-top-10-for-backend",
+    "read-replicas-and-stale-reads",
+    "schema-migrations-flyway-liquibase",
+    "secrets-management",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 662,
+   "ru": "notes-ru/databases/design/database-security-and-permissions.md",
+   "title_ru": "Безопасность баз данных и права доступа"
+  },
+  {
    "id": "multi-tenancy-strategies",
    "sec": "databases",
    "sub": "design",
@@ -3320,6 +3379,33 @@
    "title_ru": "Как правильно хранить время, деньги и идентификаторы"
   },
   {
+   "id": "concurrency-control",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Database concurrency control",
+   "tags": [
+    "databases",
+    "locking",
+    "concurrency",
+    "transactions",
+    "deadlocks"
+   ],
+   "learned": "2026-10-30",
+   "path": "notes/databases/fundamentals/concurrency-control.md",
+   "links": [
+    "deadlocks-and-synchronization-primitives",
+    "distributed-locks-and-fencing",
+    "jpa-locking",
+    "postgres-isolation-levels",
+    "postgres-locks",
+    "race-conditions-and-critical-sections",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 1018,
+   "ru": "notes-ru/databases/fundamentals/concurrency-control.md",
+   "title_ru": "Управление конкурентным доступом в базах данных"
+  },
+  {
    "id": "constraints-and-relationships",
    "sec": "databases",
    "sub": "fundamentals",
@@ -3341,6 +3427,32 @@
    "words": 1047,
    "ru": "notes-ru/databases/fundamentals/constraints-and-relationships.md",
    "title_ru": "Ограничения и связи между таблицами"
+  },
+  {
+   "id": "database-cursors",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Database cursors (server-side vs client-side)",
+   "tags": [
+    "databases",
+    "cursors",
+    "jdbc",
+    "postgres",
+    "streaming"
+   ],
+   "learned": "2026-10-30",
+   "path": "notes/databases/fundamentals/database-cursors.md",
+   "links": [
+    "database-wire-protocols",
+    "hikaricp-pool-sizing",
+    "pagination-offset-vs-keyset",
+    "postgres-performance-checklist",
+    "postgres-vacuum-and-bloat",
+    "sockets-and-connection-pooling"
+   ],
+   "words": 716,
+   "ru": "notes-ru/databases/fundamentals/database-cursors.md",
+   "title_ru": "Курсоры в базах данных (серверные и клиентские)"
   },
   {
    "id": "database-fundamentals",
@@ -3385,12 +3497,16 @@
    "learned": "2026-10-22",
    "path": "notes/databases/fundamentals/database-indexes.md",
    "links": [
+    "b-tree-vs-b-plus-tree",
     "constraints-and-relationships",
+    "how-tables-and-indexes-are-stored",
     "jpa-n-plus-one",
     "postgres-indexes",
+    "primary-vs-secondary-indexes",
+    "query-planning-and-execution",
     "sql-joins-and-commands"
    ],
-   "words": 1004,
+   "words": 1416,
    "ru": "notes-ru/databases/fundamentals/database-indexes.md",
    "title_ru": "Индексы в базах данных: как они работают и когда вредят"
   },
@@ -3418,6 +3534,32 @@
    "words": 765,
    "ru": "notes-ru/databases/fundamentals/normalization-and-denormalization.md",
    "title_ru": "Нормальные формы и денормализация"
+  },
+  {
+   "id": "pagination-offset-vs-keyset",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Pagination: OFFSET vs keyset",
+   "tags": [
+    "databases",
+    "sql",
+    "pagination",
+    "performance"
+   ],
+   "learned": "2026-10-30",
+   "path": "notes/databases/fundamentals/pagination-offset-vs-keyset.md",
+   "links": [
+    "api-design-for-system-design",
+    "b-tree-vs-b-plus-tree",
+    "database-cursors",
+    "database-indexes",
+    "design-news-feed",
+    "explain-analyze",
+    "postgres-performance-checklist"
+   ],
+   "words": 660,
+   "ru": "notes-ru/databases/fundamentals/pagination-offset-vs-keyset.md",
+   "title_ru": "Пагинация: OFFSET и keyset"
   },
   {
    "id": "query-planning-and-execution",
@@ -3524,18 +3666,220 @@
    "learned": "2026-10-22",
    "path": "notes/databases/fundamentals/transactions-acid-and-isolation.md",
    "links": [
+    "cap-and-pacelc",
     "concurrency-hazards",
+    "consistency-models",
     "constraints-and-relationships",
     "idempotency",
     "jpa-locking",
     "outbox-pattern",
     "postgres-isolation-levels",
     "spring-transactional",
-    "sql-joins-and-commands"
+    "sql-joins-and-commands",
+    "wal-redo-undo-and-durability"
    ],
-   "words": 985,
+   "words": 1342,
    "ru": "notes-ru/databases/fundamentals/transactions-acid-and-isolation.md",
    "title_ru": "Транзакции, ACID и аномалии изоляции"
+  },
+  {
+   "id": "b-tree-vs-b-plus-tree",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "B-tree vs B+tree in database systems",
+   "tags": [
+    "databases",
+    "indexes",
+    "b-tree",
+    "data-structures",
+    "storage"
+   ],
+   "learned": "2026-10-30",
+   "order": 4,
+   "path": "notes/databases/internals/b-tree-vs-b-plus-tree.md",
+   "links": [
+    "database-engines",
+    "database-indexes",
+    "how-tables-and-indexes-are-stored",
+    "postgres-indexes",
+    "primary-vs-secondary-indexes",
+    "trees-and-bst"
+   ],
+   "words": 1071,
+   "ru": "notes-ru/databases/internals/b-tree-vs-b-plus-tree.md",
+   "title_ru": "B-дерево и B+-дерево в базах данных"
+  },
+  {
+   "id": "database-engines",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "Database engines (storage engines)",
+   "tags": [
+    "databases",
+    "storage-engines",
+    "innodb",
+    "rocksdb",
+    "lsm"
+   ],
+   "learned": "2026-10-30",
+   "order": 6,
+   "path": "notes/databases/internals/database-engines.md",
+   "links": [
+    "b-tree-vs-b-plus-tree",
+    "bloom-filters-and-probabilistic",
+    "column-and-wide-column-stores",
+    "how-tables-and-indexes-are-stored",
+    "mongodb-basics",
+    "primary-vs-secondary-indexes",
+    "sql-vs-nosql-choosing",
+    "storage-choices",
+    "wal-redo-undo-and-durability"
+   ],
+   "words": 776,
+   "ru": "notes-ru/databases/internals/database-engines.md",
+   "title_ru": "Движки баз данных (storage engines)"
+  },
+  {
+   "id": "database-wire-protocols",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "Database wire protocols (Postgres and MongoDB)",
+   "tags": [
+    "databases",
+    "protocols",
+    "postgres",
+    "mongodb",
+    "networking"
+   ],
+   "learned": "2026-10-30",
+   "order": 7,
+   "path": "notes/databases/internals/database-wire-protocols.md",
+   "links": [
+    "database-cursors",
+    "database-security-and-permissions",
+    "network-access-to-databases",
+    "postgres-architecture",
+    "sockets-and-connection-pooling",
+    "tcpdump",
+    "tls-handshake-and-certificates"
+   ],
+   "words": 772,
+   "ru": "notes-ru/databases/internals/database-wire-protocols.md",
+   "title_ru": "Сетевые протоколы баз данных (Postgres и MongoDB)"
+  },
+  {
+   "id": "how-tables-and-indexes-are-stored",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "How tables and indexes are stored on disk",
+   "tags": [
+    "databases",
+    "storage",
+    "pages",
+    "heap",
+    "indexes"
+   ],
+   "learned": "2026-10-30",
+   "order": 1,
+   "path": "notes/databases/internals/how-tables-and-indexes-are-stored.md",
+   "links": [
+    "b-tree-vs-b-plus-tree",
+    "database-indexes",
+    "postgres-indexes",
+    "postgres-vacuum-and-bloat",
+    "primary-vs-secondary-indexes",
+    "row-vs-column-storage",
+    "storage-management",
+    "wal-redo-undo-and-durability"
+   ],
+   "words": 939,
+   "ru": "notes-ru/databases/internals/how-tables-and-indexes-are-stored.md",
+   "title_ru": "Как таблицы и индексы хранятся на диске"
+  },
+  {
+   "id": "primary-vs-secondary-indexes",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "Primary (clustered) vs secondary indexes",
+   "tags": [
+    "databases",
+    "indexes",
+    "innodb",
+    "postgres",
+    "uuid"
+   ],
+   "learned": "2026-10-30",
+   "order": 3,
+   "path": "notes/databases/internals/primary-vs-secondary-indexes.md",
+   "links": [
+    "b-tree-vs-b-plus-tree",
+    "database-indexes",
+    "how-tables-and-indexes-are-stored",
+    "postgres-architecture",
+    "postgres-indexes",
+    "time-money-and-ids",
+    "wal-redo-undo-and-durability"
+   ],
+   "words": 901,
+   "ru": "notes-ru/databases/internals/primary-vs-secondary-indexes.md",
+   "title_ru": "Первичные (кластеризованные) и вторичные индексы"
+  },
+  {
+   "id": "row-vs-column-storage",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "Row-oriented vs column-oriented storage",
+   "tags": [
+    "databases",
+    "storage",
+    "columnar",
+    "olap",
+    "oltp"
+   ],
+   "learned": "2026-10-30",
+   "order": 2,
+   "path": "notes/databases/internals/row-vs-column-storage.md",
+   "links": [
+    "column-and-wide-column-stores",
+    "cpu-caches-and-cache-lines",
+    "database-wire-protocols",
+    "how-tables-and-indexes-are-stored",
+    "sql-vs-nosql-choosing",
+    "storage-choices"
+   ],
+   "words": 798,
+   "ru": "notes-ru/databases/internals/row-vs-column-storage.md",
+   "title_ru": "Строковое и колоночное хранение"
+  },
+  {
+   "id": "wal-redo-undo-and-durability",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "WAL, redo and undo logs, and durability",
+   "tags": [
+    "databases",
+    "wal",
+    "durability",
+    "recovery",
+    "fsync"
+   ],
+   "learned": "2026-10-30",
+   "order": 5,
+   "path": "notes/databases/internals/wal-redo-undo-and-durability.md",
+   "links": [
+    "database-engines",
+    "how-tables-and-indexes-are-stored",
+    "postgres-architecture",
+    "postgres-replication-and-failover",
+    "postgres-vacuum-and-bloat",
+    "primary-vs-secondary-indexes",
+    "redis-patterns-and-persistence",
+    "storage-management",
+    "transactions-acid-and-isolation"
+   ],
+   "words": 934,
+   "ru": "notes-ru/databases/internals/wal-redo-undo-and-durability.md",
+   "title_ru": "WAL, журналы redo и undo и надёжность хранения"
   },
   {
    "id": "column-and-wide-column-stores",
@@ -3597,6 +3941,33 @@
    "title_ru": "Основы Elasticsearch: инвертированный индекс, маппинги, когда применять"
   },
   {
+   "id": "memcached-architecture",
+   "sec": "databases",
+   "sub": "nosql",
+   "title": "Memcached architecture",
+   "tags": [
+    "memcached",
+    "caching",
+    "nosql",
+    "in-memory"
+   ],
+   "learned": "2026-10-30",
+   "path": "notes/databases/nosql/memcached-architecture.md",
+   "links": [
+    "caching",
+    "consistent-hashing",
+    "distributed-cache-coherence",
+    "lru-cache-design",
+    "redis-data-structures",
+    "redis-patterns-and-persistence",
+    "socket-management",
+    "udp-in-depth"
+   ],
+   "words": 761,
+   "ru": "notes-ru/databases/nosql/memcached-architecture.md",
+   "title_ru": "Архитектура Memcached"
+  },
+  {
    "id": "mongodb-basics",
    "sec": "databases",
    "sub": "nosql",
@@ -3611,19 +3982,25 @@
    "path": "notes/databases/nosql/mongodb-basics.md",
    "links": [
     "aggregates-and-invariants",
+    "b-tree-vs-b-plus-tree",
+    "database-cursors",
+    "database-engines",
     "database-indexes",
+    "database-wire-protocols",
     "explain-analyze",
     "idempotency",
     "leader-follower-replication",
     "normalization-and-denormalization",
+    "primary-vs-secondary-indexes",
     "raft-explained",
     "read-replicas-and-stale-reads",
     "schema-migrations-flyway-liquibase",
     "sharding-strategies",
     "sql-vs-nosql-choosing",
-    "time-money-and-ids"
+    "time-money-and-ids",
+    "wal-redo-undo-and-durability"
    ],
-   "words": 1047,
+   "words": 1217,
    "ru": "notes-ru/databases/nosql/mongodb-basics.md",
    "title_ru": "Основы MongoDB: документы, индексы, агрегация, транзакции"
   },
@@ -3642,9 +4019,13 @@
    "links": [
     "idempotency",
     "kafka-architecture",
-    "spring-cache-abstraction"
+    "memcached-architecture",
+    "redis-patterns-and-persistence",
+    "socket-management",
+    "spring-cache-abstraction",
+    "wal-redo-undo-and-durability"
    ],
-   "words": 304,
+   "words": 547,
    "ru": "notes-ru/databases/nosql/redis-data-structures.md",
    "title_ru": "Шпаргалка по структурам данных Redis"
   },
@@ -3700,9 +4081,39 @@
     "postgres-performance-checklist",
     "query-planning-and-execution"
    ],
-   "words": 1041,
+   "words": 1244,
    "ru": "notes-ru/databases/postgres/explain-analyze.md",
    "title_ru": "Чтение планов EXPLAIN ANALYZE в Postgres"
+  },
+  {
+   "id": "postgres-architecture",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Postgres architecture: processes, memory and the life of an UPDATE",
+   "tags": [
+    "postgres",
+    "architecture",
+    "processes",
+    "mvcc",
+    "hot"
+   ],
+   "learned": "2026-10-30",
+   "order": 1,
+   "path": "notes/databases/postgres/postgres-architecture.md",
+   "links": [
+    "database-wire-protocols",
+    "hikaricp-pool-sizing",
+    "how-tables-and-indexes-are-stored",
+    "postgres-performance-checklist",
+    "postgres-replication-and-failover",
+    "postgres-vacuum-and-bloat",
+    "primary-vs-secondary-indexes",
+    "process-management",
+    "wal-redo-undo-and-durability"
+   ],
+   "words": 843,
+   "ru": "notes-ru/databases/postgres/postgres-architecture.md",
+   "title_ru": "Архитектура Postgres: процессы, память и жизнь UPDATE"
   },
   {
    "id": "postgres-indexes",
@@ -3720,9 +4131,11 @@
     "database-indexes",
     "jpa-n-plus-one",
     "outbox-pattern",
-    "postgres-isolation-levels"
+    "postgres-isolation-levels",
+    "primary-vs-secondary-indexes",
+    "schema-migrations-flyway-liquibase"
    ],
-   "words": 904,
+   "words": 1263,
    "ru": "notes-ru/databases/postgres/postgres-indexes.md",
    "title_ru": "Типы индексов в Postgres и когда их применять"
   },
@@ -3740,11 +4153,13 @@
    "learned": "2026-09-12",
    "path": "notes/databases/postgres/postgres-isolation-levels.md",
    "links": [
+    "concurrency-control",
     "idempotency",
-    "postgres-indexes",
-    "spring-transactional"
+    "postgres-vacuum-and-bloat",
+    "spring-transactional",
+    "transactions-acid-and-isolation"
    ],
-   "words": 218,
+   "words": 840,
    "ru": "notes-ru/databases/postgres/postgres-isolation-levels.md",
    "title_ru": "Уровни изоляции транзакций в Postgres"
   },
@@ -3788,6 +4203,7 @@
    "learned": "2026-10-27",
    "path": "notes/databases/postgres/postgres-locks.md",
    "links": [
+    "concurrency-control",
     "deadlocks-and-synchronization-primitives",
     "distributed-locks-and-fencing",
     "jpa-locking",
@@ -3796,7 +4212,7 @@
     "race-conditions-and-critical-sections",
     "schema-migrations-flyway-liquibase"
    ],
-   "words": 1072,
+   "words": 1207,
    "ru": "notes-ru/databases/postgres/postgres-locks.md",
    "title_ru": "Блокировки в Postgres: строки, таблицы, advisory и deadlock"
   },
@@ -3814,14 +4230,16 @@
    "learned": "2026-10-27",
    "path": "notes/databases/postgres/postgres-partitioning.md",
    "links": [
+    "cross-shard-queries-and-transactions",
     "database-scaling-path",
     "explain-analyze",
     "postgres-indexes",
     "postgres-vacuum-and-bloat",
+    "row-vs-column-storage",
     "sharding-strategies",
     "time-money-and-ids"
    ],
-   "words": 1061,
+   "words": 1417,
    "ru": "notes-ru/databases/postgres/postgres-partitioning.md",
    "title_ru": "Декларативное партиционирование в Postgres"
   },
@@ -3851,10 +4269,12 @@
     "postgres-replication-and-failover",
     "postgres-vacuum-and-bloat",
     "query-planning-and-execution",
+    "sharding-strategies",
     "slo-sli-and-alerting",
-    "spring-transactional"
+    "spring-transactional",
+    "wal-redo-undo-and-durability"
    ],
-   "words": 886,
+   "words": 1050,
    "ru": "notes-ru/databases/postgres/postgres-performance-checklist.md",
    "title_ru": "Чек-лист производительности Postgres для Spring-сервиса"
   },
@@ -3881,7 +4301,7 @@
     "read-replicas-and-stale-reads",
     "read-write-splitting-and-cqrs-lite"
    ],
-   "words": 990,
+   "words": 1088,
    "ru": "notes-ru/databases/postgres/postgres-replication-and-failover.md",
    "title_ru": "Потоковая репликация и механика failover в Postgres"
   },
@@ -4708,7 +5128,7 @@
     "quorums-and-leader-election",
     "slo-sli-and-alerting"
    ],
-   "words": 897,
+   "words": 1010,
    "ru": "notes-ru/distributed-systems/fundamentals/cap-and-pacelc.md",
    "title_ru": "CAP и PACELC — что на самом деле значат буквы"
   },
@@ -4726,9 +5146,11 @@
    "learned": "2026-10-27",
    "path": "notes/distributed-systems/fundamentals/consistency-models.md",
    "links": [
+    "caching",
     "cap-and-pacelc",
     "distributed-cache-coherence",
     "distributed-locks-and-fencing",
+    "idempotency",
     "kafka-consumer",
     "latency-numbers",
     "leader-follower-replication",
@@ -4741,7 +5163,7 @@
     "time-and-clocks",
     "transactions-acid-and-isolation"
    ],
-   "words": 935,
+   "words": 1063,
    "ru": "notes-ru/distributed-systems/fundamentals/consistency-models.md",
    "title_ru": "Модели согласованности от линеаризуемой до согласованности в конечном счёте"
   },
@@ -4905,7 +5327,7 @@
     "transactions-acid-and-isolation",
     "virtual-threads"
    ],
-   "words": 1004,
+   "words": 1087,
    "ru": "notes-ru/distributed-systems/partitioning/cross-shard-queries-and-transactions.md",
    "title_ru": "Межшардовые запросы и транзакции, scatter-gather и 2PC"
   },
@@ -4939,7 +5361,7 @@
     "schema-migrations-flyway-liquibase",
     "search-and-indexing-services"
    ],
-   "words": 964,
+   "words": 1213,
    "ru": "notes-ru/distributed-systems/partitioning/sharding-strategies.md",
    "title_ru": "Стратегии шардирования: по диапазону, по хешу и через справочник"
   },
@@ -5104,9 +5526,10 @@
     "postgres-vacuum-and-bloat",
     "quorums-and-leader-election",
     "raft-explained",
-    "read-replicas-and-stale-reads"
+    "read-replicas-and-stale-reads",
+    "sharding-strategies"
    ],
-   "words": 951,
+   "words": 1058,
    "ru": "notes-ru/distributed-systems/replication/leader-follower-replication.md",
    "title_ru": "Репликация лидер-follower, синхронная и асинхронная, и failover"
   },
@@ -5135,7 +5558,7 @@
     "time-and-clocks",
     "time-money-and-ids"
    ],
-   "words": 928,
+   "words": 998,
    "ru": "notes-ru/distributed-systems/replication/multi-leader-and-leaderless.md",
    "title_ru": "Репликация с несколькими лидерами и без лидера"
   },
@@ -6490,15 +6913,17 @@
    "path": "notes/networking/http/http-1-1-vs-2-vs-3.md",
    "links": [
     "cdn",
+    "database-wire-protocols",
     "dns-resolution",
     "grpc-and-protobuf",
+    "head-of-line-blocking",
     "kubernetes-basics",
     "load-balancers-l4-vs-l7",
     "rest-clients",
     "tcp-vs-udp",
     "tls-handshake-and-certificates"
    ],
-   "words": 999,
+   "words": 1060,
    "ru": "notes-ru/networking/http/http-1-1-vs-2-vs-3.md",
    "title_ru": "HTTP/1.1, HTTP/2 и HTTP/3"
   },
@@ -7253,10 +7678,13 @@
    "links": [
     "backpressure-and-flow-control",
     "circuit-breaker",
+    "database-wire-protocols",
     "dns-resolution",
     "hikaricp-pool-sizing",
     "java-nio",
     "kafka-producer",
+    "postgres-architecture",
+    "postgres-performance-checklist",
     "rest-clients",
     "socket-management",
     "spring-reactive-webclient-sse",
@@ -7265,7 +7693,7 @@
     "tcp-vs-udp",
     "virtual-threads"
    ],
-   "words": 880,
+   "words": 1052,
    "ru": "notes-ru/networking/transport/sockets-and-connection-pooling.md",
    "title_ru": "Сокеты и пулы соединений"
   },
@@ -8762,7 +9190,7 @@
     "storage-choices",
     "system-design-basics"
    ],
-   "words": 1058,
+   "words": 1116,
    "ru": "notes-ru/system-design/case-studies/design-news-feed.md",
    "title_ru": "Проектирование ленты новостей"
   },
@@ -8895,11 +9323,12 @@
     "multi-region-basics",
     "owasp-top-10-for-backend",
     "postgres-partitioning",
+    "sharding-strategies",
     "storage-choices",
     "system-design-basics",
     "time-money-and-ids"
    ],
-   "words": 1070,
+   "words": 1143,
    "ru": "notes-ru/system-design/case-studies/design-url-shortener.md",
    "title_ru": "Проектирование сокращателя ссылок"
   },

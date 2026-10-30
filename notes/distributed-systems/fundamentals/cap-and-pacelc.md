@@ -36,6 +36,12 @@ CAP says: when a network partition happens, a system must choose between staying
 | Cassandra / Dynamo | PA | EL | tunable `W + R > N` moves it toward EC |
 | MongoDB (majority write/read concern) | PC | EC | default concerns are weaker and shift it toward EL |
 
+### CAP and the databases you use
+- A single-node Postgres or MySQL is not a CAP system at all: no partition between replicas, so it is "CA" only in the trivial sense; if the node is unreachable, it is unavailable.
+- Postgres with async replicas reading from replicas: during a partition, replicas stay available with stale data (AP for reads), writes stop if the primary is cut off (CP for writes).
+- MongoDB with `w: "majority"` and majority reads, etcd, ZooKeeper: CP. Cassandra and DynamoDB at low consistency levels: AP, tunable per query.
+- The course's framing: consistency and availability are trade-offs you choose **per operation**, not a label on the product.
+
 ### Interview framing
 - "Which do you pick, C or A?" Answer with the operation: "for the eSIM activation I need C, a duplicated activation costs money; for the activity feed A is fine." Then name the mechanism: quorum, leader, idempotent retry ([[idempotency]]).
 - "Is CAP still relevant?" Yes as a reminder that partitions force a decision; no as a taxonomy. PACELC and [[consistency-models]] are the better vocabulary.
