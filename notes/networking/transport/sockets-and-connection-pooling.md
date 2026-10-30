@@ -36,6 +36,13 @@ A socket is a file descriptor the kernel ties to a 4-tuple and two buffers; crea
 | Kafka producer/consumer | one connection per broker, no pool to tune | long-lived; `connections.max.idle.ms` ([[kafka-producer]]) |
 | Lettuce (Redis) | single multiplexed connection by default | pooling only for blocking commands/transactions |
 
+### Database connection pools
+- Opening a database connection costs a TCP handshake, often TLS, authentication (SCRAM is several round trips) and, in Postgres, forking a backend process: milliseconds per connection ([[database-wire-protocols]], [[postgres-architecture]]). A pool pays it once.
+- Demo from the course: a Node.js endpoint that opens a new `pg` client per request vs one using `pg.Pool`: the pooled version is several times faster and the database does not run out of connections under load.
+- Pool size is about the database, not the app: a few connections per CPU core of the database server, shared by all app instances ([[hikaricp-pool-sizing]]).
+- **One connection is not thread-safe for concurrent use**: the protocol is a strict request–response sequence on one socket, and a transaction belongs to the connection. Two threads sharing it interleave statements into each other's transactions. Each thread borrows its own connection from the pool and returns it after the transaction.
+- Transaction pooling proxies (PgBouncer) multiply app connections onto few server backends, at the cost of session state ([[postgres-performance-checklist]]).
+
 ## Example
 A Java 21 `HttpClient` configured as a shared, pooled bean with explicit timeouts, which is what most teams get wrong by creating a new client per call (each client owns its own pool and executor).
 ```java

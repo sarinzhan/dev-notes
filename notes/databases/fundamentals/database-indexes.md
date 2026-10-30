@@ -46,6 +46,24 @@ An index is an extra data structure kept next to a table so that the DBMS can fi
 - Leading wildcard `LIKE '%abc%'` cannot use a B-tree.
 - Unused indexes should be found (`pg_stat_user_indexes.idx_scan`) and dropped.
 
+### Key vs non-key columns
+- **Key columns** are what the tree is sorted and searched by. **Non-key (included) columns** are only stored in the leaf entries to answer the query without visiting the table.
+- Demo from a 5-million-row `students(id, grade, name)` table: `SELECT name FROM students WHERE grade BETWEEN 90 AND 100` with an index on `(grade)` does a bitmap/index scan plus thousands of heap fetches; with `(grade) INCLUDE (name)` it becomes an index-only scan and drops from seconds to tens of milliseconds. The index gets bigger, so include only columns that hot queries really read.
+
+### Combining indexes
+- Two separate indexes on `a` and `b`: for `WHERE a = 1 AND b = 2` the planner may use one index and filter the rest, or build a **bitmap** from each and AND them (`BitmapAnd`); for `OR` it uses `BitmapOr`, which a composite index cannot do.
+- A composite `(a, b)` beats the bitmap combination for frequent `AND` queries; separate indexes are more flexible for ad-hoc filters and `OR`.
+
+### How the optimizer decides
+- It estimates how many rows match from **statistics** (histograms, most common values, n_distinct) and prices each plan: random page reads cost more than sequential ones (`random_page_cost` vs `seq_page_cost`). Few rows → index scan; medium → bitmap scan; many → sequential scan ([[query-planning-and-execution]]).
+- So "I have an index, why is it not used?": the value is common (stats say 30 % of rows), statistics are stale, the predicate wraps the column in a function, or the table is tiny. Postgres has no index hints; fix the cause, or test with `SET enable_seqscan = off` only to compare.
+- MySQL lets you force (`FORCE INDEX`); SQL Server has hints; use them as a last resort because data distributions change.
+
+### Duplicates and unused indexes
+- An index on a column with many duplicates stores one entry per row (Postgres 13+ deduplicates equal keys in a leaf into one key + a list of row ids, so the index is much smaller). It helps only for the rare values; for the common ones the planner will scan anyway. A **partial index** on the rare value is better.
+- Unused indexes still cost every write, take memory and slow vacuum. Find them with `idx_scan = 0` over a long window (and on replicas too: statistics are per server), make sure they do not back a constraint, then `DROP INDEX CONCURRENTLY`.
+- Physical layout details: [[how-tables-and-indexes-are-stored]], [[b-tree-vs-b-plus-tree]], [[primary-vs-secondary-indexes]].
+
 ## Example
 ```sql
 -- Queue-style table: workers pull the oldest pending rows for a given shard

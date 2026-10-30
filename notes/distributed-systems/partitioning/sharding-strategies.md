@@ -42,6 +42,20 @@ Sharding (horizontal partitioning across nodes) splits one logical dataset by a 
 - Never `hash mod N` with N = number of nodes; adding one node remaps nearly every key ([[consistent-hashing]]).
 - Rebalancing competes with production traffic for IO; throttle it and do not run it automatically on a flapping node ([[failure-modes-and-timeouts]]).
 
+### Sharding by hand (the course demo)
+- Three Postgres containers (`pgshard1..3`) with the same `url_table(id serial, url text, url_id char(5))` schema. The application holds a **consistent hash ring** of the three servers ([[consistent-hashing]]).
+- **Write**: hash the URL to a 5-character `url_id`, ask the ring which server owns that id, insert there, return the id. **Read**: the id alone tells the app which shard to query, one round trip, no scatter.
+- What the demo shows: routing is application code, every client must share the same ring, adding a fourth server means migrating the keys that move, and there is no cross-shard query or transaction.
+
+### Advantages and disadvantages
+| Advantages | Disadvantages |
+|---|---|
+| scales storage, writes and memory beyond one machine | complex client or proxy, routing must be correct everywhere |
+| smaller indexes per shard, better cache hit ratio | no cross-shard transactions, joins or global constraints |
+| failure of one shard affects only its keys | schema changes on N servers; rebalancing is a project |
+| shards can be placed near their users | queries without the key fan out to every shard |
+- When to consider sharding, in order: optimize queries and indexes, add cache, add read replicas, partition, scale up the server, split by service (each service its own DB). Shard only when writes or data size still outgrow one node; YouTube's Vitess and Instagram's Postgres shards are examples of the "we had no choice" stage ([[database-scaling-path]]).
+
 ## Example
 A directory-style router for a multi-tenant Postgres setup: one `DataSource` per shard, tenants mapped by a small table cached in memory, the hot tenant isolated on its own shard.
 ```java

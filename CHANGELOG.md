@@ -2,6 +2,9 @@
 
 What was added or changed in the vault, newest first. One line per change, with the pull request in brackets.
 
+## 2026-10-30
+- **Databases: notes from the Database Engineering course (sections 2–17).** New subsection `databases/internals` with 7 notes (storage pages and heap, row vs column, primary vs secondary indexes, B-tree vs B+tree, WAL/redo/undo, database engines, wire protocols); 7 more new notes (concurrency control, OFFSET vs keyset, cursors, Postgres architecture, Memcached, DB security, homomorphic encryption); 23 existing notes expanded (ACID, isolation levels rewritten, indexes, EXPLAIN, partitioning, sharding, replication, MongoDB/Redis internals…); B-tree content moved from trees-and-bst; 8 animations. [#33](https://github.com/sarinzhan/dev-notes/pull/33)
+
 ## 2026-10-29
 - **Changes page on the site:** a "Changes" tab next to Notes and Graph shows this changelog (`#changes`). [#32](https://github.com/sarinzhan/dev-notes/pull/32)
 - **Changelog added** (`CHANGELOG.md`), backfilled from all earlier PRs. [#31](https://github.com/sarinzhan/dev-notes/pull/31)

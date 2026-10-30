@@ -29,6 +29,8 @@ GET  /v1/users/{id}/posts?cursor=     (profile timeline, separate from the home 
 - `post_cache:{postId}` — Redis hash with the rendered post, TTL hours, so the feed read never touches Postgres for hot posts.
 - Counters (likes, comments) in Redis with periodic flush to Postgres.
 
+- Database design walkthrough (from the course's Twitter exercise): `profile(id, name, followers_count, following_count)`, `follows(source_id, target_id)` with indexes in both directions, `tweet(id, profile_id, content, created_at)` partitioned by time, `likes(tweet_id, profile_id)`. Counts are **stored columns** updated asynchronously, never `count(*)` over billions of follow rows; the home timeline is precomputed rather than a join of follows × tweets at read time.
+
 ### High-level design
 ```
 POST /posts ──▶ post service ──tx: post + outbox──▶ Postgres ──relay──▶ Kafka post.created

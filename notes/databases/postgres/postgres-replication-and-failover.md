@@ -42,6 +42,10 @@ Postgres replicates by shipping the **write-ahead log (WAL)** from a primary to 
 - `CREATE PUBLICATION` on the source, `CREATE SUBSCRIPTION` on the target; the walsender decodes WAL into inserts/updates/deletes (`pgoutput` plugin) via a logical slot. Tables need a `REPLICA IDENTITY` (primary key by default) for updates and deletes.
 - Use cases: major-version upgrades with minimal downtime, replicating a subset of tables to a reporting database, feeding Debezium/CDC for the [[outbox-pattern]]. DDL and sequences (before PG 17) are not replicated; migrations must run on both sides.
 
+### Demo: a standby in Docker
+- The course builds master/standby by hand: start a primary container, copy its data directory to a second container (in practice `pg_basebackup -R`, which also writes `standby.signal` and `primary_conninfo`), start the standby, then create a table on the primary and watch it appear on the standby; writes on the standby fail with `cannot execute INSERT in a read-only transaction`.
+- Setting `synchronous_standby_names = 'first 1 (standby1)'` turns it synchronous: stop the standby and every commit on the primary hangs until it returns. That is the availability price of zero data loss ([[leader-follower-replication]]).
+
 ## Example
 ```bash
 # Lag per standby, run on the primary

@@ -44,6 +44,25 @@ B-tree is the default and right 90% of the time. Reach for GIN for `jsonb` / arr
 - Every index adds work to each `INSERT`/`UPDATE`/`DELETE` and defeats HOT updates when an indexed column changes. Five indexes on a hot table can halve write throughput.
 - Bloat: dead index tuples accumulate; B-tree deduplication (PG 13) and bottom-up deletion (PG 14) reduce it. Measure with `pgstattuple`/`pg_stat_user_indexes`, fix with `REINDEX INDEX CONCURRENTLY` (PG 12). Drop unused ones (`pg_stat_user_indexes.idx_scan = 0`).
 
+### Seq scan vs index scan vs bitmap scan
+- **Index Scan**: for each matching index entry, fetch its heap page. Best for a handful of rows; with many rows the same heap page may be read many times in random order.
+- **Bitmap Index Scan + Bitmap Heap Scan**: first read all matching index entries and build a bitmap of **pages** (one bit per page), then read those pages once each in physical order and re-check the condition (`Recheck Cond`). Good for medium selectivity and for combining indexes with `BitmapAnd`/`BitmapOr`; it loses the index order, so an `ORDER BY` needs a sort.
+- **Seq Scan**: when most pages contain a matching row anyway, reading them sequentially is cheapest.
+- Heap fetches instead of index-only: if `Heap Fetches` is high in an Index Only Scan, the visibility map is stale; VACUUM the table.
+- Index scan vs index seek: Postgres has one "Index Scan" node; an `Index Cond` means a seek to a key or range, and without one (only for ordering) it reads the index end to end.
+
+### CREATE INDEX CONCURRENTLY, step by step
+1. Creates the index entry in the catalog as **invalid** and waits for all transactions that could modify the table to finish.
+2. First table scan builds the index; writes during the build are not in it yet.
+3. Waits again, then a second scan adds rows changed during the first pass.
+4. Waits for old snapshots to finish and marks the index **valid**.
+- If it fails (duplicate key for a unique index, cancel), an **invalid** index stays behind: it costs writes but is never used. Find with `pg_index.indisvalid = false`, drop and retry.
+- A plain `CREATE INDEX` on a busy table blocks all writes for the whole build: minutes of downtime on a large table ([[schema-migrations-flyway-liquibase]]).
+
+### Postgres vs MySQL indexing
+- Postgres indexes point to the heap tuple (ctid); InnoDB secondary indexes store the primary key. Consequences for update cost, UUID keys and covering indexes: [[primary-vs-secondary-indexes]].
+- InnoDB secondary indexes are implicitly covering for the PK columns (they are in every entry); in Postgres you add them with `INCLUDE`.
+
 ## Example
 ```sql
 -- queue table: tiny partial index on the hot rows only

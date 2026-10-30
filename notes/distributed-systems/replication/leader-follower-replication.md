@@ -42,6 +42,15 @@ In leader-follower (primary-replica, master-slave) replication one node accepts 
 ### Setting up a follower
 - Copy a consistent snapshot of the leader (Postgres `pg_basebackup`), note the log position, stream from there. The leader must retain log from that position: Postgres **replication slots** do this and are the classic way to fill a disk when a follower is away ([[postgres-vacuum-and-bloat]]).
 
+### Pros and cons of replication
+| Pros | Cons |
+|---|---|
+| read scaling: spread reads over followers | eventual consistency on async followers: stale reads ([[read-replicas-and-stale-reads]]) |
+| high availability: promote a follower when the leader dies | sync replication adds commit latency and can block writes |
+| a follower near users in another region | more servers, WAL/bandwidth cost, failover tooling to run |
+| backups and long reports run on a follower, not the leader | writes still go to one node: replication does not scale writes (that needs [[sharding-strategies]]) |
+- Vocabulary: master/standby = leader/follower = primary/replica; multi-master = multi-leader ([[multi-leader-and-leaderless]]).
+
 ## Example
 Postgres primary with one synchronous and one asynchronous standby, plus per-transaction control so only money-relevant commits pay for the sync round trip.
 ```yaml

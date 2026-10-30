@@ -71,6 +71,7 @@
   "name": "Databases",
   "subs": {
    "fundamentals": "Fundamentals",
+   "internals": "Internals & storage engines",
    "postgres": "PostgreSQL",
    "nosql": "NoSQL",
    "design": "Data modeling & migrations"
@@ -78,6 +79,7 @@
   "name_ru": "Базы данных",
   "subs_ru": {
    "fundamentals": "Основы",
+   "internals": "Внутреннее устройство и движки",
    "postgres": "PostgreSQL",
    "nosql": "NoSQL",
    "design": "Моделирование и миграции"

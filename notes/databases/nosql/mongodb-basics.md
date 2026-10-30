@@ -41,6 +41,13 @@ MongoDB stores BSON documents in collections; each document is a self-contained 
 ### Spring Data MongoDB
 - `MongoTemplate` for explicit queries and updates, `MongoRepository` for derived queries; `@Document`, `@Indexed`, `@CompoundIndex`; `@Transactional` works with a `MongoTransactionManager`. Map `Decimal128` to `BigDecimal` for money; the default `Double` is wrong for it.
 
+### Internals
+- Storage engine: **WiredTiger** since 3.2 (MMAPv1 removed in 4.2). Each collection and each index is a separate WiredTiger table, a B+tree ([[b-tree-vs-b-plus-tree]], [[database-engines]]). Documents are compressed on disk (snappy by default, zstd optional), indexes use prefix compression.
+- Concurrency: document-level locking with MVCC snapshots; checkpoints every 60 s plus a **journal** (write-ahead log, group-committed every 100 ms or on `j: true`) for durability between checkpoints ([[wal-redo-undo-and-durability]]).
+- A regular collection is keyed by a hidden **RecordId**; the `_id` index and every secondary index map key → RecordId, so a lookup by a secondary field is index → RecordId → document (like a Postgres heap lookup, two B+tree descents).
+- **Clustered collections** (5.3+) store documents in the `_id` B+tree itself, like an InnoDB table: no separate `_id` index, faster range scans and inserts in `_id` order, but secondary indexes then store the `_id` value, so a large `_id` makes them bigger ([[primary-vs-secondary-indexes]]).
+- The wire protocol is OP_MSG with BSON; query results arrive in cursor batches ([[database-wire-protocols]], [[database-cursors]]).
+
 ## Example
 ```javascript
 // Subscriber profile as one document; per-operator settings embedded, history referenced

@@ -45,9 +45,8 @@ Inserting already sorted keys into a naive BST produces a linked list, the stand
 Red-black trades slightly worse balance for cheaper writes, so it is the default for general-purpose libraries. A rotation is an O(1) pointer rewrite that preserves in-order and lowers one subtree by one level.
 
 ### B-trees and B+-trees
-- Each node holds up to hundreds of keys and children and is sized to one disk/page block (8 KB in Postgres). Height stays 3–4 for billions of rows, so a lookup is 3–4 page reads, most of them cached.
-- **B+-tree**: values only in leaves, leaves linked for range scans; this is Postgres and InnoDB. Theory and selectivity in [[database-indexes]], Postgres specifics in [[postgres-indexes]].
-- LSM trees (RocksDB, Cassandra) are the write-optimized alternative ([[column-and-wide-column-stores]]).
+- A B-tree is a balanced search tree with very wide nodes (hundreds of keys, one node = one disk page), so it stays 3–4 levels deep for billions of keys; a B+tree keeps values only in linked leaves. This is the structure behind database indexes; the full treatment (search, splits, B-tree vs B+tree, page size, MySQL vs Postgres) lives in [[b-tree-vs-b-plus-tree]].
+- LSM trees (RocksDB, Cassandra) are the write-optimized alternative ([[database-engines]]).
 
 ### Other trees you will meet
 - **Trie**: a tree over characters for prefix search ([[tries]]).

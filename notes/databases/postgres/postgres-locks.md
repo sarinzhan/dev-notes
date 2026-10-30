@@ -39,6 +39,12 @@ Postgres takes **row locks** for `UPDATE`/`DELETE`/`SELECT ... FOR UPDATE` and *
 - Prevention: lock rows in a consistent order (sort ids before `UPDATE ... WHERE id IN (...)` or lock them with `SELECT ... FOR UPDATE ORDER BY id`), keep transactions short, avoid updating parent and child tables in different orders across code paths. Foreign-key checks are a frequent hidden participant.
 - Deadlocks across a database and something else (a JVM `synchronized` block or a Redis lock) are not detected by anyone; see [[deadlocks-and-synchronization-primitives]].
 
+### Where locks live
+- **Row locks are not in memory**: Postgres writes the locker's transaction id into the tuple's `xmax` (with flag bits for the mode), so locking a million rows costs disk writes but no lock-table memory and no lock escalation. When several transactions share a row lock (`FOR SHARE`, FK checks), the tuple points to a **MultiXact** id that lists them.
+- A transaction that has to **wait** for a row lock waits on the other transaction's id (visible in `pg_locks` as `transactionid`), not on the row.
+- **Table locks** live in the shared lock table (`max_locks_per_transaction` × connections); weak locks on a few tables go through a per-backend **fast path** that avoids the shared table.
+- Compare InnoDB: row locks are index-record locks in memory, plus gap and next-key locks ([[concurrency-control]]).
+
 ### Advisory locks
 - `pg_advisory_lock(key)` / `pg_try_advisory_lock(key)` (session-scoped, must be unlocked) and `pg_advisory_xact_lock(key)` (released at commit) lock an application-defined `bigint` or `(int, int)` pair with no table involved.
 - Uses: one scheduler instance runs the nightly job (`SELECT pg_try_advisory_lock(hashtext('billing-run'))`), serialize all writes for one subscriber without locking rows that may not exist yet, prevent duplicate inserts before a unique constraint is possible. It is a single-database lock; as a cross-service distributed lock it has the same fencing problems as any lease ([[distributed-locks-and-fencing]]).

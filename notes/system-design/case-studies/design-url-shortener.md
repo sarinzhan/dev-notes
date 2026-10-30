@@ -28,6 +28,8 @@ DELETE /v1/links/{code}
 - `click_daily(code, day, count)` or raw `click(code, ts, referer, ua_hash)` partitioned by day for analytics ([[postgres-partitioning]]).
 - Postgres is enough for 600 M rows; a KV store (DynamoDB/Cassandra) if multi-region writes are needed ([[storage-choices]]).
 
+- Database-backend view (from the course): the simplest schema is `url_table(id serial PK, url text)` with the code = base62(id); the read is a primary-key lookup, the write an insert. Alternative: code = first 8 chars of a hash, stored in an indexed `short_url` column, with a collision check on insert. At billions of rows, the code itself becomes the shard key and the app routes to the shard that owns it ([[sharding-strategies]]).
+
 ### High-level design
 ```
 browser ──GET /abc1234──▶ CDN / edge (cached 302 for hot codes)

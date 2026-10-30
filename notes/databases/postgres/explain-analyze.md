@@ -53,6 +53,16 @@ Index Scan using sim_msisdn_idx on sim  (cost=0.43..8.45 rows=1 width=120) (actu
 4. Check `Buffers`: `read` ≫ `hit` means cold cache or a working set larger than memory; `temp written` means a spill.
 5. Fix the root cause (index, statistics, query shape), re-run, compare.
 
+### What the cost unit is
+- Cost has no unit of time. It is measured in "sequential page fetches": `seq_page_cost = 1.0` by definition; `random_page_cost = 4.0` (1.1 on SSD is common), `cpu_tuple_cost = 0.01`, `cpu_index_tuple_cost = 0.005`, `cpu_operator_cost = 0.0025`.
+- Seq Scan cost ≈ `pages × seq_page_cost + rows × cpu_tuple_cost`. You can reproduce the number from `pg_class.relpages` and `reltuples`.
+- Costs are only comparable between plans for the same query on the same server; use them to understand the planner's choice, and `actual time` to measure.
+
+### What EXPLAIN ANALYZE actually does
+- Plain `EXPLAIN` plans the query and prints estimates; nothing runs. `EXPLAIN ANALYZE` **executes** it fully (an UPDATE really updates, so wrap in a rolled-back transaction) but discards the result rows instead of sending them, so network and client time are not included.
+- It instruments every node with timers. On machines with a slow clock source the timing overhead can double the runtime of a query with millions of rows; `EXPLAIN (ANALYZE, TIMING OFF)` keeps row counts and drops per-node timing.
+- The rows are not sent to the client, so serialization of wide or TOASTed values is skipped too; Postgres 17 `SERIALIZE` adds it back.
+
 ## Example
 ```sql
 EXPLAIN (ANALYZE, BUFFERS)

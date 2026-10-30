@@ -1129,6 +1129,19 @@
    ]
   },
   {
+   "id": "homomorphic-encryption",
+   "sec": "computer-science",
+   "sub": "security-basics",
+   "title": "Homomorphic encryption",
+   "tags": [
+    "security",
+    "cryptography",
+    "encryption",
+    "privacy",
+    "databases"
+   ]
+  },
+  {
    "id": "owasp-top-10-for-backend",
    "sec": "computer-science",
    "sub": "security-basics",
@@ -1180,6 +1193,19 @@
    ]
   },
   {
+   "id": "database-security-and-permissions",
+   "sec": "databases",
+   "sub": "design",
+   "title": "Database security and permissions",
+   "tags": [
+    "databases",
+    "security",
+    "postgres",
+    "permissions",
+    "least-privilege"
+   ]
+  },
+  {
    "id": "multi-tenancy-strategies",
    "sec": "databases",
    "sub": "design",
@@ -1218,6 +1244,19 @@
    ]
   },
   {
+   "id": "concurrency-control",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Database concurrency control",
+   "tags": [
+    "databases",
+    "locking",
+    "concurrency",
+    "transactions",
+    "deadlocks"
+   ]
+  },
+  {
    "id": "constraints-and-relationships",
    "sec": "databases",
    "sub": "fundamentals",
@@ -1227,6 +1266,19 @@
     "constraints",
     "foreign-keys",
     "schema-design"
+   ]
+  },
+  {
+   "id": "database-cursors",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Database cursors (server-side vs client-side)",
+   "tags": [
+    "databases",
+    "cursors",
+    "jdbc",
+    "postgres",
+    "streaming"
    ]
   },
   {
@@ -1263,6 +1315,18 @@
     "schema-design",
     "normalization",
     "sql"
+   ]
+  },
+  {
+   "id": "pagination-offset-vs-keyset",
+   "sec": "databases",
+   "sub": "fundamentals",
+   "title": "Pagination: OFFSET vs keyset",
+   "tags": [
+    "databases",
+    "sql",
+    "pagination",
+    "performance"
    ]
   },
   {
@@ -1314,6 +1378,97 @@
    ]
   },
   {
+   "id": "b-tree-vs-b-plus-tree",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "B-tree vs B+tree in database systems",
+   "tags": [
+    "databases",
+    "indexes",
+    "b-tree",
+    "data-structures",
+    "storage"
+   ]
+  },
+  {
+   "id": "database-engines",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "Database engines (storage engines)",
+   "tags": [
+    "databases",
+    "storage-engines",
+    "innodb",
+    "rocksdb",
+    "lsm"
+   ]
+  },
+  {
+   "id": "database-wire-protocols",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "Database wire protocols (Postgres and MongoDB)",
+   "tags": [
+    "databases",
+    "protocols",
+    "postgres",
+    "mongodb",
+    "networking"
+   ]
+  },
+  {
+   "id": "how-tables-and-indexes-are-stored",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "How tables and indexes are stored on disk",
+   "tags": [
+    "databases",
+    "storage",
+    "pages",
+    "heap",
+    "indexes"
+   ]
+  },
+  {
+   "id": "primary-vs-secondary-indexes",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "Primary (clustered) vs secondary indexes",
+   "tags": [
+    "databases",
+    "indexes",
+    "innodb",
+    "postgres",
+    "uuid"
+   ]
+  },
+  {
+   "id": "row-vs-column-storage",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "Row-oriented vs column-oriented storage",
+   "tags": [
+    "databases",
+    "storage",
+    "columnar",
+    "olap",
+    "oltp"
+   ]
+  },
+  {
+   "id": "wal-redo-undo-and-durability",
+   "sec": "databases",
+   "sub": "internals",
+   "title": "WAL, redo and undo logs, and durability",
+   "tags": [
+    "databases",
+    "wal",
+    "durability",
+    "recovery",
+    "fsync"
+   ]
+  },
+  {
    "id": "column-and-wide-column-stores",
    "sec": "databases",
    "sub": "nosql",
@@ -1336,6 +1491,18 @@
     "search",
     "nosql",
     "inverted-index"
+   ]
+  },
+  {
+   "id": "memcached-architecture",
+   "sec": "databases",
+   "sub": "nosql",
+   "title": "Memcached architecture",
+   "tags": [
+    "memcached",
+    "caching",
+    "nosql",
+    "in-memory"
    ]
   },
   {
@@ -1383,6 +1550,19 @@
     "performance",
     "query-planner",
     "explain"
+   ]
+  },
+  {
+   "id": "postgres-architecture",
+   "sec": "databases",
+   "sub": "postgres",
+   "title": "Postgres architecture: processes, memory and the life of an UPDATE",
+   "tags": [
+    "postgres",
+    "architecture",
+    "processes",
+    "mvcc",
+    "hot"
    ]
   },
   {
@@ -4323,6 +4503,10 @@
   },
   {
    "source": "api-design-for-system-design",
+   "target": "pagination-offset-vs-keyset"
+  },
+  {
+   "source": "api-design-for-system-design",
    "target": "postgres-indexes"
   },
   {
@@ -4492,6 +4676,10 @@
   {
    "source": "api-security-checklist",
    "target": "cookies-sessions-and-cors"
+  },
+  {
+   "source": "api-security-checklist",
+   "target": "database-security-and-permissions"
   },
   {
    "source": "api-security-checklist",
@@ -4859,6 +5047,10 @@
   },
   {
    "source": "authentication-vs-authorization",
+   "target": "database-security-and-permissions"
+  },
+  {
+   "source": "authentication-vs-authorization",
    "target": "http-fundamentals"
   },
   {
@@ -4880,6 +5072,38 @@
   {
    "source": "authentication-vs-authorization",
    "target": "spring-security-basics"
+  },
+  {
+   "source": "b-tree-vs-b-plus-tree",
+   "target": "database-engines"
+  },
+  {
+   "source": "b-tree-vs-b-plus-tree",
+   "target": "database-indexes"
+  },
+  {
+   "source": "b-tree-vs-b-plus-tree",
+   "target": "how-tables-and-indexes-are-stored"
+  },
+  {
+   "source": "b-tree-vs-b-plus-tree",
+   "target": "mongodb-basics"
+  },
+  {
+   "source": "b-tree-vs-b-plus-tree",
+   "target": "pagination-offset-vs-keyset"
+  },
+  {
+   "source": "b-tree-vs-b-plus-tree",
+   "target": "postgres-indexes"
+  },
+  {
+   "source": "b-tree-vs-b-plus-tree",
+   "target": "primary-vs-secondary-indexes"
+  },
+  {
+   "source": "b-tree-vs-b-plus-tree",
+   "target": "trees-and-bst"
   },
   {
    "source": "back-of-envelope-estimation",
@@ -5411,6 +5635,10 @@
   },
   {
    "source": "bloom-filters-and-probabilistic",
+   "target": "database-engines"
+  },
+  {
+   "source": "bloom-filters-and-probabilistic",
    "target": "design-notification-service"
   },
   {
@@ -5575,6 +5803,10 @@
   },
   {
    "source": "caching",
+   "target": "consistency-models"
+  },
+  {
+   "source": "caching",
    "target": "consistent-hashing"
   },
   {
@@ -5640,6 +5872,10 @@
   {
    "source": "caching",
    "target": "lru-cache-design"
+  },
+  {
+   "source": "caching",
+   "target": "memcached-architecture"
   },
   {
    "source": "caching",
@@ -5744,6 +5980,10 @@
   {
    "source": "cap-and-pacelc",
    "target": "sql-vs-nosql-choosing"
+  },
+  {
+   "source": "cap-and-pacelc",
+   "target": "transactions-acid-and-isolation"
   },
   {
    "source": "casting-and-autoboxing",
@@ -6115,6 +6355,10 @@
   },
   {
    "source": "column-and-wide-column-stores",
+   "target": "database-engines"
+  },
+  {
+   "source": "column-and-wide-column-stores",
    "target": "database-indexes"
   },
   {
@@ -6155,6 +6399,10 @@
   },
   {
    "source": "column-and-wide-column-stores",
+   "target": "row-vs-column-storage"
+  },
+  {
+   "source": "column-and-wide-column-stores",
    "target": "sharding-strategies"
   },
   {
@@ -6168,10 +6416,6 @@
   {
    "source": "column-and-wide-column-stores",
    "target": "time-and-clocks"
-  },
-  {
-   "source": "column-and-wide-column-stores",
-   "target": "trees-and-bst"
   },
   {
    "source": "compilation-interpretation-jit",
@@ -6264,6 +6508,34 @@
   {
    "source": "completable-future",
    "target": "virtual-threads"
+  },
+  {
+   "source": "concurrency-control",
+   "target": "deadlocks-and-synchronization-primitives"
+  },
+  {
+   "source": "concurrency-control",
+   "target": "distributed-locks-and-fencing"
+  },
+  {
+   "source": "concurrency-control",
+   "target": "jpa-locking"
+  },
+  {
+   "source": "concurrency-control",
+   "target": "postgres-isolation-levels"
+  },
+  {
+   "source": "concurrency-control",
+   "target": "postgres-locks"
+  },
+  {
+   "source": "concurrency-control",
+   "target": "race-conditions-and-critical-sections"
+  },
+  {
+   "source": "concurrency-control",
+   "target": "transactions-acid-and-isolation"
   },
   {
    "source": "concurrency-hazards",
@@ -6443,6 +6715,10 @@
   },
   {
    "source": "consistency-models",
+   "target": "idempotency"
+  },
+  {
+   "source": "consistency-models",
    "target": "kafka-consumer"
   },
   {
@@ -6540,6 +6816,10 @@
   {
    "source": "consistent-hashing",
    "target": "load-balancing"
+  },
+  {
+   "source": "consistent-hashing",
+   "target": "memcached-architecture"
   },
   {
    "source": "consistent-hashing",
@@ -6894,6 +7174,10 @@
    "target": "process-management"
   },
   {
+   "source": "cpu-caches-and-cache-lines",
+   "target": "row-vs-column-storage"
+  },
+  {
    "source": "cqrs",
    "target": "cross-shard-queries-and-transactions"
   },
@@ -7036,6 +7320,10 @@
   {
    "source": "cross-shard-queries-and-transactions",
    "target": "postgres-locks"
+  },
+  {
+   "source": "cross-shard-queries-and-transactions",
+   "target": "postgres-partitioning"
   },
   {
    "source": "cross-shard-queries-and-transactions",
@@ -7198,6 +7486,62 @@
    "target": "tries"
   },
   {
+   "source": "database-cursors",
+   "target": "database-wire-protocols"
+  },
+  {
+   "source": "database-cursors",
+   "target": "hikaricp-pool-sizing"
+  },
+  {
+   "source": "database-cursors",
+   "target": "mongodb-basics"
+  },
+  {
+   "source": "database-cursors",
+   "target": "pagination-offset-vs-keyset"
+  },
+  {
+   "source": "database-cursors",
+   "target": "postgres-performance-checklist"
+  },
+  {
+   "source": "database-cursors",
+   "target": "postgres-vacuum-and-bloat"
+  },
+  {
+   "source": "database-cursors",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "database-engines",
+   "target": "how-tables-and-indexes-are-stored"
+  },
+  {
+   "source": "database-engines",
+   "target": "mongodb-basics"
+  },
+  {
+   "source": "database-engines",
+   "target": "primary-vs-secondary-indexes"
+  },
+  {
+   "source": "database-engines",
+   "target": "sql-vs-nosql-choosing"
+  },
+  {
+   "source": "database-engines",
+   "target": "storage-choices"
+  },
+  {
+   "source": "database-engines",
+   "target": "trees-and-bst"
+  },
+  {
+   "source": "database-engines",
+   "target": "wal-redo-undo-and-durability"
+  },
+  {
    "source": "database-fundamentals",
    "target": "database-indexes"
   },
@@ -7251,6 +7595,10 @@
   },
   {
    "source": "database-indexes",
+   "target": "how-tables-and-indexes-are-stored"
+  },
+  {
+   "source": "database-indexes",
    "target": "jpa-n-plus-one"
   },
   {
@@ -7263,11 +7611,19 @@
   },
   {
    "source": "database-indexes",
+   "target": "pagination-offset-vs-keyset"
+  },
+  {
+   "source": "database-indexes",
    "target": "postgres-indexes"
   },
   {
    "source": "database-indexes",
    "target": "postgres-performance-checklist"
+  },
+  {
+   "source": "database-indexes",
+   "target": "primary-vs-secondary-indexes"
   },
   {
    "source": "database-indexes",
@@ -7376,6 +7732,78 @@
   {
    "source": "database-scaling-path",
    "target": "transactions-acid-and-isolation"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "database-wire-protocols"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "homomorphic-encryption"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "mtls-and-service-to-service-auth"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "multi-tenancy-strategies"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "network-access-to-databases"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "owasp-top-10-for-backend"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "read-replicas-and-stale-reads"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "schema-migrations-flyway-liquibase"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "secrets-management"
+  },
+  {
+   "source": "database-security-and-permissions",
+   "target": "tls-handshake-and-certificates"
+  },
+  {
+   "source": "database-wire-protocols",
+   "target": "http-1-1-vs-2-vs-3"
+  },
+  {
+   "source": "database-wire-protocols",
+   "target": "mongodb-basics"
+  },
+  {
+   "source": "database-wire-protocols",
+   "target": "network-access-to-databases"
+  },
+  {
+   "source": "database-wire-protocols",
+   "target": "postgres-architecture"
+  },
+  {
+   "source": "database-wire-protocols",
+   "target": "row-vs-column-storage"
+  },
+  {
+   "source": "database-wire-protocols",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "database-wire-protocols",
+   "target": "tcpdump"
+  },
+  {
+   "source": "database-wire-protocols",
+   "target": "tls-handshake-and-certificates"
   },
   {
    "source": "ddd-basics",
@@ -7735,6 +8163,10 @@
   },
   {
    "source": "design-news-feed",
+   "target": "pagination-offset-vs-keyset"
+  },
+  {
+   "source": "design-news-feed",
    "target": "read-write-splitting-and-cqrs-lite"
   },
   {
@@ -7931,6 +8363,10 @@
   },
   {
    "source": "design-url-shortener",
+   "target": "sharding-strategies"
+  },
+  {
+   "source": "design-url-shortener",
    "target": "storage-choices"
   },
   {
@@ -8032,6 +8468,10 @@
   {
    "source": "distributed-cache-coherence",
    "target": "lru-cache-design"
+  },
+  {
+   "source": "distributed-cache-coherence",
+   "target": "memcached-architecture"
   },
   {
    "source": "distributed-cache-coherence",
@@ -9275,6 +9715,10 @@
   },
   {
    "source": "explain-analyze",
+   "target": "pagination-offset-vs-keyset"
+  },
+  {
+   "source": "explain-analyze",
    "target": "postgres-indexes"
   },
   {
@@ -9855,6 +10299,10 @@
   },
   {
    "source": "hashing-vs-encryption",
+   "target": "homomorphic-encryption"
+  },
+  {
+   "source": "hashing-vs-encryption",
    "target": "idempotency"
   },
   {
@@ -10147,6 +10595,10 @@
   },
   {
    "source": "hikaricp-pool-sizing",
+   "target": "postgres-architecture"
+  },
+  {
+   "source": "hikaricp-pool-sizing",
    "target": "postgres-isolation-levels"
   },
   {
@@ -10188,6 +10640,18 @@
   {
    "source": "hikaricp-pool-sizing",
    "target": "virtual-threads"
+  },
+  {
+   "source": "homomorphic-encryption",
+   "target": "owasp-top-10-for-backend"
+  },
+  {
+   "source": "homomorphic-encryption",
+   "target": "secrets-management"
+  },
+  {
+   "source": "homomorphic-encryption",
+   "target": "symmetric-and-asymmetric-crypto"
   },
   {
    "source": "horizontal-vs-vertical-scaling",
@@ -10280,6 +10744,34 @@
   {
    "source": "host-to-host-communication",
    "target": "tcpdump"
+  },
+  {
+   "source": "how-tables-and-indexes-are-stored",
+   "target": "postgres-architecture"
+  },
+  {
+   "source": "how-tables-and-indexes-are-stored",
+   "target": "postgres-indexes"
+  },
+  {
+   "source": "how-tables-and-indexes-are-stored",
+   "target": "postgres-vacuum-and-bloat"
+  },
+  {
+   "source": "how-tables-and-indexes-are-stored",
+   "target": "primary-vs-secondary-indexes"
+  },
+  {
+   "source": "how-tables-and-indexes-are-stored",
+   "target": "row-vs-column-storage"
+  },
+  {
+   "source": "how-tables-and-indexes-are-stored",
+   "target": "storage-management"
+  },
+  {
+   "source": "how-tables-and-indexes-are-stored",
+   "target": "wal-redo-undo-and-durability"
   },
   {
    "source": "http-1-1-vs-2-vs-3",
@@ -11590,6 +12082,10 @@
    "target": "redis-patterns-and-persistence"
   },
   {
+   "source": "leader-follower-replication",
+   "target": "sharding-strategies"
+  },
+  {
    "source": "leases-heartbeats-and-health",
    "target": "load-balancing"
   },
@@ -11919,6 +12415,10 @@
   },
   {
    "source": "lru-cache-design",
+   "target": "memcached-architecture"
+  },
+  {
+   "source": "lru-cache-design",
    "target": "memory-management"
   },
   {
@@ -11948,6 +12448,22 @@
   {
    "source": "maven",
    "target": "testing-types-and-dev-cycles"
+  },
+  {
+   "source": "memcached-architecture",
+   "target": "redis-data-structures"
+  },
+  {
+   "source": "memcached-architecture",
+   "target": "redis-patterns-and-persistence"
+  },
+  {
+   "source": "memcached-architecture",
+   "target": "socket-management"
+  },
+  {
+   "source": "memcached-architecture",
+   "target": "udp-in-depth"
   },
   {
    "source": "memory-management",
@@ -12115,6 +12631,10 @@
   },
   {
    "source": "mongodb-basics",
+   "target": "primary-vs-secondary-indexes"
+  },
+  {
+   "source": "mongodb-basics",
    "target": "raft-explained"
   },
   {
@@ -12140,6 +12660,10 @@
   {
    "source": "mongodb-basics",
    "target": "time-money-and-ids"
+  },
+  {
+   "source": "mongodb-basics",
+   "target": "wal-redo-undo-and-durability"
   },
   {
    "source": "monolith-vs-microservices",
@@ -12810,6 +13334,38 @@
    "target": "symmetric-and-asymmetric-crypto"
   },
   {
+   "source": "pagination-offset-vs-keyset",
+   "target": "postgres-performance-checklist"
+  },
+  {
+   "source": "postgres-architecture",
+   "target": "postgres-performance-checklist"
+  },
+  {
+   "source": "postgres-architecture",
+   "target": "postgres-replication-and-failover"
+  },
+  {
+   "source": "postgres-architecture",
+   "target": "postgres-vacuum-and-bloat"
+  },
+  {
+   "source": "postgres-architecture",
+   "target": "primary-vs-secondary-indexes"
+  },
+  {
+   "source": "postgres-architecture",
+   "target": "process-management"
+  },
+  {
+   "source": "postgres-architecture",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "postgres-architecture",
+   "target": "wal-redo-undo-and-durability"
+  },
+  {
    "source": "postgres-indexes",
    "target": "postgres-isolation-levels"
   },
@@ -12832,6 +13388,10 @@
   {
    "source": "postgres-indexes",
    "target": "prefix-sums-and-intervals"
+  },
+  {
+   "source": "postgres-indexes",
+   "target": "primary-vs-secondary-indexes"
   },
   {
    "source": "postgres-indexes",
@@ -12959,6 +13519,10 @@
   },
   {
    "source": "postgres-partitioning",
+   "target": "row-vs-column-storage"
+  },
+  {
+   "source": "postgres-partitioning",
    "target": "sharding-strategies"
   },
   {
@@ -13003,7 +13567,15 @@
   },
   {
    "source": "postgres-performance-checklist",
+   "target": "sockets-and-connection-pooling"
+  },
+  {
+   "source": "postgres-performance-checklist",
    "target": "spring-transactional"
+  },
+  {
+   "source": "postgres-performance-checklist",
+   "target": "wal-redo-undo-and-durability"
   },
   {
    "source": "postgres-replication-and-failover",
@@ -13026,6 +13598,10 @@
    "target": "requirements-and-constraints"
   },
   {
+   "source": "postgres-replication-and-failover",
+   "target": "wal-redo-undo-and-durability"
+  },
+  {
    "source": "postgres-vacuum-and-bloat",
    "target": "query-planning-and-execution"
   },
@@ -13046,6 +13622,10 @@
    "target": "time-money-and-ids"
   },
   {
+   "source": "postgres-vacuum-and-bloat",
+   "target": "wal-redo-undo-and-durability"
+  },
+  {
    "source": "prefix-sums-and-intervals",
    "target": "slo-sli-and-alerting"
   },
@@ -13056,6 +13636,14 @@
   {
    "source": "prefix-sums-and-intervals",
    "target": "two-pointers-and-sliding-window"
+  },
+  {
+   "source": "primary-vs-secondary-indexes",
+   "target": "time-money-and-ids"
+  },
+  {
+   "source": "primary-vs-secondary-indexes",
+   "target": "wal-redo-undo-and-durability"
   },
   {
    "source": "primitives-and-wrappers",
@@ -13263,6 +13851,10 @@
   },
   {
    "source": "redis-data-structures",
+   "target": "socket-management"
+  },
+  {
+   "source": "redis-data-structures",
    "target": "spring-cache-abstraction"
   },
   {
@@ -13272,6 +13864,10 @@
   {
    "source": "redis-data-structures",
    "target": "system-design-basics"
+  },
+  {
+   "source": "redis-data-structures",
+   "target": "wal-redo-undo-and-durability"
   },
   {
    "source": "redis-patterns-and-persistence",
@@ -13284,6 +13880,10 @@
   {
    "source": "redis-patterns-and-persistence",
    "target": "storage-choices"
+  },
+  {
+   "source": "redis-patterns-and-persistence",
+   "target": "wal-redo-undo-and-durability"
   },
   {
    "source": "redis-patterns-and-persistence",
@@ -13384,6 +13984,14 @@
   {
    "source": "reverse-proxy-nginx-basics",
    "target": "websockets-sse-and-long-polling"
+  },
+  {
+   "source": "row-vs-column-storage",
+   "target": "sql-vs-nosql-choosing"
+  },
+  {
+   "source": "row-vs-column-storage",
+   "target": "storage-choices"
   },
   {
    "source": "saga",
@@ -13878,6 +14486,10 @@
    "target": "transactions-acid-and-isolation"
   },
   {
+   "source": "storage-management",
+   "target": "wal-redo-undo-and-durability"
+  },
+  {
    "source": "string-algorithms",
    "target": "strings-and-string-pool"
   },
@@ -14052,6 +14664,10 @@
   {
    "source": "tls-handshake-and-certificates",
    "target": "tls-key-exchange"
+  },
+  {
+   "source": "transactions-acid-and-isolation",
+   "target": "wal-redo-undo-and-durability"
   },
   {
    "source": "trees-and-bst",
