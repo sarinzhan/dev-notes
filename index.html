@@ -5346,6 +5346,97 @@ ANIMS["phantom-rr-vs-serializable"] = el=>{
   }});
 };
 
+ANIMS["ddd-command-flow"] = el=>{
+  const ST = [
+    { t: ["Two bounded contexts", "Два ограниченных контекста"], m: "ctx",
+      en: "Provisioning and Billing both talk about a \"subscriber\" but mean different things: here a Sim with an ICCID and profiles, there a Subscriber with a tariff and a balance. Each context keeps its own model and its own language.",
+      ru: "И Provisioning, и Billing говорят об «абоненте», но имеют в виду разное: здесь — Sim с ICCID и профилями, там — Subscriber с тарифом и балансом. У каждого контекста своя модель и свой язык." },
+    { t: ["The command enters", "Команда входит"], m: "cmd",
+      en: "A thin adapter turns POST /sims/7f3a/profiles/P2/activate into a call to the ActivateProfile use case. The application layer only orchestrates: open a transaction, load, make one domain call, save. No business rules here.",
+      ru: "Тонкий адаптер превращает POST /sims/7f3a/profiles/P2/activate в вызов use case ActivateProfile. Слой приложения только координирует: открыть транзакцию, загрузить, сделать один вызов домена, сохранить. Бизнес-правил здесь нет." },
+    { t: ["Load the aggregate", "Загрузка агрегата"], m: "load",
+      en: "The use case loads the whole Sim aggregate by its id through the repository: root, profiles and value objects together. The root is the only entry point, so nobody changes Profile P2 directly.",
+      ru: "Use case загружает весь агрегат Sim по id через репозиторий: корень, профили и объекты-значения вместе. Корень — единственная точка входа, поэтому Profile P2 напрямую никто не меняет." },
+    { t: ["The invariant", "Инвариант"], m: "inv",
+      en: "sim.activate(P2): the root enforces \"at most one ACTIVE profile per SIM\", so it disables P1 and enables P2 in one step. A call that would break the rule throws, and the use case turns that into 409 Conflict.",
+      ru: "sim.activate(P2): корень соблюдает правило «не больше одного ACTIVE-профиля на SIM», поэтому за один шаг выключает P1 и включает P2. Вызов, который нарушил бы правило, бросает исключение, и use case превращает его в 409 Conflict." },
+    { t: ["One transaction", "Одна транзакция"], m: "tx",
+      en: "The root records a domain event, ProfileActivated. The same database transaction saves the Sim and inserts an outbox row with that event: both commit, or neither does. Nothing is sent to Kafka yet.",
+      ru: "Корень записывает доменное событие ProfileActivated. Та же транзакция БД сохраняет Sim и вставляет строку outbox с этим событием: фиксируются оба или ни одно. В Kafka пока ничего не отправлено." },
+    { t: ["Integration event", "Интеграционное событие"], m: "pub",
+      en: "After the commit, a relay (a poller or Debezium) reads the outbox and publishes a versioned integration event to Kafka, keyed by the SIM id so events for one SIM stay in order. This event is a public contract, unlike the internal domain event.",
+      ru: "После коммита relay (поллер или Debezium) читает outbox и публикует в Kafka версионированное интеграционное событие с ключом id SIM, чтобы события одной SIM шли по порядку. Это публичный контракт, в отличие от внутреннего доменного события." },
+    { t: ["Billing translates", "Billing переводит"], m: "bill",
+      en: "Billing's consumer skips events it has already seen (by eventId), then passes the event through an anti-corruption layer that maps it into Billing's own model: the Subscriber starts being charged. Provisioning's model never leaks into Billing.",
+      ru: "Консьюмер Billing пропускает уже обработанные события (по eventId), затем передаёт событие через антикоррупционный слой, который переводит его в собственную модель Billing: Subscriber начинают тарифицировать. Модель Provisioning в Billing не протекает." }
+  ];
+  return steppedAnim(el, { title: LL("DDD: one command, end to end", "DDD: одна команда от начала до конца"), vb: [880, 404], steps: ST, stepMs: 7500, render(g, s, t){
+    const m = s.m, k = easeIO(Math.min(1, t / 1800)), L = E(g, "g", {});
+    const D = {   // per step: which boxes are active (a), normal (n) or dimmed (everything else)
+      ctx:  { prov: "lead", bill: "lead", agg: "a", sub: "a", prof: "a", vo: "n" },
+      cmd:  { prov: "n", ctrl: "a", uc: "a", repo: "n" },
+      load: { prov: "n", ctrl: "n", uc: "a", repo: "a", agg: "a", prof: "n", vo: "n" },
+      inv:  { prov: "n", ctrl: "n", uc: "a", repo: "n", agg: "a", prof: "n", vo: "n" },
+      tx:   { prov: "n", uc: "n", repo: "a", agg: "a", prof: "n", vo: "n", out: "a" },
+      pub:  { prov: "n", out: "a", kafka: "ev" },
+      bill: { bill: "lead", sub: "a", acl: "a", cons: "a", kafka: "ev" }
+    }[m];
+    const st = id => D[id] || "d";
+    const layer = id => st(id) === "d" ? E(g, "g", { class: "an-dim" }) : g;
+    const cls = id => ({ a: "an-reg on", ev: "an-pg k0", lead: "an-frame lead" })[st(id)] || "an-box";
+    const card = (id, x, y, w, h, l1, l2, r)=>{ const p = layer(id); oR(p, x, y, w, h, cls(id), r || 7);
+      if(l2){ oT(p, x + w / 2, y + h / 2 - 3, l1, "an-t an-b"); oT(p, x + w / 2, y + h / 2 + 13, l2, "an-m"); } else oT(p, x + w / 2, y + h / 2 + 4, l1, "an-t an-b"); };
+    const ln = (a, b, ev)=>E(L, "line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], class: ev ? "an-flowline" : "an-link2 on" });
+    const dot = P=>{ const [x, y] = polyAt(P, k); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); };
+    // bands
+    const bp = layer("prov"); oR(bp, 32, 16, 560, 312, st("prov") === "lead" ? "an-frame lead" : "an-frame", 12); oT(bp, 48, 34, LL("PROVISIONING CONTEXT", "КОНТЕКСТ PROVISIONING"), "an-m an-b", "start");
+    const bb = layer("bill"); oR(bb, 640, 16, 208, 312, st("bill") === "lead" ? "an-frame lead" : "an-frame", 12); oT(bb, 656, 34, LL("BILLING CONTEXT", "КОНТЕКСТ BILLING"), "an-m an-b", "start");
+    if(m === "tx") oR(g, 44, 124, 544, 198, "an-cow", 12);
+    // provisioning: adapter, use case, repository
+    card("ctrl", 56, 48, 140, 48, "SimController", m === "pub" ? "200 OK" : "POST /activate");
+    card("uc", 244, 48, 160, 48, "ActivateProfile", LL("use case", "use case"));
+    card("repo", 452, 48, 124, 48, "SimRepository", m === "tx" ? "save(sim)" : "");
+    if(m === "cmd"){ oT(g, 126, 114, LL("adapter", "адаптер"), "an-m"); oT(g, 324, 114, LL("application layer", "слой приложения"), "an-m"); }
+    // aggregate
+    const ga = layer("agg"); oR(ga, 56, 136, 340, 176, st("agg") === "a" ? "an-reg on" : "an-box", 10);
+    oT(ga, 72, 156, LL("Sim 7f3a · aggregate root", "Sim 7f3a · корень агрегата"), "an-t an-b", "start");
+    const swapped = m === "tx" || m === "pub" || m === "bill" || (m === "inv" && t > 2200);
+    const pf = layer(D.prof ? "prof" : "agg");
+    const p1 = swapped ? "DISABLED" : "ACTIVE", p2 = swapped ? "ACTIVE" : "DISABLED";
+    oR(pf, 72, 176, 148, 40, (m === "ctx" ? "an-reg on" : "an-box"), 7); oT(pf, 146, 201, `Profile P1 · ${p1}`, "an-m an-b" + (p1 === "ACTIVE" ? " an-sp" : ""));
+    oR(pf, 72, 224, 148, 40, (m === "ctx" || (m === "inv" && swapped) ? "an-reg on" : "an-box"), 7); oT(pf, 146, 249, `Profile P2 · ${p2}`, "an-m an-b" + (p2 === "ACTIVE" ? " an-sp" : ""));
+    const vo = layer(D.vo ? "vo" : "agg");
+    oR(vo, 236, 176, 144, 40, "an-box", 20); oT(vo, 308, 200, "Iccid 89997…", "an-code");
+    oR(vo, 236, 224, 144, 40, "an-box", 20); oT(vo, 308, 248, "Eid 8904…", "an-code");
+    if(m === "ctx") oT(g, 226, 296, LL("entities (by id) · value objects (by value)", "сущности (по id) · объекты-значения (по значению)"), "an-m");
+    if(m === "load") oT(g, 226, 296, LL("loaded and saved as one unit", "загружается и сохраняется целиком"), "an-m");
+    if(m === "inv"){ oR(g, 72, 276, 308, 28, "an-pg k2", 6); oT(g, 226, 294, LL("invariant: at most one ACTIVE profile ✓", "инвариант: не больше одного ACTIVE ✓"), "an-t an-b");
+      oR(g, 412, 276, 168, 28, "an-leak", 6); oT(g, 496, 294, LL("else: throw → 409", "иначе: исключение → 409"), "an-m an-b an-warn"); }
+    if(m === "tx"){ oR(g, 72, 276, 308, 28, "an-pg k0", 14); oT(g, 226, 294, LL("domain event: ProfileActivated(P2)", "доменное событие: ProfileActivated(P2)"), "an-t an-b"); }
+    // outbox
+    const ob = layer("out"); oR(ob, 452, 184, 124, 80, cls("out"), 7);
+    oT(ob, 514, m === "tx" || m === "pub" ? 212 : 228, LL("outbox", "outbox"), "an-t an-b");
+    if(m === "tx"){ oT(ob, 514, 230, LL("+1 row", "+1 строка"), "an-m"); oT(ob, 514, 246, "ProfileActivated", "an-m"); }
+    if(m === "pub") oT(ob, 514, 232, LL("row → sent", "строка → sent"), "an-m");
+    if(m === "tx") oT(g, 496, 290, LL("one DB transaction · COMMIT", "одна транзакция БД · COMMIT"), "an-m an-b an-sp");
+    // billing
+    card("sub", 656, 48, 176, 72, m === "bill" ? "Subscriber 4412" : "Subscriber", m === "bill" ? LL("billing started", "тарификация пошла") : LL("tariff · balance · debt", "тариф · баланс · долг"));
+    card("acl", 656, 160, 176, 56, LL("anti-corruption layer", "антикоррупционный слой"), m === "bill" ? "iccid → subscriberId" : "");
+    card("cons", 656, 256, 176, 48, LL("Kafka consumer", "Kafka-консьюмер"), m === "bill" ? LL("dedup by eventId", "дедупликация по eventId") : "");
+    // kafka
+    const kf = layer("kafka"); oR(kf, 32, 352, 816, 40, cls("kafka"), 7);
+    oT(kf, 440, 376, st("kafka") === "ev" ? "sim.profile-activated.v1 · key 7f3a · {eventId, iccid, profileId, occurredAt}" : "Kafka · topic sim.profile-activated.v1", "an-code");
+    // flows
+    if(m === "ctx") oT(g, 616, 160, "≠", "an-big an-warn");
+    if(m === "cmd"){ ln([196, 72], [244, 72]); dot([[126, 72], [244, 72]]); }
+    if(m === "load"){ ln([404, 72], [452, 72]); ln([324, 96], [324, 136]); oT(g, 336, 122, "findById(7f3a)", "an-code", "start"); dot([[404, 72], [452, 72], [404, 72], [324, 96], [324, 136]]); }
+    if(m === "inv"){ ln([324, 96], [324, 136]); oT(g, 336, 122, "sim.activate(P2)", "an-code", "start"); dot([[324, 96], [324, 140], [146, 244]]); }
+    if(m === "tx"){ ln([396, 224], [452, 224], true); dot([[380, 290], [396, 224], [452, 224]]); }
+    if(m === "pub"){ ln([514, 264], [514, 352], true); oT(g, 526, 300, "relay", "an-m an-b", "start"); dot([[514, 264], [514, 372]]); }
+    if(m === "bill"){ ln([744, 352], [744, 304], true); ln([744, 256], [744, 216]); ln([744, 160], [744, 120]); dot([[744, 372], [744, 280], [744, 188], [744, 84]]); }
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id); if(start==="changes") showChanges();
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(id==="changes"){ if(VIEW!=="changes") showChanges(); return; } if(byId[id] && (id!==current||VIEW!=="note")) go(id); }); }

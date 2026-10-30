@@ -302,10 +302,13 @@
    "learned": "2026-10-22",
    "path": "notes/architecture/ddd/ddd-basics.md",
    "links": [
+    "aggregates-and-invariants",
     "architecture-resources",
     "behavioral-patterns",
+    "bounded-contexts-and-context-mapping",
     "creational-patterns",
     "docker-swarm",
+    "domain-events-and-integration-events",
     "idempotency",
     "immutable-objects",
     "jpa-entities-and-relationships",
@@ -316,9 +319,11 @@
     "rabbitmq-basics",
     "solid",
     "spring-data-repositories",
-    "structural-patterns"
+    "structural-patterns",
+    "use-cases-and-application-layer",
+    "value-objects-and-entities"
    ],
-   "words": 845,
+   "words": 908,
    "ru": "notes-ru/architecture/ddd/ddd-basics.md",
    "title_ru": "Основы DDD и словарь архитектуры"
   },

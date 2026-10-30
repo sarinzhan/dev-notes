@@ -22,6 +22,13 @@ Domain-driven design (DDD) models code after the business: the **domain** is the
 - Each aggregate is loaded and saved as a whole by a **repository** ([[spring-data-repositories]]); it is the natural unit for the `aggregate_id` key in the [[outbox-pattern]] and for Kafka partitioning ([[kafka-architecture]]).
 - Cross-aggregate changes go through **domain events** and eventual consistency, not through one big transaction.
 
+### One command, end to end
+How the pieces work together, on one eSIM request: an adapter and a use case ([[use-cases-and-application-layer]]), an aggregate guarding its invariant ([[aggregates-and-invariants]]) with entities and value objects ([[value-objects-and-entities]]), a domain event that leaves through the [[outbox-pattern]] as an integration event ([[domain-events-and-integration-events]]), and a second bounded context that translates it through an anti-corruption layer ([[bounded-contexts-and-context-mapping]]).
+
+```anim
+ddd-command-flow
+```
+
 ### Application-level architectures (structural: how the system is built)
 - Layered (controller / service / repository), Clean, Onion, Hexagonal (ports and adapters), Microservices, Modular monolith. Goal: manageability and separation of responsibilities.
 - Clean and Onion are nearly identical conceptually; Hexagonal focuses on integration with the outside world through ports and adapters; Layered is just a scheme for splitting code into layers.
