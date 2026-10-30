@@ -6,11 +6,12 @@ learned: 2026-10-27
 ## TL;DR
 When a screen needs data from five services, somebody must make five calls and merge the results. **API composition** does it in a composer service or the gateway; a **backend for frontend (BFF)** is a composer owned by one client team (web, iOS, partner API) that returns exactly the shape that client needs. Both keep aggregation out of the clients and out of the domain services. The risks are the same: the composer becomes a chatty, slow fan-out with N+1 calls, a dumping ground for business logic, or a bottleneck owned by nobody. Composition works for reads; writes across services belong to a [[saga]] or workflow, not to a BFF.
 
-## Key points
+## The problem it solves
+- **Without it:** the mobile subscriber page shows SIM status (provisioning), balance (billing), tariff (catalogue) and last tickets (support). Either the app calls four APIs (slow on mobile, four auth flows, four error cases, every client re-implements the merge), or one service calls the others (which one? now it depends on all of them). On top of that, clients want different shapes: the web dashboard wants 40 fields and pagination, the mobile app 8 fields and small payloads, the partner API a stable versioned contract. One "general" API serves none of them well.
+- **What it changes:** a composer or BFF makes the calls in parallel, merges the results and returns exactly the shape one client needs; clients and domain services keep no aggregation code.
+- **When you don't need it:** one client type whose screens map onto one service's API; or a hot page, where a pre-computed read model is cheaper than a fan-out on every request.
 
-### The problem it solves
-- Mobile app shows the subscriber page: SIM status (provisioning), balance (billing), tariff (catalogue), last tickets (support). Options: the app calls four APIs (slow on mobile, four auth flows, four error cases, every client re-implements the merge); one service calls the others (which one? now it depends on all of them); or a composer.
-- Different clients want different shapes: the web dashboard wants 40 fields and pagination, the mobile app wants 8 fields and small payloads, the partner API wants a stable versioned contract. One "general" API serves none of them well.
+## Key points
 
 ### API gateway vs API composition vs BFF
 | | API gateway | Composition service | BFF |

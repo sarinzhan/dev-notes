@@ -6,6 +6,12 @@ learned: 2026-10-27
 ## TL;DR
 An **API gateway** is the single entry point for clients: it routes requests to internal services and handles the cross-cutting work (auth, rate limiting, TLS, aggregation) so services do not repeat it. **Service discovery** answers "where is `payment-service` right now" when instances come and go: either the client asks a registry (Eureka/Consul) or the platform hides it behind a stable DNS name (Kubernetes Service). A **config server** centralises configuration. All three are plumbing that a small team may not need — a modular monolith is often the right first answer.
 
+## The problem it solves
+- **Gateway:** without it every client knows the addresses of `esim-service`, `payment-service` and the rest, and each service checks the JWT, limits the rate and terminates TLS on its own, each a little differently → it gives clients one entry point and does the edge work once.
+- **Service discovery:** without it callers hard-code `host:port`, so a new replica gets no traffic and a dead one still gets calls → it keeps a live list of healthy instances behind one name.
+- **Config server:** without it each service carries its own config per environment, and changing one setting means a rebuild and redeploy of every copy → it serves configuration from one place (Git/Vault) and can refresh it.
+- **When you don't need it:** one team with a modular monolith has none of these problems; on Kubernetes, Service DNS and ConfigMaps already cover discovery and config, so Eureka and a config server are extra parts to run.
+
 ## Key points
 
 ### Gateway responsibilities
