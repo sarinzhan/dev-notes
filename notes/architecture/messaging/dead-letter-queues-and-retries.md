@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 A consumer that fails on a message has three choices: retry in place (blocks the partition), retry later through a **retry topic** with backoff (non-blocking), or give up and park the message in a **dead letter queue/topic (DLQ/DLT)** with the error attached. Transient errors (dependency down, lock timeout) deserve bounded retries with exponential backoff; permanent errors (bad payload, business rule violation) go straight to the DLT. A DLT without an alert and a replay tool is a black hole; a retry without a cap is an infinite loop on a **poison message**.
 
+## The problem it solves
+- **Without it:** a consumer of `esim.activation.requested` meets a record it cannot process: a malformed payload, or an SM-DP+ that answers 503 for ten minutes. With in-place retries and no cap, the poison message stalls the partition and every activation behind it waits. If the code gives up instead, the record is skipped and the activation request is lost without anyone noticing.
+- **What it changes:** transient errors get a bounded number of delayed retries while the partition keeps moving; whatever still fails lands in a DLT with the error and its original coordinates, triggers an alert, and can be replayed after the fix.
+- **When you don't need it:** the messages are cheap to lose or will arrive again anyway (periodic status snapshots, metrics), or on failure you can simply stop the consumer, because order matters more than progress and an operator watches the flow.
+
 ## Key points
 
 ### Classify the failure first

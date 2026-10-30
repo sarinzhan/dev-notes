@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 The **application layer** is the thin layer between transport (controller, Kafka listener, scheduler) and the domain. Each **use case** (application service, command handler) does orchestration only: open a transaction, load an aggregate through a repository, call one domain method, save, publish events, map the result. Business rules live in the domain ([[aggregates-and-invariants]]); HTTP and JSON live in the adapters ([[hexagonal-architecture]]). Splitting use cases into **commands** (change state) and **queries** (read, no side effects) keeps them small and is the first step toward [[cqrs]].
 
+## The problem it solves
+- **Without it:** business rules sit in the `@RestController` and get copied into a `@KafkaListener` and a scheduler, or one `SimService` grows to 30 methods with no clear transaction boundary.
+- **What it changes:** each use case is one handler that runs one transaction around one aggregate, and REST, Kafka and the scheduler call the same handler. Split into commands and queries, the 30-method `SimService` becomes thirty one-method classes that each depend only on what they use ([[solid|ISP, SRP]]); testing one use case needs one fake port ([[testing-types-and-dev-cycles]]).
+- **When you don't need it:** a small CRUD service where controller → repository is the whole logic; a handler and a command object per endpoint is only ceremony there.
+
 ## Key points
 
 ### What belongs where
@@ -25,7 +30,6 @@ The **application layer** is the thin layer between transport (controller, Kafka
 ### Commands and queries
 - **Command**: an immutable object naming an intent, `ActivateProfile(simId, iccid, requestedBy)`. One handler, returns nothing or an id. Validated syntactically at the edge (`@Valid`), semantically in the domain.
 - **Query**: `GetSimStatus(simId)`; the handler reads straight through a read-optimised path (projection, `JdbcClient`, read replica) and returns a DTO. No aggregate loading, no `@Transactional` beyond `readOnly = true`.
-- Why split: a `SimService` with 30 methods becomes thirty one-method classes that each depend only on what they use ([[solid|ISP, SRP]]); testing one use case needs one fake port ([[testing-types-and-dev-cycles]]).
 - Naming: handlers after the use case (`SuspendSimHandler`), not after the entity (`SimService`).
 
 ### Cross-cutting concerns

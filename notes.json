@@ -250,7 +250,7 @@
     "use-cases-and-application-layer",
     "value-objects-and-entities"
    ],
-   "words": 830,
+   "words": 940,
    "ru": "notes-ru/architecture/ddd/aggregates-and-invariants.md",
    "title_ru": "Агрегаты, инварианты и границы транзакции"
   },
@@ -284,7 +284,7 @@
     "service-communication-sync-vs-async",
     "strangler-fig-migration"
    ],
-   "words": 818,
+   "words": 896,
    "ru": "notes-ru/architecture/ddd/bounded-contexts-and-context-mapping.md",
    "title_ru": "Ограниченные контексты и карта контекстов"
   },
@@ -323,7 +323,7 @@
     "use-cases-and-application-layer",
     "value-objects-and-entities"
    ],
-   "words": 908,
+   "words": 1015,
    "ru": "notes-ru/architecture/ddd/ddd-basics.md",
    "title_ru": "Основы DDD и словарь архитектуры"
   },
@@ -356,7 +356,7 @@
     "spring-kafka-consumer",
     "spring-transactional"
    ],
-   "words": 831,
+   "words": 941,
    "ru": "notes-ru/architecture/ddd/domain-events-and-integration-events.md",
    "title_ru": "Доменные и интеграционные события"
   },
@@ -391,7 +391,7 @@
     "temporal-concepts",
     "testing-types-and-dev-cycles"
    ],
-   "words": 829,
+   "words": 921,
    "ru": "notes-ru/architecture/ddd/use-cases-and-application-layer.md",
    "title_ru": "Сценарии использования и прикладной слой"
   },
@@ -420,7 +420,7 @@
     "spring-mvc-validation-and-uploads",
     "time-money-and-ids"
    ],
-   "words": 879,
+   "words": 952,
    "ru": "notes-ru/architecture/ddd/value-objects-and-entities.md",
    "title_ru": "Объекты-значения и сущности"
   },
@@ -450,7 +450,7 @@
     "slo-sli-and-alerting",
     "spring-kafka-consumer"
    ],
-   "words": 956,
+   "words": 1107,
    "ru": "notes-ru/architecture/messaging/dead-letter-queues-and-retries.md",
    "title_ru": "Очереди недоставленных сообщений, retry-топики и ядовитые сообщения"
   },
@@ -479,7 +479,7 @@
     "spring-kafka-consumer",
     "spring-transactional"
    ],
-   "words": 805,
+   "words": 947,
    "ru": "notes-ru/architecture/messaging/idempotency.md",
    "title_ru": "Идемпотентные потребители и API"
   },
@@ -507,7 +507,7 @@
     "kafka-producer",
     "outbox-pattern"
    ],
-   "words": 957,
+   "words": 1125,
    "ru": "notes-ru/architecture/messaging/message-schema-evolution.md",
    "title_ru": "Эволюция схем сообщений — JSON, Avro, Protobuf и schema registry"
   },
@@ -534,7 +534,7 @@
     "saga",
     "spring-transactional"
    ],
-   "words": 826,
+   "words": 847,
    "ru": "notes-ru/architecture/messaging/outbox-pattern.md",
    "title_ru": "Паттерн transactional outbox"
   },
@@ -569,7 +569,7 @@
     "spring-security-basics",
     "system-design-basics"
    ],
-   "words": 833,
+   "words": 995,
    "ru": "notes-ru/architecture/microservices/api-gateway-and-service-discovery.md",
    "title_ru": "API gateway, обнаружение сервисов и сервер конфигурации"
   },
@@ -602,7 +602,7 @@
     "spring-reactive-webclient-sse",
     "virtual-threads"
    ],
-   "words": 933,
+   "words": 998,
    "ru": "notes-ru/architecture/microservices/bff-and-api-composition.md",
    "title_ru": "Backend for frontend и композиция API"
   },
@@ -631,7 +631,7 @@
     "system-design-basics",
     "virtual-threads"
    ],
-   "words": 827,
+   "words": 958,
    "ru": "notes-ru/architecture/microservices/circuit-breaker.md",
    "title_ru": "Circuit breaker, retry, bulkhead — Resilience4j в Spring Boot"
   },
@@ -665,7 +665,7 @@
     "spring-transactional",
     "use-cases-and-application-layer"
    ],
-   "words": 928,
+   "words": 996,
    "ru": "notes-ru/architecture/microservices/cqrs.md",
    "title_ru": "CQRS — раздельные модели чтения и записи"
   },
@@ -691,7 +691,7 @@
     "spring-kafka-consumer",
     "system-design-basics"
    ],
-   "words": 957,
+   "words": 1086,
    "ru": "notes-ru/architecture/microservices/distributed-tracing.md",
    "title_ru": "Распределённая трассировка с OpenTelemetry в Spring Boot 3"
   },
@@ -731,7 +731,7 @@
     "service-communication-sync-vs-async",
     "temporal-concepts"
    ],
-   "words": 910,
+   "words": 1054,
    "ru": "notes-ru/architecture/microservices/event-driven-architecture.md",
    "title_ru": "Событийно-ориентированная архитектура"
   },
@@ -760,7 +760,7 @@
     "outbox-pattern",
     "time-money-and-ids"
    ],
-   "words": 1041,
+   "words": 1170,
    "ru": "notes-ru/architecture/microservices/event-sourcing.md",
    "title_ru": "Event sourcing"
   },
@@ -787,7 +787,7 @@
     "system-design-basics",
     "temporal-concepts"
    ],
-   "words": 798,
+   "words": 890,
    "ru": "notes-ru/architecture/microservices/saga.md",
    "title_ru": "Паттерн «Сага» — оркестрация и хореография, компенсации"
   },
@@ -824,7 +824,7 @@
     "saga",
     "temporal-concepts"
    ],
-   "words": 885,
+   "words": 1022,
    "ru": "notes-ru/architecture/microservices/service-communication-sync-vs-async.md",
    "title_ru": "Взаимодействие сервисов — синхронное и асинхронное"
   },
@@ -854,7 +854,7 @@
     "schema-migrations-flyway-liquibase",
     "slo-sli-and-alerting"
    ],
-   "words": 906,
+   "words": 964,
    "ru": "notes-ru/architecture/microservices/strangler-fig-migration.md",
    "title_ru": "Миграция «фикус-душитель» — постепенная декомпозиция монолита"
   },
@@ -890,7 +890,7 @@
     "structural-patterns",
     "threads-basics"
    ],
-   "words": 758,
+   "words": 1067,
    "ru": "notes-ru/architecture/patterns/behavioral-patterns.md",
    "title_ru": "Поведенческие паттерны проектирования"
   },
@@ -921,7 +921,7 @@
     "spring-ioc-and-di",
     "structural-patterns"
    ],
-   "words": 680,
+   "words": 869,
    "ru": "notes-ru/architecture/patterns/creational-patterns.md",
    "title_ru": "Порождающие паттерны проектирования"
   },
@@ -954,7 +954,7 @@
     "spring-transactional",
     "strings-and-string-pool"
    ],
-   "words": 692,
+   "words": 870,
    "ru": "notes-ru/architecture/patterns/structural-patterns.md",
    "title_ru": "Структурные паттерны проектирования"
   },
@@ -988,7 +988,7 @@
     "spring-aop",
     "structural-patterns"
    ],
-   "words": 932,
+   "words": 1112,
    "ru": "notes-ru/architecture/principles/coupling-cohesion-and-general-principles.md",
    "title_ru": "Связанность, связность и общие принципы проектирования"
   },
@@ -1018,7 +1018,7 @@
     "structural-patterns",
     "testing-types-and-dev-cycles"
    ],
-   "words": 659,
+   "words": 826,
    "ru": "notes-ru/architecture/principles/solid.md",
    "title_ru": "Принципы SOLID"
   },
@@ -1079,7 +1079,7 @@
     "spring-boot-starters-and-autoconfiguration",
     "spring-transactional"
    ],
-   "words": 929,
+   "words": 1053,
    "ru": "notes-ru/architecture/styles/clean-architecture.md",
    "title_ru": "Чистая архитектура — кольца, правило зависимостей, сценарии использования"
   },
@@ -1119,7 +1119,7 @@
     "testcontainers",
     "testing-types-and-dev-cycles"
    ],
-   "words": 924,
+   "words": 1047,
    "ru": "notes-ru/architecture/styles/hexagonal-architecture.md",
    "title_ru": "Гексагональная архитектура — порты и адаптеры"
   },
@@ -1151,7 +1151,7 @@
     "spring-mvc-request-lifecycle",
     "spring-transactional"
    ],
-   "words": 810,
+   "words": 930,
    "ru": "notes-ru/architecture/styles/layered-architecture.md",
    "title_ru": "Слоистая архитектура — контроллер, сервис, репозиторий"
   },
@@ -1182,7 +1182,7 @@
     "saga",
     "testcontainers"
    ],
-   "words": 910,
+   "words": 1033,
    "ru": "notes-ru/architecture/styles/modular-monolith.md",
    "title_ru": "Модульный монолит — принудительные границы, Spring Modulith, ArchUnit"
   },
@@ -1217,7 +1217,7 @@
     "testcontainers",
     "transactions-acid-and-isolation"
    ],
-   "words": 930,
+   "words": 1043,
    "ru": "notes-ru/architecture/styles/monolith-vs-microservices.md",
    "title_ru": "Монолит vs микросервисы — компромиссы, когда делить, strangler fig"
   },
@@ -1243,7 +1243,7 @@
     "saga",
     "system-design-basics"
    ],
-   "words": 1101,
+   "words": 1265,
    "ru": "notes-ru/architecture/workflows/temporal-concepts.md",
    "title_ru": "Основы Temporal — workflow, activity, replay, Spring Boot"
   },
@@ -1273,7 +1273,7 @@
     "temporal-concepts",
     "use-cases-and-application-layer"
    ],
-   "words": 1267,
+   "words": 1359,
    "ru": "notes-ru/architecture/workflows/workflow-engines-vs-sagas.md",
    "title_ru": "Движки workflow vs самописные саги — Temporal, Camunda, конечные автоматы"
   },

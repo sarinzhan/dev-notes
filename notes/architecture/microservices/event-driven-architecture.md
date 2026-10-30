@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 In an event-driven architecture (EDA) services communicate by publishing **facts** (`OrderPaid`, `ProfileActivated`) to a broker and reacting to the facts of others, instead of calling each other. The producer does not know its consumers, so adding a consumer costs nothing on the producer side and a slow consumer does not slow the producer. The price: eventual consistency, duplicates, ordering questions, and a contract (the event schema) that is harder to evolve than a REST endpoint because you cannot see who depends on it. EDA is the choreography half of [[saga]], built on [[outbox-pattern]] + [[idempotency]].
 
+## The problem it solves
+- **Without it:** the provisioning service activates an eSIM profile and then calls billing, notifications and analytics over REST, one after another. Every new consumer means a code change and a deploy in provisioning, and when billing is slow or down, profile activation is slow or fails too.
+- **What it changes:** provisioning publishes one fact, `ProfileActivated`, and each interested service reacts in its own time. Adding a consumer needs no change on the producer, and a consumer outage shows as lag, not as a failed activation.
+- **When you don't need it:** a fact has one consumer that needs the answer now, or a few services owned by one team can simply call each other. Then events only add eventual consistency, duplicates and a schema contract to maintain (see "When EDA fits and when it does not" below).
+
 ## Key points
 
 ### Events vs commands vs queries

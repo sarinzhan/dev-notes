@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 A long-running business flow (eSIM order: reserve → pay → download → wait up to 24 h → activate) needs persisted state, retries, timers, compensation and a way to ask "where is order 42". You can build that yourself (a **state machine** in Postgres driven by Kafka events and a scheduler), use a **BPMN engine** (Camunda 7/8, Flowable) where the flow is a diagram executed by the engine, or use a **durable execution engine** (Temporal, and the same model in Cadence, Restate, DBOS) where the flow is ordinary code replayed from history. Hand-rolled wins for 2–4 steps with no waits; Temporal wins when flows have timers, signals and compensation; Camunda wins when business analysts must see and change the process.
 
+## The problem it solves
+- **Without a deliberate choice:** the eSIM order starts as a `status` column and a few Kafka consumers. Hidden costs show up later: a timer table, a "stuck orders" dashboard, backoff logic in three places, and the question "why did order 42 go from PAID to FAILED" answered by grepping logs ([[logging-stacks]]). Each is small; together they are a workflow engine with worse tests.
+- **What choosing well changes:** the tool matches the flow: a hand-rolled state machine for short linear flows, Temporal for timers, signals and compensations, a BPMN engine when analysts own the process. You pay the cost of a tool only where it buys something.
+- **When it doesn't matter:** a single synchronous request that finishes in one transaction, or a one-off batch job; there is no long-running state to manage.
+
 ## Key points
 
 ### What every option must provide
@@ -34,7 +39,6 @@ A long-running business flow (eSIM order: reserve → pay → download → wait 
 
 ### When hand-rolled is right
 - The flow is 2–4 steps, each one event, no waits longer than a retry, and the team already has [[outbox-pattern]] + idempotent consumers. A `provisioning_order(status, step_data, updated_at)` table with `CHECK` on allowed statuses, a Kafka consumer per step, and a reaper job for stuck rows.
-- Hidden costs show up later: a timer table, a "stuck orders" dashboard, backoff logic in three places, and the question "why did order 42 go from PAID to FAILED" answered by grepping logs ([[logging-stacks]]). Each is small; together they are a workflow engine with worse tests.
 - Spring StateMachine or a hand-written enum machine helps with transitions but gives no durability, timers or retries by itself.
 
 ### When a BPMN engine is right

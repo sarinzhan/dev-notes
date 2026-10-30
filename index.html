@@ -88,6 +88,9 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .tag:hover{background:var(--accent-soft);color:var(--accent)}
 .meta .learned{font-family:var(--f-mono);margin-left:auto}
 .body h2{font-family:var(--f-display);font-size:22px;font-weight:700;margin:32px 0 8px;letter-spacing:-.02em}
+.body .problem{background:var(--accent-soft);border:1px solid color-mix(in oklab, var(--accent) 35%, transparent);border-radius:10px;padding:2px 20px 6px;margin:22px 0}
+.body .problem h2{font-size:18px;margin:14px 0 6px;color:var(--accent)}
+.body .problem ul{margin:6px 0 10px}
 .body h3{font-size:17px;font-weight:600;margin:24px 0 6px;letter-spacing:-.01em}
 .body{font-size:15.5px}
 .body p,.body li{line-height:1.75}
@@ -460,8 +463,16 @@ function renderNote(){
     <div class="mob-right">
       <h4>${t("linkedFrom")}</h4><ul>${bl.length?bl.map(b=>`<li><button data-go="${b.id}">${b.title}</button></li>`).join(""):`<li class="empty">${t("noBacklinks")}</li>`}</ul>
     </div>`;
+  wrapProblem($("#note .body"));
   buildToc();
   mountAnims($("#note"));
+}
+
+// "The problem it solves" section (architecture notes) is shown as a highlighted box
+function wrapProblem(body){
+  const h=[...body.querySelectorAll(":scope > h2")].find(x=>/^(The problem it solves|Какую проблему решает)$/.test(x.textContent.trim())); if(!h) return;
+  const box=document.createElement("section"); box.className="problem"; h.before(box);
+  let n=h; while(n && !(n!==h && n.tagName==="H2")){ const next=n.nextElementSibling; box.appendChild(n); n=next; }
 }
 
 // ---- table of contents (H2 + H3 of the current note)

@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 Layered architecture splits an application into horizontal layers — presentation (controllers), business (services), data access (repositories) — and lets dependencies point only downwards. It is the default shape of almost every Spring Boot service and is perfectly fine for CRUD-heavy, small or medium codebases. It breaks when business rules spread across controllers, services and SQL, when services grow into god classes, and when the domain model degrades into bags of getters and setters.
 
+## The problem it solves
+- **Without it:** with no separation at all, one controller method parses JSON, checks the subscriber's tariff, writes SQL through `JdbcTemplate` and calls SM-DP+. The "one pending order" check gets copied into the Kafka listener, and any change to the API or the schema touches business logic.
+- **What it changes:** each kind of code gets one home (controllers handle transport, services own rules and transactions, repositories own queries), and dependencies go only downwards, so everyone knows where to look.
+- **When you don't need it:** a tiny tool with one or two endpoints, where layers are just extra files. It also stops being enough once the rules grow complex (see "Where layered architecture breaks").
+
 ## Key points
 ### The layers and the dependency direction
 - **Presentation**: REST controllers, Kafka listeners, schedulers. Translate transport (HTTP, JSON, headers) into method calls and back ([[spring-mvc-request-lifecycle]]).

@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 An **aggregate** is the cluster of objects that must be consistent *together*; its **root** is the only entry point, and its **invariants** are the rules that must hold at the end of every transaction. The practical rule set: one aggregate per transaction, reference other aggregates by id, keep aggregates small, and let anything that spans aggregates become eventually consistent through [[domain-events-and-integration-events|domain events]]. The aggregate id is also your unit of locking, of Kafka partitioning and of the outbox key.
 
+## The problem it solves
+- **Without it:** the rule "a SIM has at most one active profile" is checked in `SimService`, in a Kafka listener and in an admin endpoint, each time a little differently. Two concurrent activations both pass a `countActiveProfiles` query, and one transaction locks SIM, subscriber and billing rows at once.
+- **What it changes:** the rule lives in one method on the root, the root row is the lock (`@Version`), and each transaction changes one small aggregate. Anything wider goes through an event.
+- **When you don't need it:** simple CRUD data with no rules between objects (reference tables, settings), or reports that only read.
+
 ## Key points
 
 ### Designing the boundary

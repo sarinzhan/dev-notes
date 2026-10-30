@@ -6,6 +6,12 @@ learned: 2026-10-27
 ## TL;DR
 A **circuit breaker** wraps a remote call and tracks its failure rate in a sliding window. When the rate exceeds a threshold, the breaker **opens** and fails calls instantly instead of waiting on a dead dependency; after a pause it lets a few probe calls through (**half-open**) and closes again if they succeed. Resilience4j 2.x provides breaker, retry, time limiter, bulkhead and rate limiter as annotations in Spring Boot 3. Order of defence: **timeout first, then retry with backoff, then breaker**, and only retry what is [[idempotency|idempotent]].
 
+## The problem it solves
+- **Circuit breaker:** without it, when the SM-DP+ hangs, every provisioning request waits for the full timeout, threads pile up and the service goes down together with its dependency → it fails fast (or returns a fallback such as "queued") and gives the dependency time to recover.
+- **Retry:** without it, one dropped connection or a 503 fails an eSIM download that would succeed a second later → it repeats transient failures with backoff and jitter.
+- **Bulkhead:** without it, one slow partner takes all Tomcat threads and unrelated endpoints stop answering too → it caps concurrent calls per dependency.
+- **When you don't need it:** calls that cannot hang for long (local DB with pool and query timeouts) or low-traffic internal tools, where a timeout alone is enough. Retry is wrong for non-idempotent writes without an idempotency key.
+
 ## Key points
 
 ### States
@@ -37,7 +43,7 @@ A **circuit breaker** wraps a remote call and tracks its failure rate in a slidi
 
 ### Bulkhead and timeouts
 - Timeouts protect threads; without a timeout the breaker never sees a failure, just hung threads. Set connect and read timeouts on the HTTP client ([[rest-clients]]) and on JDBC ([[hikaricp-pool-sizing|HikariCP]]) before adding any resilience annotation.
-- Bulkhead isolates dependencies so one slow partner cannot exhaust the Tomcat thread pool. With [[virtual-threads]] a semaphore bulkhead is still useful to bound load on the partner.
+- With [[virtual-threads]] a semaphore bulkhead is still useful to bound load on the partner.
 
 ## Example
 Calling the SM-DP+ (eSIM profile server) with timeout, retry with jittered backoff, and a breaker that falls back to a "queued" status.

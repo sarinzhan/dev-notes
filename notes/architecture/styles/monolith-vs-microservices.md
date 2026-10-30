@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 A monolith is one deployable with local calls and one transaction; microservices are many deployables with network calls and no shared transaction. Microservices buy independent deployment, scaling and team ownership at the price of distributed data consistency, operational cost and latency. Split when the organisation needs it — several teams, different release cadences, uneven scaling — not because the architecture is fashionable. Split badly and you get a **distributed monolith**; split safely with the **strangler fig**: route one capability at a time to a new service behind a gateway until the old system is empty.
 
+## The problem it solves
+- **Without a deliberate choice:** a team splits into services because it is fashionable and gets a distributed monolith (a shared database, joint deploys, network latency, no ACID), or stays in one monolith where three teams block each other's releases and the SM-DP+ polling worker starves the admin API's connection pool.
+- **What choosing well changes:** the cost of distribution is paid only where the organisation needs it (separate teams, release cadences, uneven scaling), and local calls and transactions stay everywhere else.
+- **When it doesn't matter:** one team of 5–8 on one product with uniform load; a modular monolith is the answer and the debate can wait.
+
 ## Key points
 ### Trade-offs
 | Concern | Monolith (incl. [[modular-monolith]]) | Microservices |

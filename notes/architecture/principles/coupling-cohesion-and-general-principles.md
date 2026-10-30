@@ -6,6 +6,15 @@ learned: 2026-10-27
 ## TL;DR
 Almost every design rule reduces to two measurable ideas: **cohesion** (how strongly the parts of one unit belong together) and **coupling** (how much one unit must know about another to work). Good design is high cohesion inside a unit and low coupling between units. KISS, DRY, YAGNI, separation of concerns and the dependency rule are different angles on the same goal: make the next change cheap and local. [[solid]] is the object-level version of the same ideas.
 
+## The problem it solves
+- **Cohesion:** without it, a `UtilService` mixes date formatting, SMS sending and PDF export, and you read the whole class to change one method; it makes each unit change for one reason.
+- **Coupling:** without it, services share a database table or must be released together; it makes a change in one unit stay local.
+- **KISS:** without it, the team builds a plugin framework for one plugin; it makes complexity appear only when a concrete need pays for it.
+- **DRY:** without it, the tax rule lives in two copies that drift apart; it makes each piece of knowledge have one authoritative place.
+- **YAGNI:** without it, you maintain abstractions for requirements that never came; it makes you build only what is needed today.
+- **Dependency rule:** without it, the domain imports JPA and Kafka classes and cannot be tested without them; it makes the domain independent of frameworks.
+- **When you don't need it:** short-lived scripts, prototypes and one-off migrations; there, chasing low coupling and DRY costs more than the next change would.
+
 ## Key points
 
 ### Cohesion

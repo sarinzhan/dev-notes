@@ -6,14 +6,12 @@ learned: 2026-08-20
 ## TL;DR
 Write the domain change and the event to publish in the **same database transaction** (an `outbox` table). A separate relay reads the outbox and publishes to Kafka. This removes the dual-write problem: the event exists if and only if the business change was committed. Delivery becomes **at-least-once**, so consumers must be [[idempotency|idempotent]].
 
-## Key points
+## The problem it solves
+- **Without it:** the naive `orders.save(order); kafka.send(event);` is a dual write. If the DB commits and the send fails (broker down, pod killed between the two calls), nobody downstream ever hears about the order: silent data loss. If the send succeeds and the commit fails, consumers react to an order that does not exist: a phantom event. Moving `send()` inside the `@Transactional` method does not help: it still happens before the commit, and now the DB connection is held during a network call ([[hikaricp-pool-sizing]]).
+- **What it changes:** the event is a row in the same local transaction as the order, and a relay publishes it later, so the event exists if and only if the order was committed. 2PC/XA is not an option: Kafka has no XA resource manager, and even with JMS + JDBC it is slow and blocks on coordinator failure.
+- **When you don't need it:** losing an occasional event is acceptable (metrics, best-effort notifications), or the service has no database of its own and only writes to Kafka.
 
-### The dual-write problem, concretely
-- Naive code: `orders.save(order); kafka.send(event);` inside one method. Two failure modes:
-  - DB commits, Kafka send fails (broker down, timeout, pod killed between the two calls): the order exists but nobody downstream ever hears about it. Silent data loss.
-  - Kafka send succeeds, DB commit fails (constraint violation, deadlock, connection lost at commit): consumers react to an order that does not exist. Phantom event.
-- Moving `send()` inside the `@Transactional` method does not help: the send is not part of the DB transaction, it just happens before commit, so case 2 is still possible, and now the DB connection is held during a network call ([[hikaricp-pool-sizing]]).
-- Interview: "why not 2PC/XA?" Kafka has no XA resource manager; even where it exists (JMS + JDBC), 2PC is slow, blocks on coordinator failure, and most cloud brokers do not support it. The outbox turns the problem into a single local transaction plus asynchronous delivery.
+## Key points
 
 ### Relay: polling publisher vs CDC (Debezium)
 | | Polling publisher | Debezium CDC |

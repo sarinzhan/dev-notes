@@ -6,6 +6,19 @@ learned: 2026-10-22
 ## TL;DR
 Behavioural patterns organise **effective and safe interaction between objects** and the distribution of responsibility among them. Most of them do the same trick: turn an individual behaviour into an object (a handler, a state, a strategy, a command) so it can be swapped, chained, stored or replayed at runtime.
 
+## The problem it solves
+- **Chain of Responsibility:** auth, rate limiting and logging are hard-wired into one request method in a fixed order → each check becomes a handler in a chain that can be reordered or extended.
+- **State:** behaviour depends on a status, and the alternative, a giant `switch` on an enum in every method, becomes unreadable fast → each state gets its own class with its own behaviour.
+- **Observer:** after payment the order service calls notifications, loyalty and analytics directly and must change for each new consumer → it publishes an event and subscribers register themselves.
+- **Memento:** undo or rollback needs the old state, but copying it from outside breaks encapsulation → the object itself makes an opaque snapshot and restores from it.
+- **Strategy:** discount rules live in one `if/else` that grows with every promo → each rule is a separate interchangeable class chosen at runtime.
+- **Iterator:** callers walk a collection's internal array or nodes and break when the structure changes → one traversal interface hides the structure.
+- **Command:** a request must be queued, logged, retried or run later, but it is only a method call → the request becomes an object that can be stored and executed later.
+- **Template Method:** several classes repeat the same algorithm with small differences (open, run, map, close) → the superclass fixes the steps and subclasses fill in only the differences.
+- **Mediator:** many objects call each other directly, so one change touches several of them → they talk through one central object instead.
+- **Visitor:** a new operation (export, validation) is needed over a fixed object structure without editing every class → the operation lives in a separate visitor.
+- **When you don't need them:** one fixed behaviour with no variation; an interface, a chain or a class per state is only ceremony there, and a lambda or a small `switch` is enough.
+
 ## Key points
 | Pattern | Intent | JDK / Spring example |
 |---|---|---|
@@ -22,7 +35,7 @@ Behavioural patterns organise **effective and safe interaction between objects**
 
 ### When each one fits
 - **Chain of Responsibility**: the set of handlers must be defined dynamically; handlers must run in strict order; or the program must handle varied requests in several ways and you do not know in advance which requests and handlers you will need.
-- **State**: behaviour changes drastically with internal state, there are many states, and their code changes often. The alternative, a giant `switch` on an enum, becomes unreadable fast.
+- **State**: behaviour changes drastically with internal state, there are many states, and their code changes often.
 - **Observer**: some objects must watch others only in certain cases, or after a state change in one object something must happen in others and you do not know in advance which ones.
 - **Strategy**: different variations of an algorithm inside one object, or many similar classes that differ only in some behaviour. With lambdas a strategy is often just a functional interface ([[functional-interfaces]]).
 - **Memento**: undo, transactions, checkpoints; the snapshot is opaque to everyone but the originator.

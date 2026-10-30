@@ -6,6 +6,16 @@ learned: 2026-10-22
 ## TL;DR
 Structural patterns are about **composing objects and classes into larger structures that stay easy to maintain**. Adapter translates one interface into another, Decorator and Proxy wrap an object with the same interface (to add behaviour or to control access), Bridge splits abstraction from implementation, Facade hides a subsystem behind a simple entry point, Composite treats a tree as a single object, Flyweight shares common state to save memory.
 
+## The problem it solves
+- **Adapter:** a third-party class has the right behaviour but the wrong interface → a wrapper translates it into the interface your code expects.
+- **Decorator:** adding retry, metrics and logging through subclasses gives a class for every combination → wrappers with the same interface are stacked as needed.
+- **Proxy:** cross-cutting work (transactions, caching, lazy loading, access checks) would be copied into every method → a stand-in intercepts calls and does it before or after the real object.
+- **Bridge:** two things that vary (a common API and vendor drivers) in one hierarchy multiply classes → abstraction and implementation become two hierarchies that change independently.
+- **Facade:** a complex library has many moving parts, but you need only a slice of its capabilities → one simple entry point exposes just that slice.
+- **Composite:** code treats single items and groups differently, with type checks everywhere → items and groups share one interface in a tree.
+- **Flyweight:** many objects store the same data and waste memory → the shared state is stored once and reused.
+- **When you don't need them:** an interface you own and can change directly, or one implementation with no cross-cutting concerns; a wrapper there only adds a layer to debug.
+
 ## Key points
 | Pattern | Intent | JDK / Spring example |
 |---|---|---|
@@ -19,8 +29,7 @@ Structural patterns are about **composing objects and classes into larger struct
 
 ### Telling the wrappers apart
 - **Adapter** changes the interface; **Decorator** keeps the interface and adds behaviour; **Proxy** keeps the interface and controls access. Decorator is composed by the client ("stack what you want"); a Proxy usually manages the lifecycle of its target and the client does not know it is there.
-- Use **Adapter** when a third-party class has the right behaviour but the wrong interface, or when several existing subclasses lack some common functionality and you cannot extend the superclass.
-- Use **Facade** when you use a complex library with many moving parts but need only a slice of its capabilities.
+- Use **Adapter** also when several existing subclasses lack some common functionality and you cannot extend the superclass.
 - Spring's proxies explain the classic bug: `@Transactional` on a method called from the same class does nothing, because the call bypasses the proxy ([[spring-transactional]]).
 
 ## Example

@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 CQRS (command query responsibility segregation) splits a service's API into **commands** that change state through the domain model and **queries** that read from a model shaped for the screen or report. The write side stays small and invariant-focused ([[aggregates-and-invariants]]); the read side can be a denormalised table, a materialised view, Elasticsearch or Redis. The simplest CQRS is two handler classes over one Postgres database; the full form has a separate read store fed by events and is eventually consistent. Most systems need the simple form; the full form is justified only by real read/write asymmetry.
 
+## The problem it solves
+- **Without it:** one JPA model serves reads and writes. The write side wants a small aggregate with invariants; the "subscriber page" wants SIM + active profile + tariff + last 5 events in one row. One entity graph for both gives [[jpa-n-plus-one]] on reads and giant aggregates on writes. Reads usually outnumber writes 100:1, yet they cannot be scaled or stored separately.
+- **What it changes:** commands go through the aggregate and are the audit surface (who did what); queries cannot change state and read a model shaped for the screen. That model can be cached, replicated and sharded on its own ([[database-scaling-path]]) or live in another store — full-text search in Elasticsearch ([[search-and-indexing-services]]), feeds in Redis, analytics in ClickHouse ([[column-and-wide-column-stores]]) — while the write model stays in Postgres.
+- **When you don't need it:** CRUD where the screen shows the entity as it is (level 0). For most other services level 1 (two handlers over one Postgres) is enough; a separate read store pays off only with real read/write asymmetry.
+
 ## Key points
 
 ### Levels of CQRS
@@ -17,12 +22,6 @@ CQRS (command query responsibility segregation) splits a service's API into **co
 | 3: separate read store | Same | Projection tables, Elasticsearch, Redis, updated from events | Eventual (s) | Different query shape or scale (search, feeds) |
 | 3 + ES | Event store | Projections rebuilt from events | Eventual | [[event-sourcing]] |
 - CQRS does not require event sourcing and event sourcing does not require a separate read store; they are often taught together because event sourcing makes querying the write model impractical.
-
-### Why split
-- Reads and writes want different shapes: the write side wants a small aggregate with invariants; the "subscriber page" wants SIM + active profile + tariff + last 5 events in one row. Serving both from one JPA graph gives [[jpa-n-plus-one]] on reads and giant aggregates on writes.
-- Different scale: 100:1 read/write ratios are normal; read models can be cached, replicated and sharded independently ([[database-scaling-path]]).
-- Different stores: full-text search belongs in Elasticsearch ([[search-and-indexing-services]]), feeds in Redis, analytics in ClickHouse ([[column-and-wide-column-stores]]); the write model stays in Postgres.
-- Security and clarity: commands are the audit surface (who did what); queries cannot change state by definition.
 
 ### Keeping the read side in sync (level 3)
 - **Same transaction**: the command handler updates the projection table too. Immediate consistency, simple, but couples the write path to every projection.

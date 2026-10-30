@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 Hexagonal architecture (Alistair Cockburn, 2005, also "ports and adapters") puts the domain and application logic in the centre and lets it talk to the outside world only through **ports** — interfaces the core defines. **Adapters** implement those ports for concrete technology: REST, Kafka, JPA, Temporal, an SM-DP+ client. Because the core owns the interfaces, every dependency points inwards and the core can be compiled and tested without Spring, a database or a broker. The cost is more interfaces and mapping code, which pays off only when the domain has real rules.
 
+## The problem it solves
+- **Without it:** the eSIM provisioning logic calls `JpaRepository`, `KafkaTemplate` and the SM-DP+ HTTP client directly, so a unit test needs a Spring context, a database and a broker, and adding a second entry point (a Temporal activity next to REST) or changing the profile vendor means editing business code.
+- **What it changes:** the core defines ports in domain language and adapters implement them, so the core is plain Java, tested in milliseconds with in-memory fakes, and an adapter can be replaced without touching the rules.
+- **When you don't need it:** when the domain has few real rules (a lookup table, a settings API); the extra interfaces and entity-to-domain mapping then cost more than they save.
+
 ## Key points
 ### Ports and adapters
 - **Port**: an interface in the core that describes a need or a capability in domain language (`ReserveProfile`, `OrderRepository`), never in technology language (`JpaOrderRepository`, `KafkaSender`).

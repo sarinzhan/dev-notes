@@ -6,6 +6,11 @@ learned: 2026-10-22
 ## TL;DR
 Domain-driven design (DDD) models code after the business: the **domain** is the subject area, the **model** is its representation in code, an **entity** is a model object with identity, and an **aggregate** is a cluster of entities and value objects that is loaded, changed and saved as one consistency unit through its **root**. Around DDD sits a vocabulary worth keeping straight: architecture *styles* (layered, hexagonal, event-driven), design *principles* (SOLID, DRY, KISS) and design *patterns* (Factory, Observer) answer different questions.
 
+## The problem it solves
+- **Without it:** the code is shaped by tables and frameworks, not by the business. Analysts say "the profile is released", the code says `status = 4`, and nobody can point to the one place that guarantees "an eSIM profile cannot be activated twice".
+- **What it changes:** a ubiquitous language makes conversations, code and the database use the same words, and aggregates give each business rule one owner and one consistency boundary.
+- **When you don't need it:** CRUD apps, admin panels and thin integrations with little business logic; there the DDD vocabulary and extra layers cost more than they give.
+
 ## Key points
 ### Core DDD terms
 - **Domain**: the subject area the software serves (billing, eSIM provisioning, referral programme).

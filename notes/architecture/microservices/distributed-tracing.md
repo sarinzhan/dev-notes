@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 A **trace** is the full story of one request across services; it is a tree of **spans**, each a timed unit of work with attributes. The trace id travels between services in the W3C `traceparent` header (HTTP) or a Kafka record header, so each service can attach its spans to the same tree. In Spring Boot 3 you get tracing either from the **OpenTelemetry Java agent** (zero code, attach at startup) or from **Micrometer Tracing** inside the app; both export to an OTel Collector that forwards to Tempo or Jaeger. Put the `traceId` into log MDC and you can jump from a log line to the whole trace.
 
+## The problem it solves
+- **Without it:** an eSIM order passes the gateway, `esim-provisioning`, a Kafka topic, the SM-DP+ call and a notification consumer. When it is slow or fails, each service has its own logs with no shared id, and finding the slow hop means searching several services by timestamp and guessing.
+- **What it changes:** one trace id travels with the request in HTTP and Kafka headers, so all spans form one tree with timings, and the same `traceId` in logs links any log line to the whole request.
+- **When you don't need it:** a monolith or two services, where a correlation id in the logs already answers "where". Tracing also costs a collector, storage and sampling setup that a small system may not repay.
+
 ## Key points
 
 ### Vocabulary

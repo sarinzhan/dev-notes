@@ -6,6 +6,14 @@ learned: 2026-10-22
 ## TL;DR
 SOLID is five object-oriented design rules that keep code easy to change: one reason to change per unit (**S**), extend without editing (**O**), subtypes must honour the base contract (**L**), small client-specific interfaces (**I**), and depend on abstractions, not implementations (**D**). They are *principles* (goals and rules), not patterns; patterns such as [[structural-patterns|Decorator]] or [[behavioral-patterns|Strategy]] are concrete ways to satisfy them.
 
+## The problem it solves
+- **Single responsibility (SRP):** without it, a `UserService` that validates, saves and sends emails changes for three reasons, and each change risks the other two; it makes each class change for one actor.
+- **Open/closed (OCP):** without it, adding a payment provider means editing working checkout code; it makes a new provider just a new `PaymentProvider` class.
+- **Liskov substitution (LSP):** without it, callers fill up with `instanceof` checks because a subtype breaks the contract; it makes any subtype safe where the base type is expected.
+- **Interface segregation (ISP):** without it, a simple implementation throws `UnsupportedOperationException` for methods it cannot support; it makes clients depend only on what they use.
+- **Dependency inversion (DIP):** without it, business code creates its JPA repository with `new` and cannot be tested without a database; it makes test doubles trivial.
+- **When you don't need it:** small scripts and code with one implementation and no test double; extra interfaces and splits there are speculative generality.
+
 ## Key points
 ### Single responsibility (SRP)
 - Each unit (class, module, service) has exactly one area of responsibility and therefore one reason to change.

@@ -6,11 +6,12 @@ learned: 2026-10-27
 ## TL;DR
 The strangler fig pattern replaces a legacy system **one capability at a time**: put a routing facade (gateway, proxy) in front of the monolith, build the new implementation of one capability beside it, switch the route, repeat until the old system is empty and can be deleted. Nothing is rewritten big-bang, every step is reversible by flipping the route back, and the business keeps shipping. The hard parts are not the code but the **data**: who owns the table during the transition, and how both sides stay consistent.
 
-## Key points
+## The problem it solves
+- **Without it:** the alternative is a full rewrite. It freezes features for months, re-implements undocumented behaviour from memory, and goes live with one giant cutover that cannot be rolled back. Most rewrites of systems older than a few years are abandoned or ship late.
+- **What it changes:** every slice delivers value on its own, the old system stays the oracle for behaviour (compare outputs), and the team learns the new platform on a low-risk capability first. Any switch can be undone by flipping the route back.
+- **When you don't need it:** the system is small enough to replace in a few weeks, or nothing really needs to leave the monolith; then enforcing module boundaries inside it is cheaper (see "Inside the monolith first" below).
 
-### Why not a rewrite
-- A full rewrite freezes features for months, re-implements undocumented behaviour from memory, and goes live with one giant cutover that cannot be rolled back. Most rewrites of systems older than a few years are abandoned or ship late.
-- Strangling delivers value per slice, keeps the old system as the oracle for behaviour (compare outputs), and lets the team learn the new platform on a low-risk capability first.
+## Key points
 
 ### The loop per capability
 1. **Pick a seam**: a capability with clear inputs/outputs and few shared tables, ideally a [[bounded-contexts-and-context-mapping|bounded context]] already visible in the code (notifications, PDF export, tariff lookup). Start with something valuable but not the most critical.

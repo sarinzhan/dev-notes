@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 A **bounded context** is the boundary inside which one model and one ubiquitous language are valid: "subscriber" in provisioning (ICCID, EID, profile state) is a different model from "subscriber" in billing (balance, tariff, debt). A **context map** documents how contexts relate and translate: who owns the contract (upstream/downstream), whether the downstream copies the model (conformist) or protects itself (anti-corruption layer), and where a shared kernel or published language exists. Context boundaries are the best first guess at service boundaries ([[monolith-vs-microservices]]).
 
+## The problem it solves
+- **Without it:** one `Subscriber` JPA entity is used by provisioning, billing and support. Every context's fields land in one table, every change touches every team, and a word like "activation" means a SIM on the HLR in one place and a promo in another.
+- **What it changes:** each context keeps its own model and language, and the context map says who adapts to whom (conformist, anti-corruption layer, published language on Kafka). Split the model even if the services are not split yet.
+- **When you don't need it:** a small system with one team and one shared vocabulary; extra contexts there only add translation code.
+
 ## Key points
 
 ### Finding the boundaries
@@ -76,7 +81,6 @@ class Es2PlusProfileServer implements ProfileServer {
 ```
 
 ## Pitfalls
-- One `Subscriber` JPA entity used by provisioning, billing and support: every context's field lands in one table, every change touches every team. Split the model even if the services are not split yet.
 - A shared kernel that grows into a `common` module with 200 classes: it quietly becomes a distributed monolith.
 - Conformist by accident: copying the vendor's DTOs into your domain because it was faster; the vendor's next API version then rewrites your domain.
 - Drawing the context map once and never updating it; it is a living document of team relationships as much as of code.

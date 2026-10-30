@@ -6,6 +6,11 @@ learned: 2026-09-05
 ## TL;DR
 An operation is idempotent when applying it twice has the same effect as once. Every at-least-once channel ([[spring-kafka-consumer|Kafka]], HTTP retries, the [[outbox-pattern]]) delivers duplicates sooner or later, so the receiving side must either be naturally idempotent or deduplicate by a key. The dedup record and the business effect must commit in the **same transaction**.
 
+## The problem it solves
+- **Without it:** Kafka, HTTP retries and the outbox relay all deliver at least once. After a rebalance or a crash before the offset commit, the `ActivationRequested` event arrives again; a client times out and resends `POST /payments`. A handler that does `balance = balance - 100` or charges the card on every call debits the subscriber twice or sends a second SMS.
+- **What it changes:** the receiver either makes the operation naturally repeatable (absolute state instead of deltas) or records an idempotency key in the same transaction as the effect, so a duplicate is detected and acknowledged without running the effect again.
+- **When you don't need it:** the operation is already idempotent (`PUT` with the full state, `UPDATE ... SET status = 'ACTIVE'`), or the channel is at-most-once and losing a message is acceptable.
+
 ## Key points
 
 ### Natural idempotency vs deduplication

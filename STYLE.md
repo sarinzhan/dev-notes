@@ -28,6 +28,8 @@ One short, realistic, compilable code block (java / sql / yaml / bash). Not toy 
 3–6 bullets: what goes wrong in practice, gotchas, deprecations. End with 1–2 bullets linking related notes.
 ```
 
+**Architecture notes** (everything under `notes/architecture/` except the resources list) also get `## The problem it solves` right after the TL;DR (RU: `## Какую проблему решает`), shown on the site as a highlighted box. Three bullets, 60–120 words: `**Without it:**` the concrete pain, `**What it changes:**` how the idea removes it, `**When you don't need it:**` honest limits (RU: `**Без этого:**`, `**Что меняет:**`, `**Когда не нужно:**`). Catalogs (SOLID, design patterns) may use one bullet per item instead. Motivation written elsewhere in the note moves into this block.
+
 ## Language
 - English, written for a backend developer who already knows the basics. Plain, direct sentences. No filler ("it is worth noting").
 - Translate the Russian source faithfully, keep its facts and explanations, but fix errors and fill obvious gaps (mark nothing as "to be written" — write it). Where the source says "дописать"/"to add", add it.
