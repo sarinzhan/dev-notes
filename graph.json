@@ -7811,6 +7811,10 @@
   },
   {
    "source": "ddd-basics",
+   "target": "domain-events-and-integration-events"
+  },
+  {
+   "source": "ddd-basics",
    "target": "esim-provisioning-platform"
   },
   {
