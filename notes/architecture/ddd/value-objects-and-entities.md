@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 An **entity** is defined by its identity: `Sim #7f3a` stays the same object while its MSISDN, status and profiles change. A **value object** is defined only by its attributes: two `Money(100, KGS)` are interchangeable, so it has no id, is immutable, and validates itself at construction. Modelling `Iccid`, `Msisdn`, `Money`, `DateRange` as value objects instead of `String`/`BigDecimal` moves validation to one place, makes invalid states unrepresentable, and gives the compiler something to check. Java records are the natural value object.
 
+## The problem it solves
+- **Without it:** "primitive obsession": `String iccid, String msisdn, String eid` in every signature. The MSISDN format is checked with `msisdn.matches(...)` in five services, and `transfer(String, String)` can be called with the arguments swapped; nobody notices until production.
+- **What it changes:** the format check lives in one constructor, every method that takes a `Msisdn` can trust it, and swapped arguments become a compile error instead of a runtime bug.
+- **When you don't need it:** values that are only passed through, with no format or rules (a free-text comment, an opaque external id you never check); wrapping them adds classes and mapping code but catches no bug.
+
 ## Key points
 
 ### Entity vs value object
@@ -20,8 +25,8 @@ An **entity** is defined by its identity: `Sim #7f3a` stays the same object whil
 - Entity ids: generate in the application (UUID v7 for time ordering, or a ULID) so the aggregate has an id before it hits the database and events can reference it ([[time-money-and-ids]]).
 
 ### Why value objects pay off
-- **Validation at construction**: `new Msisdn("996 555")` throws once; every method that takes a `Msisdn` can trust it. Compare with checking `msisdn.matches(...)` in five services.
-- **Type safety**: `transfer(Msisdn from, Iccid to)` cannot be called with the arguments swapped; `transfer(String, String)` can, and nobody notices until production.
+- **Validation at construction**: `new Msisdn("996 555")` throws once; every method that takes a `Msisdn` can trust it.
+- **Type safety**: `transfer(Msisdn from, Iccid to)` cannot be called with the arguments swapped.
 - **Behaviour with the data**: `money.plus(other)` checks the currency; `period.overlaps(other)`; `iccid.checkDigitValid()`. No `MoneyUtils`.
 - **Immutability** makes them safe to share between threads and to use as map keys ([[immutable-objects]], [[equals-and-hashcode]]).
 - Money: `BigDecimal` amount + `Currency`, scale fixed per currency, never `double` ([[numbers-bits-and-floating-point]]).
@@ -90,7 +95,6 @@ public class IccidConverter implements AttributeConverter<Iccid, String> {
 ```
 
 ## Pitfalls
-- "Primitive obsession": `String iccid, String msisdn, String eid` in every signature; mixing them up is a runtime bug the type system could have caught.
 - A value object with a setter or a mutable field (`List` without `List.copyOf`) is not a value object; two equal objects can diverge.
 - Validation only in the DTO: the Kafka listener and the scheduler bypass the controller and feed garbage into the domain.
 - Entities compared with `==` across persistence contexts, or `equals` over mutable fields: `Set<Sim>` membership silently changes.

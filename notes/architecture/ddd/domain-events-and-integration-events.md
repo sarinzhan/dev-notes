@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 A **domain event** is a fact that happened inside one bounded context, named in the past tense (`ProfileActivated`), raised by an aggregate and handled in the same process. An **integration event** is the version of that fact that leaves the context: published to Kafka, with a stable schema, for other services. Domain events are an in-memory design tool (decoupling aggregates, side effects after commit); integration events are a contract, so they go through the [[outbox-pattern]] and are versioned like an API ([[message-schema-evolution]]).
 
+## The problem it solves
+- **Without it:** `ProfileService.activate()` also sends the SMS, updates the billing read model and sends to Kafka directly. Every new reaction edits the same method, a rollback still leaves the SMS sent, and other teams consume your JPA entity as JSON, so a column rename breaks them.
+- **What it changes:** the aggregate only records a fact; handlers react to it after commit, and a separate versioned integration event, published through the outbox, is the only contract other services see.
+- **When you don't need it:** one action with one side effect, or a context that nobody outside consumes; a direct method call is clearer.
+
 ## Key points
 
 ### The two kinds compared
