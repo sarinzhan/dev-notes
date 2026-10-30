@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 Services talk either **synchronously** (REST/gRPC: the caller blocks for an answer and shares the callee's fate) or **asynchronously** (messages/events: the caller continues and the work happens later, at-least-once). Use sync for questions that need an answer now and async for facts and work that can be deferred. Every sync call needs a **timeout**, a bounded **retry budget** with backoff and jitter, and a [[circuit-breaker]]; every async hop needs an [[outbox-pattern]] on the producer and [[idempotency]] on the consumer. The usual mistake is chaining sync calls until availability multiplies down to nothing.
 
+## The problem it solves
+- **Without a deliberate choice:** teams call everything over REST because it is the easiest. An eSIM order request then waits on eligibility, payment, provisioning and billing in a chain: latency adds up, availability multiplies down, and one slow dependency takes the whole flow down. Or the opposite: an eligibility check goes through Kafka and the user waits for a reply topic.
+- **What choosing well changes:** questions the user waits for stay sync, with timeouts and a breaker; facts and work that can wait go async through an outbox, so a billing outage costs lag, not failed orders.
+- **When it doesn't matter:** a few services with low traffic and one team. Default to sync calls with timeouts and move a call to async only when it becomes a real problem.
+
 ## Key points
 
 ### The comparison

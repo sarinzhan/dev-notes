@@ -6,11 +6,12 @@ learned: 2026-10-27
 ## TL;DR
 A saga is a business transaction that spans several services, implemented as a **sequence of local transactions**, each committed in its own database. If a later step fails, the saga runs **compensating transactions** that semantically undo the earlier steps. Sagas replace distributed 2PC transactions with eventual consistency plus explicit "undo" logic; the two ways to drive them are a central **orchestrator** or event-driven **choreography**.
 
-## Key points
+## The problem it solves
+- **Without it:** an eSIM order touches three services with their own databases: reserve a profile, charge the card, activate on the HLR. A distributed 2PC (XA) transaction needs a coordinator that holds locks in every participant until the global commit. It is slow, blocks on coordinator failure, and does not exist over Kafka, HTTP or a third-party API (card processor, SM-DP+ server). Without a plan, a failure after the charge leaves the money taken and no eSIM delivered.
+- **What it changes:** services own their data ([[ddd-basics|bounded contexts]]), so cross-service ACID is off the table. Instead each step commits locally and has a compensating step, and the order ends either fully done or fully compensated: **atomicity across services**, without isolation.
+- **When you don't need it:** the whole operation lives in one service and one database (a local transaction is enough), or a failed step can simply be retried until it succeeds and nothing needs undoing.
 
-### Why not a distributed transaction
-- 2PC (XA) needs a coordinator that holds locks in every participant until the global commit. It is slow, blocks on coordinator failure, and does not exist over Kafka, HTTP or a third-party API (card processor, SM-DP+ server).
-- Microservices own their data ([[ddd-basics|bounded contexts]]), so cross-service ACID is off the table. Sagas give **atomicity across services** (all steps or all compensated) without isolation.
+## Key points
 
 ### Orchestration vs choreography
 | | Orchestration | Choreography |

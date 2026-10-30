@@ -6,6 +6,11 @@ learned: 2026-10-27
 ## TL;DR
 With event sourcing the **source of truth is the append-only log of domain events** per aggregate (`SimRegistered`, `ProfileActivated`, `SimSuspended`), not the current-state row. Current state is rebuilt by replaying the events, **snapshots** shortcut long histories, and **projections** turn the log into query-friendly tables ([[cqrs]]). You get a complete audit trail, temporal queries ("what was the state on 1 March") and natural integration events, at the cost of a different programming model, schema evolution of events that live forever, and eventual consistency on every read model. It is a per-aggregate decision, not a system-wide one; a ledger or a card-authorisation history is a good candidate, a tariff catalogue is not.
 
+## The problem it solves
+- **Without it:** a `sims` row holds only the current state. When a subscriber disputes a charge or support asks "why was this SIM suspended on 1 March?", the answer is gone: the `UPDATE` overwrote it, and a history table has only what someone remembered to log.
+- **What it changes:** the events are the record, so every change is kept together with its intent, and the state at any moment can be rebuilt by replaying them. The same log feeds projections and integration events.
+- **When you don't need it:** for most data (tariff catalogue, settings, reference data) nobody asks for anything but the current state; and if audit is the only reason, a history table is much cheaper (see the comparison below).
+
 ## Key points
 
 ### The model
