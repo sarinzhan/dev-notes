@@ -3867,6 +3867,150 @@ ANIMS["page-cache-writeback"] = el=>{
   }});
 };
 
+// ============ 47b. Reading a 50 KB file through the page cache: buffer size, start position, sector size → syscalls, readahead windows, LBA and PBA
+ANIMS["page-cache-read"] = el=>{
+  const N = 13, ISZ = 51200, MAX = 32, X0 = 16, W = 50, G = 6, SY = 150, SH = 56, DY = 256, DH = 34, NY = 340, NH = 24;
+  const BUFS = [4096, 8192, 16384, 1024], POSS = [0, 10000, 20480], SECS = [512, 4096];
+  const P = { buf: 4096, pos: 0, sec: 512 };
+  const PERM = [9, 2, 17, 5, 22, 12, 0, 15, 7, 20, 3, 11, 18];          // where the FTL happened to put each 4 KiB block
+  const cx = i => X0 + i * (W + G) + W / 2, ncx = c => 16 + Math.floor(c / 6) * 184 + (c % 6) * 28 + 13;
+  const fmt = n => n.toLocaleString(LANG === "ru" ? "ru-RU" : "en-US");
+  const pba = p => { const c = PERM[p]; return `die ${Math.floor(c / 6)} · blk ${300 + (c * 37) % 500} · pg ${(c * 13) % 64}`; };
+  const lbaOf = p => { const spp = 4096 / P.sec, l0 = 1048576 / P.sec + (1000000 + p) * spp; return [l0, l0 + spp - 1]; };
+  const p2 = n => { let v = 1; while(v < n) v *= 2; return v; };
+  const initSize = r => { const n = p2(r); return Math.min(MAX, n <= MAX / 32 ? n * 4 : n <= MAX / 4 ? n * 2 : MAX); };   // mm/readahead.c get_init_ra_size
+  const nextSize = c => Math.min(MAX, c < MAX / 16 ? c * 4 : c <= MAX / 2 ? c * 2 : MAX);                               // get_next_ra_size
+  function sim(buf, pos){
+    const cached = new Array(N).fill(false), mark = new Array(N).fill(false), R = [];
+    let raEnd = -1, raSize = 0, prevLast = null;
+    for(let g = 0; g < 200; g++){
+      const cb = cached.slice(), mb = mark.slice();
+      if(pos >= ISZ){ R.push({ pos, ret: 0, pages: [], ios: [], eof: true, cb, mb, ma: mark.slice() }); break; }
+      const end = Math.min(pos + buf, ISZ), first = pos >> 12, last = (end - 1) >> 12, ios = [], pages = [];
+      for(let p = first; p <= last; p++){
+        if(!cached[p]){
+          const seq = p === 0 || (prevLast !== null && p <= prevLast + 1), req = last - p + 1; let we, mk = -1, size = 0;
+          if(seq){ size = initSize(req); we = Math.min(p + size - 1, N - 1); const a = size > req ? size - req : size, m = p + size - a; if(m > p && m <= we) mk = m; raSize = size; }
+          else { we = last; raSize = 0; }
+          raEnd = we; const pg = []; for(let q = p; q <= we; q++) if(!cached[q]){ pg.push(q); cached[q] = true; }
+          if(mk >= 0) mark[mk] = true; ios.push({ pages: pg, block: true, kind: seq ? "sync" : "rand", size });
+        } else if(mark[p]){
+          mark[p] = false;
+          if(raEnd < N - 1){ const size = nextSize(raSize || 4), ws = raEnd + 1, we = Math.min(ws + size - 1, N - 1), pg = [];
+            for(let q = ws; q <= we; q++) if(!cached[q]){ pg.push(q); cached[q] = true; }
+            if(we < N - 1) mark[ws] = true; raSize = size; raEnd = we; if(pg.length) ios.push({ pages: pg, block: false, kind: "async", size }); }
+        }
+        const s = Math.max(pos, p * 4096), e = Math.min(end, (p + 1) * 4096); pages.push({ p, bytes: e - s, off: s - p * 4096 });
+      }
+      R.push({ pos, ret: end - pos, pages, ios, first, last, cb, mb, ma: mark.slice() }); prevLast = last; pos = end;
+    }
+    return R;
+  }
+  function text(r, k, tot){
+    const n = k + 1, f = fmt, rg = (a, b) => a === b ? [`page ${a}`, `стр. ${a}`] : [`pages ${a}–${b}`, `стр. ${a}–${b}`];
+    if(r.eof) return { t: [`#${n} EOF`, `#${n} EOF`],
+      en: `read #${n}: pos ${f(r.pos)} is the file size (i_size), so read() returns 0, which means end of file. Totals: ${tot.sys} syscalls, ${tot.io} disk requests, ${tot.blk} of which made the thread wait.`,
+      ru: `read #${n}: pos ${f(r.pos)} равен размеру файла (i_size), поэтому read() возвращает 0, то есть конец файла. Итого: ${tot.sys} системных вызовов, ${tot.io} запросов к диску, из них ${tot.blk} заставили поток ждать.` };
+    const pr = rg(r.first, r.last), B = r.ios.filter(i => i.block), A = r.ios.filter(i => !i.block);
+    let en = `read #${n}: pos ${f(r.pos)} → ${pr[0]} (index = pos >> 12)`, ru = `read #${n}: pos ${f(r.pos)} → ${pr[1]} (индекс = pos >> 12)`;
+    if(r.pages[0].off){ en += `, starting ${f(r.pages[0].off)} bytes into the page: not aligned`; ru += `, со смещения ${f(r.pages[0].off)} внутри страницы: без выравнивания`; }
+    en += ". "; ru += ". ";
+    for(const i of B){ const q = rg(i.pages[0], i.pages.at(-1));
+      if(i.kind === "rand"){ en += `Miss. A first read in the middle of the file does not look sequential, so the disk reads only ${q[0]}, with no readahead. The thread sleeps until the DMA finishes. `;
+        ru += `Промах. Первое чтение из середины файла не похоже на последовательное, поэтому диск читает только ${q[1]}, без упреждающего чтения. Поток спит, пока не закончится DMA. `; }
+      else { en += `Miss. The thread sleeps while one disk request reads ${q[0]} (readahead window ${i.size}); the first prefetched page gets a marker. `;
+        ru += `Промах. Поток спит, пока один запрос к диску читает ${q[1]} (окно упреждающего чтения ${i.size}); первая заранее прочитанная страница получает маркер. `; } }
+    if(!B.length){ en += "Hit: only a CPU copy from RAM, about a microsecond. "; ru += "Попадание: только копирование из RAM силами CPU, около микросекунды. "; }
+    for(const i of A){ const q = rg(i.pages[0], i.pages.at(-1)), cut = i.pages.at(-1) === N - 1 && i.pages.length < i.size;
+      en += `The read touched a marker, so the kernel starts an async readahead of ${q[0]} (window ${i.size}${cut ? ", cut at the end of the file" : ""}) and the app does not wait. `;
+      ru += `Чтение задело маркер, поэтому ядро запускает асинхронное упреждающее чтение: ${q[1]} (окно ${i.size}${cut ? ", обрезано по концу файла" : ""}), и приложение не ждёт. `; }
+    if(r.ret < P.buf){ en += `Short read: returns ${f(r.ret)}, not ${f(P.buf)}.`; ru += `Короткое чтение: возвращает ${f(r.ret)}, а не ${f(P.buf)}.`; }
+    const kind = B.length ? ["miss", "промах"] : ["hit", "попадание"];
+    return { t: [`#${n} ${pr[0]}: ${kind[0]}`, `#${n} ${pr[1]}: ${kind[1]}`], en: en.trim(), ru: ru.trim() };
+  }
+  const label = { buf: () => LL("buffer: ", "буфер: ") + P.buf, pos: () => LL("start: ", "старт: ") + P.pos, sec: () => LL("sector: ", "сектор: ") + (P.sec === 512 ? "512e" : "4Kn") };
+  const cycle = (arr, v) => arr[(arr.indexOf(v) + 1) % arr.length];
+  const S = { i: 0, t: 0 }; let R = [], ST = [], tot = {}, bar = null;
+  const sh = animShell(el, { title: LL("Reading a 50 KB file through the page cache", "Чтение файла 50 КБ через страничный кэш"), vb: [760, 492], buttons: [
+    { id: "buf", label: label.buf(), on(){ P.buf = cycle(BUFS, P.buf); build(); } },
+    { id: "pos", label: label.pos(), on(){ P.pos = cycle(POSS, P.pos); build(); } },
+    { id: "sec", label: label.sec(), on(){ P.sec = cycle(SECS, P.sec); build(); } },
+    { id: "prev", label: LL("← Back", "← Назад"), on(){ go(S.i - 1); } },
+    { id: "next", label: LL("Next →", "Дальше →"), on(){ go(S.i + 1); } }
+  ]});
+  const dur = i => R[i].ios.length ? 5600 : 3400;
+  function go(i){ S.i = (i + R.length) % R.length; S.t = 0; sh.say(LL(ST[S.i].en, ST[S.i].ru), 1); }
+  function build(){
+    R = sim(P.buf, P.pos);
+    tot = { sys: R.length, io: R.reduce((a, r) => a + r.ios.length, 0), blk: R.reduce((a, r) => a + r.ios.filter(i => i.block).length, 0) };
+    ST = R.map((r, k) => text(r, k, tot));
+    for(const id of ["buf", "pos", "sec"]) sh.btns[id].textContent = label[id]();
+    el.querySelectorAll(".anim-steps, .anim-all").forEach(x => x.remove());
+    bar = sh.steps(ST.map(s => ({ title: LL(...s.t), text: LL(s.en, s.ru) })), i => go(i));
+    go(0);
+  }
+  function render(g, r, tt, s){
+    const blk = r.ios.some(i => i.block), ph = blk ? { b0: 0, b1: .5, a0: .6, a1: .95, c0: .55, c1: .95 } : { a0: .25, a1: .9, c0: .05, c1: .55 };
+    const state = r.cb.map(v => v ? 2 : 0), dots = [];
+    let bytes = 0, ios = 0;
+    for(let k = 0; k < s; k++){ bytes += R[k].ret; ios += R[k].ios.length; }
+    for(const io of r.ios){ const i0 = io.block ? ph.b0 : ph.a0, i1 = io.block ? ph.b1 : ph.a1, n = io.pages.length;
+      if(tt >= i0) ios++;
+      io.pages.forEach((p, k)=>{ if(tt < i0) return; const st = i0 + (i1 - i0) * .4 * k / Math.max(1, n), pr = Math.min(1, (tt - st) / ((i1 - i0) * .6));
+        if(pr >= 1){ state[p] = 2; return; } state[p] = 1; if(pr > 0) dots.push([p, easeIO(pr)]); }); }
+    // user space
+    oR(g, 10, 20, 300, 82, "an-frame", 8); oT(g, 22, 40, LL("app · user space", "приложение · пространство пользователя"), "an-m an-b", "start");
+    oT(g, 22, 62, `read(fd, buf, ${P.buf})  pos=${fmt(r.pos)}`, "an-code", "start");
+    const sleeping = blk && tt < ph.c0;
+    oT(g, 22, 88, sleeping ? LL("thread: sleeping (D), waiting for the disk", "поток: спит (D), ждёт диск") : LL("thread: running", "поток: выполняется"), "an-m an-b" + (sleeping ? " an-warn" : ""), "start");
+    let copied = 0, cdot = null;
+    if(!r.eof){ const seg = (ph.c1 - ph.c0) / r.pages.length;
+      r.pages.forEach((q, k)=>{ const a = ph.c0 + seg * k, pr = (tt - a) / seg; if(pr >= 1) copied += q.bytes; else if(pr >= 0) cdot = [q.p, easeIO(pr)]; }); }
+    bytes += copied;
+    oT(g, 440, 30, LL(`user buffer, ${fmt(P.buf)} bytes`, `буфер пользователя, ${fmt(P.buf)} байт`), "an-m an-b", "start");
+    oR(g, 440, 36, 310, 40, "an-box", 6); if(copied) oR(g, 442, 38, 306 * copied / P.buf, 36, "an-pg k2", 5);
+    oT(g, 595, 61, r.eof ? LL("0 bytes: EOF", "0 байт: EOF") : copied ? LL(`${fmt(copied)} bytes`, `${fmt(copied)} байт`) : tt >= ph.c0 ? LL("copying…", "копирование…") : LL("empty", "пусто"), "an-t an-b");
+    const ret = r.eof || tt >= ph.c1 ? fmt(r.ret) : "…";
+    oT(g, 750, 96, LL(`syscalls ${s + 1} · disk requests ${ios} · bytes ${fmt(bytes)} · returned ${ret}`, `вызовов ${s + 1} · запросов к диску ${ios} · байт ${fmt(bytes)} · вернул ${ret}`), "an-m an-b", "end");
+    E(g, "line", { x1: 10, y1: 114, x2: 750, y2: 114, class: "an-lane" }); oT(g, 750, 130, LL("kernel", "ядро"), "an-m an-b", "end");
+    // page cache
+    oT(g, X0, 140, LL("page cache (RAM): this file's 4 KiB pages, index = offset >> 12", "страничный кэш (RAM): страницы файла по 4 КиБ, индекс = смещение >> 12"), "an-m an-b", "start");
+    const marks = tt < .5 ? r.mb : r.ma, cur = new Set(r.pages.map(q => q.p));
+    for(let i = 0; i < N; i++){ const x = X0 + i * (W + G), v = state[i];
+      oR(g, x, SY, W, SH, v === 2 ? "an-pg k1" : v === 1 ? "an-pg k0" : "an-free", 5);
+      if(cur.has(i)) oR(g, x - 3, SY - 3, W + 6, SH + 6, "an-selbox", 7);
+      oT(g, x + W / 2, SY + 24, "p" + i, "an-t an-b");
+      oT(g, x + W / 2, SY + 42, v === 2 ? (i === N - 1 ? "2 KiB" : "4 KiB") : v === 1 ? LL("load", "загр.") : "—", "an-m");
+      if(marks[i]) E(g, "path", { d: `M${x + W - 13} ${SY + 3} h10 v10 z`, class: "an-warn" }); }
+    E(g, "path", { d: `M${X0 + 466} ${SY + SH + 12} h8 v8 z`, class: "an-warn" });
+    oT(g, X0 + 480, SY + SH + 20, LL("readahead marker", "маркер упреждающего чтения"), "an-m", "start");
+    oT(g, X0, SY + SH + 20, LL("dashed = not cached · orange = loading · blue = cached", "пунктир = нет в кэше · оранжевый = загрузка · синий = в кэше"), "an-m", "start");
+    // disk, logical
+    const [la] = lbaOf(0), [, lb] = lbaOf(N - 1), spp = 4096 / P.sec;
+    oT(g, X0, DY - 8, LL(`disk, logical: LBA ${fmt(la)}–${fmt(lb)} · ${spp} LBA per page (${P.sec} B sectors)`, `диск, логически: LBA ${fmt(la)}–${fmt(lb)} · ${spp} LBA на страницу (сектор ${P.sec} Б)`), "an-m an-b", "start");
+    for(let i = 0; i < N; i++){ const x = X0 + i * (W + G); oR(g, x, DY, W, DH, state[i] === 1 ? "an-reg on" : "an-box", 4); oT(g, x + W / 2, DY + 22, "b" + i, "an-m an-b"); }
+    // SSD NAND, physical
+    oT(g, X0, NY + NH + 30, LL("SSD NAND, physical (PBA): where the FTL put each block", "SSD NAND, физически (PBA): куда FTL положил каждый блок"), "an-m an-b", "start");
+    for(let c = 0; c < 24; c++){ const own = PERM.indexOf(c), x = ncx(c) - 13;
+      oR(g, x, NY, 26, NH, own >= 0 ? "an-pg k3" : "an-free", 3); if(own >= 0) oT(g, x + 13, NY + 16, String(own), "an-m an-b"); }
+    for(let d = 0; d < 4; d++) oT(g, 16 + d * 184 + 83, NY + NH + 14, "die " + d, "an-m");
+    for(let i = 0; i < N; i++) if(state[i] === 1) E(g, "line", { x1: cx(i), y1: DY + DH, x2: ncx(PERM[i]), y2: NY, class: "an-map s3" });
+    for(const [p, k] of dots){ const [x, y] = polyAt([[ncx(PERM[p]), NY + NH / 2], [cx(p), DY + DH / 2], [cx(p), SY + SH / 2]], k); E(g, "circle", { cx: x, cy: y, r: 5, class: "an-dot k0" }); }
+    if(cdot){ const [x, y] = polyAt([[cx(cdot[0]), SY], [cx(cdot[0]), 114], [595, 76]], cdot[1]); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); }
+    // the address chain for this read
+    oT(g, X0, 426, LL("address chain for this read:", "цепочка адресов для этого чтения:"), "an-m an-b", "start");
+    const show = r.pages.slice(0, 3);
+    if(!show.length) oT(g, X0, 428, LL("no pages: end of file", "страниц нет: конец файла"), "an-code c", "start").setAttribute("y", 444);
+    show.forEach((q, k)=>{ const [l0, l1] = lbaOf(q.p);
+      oT(g, X0, 444 + k * 16, `page ${q.p} → FS block ${fmt(1000000 + q.p)} → LBA ${l0 === l1 ? fmt(l0) : fmt(l0) + "–" + fmt(l1)} → PBA ${pba(q.p)}`, "an-code", "start"); });
+    if(r.pages.length > 3) oT(g, X0, 490, LL(`+${r.pages.length - 3} more pages`, `ещё страниц: ${r.pages.length - 3}`), "an-code c", "start");
+  }
+  sh.onFrame(dt=>{ S.t += dt; if(S.t > dur(S.i)) go(S.i + 1); const d = dur(S.i);
+    bar.set(S.i, S.t / d); sh.svg.textContent = ""; render(sh.svg, R[S.i], Math.min(1, S.t / d), S.i); });
+  build(); sh.kick();
+  return sh;
+};
+
 // ============ 48. Serving a file: read()+write() copies vs sendfile() zero-copy, and why TLS breaks it
 ANIMS["sendfile-zero-copy"] = el=>{
   const B = { disk: [20, 230, 120, 50, ["disk", "диск"]], pc: [200, 150, 150, 50, ["page cache", "страничный кэш"]], user: [300, 40, 160, 50, ["app buffer", "буфер приложения"]], sock: [410, 150, 150, 50, ["socket send buffer", "буфер отправки сокета"]], nic: [620, 230, 120, 50, ["NIC", "сетевая карта"]] };

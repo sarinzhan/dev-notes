@@ -2,6 +2,9 @@
 
 What was added or changed in the vault, newest first. One line per change, with the pull request in brackets.
 
+## 2026-11-03
+- **Storage management: page cache read animation.** A 50 KB file read call by call: page index from the offset, misses and hits, readahead windows growing 4 → 8, short read and EOF, and the LBA → PBA chain; buttons change the buffer size, start position and sector size (512e / 4Kn). [#36](https://github.com/sarinzhan/dev-notes/pull/36)
+
 ## 2026-10-30
 - **"The problem it solves" block in all architecture notes** (32 notes, EN + RU): what goes wrong without the pattern, what it changes, when you don't need it. Shown as a highlighted box right after the TL;DR; scattered "why" text moved into it. [#35](https://github.com/sarinzhan/dev-notes/pull/35)
 - **DDD animation:** one command end to end (bounded contexts, use case, aggregate and invariant, domain event, outbox, integration event, anti-corruption layer), in DDD basics. [#34](https://github.com/sarinzhan/dev-notes/pull/34)

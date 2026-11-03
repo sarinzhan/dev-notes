@@ -2878,7 +2878,7 @@
     "syscalls-and-file-descriptors",
     "transactions-acid-and-isolation"
    ],
-   "words": 4146,
+   "words": 4334,
    "ru": "notes-ru/computer-science/operating-systems/storage-management.md",
    "title_ru": "Управление хранилищем"
   },
