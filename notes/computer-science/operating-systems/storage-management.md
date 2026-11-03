@@ -160,6 +160,13 @@ So many layers: a POSIX `read()` becomes file-system blocks, then pages, then LB
 storage-read-path
 ```
 
+- **Readahead and the buffer size.** A `read()` turns its file offset into a page index with a shift (`index = pos >> 12`, offset in the page `pos & 4095`). The first miss at offset 0 reads a small window (4 pages for a 1-page request) and marks the first prefetched page. Each time the app reaches a marker, the kernel fetches the next window **asynchronously** at double size, up to `read_ahead_kb` (128 KiB = 32 pages by default), so a sequential reader almost never waits. A first read in the middle of the file looks random and gets no readahead.
+- The buffer size decides the number of **syscalls**; readahead decides the number of **disk requests**. A 50 KB file read with a 4,096-byte buffer takes 14 `read()` calls (the 13th returns only 2,048 bytes, the 14th returns 0 = EOF) but only 3 disk requests, and only the first one blocks. An unaligned start makes every call touch two pages. Try it below: the buttons change the buffer, the start position and the sector size (512e: 8 LBAs per page, 4Kn: 1).
+
+```anim
+page-cache-read
+```
+
 - One NVMe or SCSI read command takes **one starting LBA and a count**. Blocks scattered across the disk need one command each, which is why file systems try hard to allocate a file's blocks contiguously (extents) and why sequential files read faster even on SSDs.
 
 ### IO scheduling
