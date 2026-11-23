@@ -2222,6 +2222,18 @@
    ]
   },
   {
+   "id": "blocking-queues",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Blocking queues",
+   "tags": [
+    "blockingqueue",
+    "producer-consumer",
+    "backpressure",
+    "thread-pools"
+   ]
+  },
+  {
    "id": "completable-future",
    "sec": "java",
    "sub": "concurrency",
@@ -2253,7 +2265,21 @@
     "collections",
     "concurrenthashmap",
     "copyonwrite",
-    "blockingqueue"
+    "skip-list",
+    "weakly-consistent"
+   ]
+  },
+  {
+   "id": "concurrenthashmap-internals",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "ConcurrentHashMap internals",
+   "tags": [
+    "concurrenthashmap",
+    "cas",
+    "resize",
+    "longadder",
+    "red-black-tree"
    ]
   },
   {
@@ -5618,6 +5644,26 @@
    "target": "numbers-bits-and-floating-point"
   },
   {
+   "source": "blocking-queues",
+   "target": "collections-framework"
+  },
+  {
+   "source": "blocking-queues",
+   "target": "concurrent-collections"
+  },
+  {
+   "source": "blocking-queues",
+   "target": "executors-and-thread-pools"
+  },
+  {
+   "source": "blocking-queues",
+   "target": "synchronizers"
+  },
+  {
+   "source": "blocking-queues",
+   "target": "virtual-threads"
+  },
+  {
    "source": "bloom-filters-and-probabilistic",
    "target": "caching"
   },
@@ -6295,6 +6341,10 @@
   },
   {
    "source": "collections-framework",
+   "target": "concurrenthashmap-internals"
+  },
+  {
+   "source": "collections-framework",
    "target": "data-structures"
   },
   {
@@ -6579,7 +6629,7 @@
   },
   {
    "source": "concurrent-collections",
-   "target": "executors-and-thread-pools"
+   "target": "concurrenthashmap-internals"
   },
   {
    "source": "concurrent-collections",
@@ -6620,6 +6670,18 @@
   {
    "source": "concurrent-collections",
    "target": "trees-and-bst"
+  },
+  {
+   "source": "concurrenthashmap-internals",
+   "target": "fork-join-framework"
+  },
+  {
+   "source": "concurrenthashmap-internals",
+   "target": "hashmap-internals"
+  },
+  {
+   "source": "concurrenthashmap-internals",
+   "target": "locks-and-lock-free"
   },
   {
    "source": "connection-establishment-cost",

@@ -5620,13 +5620,15 @@
    "learned": "2026-10-22",
    "path": "notes/java/collections/collections-framework.md",
    "links": [
+    "blocking-queues",
     "concurrent-collections",
+    "concurrenthashmap-internals",
     "generics",
     "hashmap-internals",
     "iterators-and-fail-fast",
     "trees-and-bst"
    ],
-   "words": 783,
+   "words": 916,
    "ru": "notes-ru/java/collections/collections-framework.md",
    "title_ru": "Карта Java Collections Framework"
   },
@@ -5673,6 +5675,29 @@
    "words": 359,
    "ru": "notes-ru/java/collections/iterators-and-fail-fast.md",
    "title_ru": "Iterator, Iterable и fail-fast против fail-safe"
+  },
+  {
+   "id": "blocking-queues",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "Blocking queues",
+   "tags": [
+    "blockingqueue",
+    "producer-consumer",
+    "backpressure",
+    "thread-pools"
+   ],
+   "learned": "2026-11-23",
+   "path": "notes/java/concurrency/blocking-queues.md",
+   "links": [
+    "concurrent-collections",
+    "executors-and-thread-pools",
+    "synchronizers",
+    "virtual-threads"
+   ],
+   "words": 741,
+   "ru": "notes-ru/java/concurrency/blocking-queues.md",
+   "title_ru": "Блокирующие очереди"
   },
   {
    "id": "completable-future",
@@ -5732,17 +5757,44 @@
     "collections",
     "concurrenthashmap",
     "copyonwrite",
-    "blockingqueue"
+    "skip-list",
+    "weakly-consistent"
    ],
    "learned": "2026-10-22",
    "path": "notes/java/concurrency/concurrent-collections.md",
    "links": [
-    "executors-and-thread-pools",
+    "blocking-queues",
+    "concurrenthashmap-internals",
+    "iterators-and-fail-fast",
     "locks-and-lock-free"
    ],
-   "words": 379,
+   "words": 773,
    "ru": "notes-ru/java/concurrency/concurrent-collections.md",
    "title_ru": "Потокобезопасные коллекции"
+  },
+  {
+   "id": "concurrenthashmap-internals",
+   "sec": "java",
+   "sub": "concurrency",
+   "title": "ConcurrentHashMap internals",
+   "tags": [
+    "concurrenthashmap",
+    "cas",
+    "resize",
+    "longadder",
+    "red-black-tree"
+   ],
+   "learned": "2026-11-23",
+   "path": "notes/java/concurrency/concurrenthashmap-internals.md",
+   "links": [
+    "concurrent-collections",
+    "fork-join-framework",
+    "hashmap-internals",
+    "locks-and-lock-free"
+   ],
+   "words": 877,
+   "ru": "notes-ru/java/concurrency/concurrenthashmap-internals.md",
+   "title_ru": "Как устроен ConcurrentHashMap"
   },
   {
    "id": "executors-and-thread-pools",
