@@ -3,7 +3,7 @@
 What was added or changed in the vault, newest first. One line per change, with the pull request in brackets.
 
 ## 2026-11-23
-- **Java Collections Framework map:** the five red-black tree rules (behind `TreeMap`/`TreeSet`), EN + RU. [#36](https://github.com/sarinzhan/dev-notes/pull/36)
+- **Java Collections Framework map:** the five red-black tree rules (behind `TreeMap`/`TreeSet`), EN + RU. [#37](https://github.com/sarinzhan/dev-notes/pull/37)
 
 ## 2026-10-30
 - **"The problem it solves" block in all architecture notes** (32 notes, EN + RU): what goes wrong without the pattern, what it changes, when you don't need it. Shown as a highlighted box right after the TL;DR; scattered "why" text moved into it. [#35](https://github.com/sarinzhan/dev-notes/pull/35)
