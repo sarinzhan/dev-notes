@@ -40,6 +40,20 @@ learned: 2026-10-22
 
 Повороты, оценка высоты и сравнение с AVL и B-деревьями: [[trees-and-bst]].
 
+### Потокобезопасные аналоги
+Ни один из классов выше не потокобезопасен (кроме legacy `Vector`, `Stack`, `Hashtable`). Для общих данных используй `java.util.concurrent`:
+
+| Вместо | Используй | Почему |
+|---|---|---|
+| `HashMap` / `HashSet` | `ConcurrentHashMap` / `ConcurrentHashMap.newKeySet()` | блокировка на корзину, чтение без блокировок |
+| `TreeMap` / `TreeSet` | `ConcurrentSkipListMap` / `ConcurrentSkipListSet` | отсортированы, CAS на skip list вместо дерева |
+| `ArrayList` | `CopyOnWriteArrayList` | только для списков, которые в основном читают; каждая запись копирует массив |
+| `ArrayDeque` / `LinkedList` как очередь | `ConcurrentLinkedQueue` / `ConcurrentLinkedDeque` | lock-free, никогда не блокирует |
+| очередь между потоками | `ArrayBlockingQueue`, `LinkedBlockingQueue`… | `put` ждёт, когда полна, `take` ждёт, когда пуста |
+| `Collections.synchronizedX(…)`, `Hashtable` | любой из вариантов выше | одна глобальная блокировка, небезопасная итерация |
+
+Подробнее: [[concurrent-collections]], [[concurrenthashmap-internals]], [[blocking-queues]].
+
 ### Сложность (Big O)
 Big O описывает, как растут время или память с ростом размера входа n. O(1) — константа, O(log n) — логарифм (деревья, двоичный поиск), O(n) — линейная, O(n log n) — сортировка, O(n²) — вложенные циклы.
 

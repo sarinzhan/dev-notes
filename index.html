@@ -5448,6 +5448,105 @@ ANIMS["ddd-command-flow"] = el=>{
   }});
 };
 
+// ============ java: ConcurrentHashMap put, counting and cooperative resize
+ANIMS["chm-put-resize"] = el=>{
+  const BASE = { 1: ["A·1"], 3: ["B·3", "C·11"], 5: ["D·5"] };
+  const ST = [
+    { t: ["Table of buckets", "Таблица корзин"], m: "table",
+      en: "A ConcurrentHashMap with 8 buckets. A key goes to bucket hash & (n − 1); the number after each key is its hash. Bucket 3 holds a chain of two nodes. There is no lock for the whole map.",
+      ru: "ConcurrentHashMap с 8 корзинами. Ключ попадает в корзину hash & (n − 1); число после ключа — его хеш. В корзине 3 цепочка из двух узлов. Блокировки на всю map нет." },
+    { t: ["Empty bucket: one CAS", "Пустая корзина: один CAS"], m: "cas",
+      en: "T1 calls put(E), hash 2. Bucket 2 is empty, so T1 does a single CAS: null → new Node(E). No lock at all. If the CAS fails, another thread filled the bucket first, and T1 simply loops again.",
+      ru: "T1 вызывает put(E), хеш 2. Корзина 2 пуста, поэтому T1 делает один CAS: null → new Node(E). Никакой блокировки. Если CAS не удался, корзину первым заполнил другой поток, и T1 просто повторяет цикл." },
+    { t: ["Occupied: lock the head", "Занята: блокировка головы"], m: "lock",
+      en: "T1 calls put(F), hash 19, which lands in bucket 3. It is occupied, so T1 takes synchronized on the head node B and appends F. At the same moment T2 puts G (hash 13) into bucket 5 and locks D. Different buckets, different locks: both run in parallel.",
+      ru: "T1 вызывает put(F), хеш 19, это корзина 3. Она занята, поэтому T1 берёт synchronized на головном узле B и добавляет F в конец. В тот же момент T2 кладёт G (хеш 13) в корзину 5 и блокирует D. Разные корзины — разные блокировки: оба работают параллельно." },
+    { t: ["Same bucket: wait; get: never", "Та же корзина: ждать; get: никогда"], m: "wait",
+      en: "Now T2 also wants bucket 3 and waits for the lock on B. Meanwhile T3 calls get(C): it takes no lock, it just reads the bucket and walks the chain with volatile reads, so readers never wait for writers.",
+      ru: "Теперь T2 тоже нужна корзина 3, и он ждёт блокировку на B. Тем временем T3 вызывает get(C): он ничего не блокирует, а просто читает корзину и идёт по цепочке через volatile-чтения, поэтому читатели никогда не ждут писателей." },
+    { t: ["Counting the size", "Подсчёт размера"], m: "count",
+      en: "After every insert, addCount(+1) tries a CAS on baseCount. When two threads collide, the loser does not spin on it: it adds 1 to its own CounterCell, like LongAdder. size() = baseCount + all cells = 7.",
+      ru: "После каждой вставки addCount(+1) пробует CAS на baseCount. Когда два потока сталкиваются, проигравший не крутится на нём, а прибавляет 1 к своей CounterCell, как LongAdder. size() = baseCount + все ячейки = 7." },
+    { t: ["Resize: threads share the work", "Resize: потоки делят работу"], m: "resize",
+      en: "The count passed the threshold 0.75 × 8 = 6. A new table with 16 buckets is created. Threads claim ranges of old buckets from the end: T1 takes 7…4, T2 takes 3…0. Each bucket is locked and split: a node with hash & 8 == 0 stays at i, the others go to i + 8 (C·11 → 11, G·13 → 13). A moved bucket becomes a ForwardingNode (FWD).",
+      ru: "Счётчик перешёл порог 0.75 × 8 = 6. Создаётся новая таблица на 16 корзин. Потоки забирают диапазоны старых корзин с конца: T1 берёт 7…4, T2 — 3…0. Каждая корзина блокируется и делится: узел с hash & 8 == 0 остаётся на i, остальные уходят на i + 8 (C·11 → 11, G·13 → 13). Перенесённая корзина становится ForwardingNode (FWD)." },
+    { t: ["FWD: writers help, readers follow", "FWD: писатели помогают, читатели идут дальше"], m: "help",
+      en: "T3 wants to put into bucket 6 and finds FWD: instead of waiting, it joins the resize and moves buckets too. A reader calling get(A) finds FWD in bucket 1 and follows it to the new table. get keeps working during the whole resize.",
+      ru: "T3 хочет положить в корзину 6 и находит FWD: вместо ожидания он присоединяется к resize и тоже переносит корзины. Читатель с get(A) находит FWD в корзине 1 и идёт по нему в новую таблицу. get работает всё время, пока идёт resize." },
+    { t: ["Long chain → red-black tree", "Длинная цепочка → красно-чёрное дерево"], m: "tree",
+      en: "If many keys collide and one chain reaches 8 nodes, the bucket becomes a TreeBin holding a red-black tree, so a lookup is O(log n) instead of O(n). This happens only when the table has at least 64 buckets; a smaller table is resized instead.",
+      ru: "Если много ключей сталкиваются и одна цепочка доходит до 8 узлов, корзина становится TreeBin с красно-чёрным деревом, и поиск стоит O(log n) вместо O(n). Это происходит, только если в таблице не меньше 64 корзин; меньшую таблицу вместо этого увеличивают." }
+  ];
+  return steppedAnim(el, { title: LL("ConcurrentHashMap: put, size and resize", "ConcurrentHashMap: put, size и resize"), vb: [760, 360], steps: ST, stepMs: 8000, render(g, s, t){
+    const m = s.m, k = easeIO(Math.min(1, t / 1600));
+    const bins = JSON.parse(JSON.stringify(BASE));
+    if(m !== "table") bins[2] = ["E·2"];
+    if(["lock", "wait", "count", "resize", "help"].includes(m)){ bins[3].push("F·19"); bins[5].push("G·13"); }
+    const BW = 78, BX = i => 70 + i * 84, BY = 64;
+    const thread = (x, y, name, txt, on) => { oR(g, x, y, 54, 24, on ? "an-reg on" : "an-box", 12); oT(g, x + 27, y + 16, name, "an-t an-b"); if(txt) oT(g, x + 60, y + 16, txt, "an-code", "start"); };
+    const dot = P => { const [x, y] = polyAt(P, k); E(g, "circle", { cx: x, cy: y, r: 6, class: "an-dot an-flow" }); };
+    oT(g, 30, BY + 22, m === "resize" || m === "help" ? LL("old", "стар.") : "table", "an-m an-b", "middle");
+    // old table
+    const fwd = i => (m === "resize" && (i >= 4 ? t > 1800 + (7 - i) * 500 : t > 1800 + (3 - i) * 500)) || m === "help";
+    for(let i = 0; i < 8; i++){
+      const x = BX(i), items = bins[i] || [], f = fwd(i);
+      const hot = (m === "cas" && i === 2) || ((m === "lock" || m === "wait") && (i === 3 || (m === "lock" && i === 5))) || (m === "tree" && i === 3);
+      oR(g, x, BY, BW, 32, f ? "an-pg k0" : hot ? "an-reg on" : "an-box", 5);
+      oT(g, x + BW / 2, BY - 6, String(i), "an-m");
+      if(f){ oT(g, x + BW / 2, BY + 21, "FWD", "an-m an-b"); continue; }
+      if(m === "tree" && i === 3){
+        oT(g, x + BW / 2, BY + 21, "TreeBin", "an-m an-b");
+        const N = [[x + 39, 120], [x + 17, 160], [x + 61, 160], [x + 6, 200], [x + 28, 200], [x + 50, 200], [x + 72, 200]];
+        [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6]].forEach(([a, b]) => E(g, "line", { x1: N[a][0], y1: N[a][1], x2: N[b][0], y2: N[b][1], class: "an-link2" }));
+        N.forEach(([cx, cy], j) => E(g, "circle", { cx, cy, r: 9, class: "an-pg " + ([0, 3, 4, 5, 6].includes(j) ? "k3" : "k1") }));
+        E(g, "line", { x1: x + 39, y1: BY + 32, x2: x + 39, y2: 111, class: "an-link2 on" });
+        continue;
+      }
+      oT(g, x + BW / 2, BY + 21, items.length ? "head" : "null", "an-m");
+      items.forEach((it, j) => {
+        const y = BY + 44 + j * 30, fresh = (m === "cas" && it === "E·2") || (m === "lock" && (it === "F·19" || it === "G·13"));
+        E(g, "line", { x1: x + BW / 2, y1: y - 12, x2: x + BW / 2, y2: y, class: "an-link2" });
+        oR(g, x + 8, y, BW - 16, 24, fresh && k < 1 ? "an-reg on" : "an-pg k2", 5);
+        oT(g, x + BW / 2, y + 16, it, "an-code");
+        const locked = ((m === "lock" || m === "wait") && j === 0 && (i === 3 || (m === "lock" && i === 5)));
+        if(locked) oT(g, x + BW - 2, y - 2, "🔒", "an-m", "end");
+      });
+    }
+    // per-step overlays
+    if(m === "table") oT(g, 380, 230, LL("index = hash & (n − 1) = hash & 7", "индекс = hash & (n − 1) = hash & 7"), "an-code");
+    if(m === "cas"){ thread(70, 250, "T1", "put(E) → CAS null → Node(E) ✓", true); dot([[97, 250], [BX(2) + 39, BY + 32]]); oT(g, 380, 310, LL("no lock taken", "без блокировки"), "an-m an-b an-sp"); }
+    if(m === "lock"){ thread(70, 250, "T1", "put(F) → synchronized(B)", true); thread(70, 290, "T2", "put(G) → synchronized(D)", true);
+      dot([[97, 250], [BX(3) + 39, BY + 32]]); dot([[97, 290], [BX(5) + 39, BY + 32]]); oT(g, 560, 330, LL("different buckets → in parallel", "разные корзины → параллельно"), "an-m an-b an-sp"); }
+    if(m === "wait"){ thread(70, 250, "T1", LL("holds lock on B", "держит блокировку B"), true); thread(70, 284, "T2", LL("put(H) → waits for B…", "put(H) → ждёт B…"), false); thread(70, 318, "T3", LL("get(C) → no lock, volatile reads ✓", "get(C) → без блокировки, volatile-чтения ✓"), true);
+      dot([[97, 318], [BX(3) + 39, BY + 32], [BX(3) + 39, BY + 116]]); }
+    if(m === "count"){
+      oR(g, 70, 240, 160, 44, "an-reg on", 6); oT(g, 150, 258, "baseCount", "an-m an-b"); oT(g, 150, 276, "5", "an-code");
+      for(let c = 0; c < 2; c++){ oR(g, 270 + c * 110, 240, 96, 44, c === 0 && t > 2500 ? "an-reg on" : "an-box", 6); oT(g, 318 + c * 110, 258, "CounterCell[" + c + "]", "an-m an-b"); oT(g, 318 + c * 110, 276, c === 0 ? "2" : "0", "an-code"); }
+      oT(g, 150, 304, LL("T1: CAS 4 → 5 ✓", "T1: CAS 4 → 5 ✓"), "an-m an-sp"); oT(g, 318, 304, LL("T2: CAS failed → own cell", "T2: CAS не удался → своя ячейка"), "an-m an-warn");
+      oT(g, 620, 268, "size() = 5 + 2 + 0 = 7", "an-code");
+      oT(g, 620, 290, LL("≥ threshold 0.75 × 8 = 6 → resize", "≥ порога 0.75 × 8 = 6 → resize"), "an-m an-b an-warn");
+    }
+    if(m === "resize" || m === "help"){
+      const NX = i => 40 + i * 44, NY = 250;
+      oT(g, 30, NY - 8, LL("new · 16", "нов. · 16"), "an-m an-b", "start");
+      const NEW = { 1: "A·1", 2: "E·2", 3: "B·3 F·19", 5: "D·5", 11: "C·11", 13: "G·13" };
+      for(let i = 0; i < 16; i++){
+        const src = i % 8, moved = fwd(src) || m === "help";
+        oR(g, NX(i), NY, 40, 32, moved && NEW[i] ? "an-pg k3" : "an-box", 4); oT(g, NX(i) + 20, NY + 46, String(i), "an-m");
+        if(moved && NEW[i]) NEW[i].split(" ").forEach((w, j, a) => oT(g, NX(i) + 20, NY + 14 + j * 12 - (a.length - 1) * 4, w, "an-m an-b"));
+      }
+      if(m === "resize"){ oT(g, BX(4) + BW * 2, 40, LL("T1 claims 7…4", "T1 берёт 7…4"), "an-m an-b"); oT(g, BX(0) + BW * 2, 40, LL("T2 claims 3…0", "T2 берёт 3…0"), "an-m an-b");
+        E(g, "line", { x1: BX(3) + 39, y1: BY + 32, x2: NX(3) + 20, y2: NY, class: "an-flowline" }); E(g, "line", { x1: BX(3) + 39, y1: BY + 32, x2: NX(11) + 20, y2: NY, class: "an-flowline" });
+        oT(g, 380, 330, LL("hash & 8 == 0 → stays at i · else → i + 8", "hash & 8 == 0 → остаётся на i · иначе → i + 8"), "an-code"); }
+      if(m === "help"){ thread(560, 120, "T3", "", true); oT(g, 620, 156, LL("put → FWD → helps move", "put → FWD → помогает"), "an-m an-b", "middle");
+        thread(560, 176, "get", "", true); oT(g, 620, 212, LL("get(A) → FWD → new table", "get(A) → FWD → нов. таблица"), "an-m an-b", "middle");
+        dot([[BX(1) + 39, BY + 32], [NX(1) + 20, NY]]); }
+    }
+    if(m === "tree"){ oT(g, 520, 140, LL("chain ≥ 8 nodes and table ≥ 64", "цепочка ≥ 8 узлов и таблица ≥ 64"), "an-m an-b"); oT(g, 520, 162, LL("→ red-black tree: O(log n)", "→ красно-чёрное дерево: O(log n)"), "an-m an-b an-sp");
+      oT(g, 520, 190, LL("table < 64 → resize instead", "таблица < 64 → вместо этого resize"), "an-m"); oT(g, 520, 212, LL("readers never wait: walk the nodes as a list", "читатели не ждут: идут по узлам как по списку"), "an-m"); }
+  }});
+};
+
 // ---- boot
 function boot(){ const start=(location.hash||"").slice(1); go(byId[start]?start:NOTES[0].id); if(start==="changes") showChanges();
   window.addEventListener("hashchange",()=>{ const id=location.hash.slice(1); if(id==="changes"){ if(VIEW!=="changes") showChanges(); return; } if(byId[id] && (id!==current||VIEW!=="note")) go(id); }); }

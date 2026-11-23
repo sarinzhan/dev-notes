@@ -40,6 +40,20 @@ A red-black tree is a binary search tree that follows five rules. Together they 
 
 Rotations, the height bound and how it compares with AVL and B-trees: [[trees-and-bst]].
 
+### Thread-safe counterparts
+None of the classes above is thread-safe (except the legacy `Vector`, `Stack`, `Hashtable`). For shared data, use `java.util.concurrent`:
+
+| Instead of | Use | Why |
+|---|---|---|
+| `HashMap` / `HashSet` | `ConcurrentHashMap` / `ConcurrentHashMap.newKeySet()` | lock per bucket, lock-free reads |
+| `TreeMap` / `TreeSet` | `ConcurrentSkipListMap` / `ConcurrentSkipListSet` | sorted, CAS on a skip list instead of a tree |
+| `ArrayList` | `CopyOnWriteArrayList` | only for read-mostly lists; every write copies the array |
+| `ArrayDeque` / `LinkedList` as a queue | `ConcurrentLinkedQueue` / `ConcurrentLinkedDeque` | lock-free, never blocks |
+| a queue between threads | `ArrayBlockingQueue`, `LinkedBlockingQueue`… | `put` waits when full, `take` waits when empty |
+| `Collections.synchronizedX(…)`, `Hashtable` | any of the above | one global lock, unsafe iteration |
+
+Details: [[concurrent-collections]], [[concurrenthashmap-internals]], [[blocking-queues]].
+
 ### Complexity (Big O)
 Big O describes how time or memory grows with input size n. O(1) constant, O(log n) logarithmic (trees, binary search), O(n) linear, O(n log n) sorting, O(n²) nested loops.
 
