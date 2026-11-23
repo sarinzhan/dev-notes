@@ -29,6 +29,17 @@ The framework splits into two roots: `Collection` (sequences of elements: `List`
 | Map | `Hashtable` | synchronized | legacy, no nulls |
 | Map | `WeakHashMap`, `IdentityHashMap` | special keys | see [[hashmap-internals]] |
 
+### Red-black tree (behind `TreeMap` and `TreeSet`)
+A red-black tree is a binary search tree that follows five rules. Together they keep it roughly balanced, so search, insert and delete always take O(log n) time:
+
+1. Every node is red or black.
+2. The root is black.
+3. Every null leaf counts as black.
+4. A red node can't have a red child.
+5. Every path from a node down to its null leaves passes through the same number of black nodes. This is called the black-height.
+
+Rotations, the height bound and how it compares with AVL and B-trees: [[trees-and-bst]].
+
 ### Complexity (Big O)
 Big O describes how time or memory grows with input size n. O(1) constant, O(log n) logarithmic (trees, binary search), O(n) linear, O(n log n) sorting, O(n²) nested loops.
 

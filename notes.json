@@ -5623,9 +5623,10 @@
     "concurrent-collections",
     "generics",
     "hashmap-internals",
-    "iterators-and-fail-fast"
+    "iterators-and-fail-fast",
+    "trees-and-bst"
    ],
-   "words": 683,
+   "words": 783,
    "ru": "notes-ru/java/collections/collections-framework.md",
    "title_ru": "Карта Java Collections Framework"
   },
