@@ -2,6 +2,9 @@
 
 What was added or changed in the vault, newest first. One line per change, with the pull request in brackets.
 
+## 2026-11-25
+- **New note: Class loading, class loaders and parent delegation** (EN + RU, `java/jvm`): the 3 stages, when a class is loaded vs initialized, the loader table, parent delegation and where it is broken, a runnable demo with real output. Loading content moved here from Class initialization order, which now covers only the static/instance order. [#39](https://github.com/sarinzhan/dev-notes/pull/39)
+
 ## 2026-11-23
 - **Concurrent collections** (EN + RU): the Thread-safe collections note reworked (which-to-use table, weakly consistent iterators, skip lists, copy-on-write snapshots); 2 new notes: **ConcurrentHashMap internals** (lock-free get, CAS/lock per bucket, CounterCells, cooperative resize, tree bins, bulk ops) and **Blocking queues** (4 method forms, 7 implementations compared, thread pool queues, backpressure, poison pill); a thread-safe counterparts table in the Collections map; 1 animation. [#38](https://github.com/sarinzhan/dev-notes/pull/38)
 - **Java Collections Framework map:** the five red-black tree rules (behind `TreeMap`/`TreeSet`), EN + RU. [#37](https://github.com/sarinzhan/dev-notes/pull/37)

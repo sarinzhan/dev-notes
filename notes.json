@@ -6054,25 +6054,23 @@
    "id": "class-initialization-order",
    "sec": "java",
    "sub": "core",
-   "title": "Class loading and initialization order",
+   "title": "Class initialization order",
    "tags": [
-    "class-loading",
     "static-init",
     "initialization-order",
-    "classloader"
+    "constructors"
    ],
    "learned": "2026-10-22",
    "path": "notes/java/core/class-initialization-order.md",
    "links": [
+    "class-loading",
     "constructors-and-initialization",
-    "creational-patterns",
     "jvm-jre-jdk",
-    "jvm-memory-areas",
     "modifiers-final-static-access"
    ],
-   "words": 670,
+   "words": 427,
    "ru": "notes-ru/java/core/class-initialization-order.md",
-   "title_ru": "Загрузка классов и порядок инициализации"
+   "title_ru": "Порядок инициализации классов"
   },
   {
    "id": "class-relationships",
@@ -6301,7 +6299,7 @@
    "learned": "2026-10-22",
    "path": "notes/java/core/jvm-jre-jdk.md",
    "links": [
-    "class-initialization-order",
+    "class-loading",
     "docker-containers-and-resources",
     "garbage-collection",
     "jvm-memory-areas",
@@ -6411,7 +6409,7 @@
    "path": "notes/java/core/object-class-and-reflection.md",
    "links": [
     "annotations",
-    "class-initialization-order",
+    "class-loading",
     "equals-and-hashcode",
     "exceptions",
     "immutable-objects",
@@ -6582,6 +6580,31 @@
    "title_ru": "Размер пула HikariCP"
   },
   {
+   "id": "class-loading",
+   "sec": "java",
+   "sub": "jvm",
+   "title": "Class loading, class loaders and parent delegation",
+   "tags": [
+    "jvm",
+    "class-loading",
+    "classloader",
+    "parent-delegation",
+    "static-init"
+   ],
+   "learned": "2026-11-25",
+   "path": "notes/java/jvm/class-loading.md",
+   "links": [
+    "class-initialization-order",
+    "compilation-interpretation-jit",
+    "creational-patterns",
+    "jvm-memory-areas",
+    "object-class-and-reflection"
+   ],
+   "words": 1227,
+   "ru": "notes-ru/java/jvm/class-loading.md",
+   "title_ru": "Загрузка классов, загрузчики и делегирование родителю"
+  },
+  {
    "id": "garbage-collection",
    "sec": "java",
    "sub": "jvm",
@@ -6622,7 +6645,7 @@
    "learned": "2026-10-22",
    "path": "notes/java/jvm/jvm-memory-areas.md",
    "links": [
-    "class-initialization-order",
+    "class-loading",
     "data-structures",
     "docker-containers-and-resources",
     "executors-and-thread-pools",
