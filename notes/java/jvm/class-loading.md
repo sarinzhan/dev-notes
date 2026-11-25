@@ -18,6 +18,11 @@ Loading  →  Linking (Verify → Prepare → Resolve)  →  Initialization
    - **Resolution:** symbolic references in the constant pool (`"java/util/List"`) become direct references. HotSpot does it lazily, on first use.
 3. **Initialization.** The JVM runs `<clinit>`: static field assignments and `static {}` blocks in source order, under a per-class lock, exactly once. The holder-idiom singleton relies on that lock ([[creational-patterns]]). The detailed static and instance order is in [[class-initialization-order]].
 
+### Metaspace vs the `Class` object
+Loading creates two halves of one class, linked to each other:
+- **Metaspace** (native memory) is the class's **blueprint for the JVM**: field layout and object size, methods and bytecode, the constant pool, vtables, JIT profiling data. The JVM reads it on `new Foo()` (size, layout), on `foo.bar()` (which bytecode, which implementation), on first resolution (names → addresses) and when it JIT-compiles hot code.
+- **The `java.lang.Class` object** (heap) is the **handle for Java code**, because Java can only reference Java objects: `Foo.class`, `getClass()` and reflection go through it, **static fields live in it**, `static synchronized` locks on it, and while it is reachable the class and its loader stay alive.
+
 ### When a class is loaded
 - **Startup:** Bootstrap loads the core classes (`Object`, `String`, `Thread`…), then the Application loader loads the main class.
 - **Resolving a reference:** the first time running code touches `Foo` (`new Foo()`, `Foo.bar()`, `new Foo[3]`).

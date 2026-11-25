@@ -6600,7 +6600,7 @@
     "jvm-memory-areas",
     "object-class-and-reflection"
    ],
-   "words": 1227,
+   "words": 1344,
    "ru": "notes-ru/java/jvm/class-loading.md",
    "title_ru": "Загрузка классов, загрузчики и делегирование родителю"
   },
