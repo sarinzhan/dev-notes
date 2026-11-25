@@ -27,7 +27,7 @@ The JVM splits memory into the shared **heap** (all objects, divided into young 
 
 ### Metaspace (and PermGen before it)
 - Class metadata: the runtime representation of each loaded class (methods, bytecode, constant pool, vtables, annotations). Java ≤ 7 kept this in **PermGen**, a fixed-size part of the heap that produced `OutOfMemoryError: PermGen space` on redeploys and with many classes. Java 8 moved it to **Metaspace** in native memory, which grows on demand; cap with `-XX:MaxMetaspaceSize`. Interned strings and static fields moved to the heap at the same time.
-- Memory is freed only when a class loader and all its classes become unreachable ([[class-initialization-order]]). Leaking loaders (hot redeploy, dynamic proxies/lambdas generated without bound, Groovy scripts) grow Metaspace without limit.
+- Memory is freed only when a class loader and all its classes become unreachable ([[class-loading]]). Leaking loaders (hot redeploy, dynamic proxies/lambdas generated without bound, Groovy scripts) grow Metaspace without limit.
 - Compressed class space is a separate 1 GB reservation for the class pointers (`-XX:CompressedClassSpaceSize`).
 
 ### Runtime constant pool and method area

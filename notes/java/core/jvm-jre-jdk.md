@@ -14,7 +14,7 @@ The **JVM** executes bytecode; the **JRE** is the JVM plus the standard class li
 
 ### From source to running code
 1. `javac` compiles `.java` to platform-independent bytecode (`.class`). This is "write once, run anywhere": the bytecode is the same, the JVM is per platform.
-2. The launcher `java` starts the JVM; the class loader hierarchy loads classes lazily on first use ([[class-initialization-order]]): bootstrap (`java.base`), platform, application (classpath/module path), plus custom loaders (Spring Boot's fat-jar loader, Tomcat's per-webapp loader).
+2. The launcher `java` starts the JVM; the class loader hierarchy loads classes lazily on first use ([[class-loading]]): bootstrap (`java.base`), platform, application (classpath/module path), plus custom loaders (Spring Boot's fat-jar loader, Tomcat's per-webapp loader).
 3. The bytecode verifier checks type safety and stack discipline so that malformed classes cannot corrupt the VM.
 4. The interpreter runs bytecode; the JIT compiler (C1 quickly, C2 for hot code, "tiered compilation") compiles methods to native code after they cross invocation thresholds, using profiling data for inlining, escape analysis and devirtualization. Code can be **deoptimized** if an assumption (for example "this interface has one implementation") stops holding.
 - GraalVM native-image is the alternative: ahead-of-time compile to a native binary with no JIT, fast start, lower peak throughput, closed-world assumptions that break reflection unless configured (Spring Boot 3 supports it via AOT processing).

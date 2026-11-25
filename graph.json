@@ -2425,12 +2425,11 @@
    "id": "class-initialization-order",
    "sec": "java",
    "sub": "core",
-   "title": "Class loading and initialization order",
+   "title": "Class initialization order",
    "tags": [
-    "class-loading",
     "static-init",
     "initialization-order",
-    "classloader"
+    "constructors"
    ]
   },
   {
@@ -2675,6 +2674,19 @@
     "performance",
     "postgres",
     "spring-boot"
+   ]
+  },
+  {
+   "id": "class-loading",
+   "sec": "java",
+   "sub": "jvm",
+   "title": "Class loading, class loaders and parent delegation",
+   "tags": [
+    "jvm",
+    "class-loading",
+    "classloader",
+    "parent-delegation",
+    "static-init"
    ]
   },
   {
@@ -6233,11 +6245,11 @@
   },
   {
    "source": "class-initialization-order",
-   "target": "constructors-and-initialization"
+   "target": "class-loading"
   },
   {
    "source": "class-initialization-order",
-   "target": "creational-patterns"
+   "target": "constructors-and-initialization"
   },
   {
    "source": "class-initialization-order",
@@ -6249,19 +6261,31 @@
   },
   {
    "source": "class-initialization-order",
-   "target": "jvm-memory-areas"
-  },
-  {
-   "source": "class-initialization-order",
    "target": "modifiers-final-static-access"
   },
   {
    "source": "class-initialization-order",
-   "target": "object-class-and-reflection"
+   "target": "spring-bean-lifecycle"
   },
   {
-   "source": "class-initialization-order",
-   "target": "spring-bean-lifecycle"
+   "source": "class-loading",
+   "target": "compilation-interpretation-jit"
+  },
+  {
+   "source": "class-loading",
+   "target": "creational-patterns"
+  },
+  {
+   "source": "class-loading",
+   "target": "jvm-jre-jdk"
+  },
+  {
+   "source": "class-loading",
+   "target": "jvm-memory-areas"
+  },
+  {
+   "source": "class-loading",
+   "target": "object-class-and-reflection"
   },
   {
    "source": "class-relationships",

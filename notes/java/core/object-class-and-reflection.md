@@ -27,7 +27,7 @@ learned: 2026-10-22
 - Everywhere else it is considered a design mistake (bypasses constructors, no `final` field re-assignment, checked exception). Prefer a copy constructor, a static `copyOf` factory, or records' `with`-style methods ([[immutable-objects]]).
 
 ### Reflection
-- Obtaining a `Class`: `obj.getClass()`, `Type.class`, `Class.forName("fq.Name")` (also initializes the class, see [[class-initialization-order]]), `classLoader.loadClass`.
+- Obtaining a `Class`: `obj.getClass()`, `Type.class`, `Class.forName("fq.Name")` (also initializes the class, see [[class-loading]]), `classLoader.loadClass`.
 - What you can do: find the superclass and interfaces; list modifiers, fields, methods, constructors (`getDeclaredX` includes private, `getX` only public including inherited); read annotations ([[annotations]]); instantiate (`getDeclaredConstructor(...).newInstance(...)`); get/set field values; invoke methods; create arrays (`Array.newInstance`); build dynamic proxies (`java.lang.reflect.Proxy`, the basis of JDK-proxy AOP in [[spring-aop]]).
 - `setAccessible(true)` bypasses access checks; since Java 9 it is refused for JDK internals unless the module is opened (`--add-opens java.base/java.lang=ALL-UNNAMED`), and since 16 strong encapsulation is the default. Your own classpath code is still fully open to itself.
 - Cost: lookups are slow (string matching, security checks); cache `Method`/`Field` objects. Invocation through `Method.invoke` is a few times slower than a direct call and opaque to the JIT; `MethodHandle` (Java 7) and `LambdaMetafactory` are faster once bound, which is why frameworks moved to them.
